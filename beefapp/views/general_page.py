@@ -90,7 +90,6 @@ from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.views import View
-from xhtml2pdf import pisa
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
