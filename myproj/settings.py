@@ -21,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+#B99bcw4Tv1h8qn_q5GtB99db0kls8M6avmzu8w8xcd
 SECRET_KEY = config('SECRET_KEY')
 # Barikoi api key
 #BARIKOI_AUTOCOMPLETE_API_KEY = config('BARIKOI_AUTOCOMPLETE_API_KEY')
@@ -70,8 +71,8 @@ INSTALLED_APPS = [
     #addded 18 Oct 2021
     # 'allauth.socialaccount',
     # 'allauth.socialaccount.providers.google', # for Google OAuth 2.0
-    'rest_framework',
-    'rest_framework.authtoken',
+    # 'rest_framework',
+    # 'rest_framework.authtoken',
     'corsheaders',
      
     
@@ -87,7 +88,7 @@ INSTALLED_APPS = [
     'import_export',
    
     "common",
-     "tempus_dominus",
+    #  "tempus_dominus",
     
 ]
 
