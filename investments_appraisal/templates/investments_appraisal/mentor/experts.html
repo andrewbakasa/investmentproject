@@ -1,0 +1,61 @@
+{% extends 'investments_appraisal/mentor/index.html' %}<!--investments_appraisal/main.html---->
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+   <title>Experts</title>
+{% endblock %}
+
+
+{% block stylesheets %}
+ 
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+{% block content %}
+
+ 
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+      <div class="container">
+        <h2>Experts</h2>
+        <p>Est dolorum ut non facere possimus quibusdam eligendi voluptatem. Quia id aut similique quia voluptas sit quaerat debitis. Rerum omnis ipsam aperiam consequatur laboriosam nemo harum praesentium. </p>
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+  <!-- ======= Experts Section ======= -->
+   {% include 'investments_appraisal/mentor/sections/section_experts.html' %} 
+  
+  
+  
+</main><!-- End #main -->
+
+
+{%endblock content%}
+
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  {% block scripts %}
+  <script>
+    $(document).ready(function (){ 
+      // $("#index").removeClass( "active")
+      $("#experts a").addClass( "active") 
+      console.log('added experts active')             
+    })
+    </script>
+  {% endblock %}
+

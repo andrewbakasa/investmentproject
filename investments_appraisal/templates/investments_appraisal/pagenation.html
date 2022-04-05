@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pagination in Django</title>
+		<style>
+     
+      .pagination { display: inline-block;}
+      .pagination a { color: black; float: left; padding: 8px 16px; text-decoration: none;}
+      .pagination a.active { background-color: #4CAF50; color: white;}
+      .pagination a:hover:not(.active) {background-color: #ddd;}
+		</style>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+     
+    </head>
+    <body>
+	
+
+    <div class="col-md-12">
+        <div class="box">
+          <div class="box-body">
+            <div class="table-responsive">
+           
+  
+              <table class="table table-striped">
+                <thead >
+                  <th style="width: 2%">#</th>  
+                  <th style="width: 10%">Model Type</th>
+                  <th style="width: 10%">Name</th>
+                  <th style="width: 15%">Currency</th>              
+                  <th style="width: 5%">Run State</th>
+                  <th style="width: 5%">Iterations</th>
+                  <th style="width: 8%">Bin size</th>
+                  <th style="width: 18%">Created on</th>
+                  <th  style="width: 10%" class="text-right">Actions</th>
+  
+                
+                </thead>
+                <tbody id="modelTable">
+                  {% for model in first_page  %}
+                    <tr id='tr-{{ model.id }}'>
+                      
+                       <td class="modelModelType modelData" > {{ forloop.counter }}</td>
+                        <td class="modelModelType modelData" name="model_type" >{{model.model_type}}</td>
+                        <td class="modelModelType modelData" name="name" >{{model.name}}</td>               
+                        <td class="modelModelType modelData" name="currency" >{{model.currency}}</td>
+                        <td class="modelModelType modelData" name="simulation_run" >
+                          <input type="checkbox" {% if model.simulation_run %} checked{% endif %} disabled>
+                        </td>
+                        <td class="modelModelType modelData" name="simulation_iterations" >{{model.simulation_iterations}}</td>
+                        <td class="modelModelType modelData" name="npv_bin_size" >{{model.npv_bin_size}}</td>
+                        <td class="modelModelType modelData" name="date_created" >{{model.date_created | date:'D d F Y H:m:s'}}</td>
+                        <!-- DIVET TO APPROPRIATE APP: -->
+                        <!--FISH..-->
+                        <!--BEEF..-->
+                        <td class="text-right modelAction modelData" name="action">
+                          <a href="{% url 'select_model' model.id %}"
+                              style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                              title='View Model'><i class="fa fa-eye"></i>
+                            </a>
+                            <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model' model.id %}" 
+                              data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                              title='Edit Model'><i class="fa fa-edit"></i>
+                            </a>
+                          <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                            data-object-name="{{ model.name }}"  data-model-id="{{model.id}}" 
+                            data-delete-url="{% url 'delete_bussiness_model' model.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            title='Delete' > <i class="fa fa-trash "></i> 
+                          </a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+
+
+              
+            </div>
+
+            <div class="pagination">
+                {% for i in page_range %}
+                <a style="margin-left: 5px; " href="{{i}}">{{i}}</a>
+                {% endfor %}
+            </div>
+  
+           
+          </div>
+        </div>
+      </div>
+	<script>
+
+        function getToken(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getToken('csrftoken');
+            $('a').click(function(event){
+                // preventing default actions
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                    $.ajax({
+                            type: "POST",
+                            // define url name
+                            url: "{% url 'display_models_ajax' 1 %}", 
+                            data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
+                        },
+                        // handle a successful response
+                        success: function (response) {
+                               $('#modelTable tr').html('')
+                                var counter=0
+                                // console.log(response.results)
+                                $.each(response.results, function(i, val) {
+                                      var checked=''
+                                      if (val.simulation_run) {
+                                        checked='checked'
+
+                                      }
+                                      var js_date_created = new Date(val.date_created)
+                                       //append to post
+                                        counter= counter+1
+                                        a_html=`<tr id="tr-${val.id}" >
+                                                    <td class="modelModelType modelData" > ${counter}</td>
+                                                    <td class="modelModelType modelData" name="model_type" >${val.model_type}</td>
+                                                    <td class="modelModelType modelData" name="name" >${val.name}</td>               
+                                                    <td class="modelModelType modelData" name="currency" >${val.currency}</td>
+                                                    <td class="modelModelType modelData" name="simulation_run" >
+                                                       <input type="checkbox" ${checked} disabled> </td>
+                                                    <td class="modelModelType modelData" name="simulation_iterations" >${val.simulation_iterations}</td>
+                                                    <td class="modelModelType modelData" name="npv_bin_size" >${val.npv_bin_size}</td>
+                                                    <td class="modelModelType modelData" name="date_created" >${js_date_created}</td>
+                                                
+                                                    <td class="text-right modelAction modelData" name="action">
+                                                      <a href="/select_model/${val.id}/"
+                                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                          title='View Model'><i class="fa fa-eye"></i>
+                                                      </a>
+                                                      <a class="model-edit show-form-update" href="#" data-url="/update_model/${val.id}/" 
+                                                          data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                          title='Edit Model'><i class="fa fa-edit"></i>
+                                                      </a>
+                                                      <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                                          data-object-name="${val.name}"  data-model-id="${val.id}" 
+                                                          data-delete-url="/delete_bussiness_model/${val.id} %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                                          title='Delete' > <i class="fa fa-trash "></i> 
+                                                      </a>
+                                                    </td>
+                                                </tr>` ;
+                                        $('#modelTable').append(a_html)
+                                        // console.log(a_html)
+                                });
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                    }); 
+            });    
+	</script>
+</body>
+</html>

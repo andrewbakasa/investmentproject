@@ -1,0 +1,97 @@
+
+
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+{% load i18n %}
+<section id="contact" class="contact">
+  
+
+  <div class="container" data-aos="fade-up">
+
+    <!-- <div class="row mt-5"> -->
+
+     
+      <!-- <div class="col-lg-12 mt-5 mt-lg-0"> -->
+        <div class="box-body">
+            <form  enctype="multipart/form-data" method="POST" class="form-horizontal user-profile-update" data-url="{% url 'update_user_profile_ajax' %}">
+      
+                  {% csrf_token %}
+
+                <div class="form-group row">
+                    <label class="col-sm-2 control-label" for="{{ form.age.id_for_label }}">{{ form.age.label }}</label>
+                    <div class="col-sm-4  {% if form.age.errors %} has-error{% endif %}">
+                        {{ form.age|add_class:"form-control" }}
+                        {% for error in form.age.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    </br>
+
+
+                
+                    <label class="col-sm-2 control-label" for="{{ form.country.id_for_label }}">{{ form.country.label }}</label>
+                    <div class="col-sm-4  {% if form.country.errors %} has-error{% endif %}">
+                        {{ form.country|add_class:"form-control" }}
+                        {% for error in form.country.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>            
+                </div>
+              </br>
+                <div class="form-group row">
+                  <label class="col-sm-2 control-label" for="{{ form.sex.id_for_label }}">{{ form.sex.label }}</label>
+                  <div class="col-sm-4  {% if form.sex.errors %} has-error{% endif %}">
+                      {{ form.sex|add_class:"form-control" }}
+                      {% for error in form.sex.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>
+
+
+              
+                  <label class="col-sm-2 control-label" for="{{ form.profession.id_for_label }}">{{ form.profession.label }}</label>
+                  <div class="col-sm-4  {% if form.profession.errors %} has-error{% endif %}">
+                      {{ form.profession|add_class:"form-control" }}
+                      {% for error in form.profession.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>            
+                </div>
+              </br>  
+                <div class="form-group row ">
+                  <label class="col-sm-2 control-label" for="{{ form.aboutyou.id_for_label }}">{{ form.aboutyou.label }}</label>
+                  <div class="col-sm-10  {% if form.aboutyou.errors %} has-error{% endif %}">
+                      {{ form.aboutyou|add_class:"form-control" }}
+                      {% for error in form.aboutyou.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>
+                </div>     
+
+
+    
+              </br>
+              <div id="public_toggle_form-errors" class="form-error2 form-group" style='display:none'>
+              </div>
+              <div class="box-footer">
+                  <div class="col-sm-offset-2 col-sm-8">
+                    <button type="submit" class="btn btn-primary user-settings-update">{% trans 'Update' %}</button>
+
+                  </div>
+              </div>
+
+                
+            </form>
+        
+      </div>
+      <!-- </div> -->
+
+    <!-- </div> -->
+
+  </div>
+</section><!-- End Contact Section -->
+
+

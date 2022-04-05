@@ -1,0 +1,77 @@
+
+<div class="accordion-item" id='tankdesignparameters_accordion'>
+
+    <h4 class="accordion-header" id="tankdesignparameters_header" >
+      <button id="tankdesignparameters_accordion_button" type="button" {%if tankdesignparameters_record %} class="accordion-button section-complete" {% else  %} 
+                   class="accordion-button section-incomplete" {% endif %} data-toggle="collapse" 
+        data-target="#tankdesignparameters_target" aria-expanded="false" aria-controls="tankdesignparameters_target">
+        Tank Design Parameters
+      </button>
+    </h4>
+     
+    
+    <div id="tankdesignparameters_target" class="accordion-collapse collapse" aria-labelledby="tankdesignparameters_header" data-parent="#accordionExample">
+      <div class="accordion-body card" id='tankdesignparameters_section'>
+        <div class="box-description view-section" name='my_tankdesignparameters_section'>
+            {%if tankdesignparameters_record %}
+                <!-- Edit/Change -->
+                <div class="table-responsive">
+                    <table id="tankdesignparametersTable" class="table table-striped" >
+                        <thead>
+                        </thead>
+                        
+                        <tbody id="tankdesignparameters-table-tbody">
+                            <tr id="tankdesignparameters-tank_length" >
+                                <th scope="row">Length</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData" name="tank_length" >{{tankdesignparameters_record.tank_length}}</td>                                                    
+                            </tr>
+                   
+                            <tr id="tankdesignparameters-tank_width" >
+                                <th scope="row">Width</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="tank_width">{{tankdesignparameters_record.tank_width}}</td>                                                    
+                            </tr>
+                            <tr id="tankdesignparameters-depth" >
+                                <th scope="row">Depth</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="depth">{{tankdesignparameters_record.depth}}</td>                                                    
+                            </tr>
+                            <tr id="tankdesignparameters-volume_of_water" >
+                                <th scope="row">Volume of water</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData" name="volume_of_water" >{{tankdesignparameters_record.volume_of_water}}</td>                                                    
+                            </tr>
+                            <tr id="tankdesignparameters-density_per_cubic_metre" >
+                                <th scope="row">Density per cubic metre</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="density_per_cubic_metre">{{tankdesignparameters_record.density_per_cubic_metre}}</td>                                                    
+                            </tr>
+                            <tr id="tankdesignparameters-total_fish_per_tank_per_cycle" >
+                                <th scope="row">Total fish per tank per cycle</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="total_fish_per_tank_per_cycle">{{tankdesignparameters_record.total_fish_per_tank_per_cycle}}</td>                                                    
+                            </tr>
+
+                            <tr id="tankdesignparameters-tank_num_of_months_per_cycle" >
+                                <th scope="row"># of months per cycle</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="tank_num_of_months_per_cycle">{{tankdesignparameters_record.tank_num_of_months_per_cycle}}</td>                                                    
+                            </tr>
+                            <tr id="tankdesignparameters-fish_per_tank_per_year" >
+                                <th scope="row">Annual Fish per tank per year</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="fish_per_tank_per_year">{{tankdesignparameters_record.fish_per_tank_per_year}}</td>                                                    
+                            </tr>
+                            <tr id="tankdesignparameters-num_of_tanks" >
+                                <th scope="row"># of Tanks</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="num_of_tanks">{{tankdesignparameters_record.num_of_tanks}}</td>                                                    
+                            </tr>
+
+                           
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                data-target="#modal_add_model_tankdesignparameters"> <i class="fa fa-edit"></i></a>
+            {% else %}
+                <!-- Add For First Time -->
+                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                data-target="#modal_add_model_tankdesignparameters"> <i class="fa fa-plus"></i></a>
+            {% endif%}
+        </div>
+      </div>
+    </div>
+</div>

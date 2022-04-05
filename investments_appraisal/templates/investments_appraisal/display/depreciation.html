@@ -1,0 +1,46 @@
+<div class="box box-profile">
+    <div class="box-body" id='depreciation_section'>
+        <h4 class="box-title" style="color:blue">Depreciation</h4>
+        <div class="box-description view-section" name='my_depreciation_section'>
+            {%if depreciation_record %}
+                <!-- Edit/Change -->
+                <div class="table-responsive">
+                    <table id="depreciationTable" class="table table-striped" >
+                        <thead>
+                        </thead>
+                        <tbody id="depreciation-table-tbody">
+                            <tr id="depreciation-economic_life_of_machinery" >
+                                <th scope="row">Economic life of machinery</th>
+                                <td class="depreciationAction depreciationData" name="economic_life_of_machinery" >{{depreciation_record.economic_life_of_machinery}}</td>                                                    
+                            </tr>
+                            <tr id="depreciation-economic_life_of_buildings" >
+                                <th scope="row">Economic life of buildings</th>
+                                <td class="depreciationAction depreciationData"  name="economic_life_of_buildings">{{depreciation_record.economic_life_of_buildings}}</td>                                                    
+                            </tr>
+                            <tr id="depreciation-tax_life_of_machinery" >
+                                <th scope="row">Tax life of machinery</th>
+                                <td class="depreciationAction depreciationData"  name="tax_life_of_machinery">{{depreciation_record.tax_life_of_machinery}}</td>                                                    
+                            </tr>
+
+                            <tr id="depreciation-tax_life_of_buildings" >
+                                <th scope="row">Tax life of buildings</th>
+                                <td class="depreciationAction depreciationData"  name="tax_life_of_buildings">{{depreciation_record.tax_life_of_buildings}}</td>                                                    
+                            </tr>
+                            <tr id="depreciation-tax_life_of_soft_capital_costs" >
+                                <th scope="row">Tax life of soft capital costs</th>
+                                <td class="depreciationAction depreciationData"  name="tax_life_of_soft_capital_costs">{{depreciation_record.tax_life_of_soft_capital_costs}}</td>                                                    
+                            </tr>
+                           
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                  data-target="#modal_add_model_depreciation"> <i class="fa fa-edit"></i></a>
+            {% else %}
+                <!-- Add For First Time -->
+                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                data-target="#modal_add_model_depreciation"> <i class="fa fa-plus"></i></a>
+            {% endif%}
+        </div>
+    </div>
+</div>

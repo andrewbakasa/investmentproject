@@ -1,0 +1,38 @@
+ <!-- modal Add modal_add_model_timing -->
+ <div class="modal fade" id="modal_add_model_timing_assumptions" tabindex="-1" role="dialog"
+ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+ <div class="modal-dialog" role="document">
+         <div class="modal-content">
+             <!--Header-->
+             <div class="modal-header">
+                 <h4 class="modal-title" id="timing_assumptions_label"> {% if ta_record %} Edit {% else %}  Add {% endif %} Timing Assumptions: {{usermodel.name}} </h4>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">×</span>
+                 </button>
+             </div>
+             <!--Body-->
+             <div class="modal-body">
+
+                     
+             <form method="POST" id='form-timing-assumptions'
+                 {% if ta_record %} class="model-timing-assumptions-edit" data-url="{% url 'edit_model_timing_assumptions_ajax' usermodel.id ta_record.id %}" 
+                 {% else %}  class="model-timing-assumptions-add"   data-url="{% url 'add_model_timing_assumptions_ajax' usermodel.id %}" 
+             
+                 {% endif %} > 
+                 {% csrf_token %}
+
+                 {% include 'investments_appraisal/form_timing_assumption.html' %}
+
+             </div> 
+             <!--Footer-->
+             <div class="modal-footer">
+                 <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+                     type="reset">Close
+                 </button>  
+                 <button class="btn btn-danger" type="submit" id ="submit_timing_assumptions">Save</button>
+         
+             </div>
+             </form>
+         </div>
+ </div>
+</div>

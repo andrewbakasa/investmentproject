@@ -1,0 +1,74 @@
+{% load static %}
+{% load i18n %}
+{% load account %}
+
+<header id="header" class="fixed-top">
+  <div class="container d-flex align-items-center">
+
+    <h1 class="logo me-auto"><a href="{% url 'index' %}">Investafin</a></h1>
+    <!-- Uncomment below if you prefer to use an image logo -->
+    <!-- <a href="index.html" class="logo me-auto"><img src="{% static 'mentor/assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+    <nav id="navbar" class="navbar order-last order-lg-0">
+      <ul>
+        <li id="index"><a href="{% url 'index' %}">Home</a></li>
+        <li id="about"><a href="{% url 'about' %}">About</a></li>
+        <li id="projects"><a href="{% url 'projects' %}">Projects</a></li>
+        <li id="models"><a href="{% url 'models' %}">Models</a></li>
+        <!-- <li id="experts"><a href="{% url 'experts' %}">Experts</a></li> -->
+        <!-- <li id="events"><a href="{% url 'events' %}">Events</a></li> -->
+        <!-- <li id="pricing"><a href="{% url 'pricing' %}">Pricing</a></li> -->
+<!-- 
+        <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+          <ul>
+            <li><a href="#">Drop Down 1</a></li>
+            <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
+              <ul>
+                <li><a href="#">Deep Drop Down 1</a></li>
+                <li><a href="#">Deep Drop Down 2</a></li>
+                <li><a href="#">Deep Drop Down 3</a></li>
+                <li><a href="#">Deep Drop Down 4</a></li>
+                <li><a href="#">Deep Drop Down 5</a></li>
+              </ul>
+            </li>
+            <li><a href="#">Drop Down 2</a></li>
+            <li><a href="#">Drop Down 3</a></li>
+            <li><a href="#">Drop Down 4</a></li>
+          </ul>
+        </li> -->
+
+        {% if request.user.is_authenticated %}
+        <li class="nav-item dropdown user user-menu">
+            <a href="#" class="nav-link" id="navbarDropdownMenuAvatar" data-toggle="dropdown">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            <span class="hidden-xs">{% user_display user %}</span>
+            </a>
+        
+
+            <ul class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdownMenuAvatar">
+
+                <li>
+                    <a class="dropdown-item" href="{% url 'upload_form_user_profile' %}" >My profile</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'upload_form_user_pref' %}" >Settings</a>
+                    
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
+                </li>
+            </ul>
+        </li>
+        {% endif %}
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+      <i class="bi bi-list mobile-nav-toggle"></i>
+    </nav><!-- .navbar -->
+    {% block searchbutton %}
+    <a href="{% url 'projects' %}" class="get-started-btn">Get Started</a>
+    {% endblock  %}
+    
+
+  </div>
+</header><!-- End Header -->

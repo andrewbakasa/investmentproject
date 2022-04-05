@@ -1,0 +1,160 @@
+{% extends 'investments_appraisal/base.html' %}
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content_header %}
+<h1>Transactions
+  <small>
+    {% if object %}
+    {% blocktrans with object_name=object.title %}Edit {{ object.title }}{% endblocktrans %}
+    {% else %}
+    {% blocktrans %}Add new {{ submenu }}{% endblocktrans %}
+    {% endif %}
+  </small>
+</h1>
+<ol class="breadcrumb">
+  <li><a href="/">Home</a></li>
+  <li><a href="#">{% trans 'Locomotive Failures' %}</a></li>
+  {% if object %}
+  <li><a href="{{ object.get_absolute_url }}">{{ object }}</a></li>
+  <li class="active">{% trans 'Edit' %}</li>
+  {% else %}
+  <li class="active">{% trans 'Create' %}</li>
+  {% endif %}
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">{% trans 'User Model' %}</h3>
+  </div>
+  <div class="box-body">
+    
+    <!-- TiminingAssuptions Form -->
+    <form method="post" class="form-horizontal">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="{{ form.usermodel.id_for_label }}">{{ form.usermodel.label }}</label>
+        <div class="col-sm-4{% if form.usermodel.errors %} has-error{% endif %}">
+          {{ form.usermodel|add_class:"form-control" }}
+          {% for error in form.usermodel.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+     
+        <label class="col-sm-1 control-label" for="{{ form.base_period.id_for_label }}">{{ form.base_period.label }}</label>
+        <div class="col-sm-4{% if form.base_period.errors %} has-error{% endif %}">
+          {{ form.base_period|add_class:"form-control" }}
+          {% for error in form.base_period.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="{{ form.construction_start_year.id_for_label }}">{{ form.construction_start_year.label }}</label>
+        <div class="col-sm-4{% if form.construction_start_year.errors %} has-error{% endif %}">
+          {{ form.construction_start_year|add_class:"form-control" }}
+          {% for error in form.construction_start_year.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+     
+        <label class="col-sm-1 control-label" for="{{ form.construction_len.id_for_label }}">{{ form.construction_len.label }}</label>
+        <div class="col-sm-4{% if form.construction_len.errors %} has-error{% endif %}">
+          {{ form.construction_len|add_class:"form-control" }}
+          {% for error in form.construction_len.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+      </div>
+
+     
+     
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="{{ form.construction_year_end.id_for_label }}">{{ form.construction_year_end.label }}</label>
+        <div class="col-sm-4{% if form.construction_year_end.errors %} has-error{% endif %}">
+          {{ form.construction_year_end|add_class:"form-control" }}
+          {% for error in form.construction_year_end.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+        <label class="col-sm-1 control-label" for="{{ form.operation_start_year.id_for_label }}">{{ form.operation_start_year.label }}</label>
+        <div class="col-sm-4{% if form.operation_start_year.errors %} has-error{% endif %}">
+          {{ form.operation_start_year|add_class:"form-control" }}
+          {% for error in form.operation_start_year.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+      
+       
+        
+      </div>
+      
+     
+      <div class="form-group{% if form.operation_duration.errors %} has-error{% endif %}">
+        <label class="col-sm-2 control-label" for="{{ form.operation_duration.id_for_label }}">{{ form.operation_duration.label }}</label>
+        <div class="col-sm-9">
+          {{ form.operation_duration|add_class:"form-control" }}
+          {% for error in form.operation_duration.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="{{ form.operation_end.id_for_label }}">{{ form.operation_end.label }}</label>
+        <div class="col-sm-4{% if form.operation_end.errors %} has-error{% endif %}">
+          {{ form.operation_end|add_class:"form-control  date-input" }}
+          {% for error in form.operation_end.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+      
+        <label class="col-sm-1 control-label" for="{{ form.number_of_months_in_a_year.id_for_label }}">{{ form.number_of_months_in_a_year.label }}</label>
+        <div class="col-sm-4{% if form.number_of_months_in_a_year.errors %} has-error{% endif %}">
+          {{ form.number_of_months_in_a_year|add_class:"form-control  date-input" }}
+          {% for error in form.number_of_months_in_a_year.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+     
+    
+      
+      <button type="submit" class="btn btn-primary col-md-offset-2">{% if object %}{% trans 'Update' %}{% else %}{% trans 'Create' %}{% endif %}</button>
+    </form>
+    
+     <!-- TiminingAssuptions Form -->
+
+</div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+
+<script>
+$(function() {
+  $('.date-input').datepicker({
+  autoclose: true,
+  format: 'yyyy-mm-dd',
+  orientation: 'bottom'
+
+  });
+ 
+  $('.date-input').attr('autocomplete', 'off');
+})
+</script>
+{% endblock %}
+

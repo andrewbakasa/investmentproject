@@ -1,0 +1,59 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+<section style= 'padding: 5px 0;' id="project-details" class="project-details">
+  <div class="container" data-aos="fade-up">
+     <!-- ======= Breadcrumbs ======= -->
+     <div class="row">
+      <ol class="breadcrumb" >
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'projects' %}">{% trans 'Back to Projects' %}</a></li>
+      
+        <li class="breadcrumb-item" >
+          <label id="total_projects_searched"></label>
+        </li>  
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8">     
+        <!-- <img src ="{% static 'mentor/assets/img/projects/' %}{{model.uniqueid}}.jpg" class="img-fluid"alt=""> -->
+        <img src ="{% static 'mentor/assets/img/projects/'|add:model.uniqueid|add:'.jpg' %}" class="img-fluid"alt="">
+        <h3>{{model.details.motto}}</h3>
+        <p>
+          {{model.description}}
+        </p>
+      </div>
+      <div class="col-lg-4">
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Lead</h5>
+          <p><a href="#">{{model.details.head}}</a></p>
+        </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Sector</h5>
+          <p>{{model.details.sector}}</p>
+        </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Downloads</h5>
+          <p>{{model.hits}}</p>
+        </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          {% if model.details.premium %}
+            <h5>Premium</h5>
+            <p><i style='color:inherit;' class="bi bi-check-circle"></i></p>
+          {% else %}
+            <h5></h5>
+            <p>Free</p>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section><!-- End Cource Details Section -->

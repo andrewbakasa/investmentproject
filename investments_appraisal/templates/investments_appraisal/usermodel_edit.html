@@ -1,0 +1,101 @@
+{% extends 'investments_appraisal/base.html' %}<!---investments_appraisal/base.html-->
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content_header %}
+<h1>Transactions
+  <small>
+    {% if object %}
+    {% blocktrans with object_name=object.title %}Edit {{ object.title }}{% endblocktrans %}
+    {% else %}
+    {% blocktrans %}Add new {{ submenu }}{% endblocktrans %}
+    {% endif %}
+  </small>
+</h1>
+<ol class="breadcrumb">
+  <li><a href="/">Home</a></li>
+  <li><a href="#">{% trans 'Locomotive Failures' %}</a></li>
+  {% if object %}
+  <li><a href="{{ object.get_absolute_url }}">{{ object }}</a></li>
+  <li class="active">{% trans 'Edit' %}</li>
+  {% else %}
+  <li class="active">{% trans 'Create' %}</li>
+  {% endif %}
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">{% trans 'User Model' %}</h3>
+  </div>
+  <div class="box-body">
+    
+    <!-- User Form -->
+    <form method="post" >
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="{{ form.model_type.id_for_label }}">{{ form.model_type.label }}</label>
+        <div class="col-sm-4{% if form.model_type.errors %} has-error{% endif %}">
+          {{ form.model_type|add_class:"form-control" }}
+          {% for error in form.model_type.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+     
+        <label class="col-sm-1 control-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+        <div class="col-sm-4{% if form.name.errors %} has-error{% endif %}">
+          {{ form.name|add_class:"form-control" }}
+          {% for error in form.name.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+        <div class="col-sm-4{% if form.date.errors %} has-error{% endif %}">
+          {{ form.date|add_class:"form-control  date-input" }}
+          {% for error in form.date.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+     
+        <label class="col-sm-1 control-label" for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+        <div class="col-sm-4{% if form.status.errors %} has-error{% endif %}">
+          {{ form.status|add_class:"form-control" }}
+          {% for error in form.status.errors %}
+          <span class="help-block">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+      </div>
+
+     
+     
+      <div class="form-group">
+          <label class="col-sm-2 control-label" for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
+          <div class="col-sm-4{% if form.currency.errors %} has-error{% endif %}">
+            {{ form.currency|add_class:"form-control" }}
+            {% for error in form.currency.errors %}
+            <span class="help-block">{{ error }}</span>
+            {% endfor %}
+          </div>
+      </div>
+      
+      
+      
+
+     
+    
+      
+      <button type="submit" class="btn btn-primary col-md-offset-2">{% if object %}{% trans 'Update' %}{% else %}{% trans 'Create' %}{% endif %}</button>
+    </form>
+    
+     <!-- TiminingAssuptions Form -->
+
+</div>
+</div>
+{% endblock %}

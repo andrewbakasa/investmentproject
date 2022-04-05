@@ -1,0 +1,69 @@
+
+<div class="accordion-item" id='financing_accordion'>
+
+    <h4 class="accordion-header" id="financing_header" >
+      <button id="financing_accordion_button" type="button" {%if financing_record %} class="accordion-button section-complete" {% else  %} 
+                   class="accordion-button section-incomplete" {% endif %} data-toggle="collapse" 
+        data-target="#financing_target" aria-expanded="false" aria-controls="financing_target">
+       Financing Details
+      </button>
+    </h4>
+     
+    
+    <div id="financing_target" class="accordion-collapse collapse" aria-labelledby="financing_header" data-parent="#accordionExample">
+      <div class="accordion-body card" id='financing_section'>
+        <div class="box-description view-section " name='my_financing_section'>
+            {%if financing_record %}
+                <!-- Edit/Change -->
+                <div class="table-responsive">
+                    <table id="financingTable" class="table table-striped" >
+                        <thead>
+                        </thead>
+                      
+                        <tbody id="financing-table-tbody">
+                            <tr id="financing-real_interest_rate" >
+                                <th scope="row">Interest rate (real)</th>
+                                <td class="financingAction financingData" name="real_interest_rate" >{{financing_record.real_interest_rate}}</td>                                                    
+                            </tr>
+                            <tr id="financing-risk_premium" >
+                                <th scope="row">Risk premium</th>
+                                <td class="financingAction financingData"  name="risk_premium">{{financing_record.risk_premium}}</td>                                                    
+                            </tr>
+                            <tr id="financing-num_of_installments" >
+                                <th scope="row"># of Installments</th>
+                                <td class="financingAction financingData"  name="num_of_installments">{{financing_record.num_of_installments}}</td>                                                    
+                            </tr>
+
+                            <tr id="financing-grace_period" >
+                                <th scope="row">Grace period</th>
+                                <td class="financingAction financingData" name="grace_period" >{{financing_record.grace_period}}</td>                                                    
+                            </tr>
+                            <tr id="financing-repayment_starts" >
+                                <th scope="row">Repayment starts</th>
+                                <td class="financingAction financingData"  name="repayment_starts">{{financing_record.repayment_starts}}</td>                                                    
+                            </tr>
+                            <tr id="financing-equity" >
+                                <th scope="row">Equity</th>
+                                <td class="financingAction financingData"  name="equity">{{financing_record.equity}}</td>                                                    
+                            </tr>
+
+                            <tr id="financing-senior_debt" >
+                                <th scope="row">Senior debt</th>
+                                <td class="financingAction financingData"  name="senior_debt">{{financing_record.senior_debt}}</td>                                                    
+                            </tr>
+                           
+                        </tbody>
+                    </table>
+                </div>
+
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                data-target="#modal_add_model_financing"> <i class="fa fa-edit"></i></a>
+            {% else %}
+                <!-- Add For First Time -->
+                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                data-target="#modal_add_model_financing"> <i class="fa fa-plus"></i></a>
+            {% endif%}
+        </div>
+      </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+
+
+    <div class="box box-profile">
+        <div class="box-body" id='prices_section'>
+            <h4 class="box-title" style="color:blue" >Prices</h4>
+            <div class="box-description view-section" name='my_prices_section'>
+                {%if price_record %}
+                    <!-- Edit/Change -->
+                    <div class="table-responsive">
+                        <table id="pricesTable" class="table table-striped" >
+                            <thead>
+                            </thead>
+                            <tbody id="prices-table-tbody">
+                                <tr id="prices-title" >
+                                    <th scope="row">Title</th>
+                                    <td class="pricesAction pricesData" name="title" >{{price_record.title}}</td>                                                    
+                                </tr>
+                                <tr id="prices-base-price" >
+                                    <th scope="row">Base Price(per ton)</th>
+                                    <td class="pricesAction pricesData"  name="base_price">{{price_record.base_price}}</td>                                                    
+                                </tr>
+                                <tr id="prices-change-in-price" >
+                                    <th scope="row">Change In Price (%)</th>
+                                    <td class="pricesAction pricesData"  name="change_in_price">{{price_record.change_in_price}}</td>                                                    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                    data-target="#modal_add_model_prices"> <i class="fa fa-edit"></i></a>
+                {% else %}
+                    <!-- Add For First Time -->
+                    <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                    data-target="#modal_add_model_prices"> <i class="fa fa-plus"></i></a>
+                {% endif%}
+            </div>
+        </div>
+    </div>

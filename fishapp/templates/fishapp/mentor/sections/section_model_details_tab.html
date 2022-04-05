@@ -1,0 +1,136 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+<section id="project-details-tabs" class="project-details-tabs">
+  <div class="container" data-aos="fade-up">
+      <div class="progressBar" >
+        <input id="user_doc_name" type="hidden" value='{{user_doc_name}}'>
+        <div class="bar" ></div>
+        <h3 >0 %</h3>
+    </div>
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="row">
+      <ol class="breadcrumb" >
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'models' %}">{% trans 'User Models' %}</a></li>
+        {% if usermodel %}
+            <li class="breadcrumb-item"><a href="{{ model.get_absolute_url }}">{{ usermodel }}</a></li>
+            <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-update"   href="#" data-url="{% url 'get_fish_model_spreadsheets' usermodel.id %}" 
+                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                title='Download Excel'><i class="fas fa-download"></i>
+                </a></li> 
+            <li id ='progress_iter' class="breadcrumb-item active">{{ progress_count}} of 8 Complete</li>            
+            <li class="breadcrumb-item active">{% trans 'Fish Model' %}</li>
+            {% if usermodel.simulation_run %}
+            <li class="breadcrumb-item active">{% trans 'Simulation' %} </li>
+            <li class="breadcrumb-item active">{{usermodel.simulation_iterations}} </li>
+            {% endif %}
+        {% else %}
+            <li class="breadcrumb-item active">{% trans 'Create' %}</li>
+        {% endif %}
+      </ol>
+    </div> 
+    <div class="row">
+      <div class="col-lg-3">
+        <ul class="nav nav-tabs flex-column">
+          
+           <li id='timing_assumption_tab' class="nav-item">
+              <a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">{% if ta_record %}<i class="bi bi-check-circle"></i> {%endif %}Timing Assumptions</a>
+            </li>
+            </li>
+            <li id='price_tab' class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-2">{% if price_record %}<i class="bi bi-check-circle"></i> {%endif %}Prices Details</a>
+            </li>
+            <li id='financing_tab' class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-3">{% if financing_record %}<i class="bi bi-check-circle"></i> {%endif %}Financing Details</a>
+            </li>
+            <li id='depreciation_tab' class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-4">{% if depreciation_record %}<i class="bi bi-check-circle"></i> {%endif %}Depreciation Details</a>
+            </li>
+            <li id='taxes_tab' class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-5">{% if taxes_record %}<i class="bi bi-check-circle"></i> {%endif %}Taxes Details</a>
+            </li>
+            <li id='workingcapital_tab' class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-6">{% if workingcapital_record %}<i class="bi bi-check-circle"></i> {%endif %}Working Capital</a>
+            </li>
+            <li id='macroeconomicparameters_tab' class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-7">{% if macroeconomicparameters_record %}<i class="bi bi-check-circle"></i> {%endif %}Macro Economic Parameters</a>
+            </li>
+          
+          <li id='tankdesignparameters_tab' class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-8">{% if tankdesignparameters_record %}<i class="bi bi-check-circle"></i> {%endif %}Tank Design</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-lg-9 mt-4 mt-lg-0">
+        <div class="tab-content">
+
+          <div class="tab-pane active show" id="tab-1">           
+            {% include 'investments_appraisal/display/timing.html' %}
+          </div>
+          
+          <div class="tab-pane" id="tab-2">
+            
+            {% include 'investments_appraisal/display/prices.html' %} 
+            
+          </div>
+          <div class="tab-pane" id="tab-3">
+            {% include 'investments_appraisal/display/financing.html' %}
+
+          </div>
+          <div class="tab-pane" id="tab-4">
+            {% include 'investments_appraisal/display/depreciation.html' %} 
+
+          </div>
+          <div class="tab-pane" id="tab-5">
+            {% include 'investments_appraisal/display/taxes.html' %} 
+          </div>
+
+          <div class="tab-pane" id="tab-6">
+            {% include 'investments_appraisal/display/working_capital.html' %}
+
+          </div>
+          <div class="tab-pane" id="tab-7">
+            {% include 'investments_appraisal/display/macro_economic_parameters.html' %} 
+          </div>
+          <div class="tab-pane" id="tab-8">
+            {% include 'fishapp/bus_options/tank_design.html' %} 
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section><!-- End Cource Details Tabs Section -->
+ <!-- *****************MODAL POPUP FORMS *************************** -->
+            <!-------------------------FORM TIMING ASSUMPTIONS SECTION ----------------------------------->
+            <!-- modal Add modal_add_model_timing -->
+            {% include 'investments_appraisal/modal/timing_assumption.html' %}    
+            <!-------------------------FORM PRICES SECTION ----------------------------->
+            <!-- modal Add modal_add_model_prices -->
+            {% include 'investments_appraisal/modal/prices.html' %}
+            <!-------------------------FORM DEPRECIATION SECTION ------------------------>            
+            {% include 'investments_appraisal/modal/depreciation.html' %}
+            <!-------------------------FORM TAXES SECTION ----------------------------------->
+            <!-- modal Add modal_add_model_taxes -->
+            {% include 'investments_appraisal/modal/taxes.html' %}
+            
+            <!--------------FORM FINANCING SECTION ------------------------------------>
+            <!-- modal Add modal_add_model_fiancing -->
+            {% include 'investments_appraisal/modal/financing.html' %}
+          
+            <!---------------FORM MACROECONOMICPARAMETER SECTION ---------------------->
+            <!-- modal Add modal_add_model_macroeconomicparameters -->
+            {% include 'investments_appraisal/modal/macro_economic_parameters.html' %}
+      
+           
+            <!------------------FORM TANKDESIGNPARAMETER SECTION ------------->
+            <!-- modal Add modal_add_model_tankdesignparameters -->
+            {% include 'fishapp/modal/tank_design.html' %}
+           
+            <!----------------------FORM WORKINGCAPITAL SECTION --------------->
+            <!-- modal Add modal_add_model_macroeconomicparameters -->
+            {% include 'investments_appraisal/modal/working_capital.html' %}
+          
+

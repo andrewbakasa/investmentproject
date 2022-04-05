@@ -1,0 +1,51 @@
+{% load static %}
+<section id="popular-projects" class="projects">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-title">
+      <h2>Projects</h2>
+      <p>Popular Projects</p>
+    </div>
+
+    <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+
+        {% for model in popular_projects %}
+            <div id="div-{{model.id}}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
+              <div class="project-item">
+             
+                <img src ="{% static 'mentor/assets/img/projects/'|add:model.uniqueid|add:'.jpg' %}" class="img-fluid"alt="">
+    
+                <div class="project-content">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>{{model.name}}</h4>
+                    <!-- <p class="price">$169</p> -->
+                  </div>
+  
+                  <h3><a href="{% url 'project-details' model.id %}">{{model.name}}</a></h3>
+                  <p>{{model.description}}</p>
+                  <div class="trainer d-flex justify-content-between align-items-center">
+                    <div class="trainer-rank d-flex align-items-center">
+                      <i class="bx bx-download"></i>&nbsp;{{model.hits}}
+                        
+                    </div>
+                    <div class="trainer-rank d-flex align-items-center">
+                        
+                        <a class="model-likes" href="#" data-url="{% url 'update_model_likes' model.id %}" 
+                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                          title='Like'><i class="bx bx-heart"></i>&nbsp;{{model.likes}}
+                        </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- End Project Item-->
+        {% endfor %} 
+
+    </div>
+
+  </div>
+</section><!-- End Popular Projects Section -->
+
+
+
+ 

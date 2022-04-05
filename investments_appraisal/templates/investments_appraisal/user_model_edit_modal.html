@@ -1,0 +1,120 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+<div class="modal-header">
+    <h4 class="modal-title" id="myModalLabel">Edit Model  [{{usermodel}}]</h4>
+    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>       
+</div>
+
+<div class="modal-body">
+    <form class="model-form-edit form-horizontal" enctype="multipart/form-data" method="post" data-url="{% url 'update_model' pk=form.instance.id %}">
+      {% csrf_token %}
+      
+        <div class="modal-body">
+
+        
+          <div class="form-group">
+              <label class="control-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+              <div class="{% if form.name.errors %} has-error{% endif %}">
+                {{ form.name|add_class:"form-control" }}
+                {% for error in form.name.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+          </div>
+          <div class="form-group">  
+              <label class="control-label" for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
+              <div class="{% if form.currency.errors %} has-error{% endif %}">
+                {{ form.currency|add_class:"form-control" }}
+                {% for error in form.currency.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+          </div>
+
+          <div class="form-group">               
+              <label class="control-label" for="{{ form.model_type.id_for_label }}">{{ form.model_type.label }}</label>
+              <div class="{% if form.model_type.errors %} has-error{% endif %}">
+                {{ form.model_type|add_class:"form-control" }}
+                {% for error in form.model_type.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+          </div>
+    
+          <div class="form-group">               
+              <label class="control-label" for="{{ form.simulation_iterations.id_for_label }}">{{ form.simulation_iterations.label }}</label>
+              <div class="{% if form.simulation_iterations.errors %} has-error{% endif %}">
+                {{ form.simulation_iterations|add_class:"form-control" }}
+                {% for error in form.simulation_iterations.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+          </div>
+              
+
+            <div class="form-group{% if form.simulation_run.errors %} hasapproved-error{% endif %}">
+                <div class="">
+                    <div class="checkbox">
+                      <label>
+                        {{ form.simulation_run }}
+                        {{ form.simulation_run.label }}
+                      </label>
+                    </div>
+                  
+                    {% for error in form.simulation_run.errors %}
+                    <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+          </div>
+    
+          
+    
+          <div class="form-group">
+            <label class="control-label" for="{{ form.npv_bin_size.id_for_label }}">{{ form.npv_bin_size.label }}</label>
+            <div class="{% if form.npv_bin_size.errors %} has-error{% endif %}">
+              {{ form.npv_bin_size|add_class:"form-control" }}
+              {% for error in form.npv_bin_size.errors %}
+              <span class="help-block">{{ error }}</span>
+              {% endfor %}
+            </div>
+            
+          </div>
+          
+          <div class="form-group{% if form.user.errors %} has-error{% endif %}">	
+            <label class="control-label" for="{{ form.user.id_for_label }}">{{ form.user.label }}</label>
+            <div class="">
+              {{ form.user|add_class:"form-control hidden" }}
+              {% for error in form.user.errors %}
+              <span class="help-block" >{{ error }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        
+          
+        
+        </br>
+      <div id="public_toggle_form-errors" class="form-error2" style='display:none'>
+      </div>
+</div>
+
+  <!--Footer-->
+  <div class="modal-footer">
+    <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+        type="reset">Close
+    </button>
+    <button class="btn btn-danger" type="submit">Save</button>
+
+    
+  </div>
+</form>
+
+
+
+

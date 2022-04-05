@@ -1,0 +1,48 @@
+
+<div class="accordion-item" id='workingcapital_accordion'>
+
+    <h4 class="accordion-header" id="workingcapital_header" >
+      <button id="workingcapital_accordion_button" type="button" {%if workingcapital_record %} class="accordion-button section-complete" {% else  %} 
+                   class="accordion-button section-incomplete" {% endif %} data-toggle="collapse" 
+        data-target="#workingcapital_target" aria-expanded="false" aria-controls="workingcapital_target">
+        Working Capital Details
+      </button>
+    </h4>
+     
+    
+    <div id="workingcapital_target" class="accordion-collapse collapse" aria-labelledby="workingcapital_header" data-parent="#accordionExample">
+      <div class="accordion-body card" id='workingcapital_section'>
+        <div class="box-description view-section" name='my_workingcapital_section'>
+            {%if workingcapital_record %}
+                <!-- Edit/Change -->
+                <div class="table-responsive">
+                    <table id="workingcapitalTable" class="table table-striped" >
+                        <thead>
+                        </thead>
+                        <tbody id="workingcapital-table-tbody">
+                            <tr id="workingcapital-accounts_receivable" >
+                                <th scope="row">Accounts receivable</th>
+                                <td class="workingcapitalAction workingcapitalData" name="accounts_receivable" >{{workingcapital_record.accounts_receivable}}</td>                                                    
+                            </tr>
+                            <tr id="workingcapital-accounts_payable" >
+                                <th scope="row">Accounts payable</th>
+                                <td class="workingcapitalAction workingcapitalData"  name="accounts_payable">{{workingcapital_record.accounts_payable}}</td>                                                    
+                            </tr>
+                            <tr id="workingcapital-cash_balance" >
+                                <th scope="row">Cash balance</th>
+                                <td class="workingcapitalAction workingcapitalData"  name="cash_balance">{{workingcapital_record.cash_balance}}</td>                                                    
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                  data-target="#modal_add_model_workingcapital"> <i class="fa fa-edit"></i></a>
+            {% else %}
+                <!-- Add For First Time -->
+                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                data-target="#modal_add_model_workingcapital"> <i class="fa fa-plus"></i></a>
+            {% endif%}
+        </div>
+      </div>
+    </div>
+</div>

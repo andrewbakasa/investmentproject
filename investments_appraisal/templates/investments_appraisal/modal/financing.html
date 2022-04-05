@@ -1,0 +1,38 @@
+  
+            <div class="modal fade" id="modal_add_model_financing" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+            <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <!--Header-->
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="financing_label"> {% if financing_record %} Edit {% else %}  Add {% endif %} financing: {{usermodel.name}} </h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <!--Body-->
+                        <div class="modal-body">
+
+                                    
+                        <form method="POST" id='form-financing'
+                            {% if financing_record %} class="model-financing-edit" data-url="{% url 'edit_model_financing_ajax' financing_record.id %}" 
+                            {% else %}  class="model-financing-add"   data-url="{% url 'add_model_financing_ajax' %}" 
+                        
+                            {% endif %} > 
+                            {% csrf_token %}
+    
+                            {% include 'investments_appraisal/form_financing.html' %}
+
+                        </div> 
+                        <!--Footer-->
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+                                type="reset">Close
+                            </button>  
+                            <button class="btn btn-danger" type="submit" id ="submit_financing">Save</button>
+                        
+                        </div>
+                        </form>
+                    </div>
+            </div>
+        </div>

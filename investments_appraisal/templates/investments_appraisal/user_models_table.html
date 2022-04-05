@@ -1,0 +1,64 @@
+<div class="table-responsive">
+    <table class="table table-striped">
+      <thead >
+        <th style="width: 2%">#</th>  
+        <th style="width: 8%">Category</th>
+        <th style="width: 15%">Title</th>
+        <th style="width: 5%">Currency</th>              
+        <th style="width: 5%">Simulate</th>
+        <th style="width: 5%">Runs</th>
+        <th style="width: 6%">Bin</th>
+        <th style="width: 39%">Created on</th>
+        <th style="width: 5%">Ready</th>
+        <th  style="width: 8%" class="text-right">Actions</th>      
+      </thead>
+      <tbody id="modelTable">
+        {% for model in first_page  %}
+          <tr id='{{model.id}}'>
+            
+             <td class="modelModelType modelData" > {{ forloop.counter }}</td>
+              <td class="modelModelType modelData" name="model_type" >{{model.model_type}}</td>
+              <td class="modelModelType modelData" name="name" >{{model.name}}</td>               
+              <td class="modelModelType modelData" name="currency" >{{model.currency.symbol}}</td>
+              <td class="modelModelType modelData" name="simulation_run" >
+                <input type="checkbox" {% if model.simulation_run %} checked{% endif %} disabled>
+              </td>
+              <td class="modelModelType modelData" name="simulation_iterations" >{{model.simulation_iterations}}</td>
+              <td class="modelModelType modelData" name="npv_bin_size" >{{model.npv_bin_size}}</td>
+              <td class="modelModelType modelData" name="date_created" >{{model.date_created | date:'D d F Y H:m:s'}}</td>
+              
+              <td class="modelModelType modelData" name="design_complete" >
+                <input type="checkbox" {% if model.design_complete %} checked{% endif %} disabled>
+              </td>
+              <!-- DIVET TO APPROPRIATE APP: -->
+              <!--FISH..-->
+              <!--BEEF..-->
+              <td class="text-right modelAction modelData" name="action">
+                  <!-- SHOW MODEL -->
+                  <a href="{% url 'select_model' model.id %}"
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='View Model'><i class="fa fa-eye"></i>
+                  </a>
+                  <!-- EDIT MODEL -->
+                  <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model' model.id %}" 
+                    data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='Edit Model'><i class="fa fa-edit"></i>
+                  </a>
+                  <!-- DELETE MODEL -->
+                 <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                    data-object-name="{{ model.name }}"  data-model-id="{{model.id}}" 
+                    data-delete-url="{% url 'delete_bussiness_model' model.id 1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                    title='Delete' > <i class="fa fa-trash "></i> 
+                    </a>
+              </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+    
+</div>
+<div id= "page_section" class="pagination">
+    {% for i in page_range %}
+    <a class='a_page_nav' style="margin-left: 5px; " href="{{i}}">{{i}}</a>
+    {% endfor %}
+</div>

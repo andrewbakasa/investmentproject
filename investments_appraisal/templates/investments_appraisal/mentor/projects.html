@@ -1,0 +1,310 @@
+{% extends 'investments_appraisal/mentor/index.html' %}<!--investments_appraisal/main.html---->
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Projects</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+
+{% block content %}
+
+ 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+     
+  </div><!-- End Breadcrumbs -->
+
+ <!-- ======= Projects Section ======= -->  
+   {% include 'investments_appraisal/mentor/sections/section_projects.html' %} 
+  
+ 
+</main><!-- End #main -->
+
+
+{%endblock content%}
+
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  {% block scripts %}
+      <!-- Search Button JS -->
+      <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+      <script>
+         //first timme
+          var display_projects_ajax_url= "{% url 'display_projects_ajax' %}"  
+      
+          $(document).ready(function (){ 
+            // $("#index").removeClass( "active")
+            $("#projects a").addClass( "active") 
+            console.log('added projects active')             
+          })
+
+          $("#search").on("keyup", function() {
+            var search_val = $(this).val().toLowerCase();
+            search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
+            //console.log('stripped:', search_val)
+            if (search_val.length == 0){
+                //change here
+                display_projects_ajax_url = "{% url 'display_projects_ajax' %}"
+          
+            }else{
+              //change here
+              display_projects_ajax_url = `{% url 'project_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
+          
+            }
+             // click first page
+            page_no=1
+
+            // in future this is short hand
+           // $(".a_page_nav:eq(" +  page_no  +")").trigger('click');
+
+
+
+             // ajax call
+             $.ajax({
+                    type: "POST",
+                    // define url name
+                    url: display_projects_ajax_url, 
+                    data : {    
+                        page_no : page_no, 
+                        csrfmiddlewaretoken: csrftoken,
+                    },
+                    // handle a successful response
+                    success: function (response) {
+                        $('#project_div').html('')
+                        var per_page=4
+                        var num_of_pages=1
+                        if (response.data.per_page){
+                            per_page=response.data.per_page
+                        }
+
+                        if (response.data.num_of_pages){
+                          num_of_pages=response.data.num_of_pages
+                        }
+                        var records
+                        if (response.data.totalrecords == 0) {
+                          records= `No records found`
+                        }else if(response.data.totalrecords == 1){
+                          records= `${response.data.totalrecords} record found`;
+                        }else{
+                          records= `${response.data.totalrecords} records found`;
+                        }
+                        
+                        html_a= `<label id="total_projects_searched"><i>${records}</i></label>`
+                        $('#total_projects_searched').html(html_a)
+                        editpages(num_of_pages)
+                        var base_counter =(parseInt(page_no)-1)*per_page
+                        var counter=base_counter
+                        $.each(response.data.results, function(i, val) {
+                            var simulation_checked=''
+                            if (val.simulation_run) {
+                                simulation_checked='checked'
+                            }
+                            var design_complete_checked=''
+                            if (val.design_complete) {
+                                design_complete_checked='checked'
+                            }
+                            var js_date_created = new Date(val.date_created)
+                            //append to post
+                           
+                            counter=  counter+1
+            
+                            a_html=`
+                            <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                              <div class="project-item">
+                                <img src="{% static 'mentor/assets/img/projects/${val.uniqueid}.jpg' %}" class="img-fluid" alt="...">
+                                <div class="project-content">
+                                  <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4>${val.name}</h4>
+                                    
+                                  </div>
+    
+                                  <h3><a href="/project-details/${val.id}/">${val.name}</a></h3>
+                                  <p>${val.description}</p>
+                                  <div class="trainer d-flex justify-content-between align-items-center">
+                                    <div class="trainer-rank d-flex align-items-center">
+                                      <i class="bx bx-download"></i>&nbsp;${val.hits}
+                                    </div>
+                                    <div class="trainer-rank d-flex align-items-center">
+                                        <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" 
+                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                          title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
+                                        </a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div> ` ;
+                          
+                            // add each model on every line
+                            $('#project_div').append(a_html)
+                        });
+                        },
+                        error: function () {
+                            alert('Error Occured');
+                        }
+                }); 
+          
+          
+          });
+          function editpages(totalpages){
+            $("#page_section").html('');
+            html_a= `<div id= "page_section" class="pagination">`;
+            for (i=1;i <= totalpages; i++){
+              html_a= html_a + `<a class='a_page_nav' style="margin-left: 5px; " href ="${i}">${i}</a>`; 
+            }
+            html_a= html_a + ` </div>`;
+            $("#page_section").html(html_a);
+          }
+         
+          function getToken(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+          var csrftoken = getToken('csrftoken');
+          $(document).ready(function (){     
+          
+          $('body').on('click', '.a_page_nav', function (event) {
+                // preventing default actions
+                console.log($(this).attr('href'))
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                $.ajax({
+                    type: "POST",
+                    // define url name
+                    url: display_projects_ajax_url, 
+                    data : {    
+                        page_no : page_no, 
+                        csrfmiddlewaretoken: csrftoken,
+                    },
+                    // handle a successful response
+                    success: function (response) {
+                        $('#project_div').html('')
+                        var per_page=4
+                        if (response.data.per_page){
+                            per_page=response.data.per_page
+                        }
+                        var base_counter =(parseInt(page_no)-1)*per_page
+                        var counter=base_counter
+                        $.each(response.data.results, function(i, val) {
+                            var simulation_checked=''
+                            if (val.simulation_run) {
+                                simulation_checked='checked'
+                            }
+                            var design_complete_checked=''
+                            if (val.design_complete) {
+                                design_complete_checked='checked'
+                            }
+                            var js_date_created = new Date(val.date_created)
+                            //append to post
+                           
+                            counter=  counter+1
+            
+                            a_html=`
+                            <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                              <div class="project-item">
+                                <img src="{% static 'mentor/assets/img/projects/${val.uniqueid}.jpg' %}" class="img-fluid" alt="...">
+                                <div class="project-content">
+                                  <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4>${val.name}</h4>
+                                    
+                                  </div>
+    
+                                  <h3><a href="/project-details/${val.id}/">${val.name}</a></h3>
+                                  <p>${val.description}</p>
+                                  <div class="trainer d-flex justify-content-between align-items-center">
+                                    <div class="trainer-rank d-flex align-items-center">
+                                      <i class="bx bx-download"></i>&nbsp;${val.hits}
+                                    </div>
+                                    <div class="trainer-rank d-flex align-items-center">
+                                        <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" 
+                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                          title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
+                                        </a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div> ` ;
+                          
+                            // add each model on every line
+                            $('#project_div').append(a_html)
+                        });
+                        },
+                        error: function () {
+                            alert('Error Occured');
+                        }
+                }); 
+            });
+          
+          
+         
+          $('body').on("click",".model-likes",function(e){
+                event.preventDefault();
+                var url = $(this).attr('data-url');
+                // ajax call
+                $.ajax({
+                  type: "POST",
+                  url: url, 
+                  data : {  
+                    csrfmiddlewaretoken: csrftoken,
+                  },
+                  success: function(response){
+                      if(response.error == false){
+                          const ref="#div-" + response.data.id
+                          val= $(ref).children().find('.trainer').find('a')
+                        
+                          htmal_a= `<a class="model-likes" href="#" data-url="/update_model_likes/${response.data.id}/" 
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
+                          $(val).html(htmal_a)
+                      }
+                  //END SUCCESS
+                  }
+              // END AJAX
+              })
+              return false;
+          })
+          
+          })
+      </script>
+
+  {% endblock %}
+
+  {% block content_custom_menu_navbar %}
+  <!-- ======= Header ======= -->
+  {% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+  
+  {% endblock %}
+

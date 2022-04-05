@@ -1,0 +1,59 @@
+<div class="box box-profile">
+    <div class="box-body" id='timing_assumptions_section'>
+        <h4 class="box-title" style="color:blue">Timing Assumptions Details</h4>
+        <div class="box-description view-section " name='my_timing_assumptions_section'>
+            {%if ta_record %}
+                <!-- Edit/Change -->
+                <div class="table-responsive">
+                    <table id="timingTable" class="table table-striped" >
+                        <thead>
+                        </thead>
+                        <tbody id="timing-table-tbody">
+                            <tr id="timing-base_period" >
+                                <th scope="row">Base Period</th>
+                                <td class="timingAction timingData" name="base_period" >{{ta_record.base_period}}</td>                                                    
+                            </tr>
+                            <tr id="timing-construction_start_year" >
+                                <th scope="row">Construction Start Year</th>
+                                <td class="timingAction timingData"  name="construction_start_year">{{ta_record.construction_start_year}}</td>                                                    
+                            </tr>
+                            <tr id="timing-construction_len" >
+                                <th scope="row">Construction Length</th>
+                                <td class="timingAction timingData"  name="construction_len">{{ta_record.construction_len}}</td>                                                    
+                            </tr>
+
+                            <tr id="timing-construction_year_end" >
+                                <th scope="row">Construction Year End</th>
+                                <td class="timingAction timingData" name="construction_year_end" >{{ta_record.construction_year_end}}</td>                                                    
+                            </tr>
+                            <tr id="timing-operation_start_year" >
+                                <th scope="row">Operation Start Year</th>
+                                <td class="timingAction timingData"  name="operation_start_year">{{ta_record.operation_start_year}}</td>                                                    
+                            </tr>
+                            <tr id="timing-operation_duration" >
+                                <th scope="row">Operation Duration</th>
+                                <td class="timingAction timingData"  name="operation_duration">{{ta_record.operation_duration}}</td>                                                    
+                            </tr>
+
+                            <tr id="timing-operation_end" >
+                                <th scope="row">Operation End</th>
+                                <td class="timingAction timingData"  name="operation_end">{{ta_record.operation_end}}</td>                                                    
+                            </tr>
+                            <tr id="timing-number_of_months_in_a_year" >
+                                <th scope="row"># of months in year</th>
+                                <td class="timingAction timingData"  name="number_of_months_in_a_year">{{ta_record.number_of_months_in_a_year}}</td>                                                    
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                data-target="#modal_add_model_timing_assumptions"> <i class="fa fa-edit"></i></a>
+            {% else %}
+                <!-- Add For First Time -->
+                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                data-target="#modal_add_model_timing_assumptions"> <i class="fa fa-plus"></i></a>
+            {% endif%}
+        </div>
+    </div>
+</div>

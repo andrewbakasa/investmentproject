@@ -1,0 +1,64 @@
+
+
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+{% load i18n %}
+<section id="contact" class="contact">
+  
+
+  <div class="container" data-aos="fade-up">
+
+    <div class="row mt-5">
+
+     
+      <div class="col-lg-12 mt-5 mt-lg-0">
+        <form  enctype="multipart/form-data" method="POST" class="form-horizontal user-settings-update" data-url="{% url 'update_user_pref_ajax' %}">
+          <div class="box-body">
+                {% csrf_token %}
+
+              <div class="form-group {% if form.perpage.errors%} has-error{% endif%}">
+                  <label class="col-sm-2 control-label" for="{{ form.perpage.id_for_label }}">{{ form.perpage.label }}</label>
+                  <div class="col-sm-4  {% if form.perpage.errors %} has-error{% endif %}">
+                      {{ form.perpage|add_class:"form-control" }}
+                      {% for error in form.perpage.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>
+                <!-- <div class="col-sm-2">
+                    <div class="col-sm-4 checkbox">
+                      <label>
+                        {{ form.g2 }}
+                        {{ form.g2.label }}
+                      </label>
+                    </div>
+                  
+                    {% for error in form.g2.errors %}
+                    <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                </div> -->
+              </div>
+        </div>
+      </br>
+        <div class="box-footer">
+            <div class="col-sm-offset-2 col-sm-8">
+              <button type="submit" class="btn btn-primary user-settings-update">{% trans 'Update' %}</button>
+
+            </div>
+        </div>
+
+        <div id="public_toggle_form-errors" class="form-error2 form-group" style='display:none'>
+        </div>
+    </form>
+       
+
+      </div>
+
+    </div>
+
+  </div>
+</section><!-- End Contact Section -->
+
+

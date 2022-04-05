@@ -1,0 +1,57 @@
+<div class="box box-profile">
+    <div class="box-body" id='macroeconomicparameters_section'>
+        <h4 class="box-title" style="color:blue">Macro Economic Parameters</h4>
+        <div class="box-description view-section" name='my_macroeconomicparameters_section'>
+            {%if macroeconomicparameters_record %}
+                <!-- Edit/Change -->
+                <div class="table-responsive">
+                    <table id="macroeconomicparametersTable" class="table table-striped" >
+                        <thead>
+                        </thead>
+                        <tbody id="macroeconomicparameters-table-tbody">
+                             <tr id="macroeconomicparameters-discount_rate_equity" >
+                                <th scope="row">Discount rate equity</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData" name="discount_rate_equity" >{{macroeconomicparameters_record.discount_rate_equity}}</td>                                                    
+                            </tr>
+                            <tr id="macroeconomicparameters-domestic_inflation_rate" >
+                                <th scope="row">Domestic inflation rate</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData"  name="domestic_inflation_rate">{{macroeconomicparameters_record.domestic_inflation_rate}}</td>                                                    
+                            </tr>
+                            <tr id="macroeconomicparameters-us_inflation_rate" >
+                                <th scope="row">US inflation rate</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData"  name="us_inflation_rate">{{macroeconomicparameters_record.us_inflation_rate}}</td>                                                    
+                            </tr>
+
+                            <tr id="macroeconomicparameters-exchange_rate" >
+                                <th scope="row">Exchange rate</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData"  name="exchange_rate">{{macroeconomicparameters_record.exchange_rate}}</td>                                                    
+                            </tr>
+                            <tr id="macroeconomicparameters-dividend_payout_ratio" >
+                                <th scope="row">Dividend payout ratio</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData"  name="dividend_payout_ratio">{{macroeconomicparameters_record.dividend_payout_ratio}}</td>                                                    
+                            </tr>
+                            <tr id="macroeconomicparameters-num_of_shares" >
+                                <th scope="row"># of shares</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData"  name="num_of_shares">{{macroeconomicparameters_record.num_of_shares}}</td>                                                    
+                            </tr>
+
+                            <tr id="macroeconomicparameters-investment_costs_over_run_factor" >
+                                <th scope="row">Investment costs_over run factor</th>
+                                <td class="macroeconomicparametersAction macroeconomicparametersData"  name="investment_costs_over_run_factor">{{macroeconomicparameters_record.investment_costs_over_run_factor}}</td>                                                    
+                            </tr>
+
+                            
+                           
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                  data-target="#modal_add_model_macroeconomicparameters"> <i class="fa fa-edit"></i></a>
+            {% else %}
+                <!-- Add For First Time -->
+                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                data-target="#modal_add_model_macroeconomicparameters"> <i class="fa fa-plus"></i></a>
+            {% endif%}
+        </div>
+    </div>
+</div>

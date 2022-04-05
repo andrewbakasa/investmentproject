@@ -1,0 +1,230 @@
+{% extends 'investments_appraisal/base1.html' %}<!--employees/employees_main.html----->
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% block page_title %}
+Manage Users
+
+{% endblock %}
+
+
+
+{% block content_header %}
+    <h1>  
+        <small>Active Users</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'hcm_home' %}">{% trans 'Home' %}</a></li>
+        <li><a href="{% url 'users_page' %}">{% trans 'Users' %}</a></li>
+        <li class="active">{{ account }}</li>
+    </ol>
+{% endblock %}
+
+
+
+
+
+{% block content %}
+<div class="box">
+  <div class="box-body">
+    <!-- Button trigger modal-->
+    <button type="button" class="btn btn-danger"  disabled data-toggle="modal" data-target="#modal_add_new_users">
+      Add New User +
+    </button>
+
+    <a href="{%url 'activate_users_page'%}">
+      <button type="button" class="btn">
+        Activate Passive User Records
+      </button>
+    </a>
+    
+      <input id="search_input" type="text"  placeholder="Search....">
+   
+    <div class="col-md-12">
+      <div class="box">
+        <div class="box-body">
+          {%if users %}
+          <!-- <h3 style="text-align:center;">Active Employees</h3>
+          <hr> -->
+          <div class="table-responsive">
+           
+            <table class="table table-hover">
+              <thead class="thead-dark">
+              <th>User Name</th>
+              <th>First Name</th>
+              <th>Email</th>
+              <th>Staff Status</th>
+              <th>Superuser Status</th>
+              <th>Date Joined</th>
+              <th>Actions</th>
+              </thead>
+              <tbody id="employee-table">
+              {% for user_instance in users  %}
+              <tr>
+                <td>{{user_instance}}</a></td>
+                <td>{{user_instance.first_name}}</td>
+                <td>{{user_instance.email}}</td>
+                <td>{{user_instance.is_staff}}</td>
+                <td>{{user_instance.is_superuser}}</td>
+                <td>{{user_instance.date_joined | date:"SHORT_DATE_FORMAT" }}</td>
+                <td>
+                
+                  <a href="{% url 'add_user_credentials_page' user_instance.id %}" style="color: inherit">
+                    Manage Credentials
+                  </a> |
+                  <a href="{% url 'suspend_user' user_instance.id %}" style="color: inherit" ...
+                     onclick="return confirm('Are you sure you want to suspend {{user_instance.first_name}} {{user_instance.last_name}}?')">
+                    Suspend
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+            <a href="{%url 'employees_download' %}">
+              <button class="btn btn-outline">Export CSV Report</button>
+            </a>
+          </div>
+
+          {%else%}
+
+          <h3>No active employees available</h3>
+
+          {%endif%}
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Modal: modalAddNewEmployee -->
+    <div class="modal fade" id="modal_add_new_users" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true" style="overflow-y: auto !important">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <!--Header-->
+          <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">Add Employee Data</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body">
+            <form method="POST" action="{%url 'add_new_employee'%}"> {%csrf_token%}
+              <div class="form-group">
+                <label for="sel1">Title:</label>
+                <select class="form-control" name="title" required>
+                  <option>Mr.</option>
+                  <option>Miss.</option>
+                  <option>Mrs.</option>
+                  <option>Dr.</option>
+                  <option>Prof.</option>
+                  <option>Eng.</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter first name" name="first_name" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter last name" name="last_name" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter employee grade" name="grade" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter work station" name="work_station">
+              </div>
+              <div class="form-group">
+                <label>Renumeration Currency:</label>
+                <select class="form-control" name="renumeration_currency" required>
+                  {%for currency in currencies%}
+                  <option value={{currency.id}}>{{currency.name}}</option>
+                  {%endfor%}
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="number" class="form-control" placeholder="Enter basic salary" name="basic_salary" required>
+              </div>
+            
+              <div class="form-group">
+                <input type="number" class="form-control" placeholder="Enter bonus" name="bonus" required>
+              </div>
+             
+              <div class="form-group">
+                <label for="sel1">Gender:</label>
+                <select class="form-control" name="gender" required>
+                  <option>Male</option>
+                  <option>Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="sel1">Marital Status:</label>
+                <select class="form-control" id="sel1" name="marital_status" required>
+                  <option>Single</option>
+                  <option>Married</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Start Date</label>
+                <input class="form-control" type="date" value="2011-08-19" name="start_date" required>
+              </div>
+
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter Nationality" name="nationality" required>
+              </div>
+
+            
+           
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter National ID Number" name="national_id"
+                       required>
+              </div>
+
+              <div class="form-group">
+                <input type="number" class="form-control" placeholder="Enter Telephone Number" name="telephone"
+                       required>
+              </div>
+
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter Residence Address" name="residence_address"
+                       required>
+              </div>
+
+              <div class="form-group">
+                <label>Date of Birth</label>
+                <input class="form-control" type="date" value="1992-08-19" name="dob">
+              </div>
+          </div>
+          <!--Footer-->
+          <div class="modal-footer">
+            <!-- <button class="btn btn-outline-danger" type="reset">Close</button> -->
+            <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+              Close
+            </button>
+
+            <button class="btn btn-danger" type="submit">Save</button>
+          </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+    <!-- Modal: modalAddNewEmployee -->
+
+  </div>
+</div>
+{%endblock content%}
+{% block scripts %}
+<script>
+  $(document).ready(function(){
+    $("#search_input").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#employee-table tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });
+  </script>
+{% endblock %}

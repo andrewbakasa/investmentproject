@@ -1,0 +1,123 @@
+{% extends 'investments_appraisal/base.html' %}
+    {% load i18n %}
+    {% load static %}
+    {% load tags %}
+    {% load humanize %}
+    {% block page_title %}
+        {% load widget_tweaks %}
+    {% endblock %}
+
+{% block content_header %}
+  
+<div class="progressBar" style="padding-left:15px">
+    <input id="user_doc_name" type="hidden" value='{{user_doc_name}}'>
+    <div class="bar" ></div>
+    <h3 >0 %</h3>
+</div>
+
+    
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'user_models' %}">{% trans 'User Models' %}</a></li>
+        {% if usermodel %}
+            <li class="breadcrumb-item"><a href="{{ usermodel.get_absolute_url }}">{{ usermodel }}</a></li>
+            <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-update" href="#" data-url="{% url 'get_beef_model_spreadsheets' usermodel.id %}" 
+                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                title='Download as Excel'><i class="fas fa-download"></i>
+                <!-- <i class="fas fa-file-excel" ></i> -->
+                </a></li>
+                  
+            <li id ='progress_iter' class="breadcrumb-item active">{{ progress_count}} of 8 Complete</li>    
+            <li class="breadcrumb-item active">{% trans 'Beef Model' %}</li>
+            {% if usermodel.simulation_run %}
+            <li class="breadcrumb-item active">{% trans 'Simulation' %} </li>
+            <li class="breadcrumb-item active">{{usermodel.simulation_iterations}} </li>
+            {% endif %}
+            
+        {% else %}
+            <li class="breadcrumb-item active">{% trans 'Create' %}</li>
+        {% endif %}
+    </ol>
+{% endblock %}
+
+{% block mainscripts %}
+
+    
+{% endblock %}
+
+{% block scripts %}
+    <style>
+        .progressBar {
+            width: 100%;
+        }
+        .bar {
+            height: 5px;
+            background-color: #bada55;
+            width: 0;
+            max-width: 100%;
+            transition: width 0.2s cubic-bezier(1, 0.64, 0, 1.26)
+        }
+        /* Dont show download until verified */
+        #run_simu {
+            display: none;
+        }
+
+        #progress_iter{
+            display: 'block';
+        }
+
+      
+    </style>
+    <script>
+        var check_url_ajax= "{% url 'check_model_beef' usermodel.id %}"  
+    </script>
+    <!--Model specific JS-->
+    <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
+    <script src="{% static 'basic_ui/js/feedlot.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="box">
+        <div class="box-body">
+            <!--****************DISPLAY*************************** -->
+             <!-- FIRST ROW -->
+             <div class="row">
+                <div class="col-md-6"> 
+                    {% include 'beefapp/display/accordion.html' %} 
+                </div>  
+                
+            </div>
+            
+              
+        
+            <!-- *****************MODAL POPUP FORMS *************************** -->
+            <!-------------------------FORM TIMING ASSUMPTIONS SECTION ----------------------------------->
+            <!-- modal Add modal_add_model_timing -->
+            {% include 'investments_appraisal/modal/timing_assumption.html' %}    
+            <!-------------------------FORM PRICES SECTION ----------------------------->
+            <!-- modal Add modal_add_model_prices -->
+            {% include 'investments_appraisal/modal/prices.html' %}
+            <!-------------------------FORM DEPRECIATION SECTION ------------------------>            
+            {% include 'investments_appraisal/modal/depreciation.html' %}
+            <!-------------------------FORM TAXES SECTION ----------------------------------->
+            <!-- modal Add modal_add_model_taxes -->
+            {% include 'investments_appraisal/modal/taxes.html' %}
+            
+            <!--------------FORM FINANCING SECTION ------------------------------------>
+            <!-- modal Add modal_add_model_fiancing -->
+            {% include 'investments_appraisal/modal/financing.html' %}
+          
+            <!---------------FORM MACROECONOMICPARAMETER SECTION ---------------------->
+            <!-- modal Add modal_add_model_macroeconomicparameters -->
+            {% include 'investments_appraisal/modal/macro_economic_parameters.html' %}
+      
+            <!-----------------FORM FEEDLOTDESIGNPARAMETER SECTION ------------>
+            <!-- modal Add modal_add_model_feedlotdesignparameters -->
+            {% include 'beefapp/modal/feedlot_design.html' %}
+           
+            <!----------------------FORM WORKINGCAPITAL SECTION --------------->
+            <!-- modal Add modal_add_model_macroeconomicparameters -->
+            {% include 'investments_appraisal/modal/working_capital.html' %}
+          
+    </div>
+{% endblock content %}
