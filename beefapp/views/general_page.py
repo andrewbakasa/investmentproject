@@ -106,7 +106,7 @@ def add_model_specs_page_mentor(request, model_id):
 
 	usermodel = get_object_or_404(UserModel,pk=model_id)
 	simulation_iterations=usermodel.simulation_iterations 
-	interva_l =min(max(simulation_iterations/10,1000),50000)
+	interva_l =min(max(simulation_iterations/10,50000),150000)
 	user_modeltype=	usermodel.model_type.uniqueid
 
 	progress_count=0
@@ -227,7 +227,7 @@ def add_model_specs_page(request, model_id):
 
 	usermodel = get_object_or_404(UserModel,pk=model_id)
 	simulation_iterations=usermodel.simulation_iterations 
-	interva_l =min(max(simulation_iterations/10,1000),50000)
+	interva_l =min(max(simulation_iterations/10,50000),150000)
 	user_modeltype=	usermodel.model_type.uniqueid
 
 	progress_count=0

@@ -23,9 +23,7 @@
 <main id="main">
   <!-- ======= Breadcrumbs ======= -->
   <div class="breadcrumbs">
-    <!-- <div class="container">
-      <h2>My Models</h2>
-    </div> -->
+  
   </div>
   <!-- End Breadcrumbs -->
 
@@ -156,6 +154,8 @@
                         var records
                         if (response.data.totalrecords == 0) {
                           records= `No records found`
+                          html_text= `<div class="col-lg-12 text-center"><p>${records}</p></div>`
+                          $('#project_div').html(html_text)
                         }else if(response.data.totalrecords == 1){
                           records= `${response.data.totalrecords} record found`;
                         }else{
