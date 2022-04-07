@@ -255,7 +255,7 @@ class TimingAssumption(models.Model):
 class Prices(models.Model):
     usermodel = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, default ='Base_Price')
-    base_price = models.DecimalField(decimal_places=2, max_digits=10, default =1000)
+    base_price = models.DecimalField(decimal_places=2, max_digits=10, default =3500)
     change_in_price = models.DecimalField(decimal_places=2, max_digits=10, default =.0)
 
     class Meta:

@@ -65,13 +65,13 @@ $(document).ready(function(){
             var url =  btn.attr("data-url")
             //btn.fadeOut(1000).fadeIn(1000).hide(1000)
             
-            const intervalLength = 2000//'{{interva_l}}'; 
+            const intervalLength = 1000//'{{interva_l}}'; 
             console.log('intervalLength', intervalLength)                 
             var interval= setInterval(progressTimer, intervalLength);
             $('#run_simu').css('display', 'none');
             setTimeout(function () {                       
                 $('.progressBar').css("display", "block");                         
-            }, intervalLength);    
+            }, 1.1*intervalLength);    
             $.ajax({
                 type: 'GET',
                     cache: false,
