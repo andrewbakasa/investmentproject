@@ -11,43 +11,50 @@
               <div class="modal-body">
 
                 
-                <div class="form-group">
-                    <label class="control-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-                    <div class="{% if form.name.errors %} has-error{% endif %}">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                    <div class="col-sm-9 {% if form.name.errors %} has-error{% endif %}">
                       {{ form.name|add_class:"form-control" }}
                       {% for error in form.name.errors %}
                       <span class="help-block">{{ error }}</span>
                       {% endfor %}
                     </div>
                 </div>
-                <div class="form-group">  
-                    <label class="control-label" for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
-                    <div class="{% if form.currency.errors %} has-error{% endif %}">
+                
+                </br>
+                <div class="form-group row">  
+                    <label class="col-sm-3 col-form-label" for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
+                    <div class="col-sm-9 {% if form.currency.errors %} has-error{% endif %}">
                       {{ form.currency|add_class:"form-control" }}
                       {% for error in form.currency.errors %}
                       <span class="help-block">{{ error }}</span>
                       {% endfor %}
                     </div>
                 </div>
+                
+             </br>
 
-                <div class="form-group">               
-                    <label class="control-label" for="{{ form.model_type.id_for_label }}">{{ form.model_type.label }}</label>
-                    <div class="{% if form.model_type.errors %} has-error{% endif %}">
+                <div class="form-group row">               
+                    <label class="col-sm-3 col-form-label" for="{{ form.model_type.id_for_label }}">{{ form.model_type.label }}</label>
+                    <div class="col-sm-9 {% if form.model_type.errors %} has-error{% endif %}">
                       {{ form.model_type|add_class:"form-control" }}
                       {% for error in form.model_type.errors %}
                       <span class="help-block">{{ error }}</span>
                       {% endfor %}
                     </div>
                 </div>
+                
+              </br>
 
-                <div class="form-group{% if form.user.errors %} has-error{% endif %}">
-                  <label class="control-label" for="{{ form.user.id_for_label }}">{{ form.user.label }}</label>
+                <div class="form-group{% if form.user.errors %} has-error{% endif %}" style="display:none">
+                  <label class="col-sm-3 col-form-label" for="{{ form.user.id_for_label }}">{{ form.user.label }}</label>
                  
                   {{ form.user|add_class:"form-control hidden" }}
                   {% for error in form.user.errors %}
                   <span class="help-block">{{ error }}</span>
                   {% endfor %}
                 </div>
+
               </div>
               
 

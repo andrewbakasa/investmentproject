@@ -128,7 +128,7 @@ def display_models(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -211,7 +211,7 @@ def display_models_ajax_filter(request,slug, *args, **kwargs):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -275,7 +275,7 @@ def display_models_ajax(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -481,7 +481,7 @@ def user_models(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -573,7 +573,7 @@ def models(request):
 			print('userpref found')
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 	else:
 		print('2. session[perpage] is...')
 		obj= UserPreference.objects.filter(user=request.user).first()
@@ -581,7 +581,7 @@ def models(request):
 			print('2.userpref found')
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 		print('2. session[perpage] =', request.session['perpage'])
 	
 
@@ -1454,7 +1454,7 @@ def get_total_pages(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 6
+			request.session['perpage']= 3
 	per_page=request.session['perpage']
 	#per_page=request.session['perpage']
 	recordcount= UserModel.objects.filter(user=request.user).count()
@@ -1585,9 +1585,9 @@ def project_search_ajax(request,slug, *args, **kwargs):
 				if obj:
 					request.session['perpage']=obj.perpage
 				else:# nothing in db
-					request.session['perpage']= 6
+					request.session['perpage']= 3
 			else:
-				request.session['perpage']= 6
+				request.session['perpage']= 3
 
 		per_page=request.session['perpage']
 

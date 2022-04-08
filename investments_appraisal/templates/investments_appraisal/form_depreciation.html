@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
-<div class="form-group">
-    <div class="{% if depreciation_form.usermodel.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <div class="col-sm-4 {% if depreciation_form.usermodel.errors %} has-error{% endif %}" style="display:none">
       {{ depreciation_form.usermodel|add_class:"form-control hidden" }}
       {% for error in depreciation_form.usermodel.errors %}
       <span class="help-block">{{ error }}</span>
@@ -8,9 +8,9 @@
     </div>
 </div>
 
-<div class="form-group"> 
-    <label class="control-label" for="{{ depreciation_form.economic_life_of_machinery.id_for_label }}">{{ depreciation_form.economic_life_of_machinery.label }}</label>
-    <div class="{% if depreciation_form.economic_life_of_machinery.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ depreciation_form.economic_life_of_machinery.id_for_label }}">{{ depreciation_form.economic_life_of_machinery.label }}</label>
+    <div class="col-sm-5  {% if depreciation_form.economic_life_of_machinery.errors %} has-error{% endif %}">
       {{ depreciation_form.economic_life_of_machinery|add_class:"form-control" }}
       {% for error in depreciation_form.economic_life_of_machinery.errors %}
       <span class="help-block">{{ error }}</span>
@@ -18,9 +18,9 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class=" control-label" for="{{ depreciation_form.economic_life_of_buildings.id_for_label }}">{{ depreciation_form.economic_life_of_buildings.label }}</label>
-    <div class="{% if depreciation_form.economic_life_of_buildings.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ depreciation_form.economic_life_of_buildings.id_for_label }}">{{ depreciation_form.economic_life_of_buildings.label }}</label>
+    <div class="col-sm-5 {% if depreciation_form.economic_life_of_buildings.errors %} has-error{% endif %}">
       {{ depreciation_form.economic_life_of_buildings|add_class:"form-control" }}
       {% for error in depreciation_form.economic_life_of_buildings.errors %}
       <span class="help-block">{{ error }}</span>
@@ -28,9 +28,9 @@
     </div>
  </div>
 
-<div class="form-group">
-    <label class="control-label" for="{{ depreciation_form.tax_life_of_machinery.id_for_label }}">{{ depreciation_form.tax_life_of_machinery.label }}</label>
-    <div class="{% if depreciation_form.tax_life_of_machinery.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ depreciation_form.tax_life_of_machinery.id_for_label }}">{{ depreciation_form.tax_life_of_machinery.label }}</label>
+    <div class="col-sm-5 {% if depreciation_form.tax_life_of_machinery.errors %} has-error{% endif %}">
       {{ depreciation_form.tax_life_of_machinery|add_class:"form-control" }}
       {% for error in depreciation_form.tax_life_of_machinery.errors %}
       <span class="help-block">{{ error }}</span>
@@ -38,9 +38,9 @@
     </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ depreciation_form.tax_life_of_buildings.id_for_label }}">{{ depreciation_form.tax_life_of_buildings.label }}</label>
-  <div class="{% if depreciation_form.tax_life_of_buildings.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ depreciation_form.tax_life_of_buildings.id_for_label }}">{{ depreciation_form.tax_life_of_buildings.label }}</label>
+  <div class="col-sm-5 {% if depreciation_form.tax_life_of_buildings.errors %} has-error{% endif %}">
     {{ depreciation_form.tax_life_of_buildings|add_class:"form-control" }}
     {% for error in depreciation_form.tax_life_of_buildings.errors %}
     <span class="help-block">{{ error }}</span>
@@ -48,9 +48,9 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ depreciation_form.tax_life_of_soft_capital_costs.id_for_label }}">{{ depreciation_form.tax_life_of_soft_capital_costs.label }}</label>
-  <div class="{% if depreciation_form.tax_life_of_soft_capital_costs.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ depreciation_form.tax_life_of_soft_capital_costs.id_for_label }}">{{ depreciation_form.tax_life_of_soft_capital_costs.label }}</label>
+  <div class="col-sm-5 {% if depreciation_form.tax_life_of_soft_capital_costs.errors %} has-error{% endif %}">
     {{ depreciation_form.tax_life_of_soft_capital_costs|add_class:"form-control" }}
     {% for error in depreciation_form.tax_life_of_soft_capital_costs.errors %}
     <span class="help-block">{{ error }}</span>

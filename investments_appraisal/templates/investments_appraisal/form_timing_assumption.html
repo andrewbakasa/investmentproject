@@ -1,18 +1,17 @@
 {% load widget_tweaks %}
 
 
-<div class="form-group">
-    <div class="{% if timing_assumptions_form.usermodel.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <div class="col-sm-5  {% if timing_assumptions_form.usermodel.errors %} has-error{% endif %}" style="display:none">
       {{ timing_assumptions_form.usermodel|add_class:"form-control hidden" }}
       {% for error in timing_assumptions_form.usermodel.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
     </div>
 </div>
-
-<div class="form-group">
-    <label class="control-label" for="{{ timing_assumptions_form.base_period.id_for_label }}">{{ timing_assumptions_form.base_period.label }}</label>
-    <div class="{% if timing_assumptions_form.base_period.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.base_period.id_for_label }}">{{ timing_assumptions_form.base_period.label }}</label>
+    <div class="col-sm-5  {% if timing_assumptions_form.base_period.errors %} has-error{% endif %}">
       {{ timing_assumptions_form.base_period|add_class:"form-control" }}
       {% for error in timing_assumptions_form.base_period.errors %}
       <span class="help-block">{{ error }}</span>
@@ -20,9 +19,9 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class="control-label" for="{{ timing_assumptions_form.construction_start_year.id_for_label }}">{{ timing_assumptions_form.construction_start_year.label }}</label>
-    <div class="{% if timing_assumptions_form.construction_start_year.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.construction_start_year.id_for_label }}">{{ timing_assumptions_form.construction_start_year.label }}</label>
+    <div class="col-sm-5  {% if timing_assumptions_form.construction_start_year.errors %} has-error{% endif %}">
       {{ timing_assumptions_form.construction_start_year|add_class:"form-control" }}
       {% for error in timing_assumptions_form.construction_start_year.errors %}
       <span class="help-block">{{ error }}</span>
@@ -30,9 +29,10 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class="control-label" for="{{ timing_assumptions_form.construction_len.id_for_label }}">{{ timing_assumptions_form.construction_len.label }}</label>
-    <div class="{% if timing_assumptions_form.construction_len.errors %} has-error{% endif %}">
+
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.construction_len.id_for_label }}">{{ timing_assumptions_form.construction_len.label }}</label>
+    <div class="col-sm-5  {% if timing_assumptions_form.construction_len.errors %} has-error{% endif %}">
       {{ timing_assumptions_form.construction_len|add_class:"form-control" }}
       {% for error in timing_assumptions_form.construction_len.errors %}
       <span class="help-block">{{ error }}</span>
@@ -41,9 +41,10 @@
 </div>
 
 
-<div class="form-group">
-  <label class="control-label" for="{{ timing_assumptions_form.construction_year_end.id_for_label }}">{{ timing_assumptions_form.construction_year_end.label }}</label>
-  <div class="{% if timing_assumptions_form.construction_year_end.errors %} has-error{% endif %}">
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.construction_year_end.id_for_label }}">{{ timing_assumptions_form.construction_year_end.label }}</label>
+  <div class="col-sm-5  {% if timing_assumptions_form.construction_year_end.errors %} has-error{% endif %}">
     {{ timing_assumptions_form.construction_year_end|add_class:"form-control" }}
     {% for error in timing_assumptions_form.construction_year_end.errors %}
     <span class="help-block">{{ error }}</span>
@@ -51,9 +52,10 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ timing_assumptions_form.operation_start_year.id_for_label }}">{{ timing_assumptions_form.operation_start_year.label }}</label>
-  <div class="{% if timing_assumptions_form.operation_start_year.errors %} has-error{% endif %}">
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.operation_start_year.id_for_label }}">{{ timing_assumptions_form.operation_start_year.label }}</label>
+  <div class="col-sm-5  {% if timing_assumptions_form.operation_start_year.errors %} has-error{% endif %}">
     {{ timing_assumptions_form.operation_start_year|add_class:"form-control" }}
     {% for error in timing_assumptions_form.operation_start_year.errors %}
     <span class="help-block">{{ error }}</span>
@@ -62,9 +64,10 @@
 </div>
 
 
-<div class="form-group">
-  <label class="control-label" for="{{ timing_assumptions_form.operation_duration.id_for_label }}">{{ timing_assumptions_form.operation_duration.label }}</label>
-  <div class="{% if timing_assumptions_form.operation_duration.errors %} has-error{% endif %}">
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.operation_duration.id_for_label }}">{{ timing_assumptions_form.operation_duration.label }}</label>
+  <div class="col-sm-5  {% if timing_assumptions_form.operation_duration.errors %} has-error{% endif %}">
     {{ timing_assumptions_form.operation_duration|add_class:"form-control" }}
     {% for error in timing_assumptions_form.operation_duration.errors %}
     <span class="help-block">{{ error }}</span>
@@ -72,9 +75,10 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ timing_assumptions_form.operation_end.id_for_label }}">{{ timing_assumptions_form.operation_end.label }}</label>
-  <div class="{% if timing_assumptions_form.operation_end.errors %} has-error{% endif %}">
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.operation_end.id_for_label }}">{{ timing_assumptions_form.operation_end.label }}</label>
+  <div class="col-sm-5  {% if timing_assumptions_form.operation_end.errors %} has-error{% endif %}">
     {{ timing_assumptions_form.operation_end|add_class:"form-control" }}
     {% for error in timing_assumptions_form.operation_end.errors %}
     <span class="help-block">{{ error }}</span>
@@ -82,9 +86,10 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ timing_assumptions_form.number_of_months_in_a_year.id_for_label }}">{{ timing_assumptions_form.number_of_months_in_a_year.label }}</label>
-  <div class="{% if timing_assumptions_form.number_of_months_in_a_year.errors %} has-error{% endif %}">
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ timing_assumptions_form.number_of_months_in_a_year.id_for_label }}">{{ timing_assumptions_form.number_of_months_in_a_year.label }}</label>
+  <div class="col-sm-5  {% if timing_assumptions_form.number_of_months_in_a_year.errors %} has-error{% endif %}">
     {{ timing_assumptions_form.number_of_months_in_a_year|add_class:"form-control" }}
     {% for error in timing_assumptions_form.number_of_months_in_a_year.errors %}
     <span class="help-block">{{ error }}</span>

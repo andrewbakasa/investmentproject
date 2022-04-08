@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
-<div class="form-group">
-    <div class="{% if macroeconomicparameters_form.usermodel.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <div class="col-sm-4 {% if macroeconomicparameters_form.usermodel.errors %} has-error{% endif %}" style="display:none">
       {{ macroeconomicparameters_form.usermodel|add_class:"form-control hidden" }}
       {% for error in macroeconomicparameters_form.usermodel.errors %}
       <span class="help-block">{{ error }}</span>
@@ -8,9 +8,9 @@
     </div>
 </div>
 
-<div class="form-group"> 
-    <label class="control-label" for="{{ macroeconomicparameters_form.discount_rate_equity.id_for_label }}">{{ macroeconomicparameters_form.discount_rate_equity.label }}</label>
-    <div class="{% if macroeconomicparameters_form.discount_rate_equity.errors %} has-error{% endif %}">
+<div class="form-group row"> 
+    <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.discount_rate_equity.id_for_label }}">{{ macroeconomicparameters_form.discount_rate_equity.label }}</label>
+    <div class="col-sm-4 {% if macroeconomicparameters_form.discount_rate_equity.errors %} has-error{% endif %}">
       {{ macroeconomicparameters_form.discount_rate_equity|add_class:"form-control" }}
       {% for error in macroeconomicparameters_form.discount_rate_equity.errors %}
       <span class="help-block">{{ error }}</span>
@@ -18,9 +18,9 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class=" control-label" for="{{ macroeconomicparameters_form.domestic_inflation_rate.id_for_label }}">{{ macroeconomicparameters_form.domestic_inflation_rate.label }}</label>
-    <div class="{% if macroeconomicparameters_form.domestic_inflation_rate.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.domestic_inflation_rate.id_for_label }}">{{ macroeconomicparameters_form.domestic_inflation_rate.label }}</label>
+    <div class="col-sm-4 {% if macroeconomicparameters_form.domestic_inflation_rate.errors %} has-error{% endif %}">
       {{ macroeconomicparameters_form.domestic_inflation_rate|add_class:"form-control" }}
       {% for error in macroeconomicparameters_form.domestic_inflation_rate.errors %}
       <span class="help-block">{{ error }}</span>
@@ -28,18 +28,18 @@
     </div>
  </div>
 
-<div class="form-group">
-    <label class="control-label" for="{{ macroeconomicparameters_form.us_inflation_rate.id_for_label }}">{{ macroeconomicparameters_form.us_inflation_rate.label }}</label>
-    <div class="{% if macroeconomicparameters_form.us_inflation_rate.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.us_inflation_rate.id_for_label }}">{{ macroeconomicparameters_form.us_inflation_rate.label }}</label>
+    <div class="col-sm-4 {% if macroeconomicparameters_form.us_inflation_rate.errors %} has-error{% endif %}">
       {{ macroeconomicparameters_form.us_inflation_rate|add_class:"form-control" }}
       {% for error in macroeconomicparameters_form.us_inflation_rate.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
     </div>
 </div>
-<div class="form-group">
-  <label class="control-label" for="{{ macroeconomicparameters_form.exchange_rate.id_for_label }}">{{ macroeconomicparameters_form.exchange_rate.label }}</label>
-  <div class="{% if macroeconomicparameters_form.exchange_rate.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.exchange_rate.id_for_label }}">{{ macroeconomicparameters_form.exchange_rate.label }}</label>
+  <div class="col-sm-4 {% if macroeconomicparameters_form.exchange_rate.errors %} has-error{% endif %}">
     {{ macroeconomicparameters_form.exchange_rate|add_class:"form-control" }}
     {% for error in macroeconomicparameters_form.exchange_rate.errors %}
     <span class="help-block">{{ error }}</span>
@@ -47,18 +47,18 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ macroeconomicparameters_form.dividend_payout_ratio.id_for_label }}">{{ macroeconomicparameters_form.dividend_payout_ratio.label }}</label>
-  <div class="{% if macroeconomicparameters_form.dividend_payout_ratio.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.dividend_payout_ratio.id_for_label }}">{{ macroeconomicparameters_form.dividend_payout_ratio.label }}</label>
+  <div class="col-sm-4 {% if macroeconomicparameters_form.dividend_payout_ratio.errors %} has-error{% endif %}">
     {{ macroeconomicparameters_form.dividend_payout_ratio|add_class:"form-control" }}
     {% for error in macroeconomicparameters_form.dividend_payout_ratio.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
   </div>
 </div>
-<div class="form-group">
-  <label class="control-label" for="{{ macroeconomicparameters_form.num_of_shares.id_for_label }}">{{ macroeconomicparameters_form.num_of_shares.label }}</label>
-  <div class="{% if macroeconomicparameters_form.num_of_shares.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.num_of_shares.id_for_label }}">{{ macroeconomicparameters_form.num_of_shares.label }}</label>
+  <div class="col-sm-4 {% if macroeconomicparameters_form.num_of_shares.errors %} has-error{% endif %}">
     {{ macroeconomicparameters_form.num_of_shares|add_class:"form-control" }}
     {% for error in macroeconomicparameters_form.num_of_shares.errors %}
     <span class="help-block">{{ error }}</span>
@@ -66,9 +66,9 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ macroeconomicparameters_form.investment_costs_over_run_factor.id_for_label }}">{{ macroeconomicparameters_form.investment_costs_over_run_factor.label }}</label>
-  <div class="{% if macroeconomicparameters_form.investment_costs_over_run_factor.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.investment_costs_over_run_factor.id_for_label }}">{{ macroeconomicparameters_form.investment_costs_over_run_factor.label }}</label>
+  <div class="col-sm-4 {% if macroeconomicparameters_form.investment_costs_over_run_factor.errors %} has-error{% endif %}">
     {{ macroeconomicparameters_form.investment_costs_over_run_factor|add_class:"form-control" }}
     {% for error in macroeconomicparameters_form.investment_costs_over_run_factor.errors %}
     <span class="help-block">{{ error }}</span>

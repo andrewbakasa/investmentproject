@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
-<div class="form-group">
-    <div class="{% if taxes_form.usermodel.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <div class="col-sm-4 {% if taxes_form.usermodel.errors %} has-error{% endif %}" style="display:none">
       {{ taxes_form.usermodel|add_class:"form-control hidden" }}
       {% for error in taxes_form.usermodel.errors %}
       <span class="help-block">{{ error }}</span>
@@ -8,9 +8,9 @@
     </div>
 </div>
 
-<div class="form-group"> 
-    <label class="control-label" for="{{ taxes_form.import_duty.id_for_label }}">{{ taxes_form.import_duty.label }}</label>
-    <div class="{% if taxes_form.import_duty.errors %} has-error{% endif %}">
+<div class="form-group row"> 
+    <label class="col-sm-7 col-form-label" for="{{ taxes_form.import_duty.id_for_label }}">{{ taxes_form.import_duty.label }}</label>
+    <div class="col-sm-4 {% if taxes_form.import_duty.errors %} has-error{% endif %}">
       {{ taxes_form.import_duty|add_class:"form-control" }}
       {% for error in taxes_form.import_duty.errors %}
       <span class="help-block">{{ error }}</span>
@@ -18,9 +18,9 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class=" control-label" for="{{ taxes_form.sales_tax.id_for_label }}">{{ taxes_form.sales_tax.label }}</label>
-    <div class="{% if taxes_form.sales_tax.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class=" col-sm-7 col-form-label" for="{{ taxes_form.sales_tax.id_for_label }}">{{ taxes_form.sales_tax.label }}</label>
+    <div class="col-sm-4 {% if taxes_form.sales_tax.errors %} has-error{% endif %}">
       {{ taxes_form.sales_tax|add_class:"form-control" }}
       {% for error in taxes_form.sales_tax.errors %}
       <span class="help-block">{{ error }}</span>
@@ -28,9 +28,9 @@
     </div>
  </div>
 
-<div class="form-group">
-    <label class="control-label" for="{{ taxes_form.corporate_income_tax.id_for_label }}">{{ taxes_form.corporate_income_tax.label }}</label>
-    <div class="{% if taxes_form.corporate_income_tax.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ taxes_form.corporate_income_tax.id_for_label }}">{{ taxes_form.corporate_income_tax.label }}</label>
+    <div class="col-sm-4 {% if taxes_form.corporate_income_tax.errors %} has-error{% endif %}">
       {{ taxes_form.corporate_income_tax|add_class:"form-control" }}
       {% for error in taxes_form.corporate_income_tax.errors %}
       <span class="help-block">{{ error }}</span>

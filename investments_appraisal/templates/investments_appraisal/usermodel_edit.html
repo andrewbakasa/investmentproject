@@ -35,7 +35,7 @@
     <!-- User Form -->
     <form method="post" >
       {% csrf_token %}
-      <div class="form-group">
+      <div class="form-group row">
         <label class="col-sm-2 control-label" for="{{ form.model_type.id_for_label }}">{{ form.model_type.label }}</label>
         <div class="col-sm-4{% if form.model_type.errors %} has-error{% endif %}">
           {{ form.model_type|add_class:"form-control" }}
@@ -54,7 +54,7 @@
 
       </div>
 
-      <div class="form-group">
+      <div class="form-group row">
         <label class="col-sm-2 control-label" for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
         <div class="col-sm-4{% if form.date.errors %} has-error{% endif %}">
           {{ form.date|add_class:"form-control  date-input" }}
@@ -75,7 +75,7 @@
 
      
      
-      <div class="form-group">
+      <div class="form-group row">
           <label class="col-sm-2 control-label" for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
           <div class="col-sm-4{% if form.currency.errors %} has-error{% endif %}">
             {{ form.currency|add_class:"form-control" }}

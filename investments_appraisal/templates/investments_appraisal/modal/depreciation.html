@@ -15,8 +15,8 @@
 
                          
                 <form method="POST" id='form-depreciation'
-                    {% if depreciation_record %} class="model-depreciation-edit" data-url="{% url 'edit_model_depreciation_ajax' usermodel.id depreciation_record.id %}" 
-                    {% else %}  class="model-depreciation-add"   data-url="{% url 'add_model_depreciation_ajax' usermodel.id %}" 
+                    {% if depreciation_record %} class="model-depreciation-edit form-horizontal" data-url="{% url 'edit_model_depreciation_ajax' usermodel.id depreciation_record.id %}" 
+                    {% else %}  class="model-depreciation-add form-horizontal"   data-url="{% url 'add_model_depreciation_ajax' usermodel.id %}" 
                 
                     {% endif %} > 
                     {% csrf_token %}

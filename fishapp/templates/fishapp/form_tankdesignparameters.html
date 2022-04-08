@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
-<div class="form-group">
-    <div class="{% if tankdesignparameters_form.usermodel.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <div class="col-sm-5  {% if tankdesignparameters_form.usermodel.errors %} has-error{% endif %}" style="display:none">
       {{ tankdesignparameters_form.usermodel|add_class:"form-control hidden" }}
       {% for error in tankdesignparameters_form.usermodel.errors %}
       <span class="help-block">{{ error }}</span>
@@ -8,9 +8,9 @@
     </div>
 </div>
 
-<div class="form-group"> 
-    <label class="control-label" for="{{ tankdesignparameters_form.tank_length.id_for_label }}">{{ tankdesignparameters_form.tank_length.label }}</label>
-    <div class="{% if tankdesignparameters_form.tank_length.errors %} has-error{% endif %}">
+<div class="form-group row"> 
+    <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.tank_length.id_for_label }}">{{ tankdesignparameters_form.tank_length.label }}</label>
+    <div class="col-sm-5  {% if tankdesignparameters_form.tank_length.errors %} has-error{% endif %}">
       {{ tankdesignparameters_form.tank_length|add_class:"form-control" }}
       {% for error in tankdesignparameters_form.tank_length.errors %}
       <span class="help-block">{{ error }}</span>
@@ -18,9 +18,9 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class=" control-label" for="{{ tankdesignparameters_form.tank_width.id_for_label }}">{{ tankdesignparameters_form.tank_width.label }}</label>
-    <div class="{% if tankdesignparameters_form.tank_width.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.tank_width.id_for_label }}">{{ tankdesignparameters_form.tank_width.label }}</label>
+    <div class="col-sm-5  {% if tankdesignparameters_form.tank_width.errors %} has-error{% endif %}">
       {{ tankdesignparameters_form.tank_width|add_class:"form-control" }}
       {% for error in tankdesignparameters_form.tank_width.errors %}
       <span class="help-block">{{ error }}</span>
@@ -28,9 +28,9 @@
     </div>
  </div>
 
-<div class="form-group">
-    <label class="control-label" for="{{ tankdesignparameters_form.depth.id_for_label }}">{{ tankdesignparameters_form.depth.label }}</label>
-    <div class="{% if tankdesignparameters_form.depth.errors %} has-error{% endif %}">
+<div class="form-group row">
+    <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.depth.id_for_label }}">{{ tankdesignparameters_form.depth.label }}</label>
+    <div class="col-sm-5  {% if tankdesignparameters_form.depth.errors %} has-error{% endif %}">
       {{ tankdesignparameters_form.depth|add_class:"form-control" }}
       {% for error in tankdesignparameters_form.depth.errors %}
       <span class="help-block">{{ error }}</span>
@@ -38,9 +38,9 @@
     </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ tankdesignparameters_form.volume_of_water.id_for_label }}">{{ tankdesignparameters_form.volume_of_water.label }}</label>
-  <div class="{% if tankdesignparameters_form.volume_of_water.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.volume_of_water.id_for_label }}">{{ tankdesignparameters_form.volume_of_water.label }}</label>
+  <div class="col-sm-5  {% if tankdesignparameters_form.volume_of_water.errors %} has-error{% endif %}">
     {{ tankdesignparameters_form.volume_of_water|add_class:"form-control" }}
     {% for error in tankdesignparameters_form.volume_of_water.errors %}
     <span class="help-block">{{ error }}</span>
@@ -48,27 +48,27 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ tankdesignparameters_form.density_per_cubic_metre.id_for_label }}">{{ tankdesignparameters_form.density_per_cubic_metre.label }}</label>
-  <div class="{% if tankdesignparameters_form.density_per_cubic_metre.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.density_per_cubic_metre.id_for_label }}">{{ tankdesignparameters_form.density_per_cubic_metre.label }}</label>
+  <div class="col-sm-5  {% if tankdesignparameters_form.density_per_cubic_metre.errors %} has-error{% endif %}">
     {{ tankdesignparameters_form.density_per_cubic_metre|add_class:"form-control" }}
     {% for error in tankdesignparameters_form.density_per_cubic_metre.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
   </div>
 </div>
-<div class="form-group">
-  <label class="control-label" for="{{ tankdesignparameters_form.total_fish_per_tank_per_cycle.id_for_label }}">{{ tankdesignparameters_form.total_fish_per_tank_per_cycle.label }}</label>
-  <div class="{% if tankdesignparameters_form.total_fish_per_tank_per_cycle.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.total_fish_per_tank_per_cycle.id_for_label }}">{{ tankdesignparameters_form.total_fish_per_tank_per_cycle.label }}</label>
+  <div class="col-sm-5  {% if tankdesignparameters_form.total_fish_per_tank_per_cycle.errors %} has-error{% endif %}">
     {{ tankdesignparameters_form.total_fish_per_tank_per_cycle|add_class:"form-control" }}
     {% for error in tankdesignparameters_form.total_fish_per_tank_per_cycle.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
   </div>
 </div>
-<div class="form-group">
-  <label class="control-label" for="{{ tankdesignparameters_form.tank_num_of_months_per_cycle.id_for_label }}">{{ tankdesignparameters_form.tank_num_of_months_per_cycle.label }}</label>
-  <div class="{% if tankdesignparameters_form.tank_num_of_months_per_cycle.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.tank_num_of_months_per_cycle.id_for_label }}">{{ tankdesignparameters_form.tank_num_of_months_per_cycle.label }}</label>
+  <div class="col-sm-5  {% if tankdesignparameters_form.tank_num_of_months_per_cycle.errors %} has-error{% endif %}">
     {{ tankdesignparameters_form.tank_num_of_months_per_cycle|add_class:"form-control" }}
     {% for error in tankdesignparameters_form.tank_num_of_months_per_cycle.errors %}
     <span class="help-block">{{ error }}</span>
@@ -76,9 +76,9 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ tankdesignparameters_form.fish_per_tank_per_year.id_for_label }}">{{ tankdesignparameters_form.fish_per_tank_per_year.label }}</label>
-  <div class="{% if tankdesignparameters_form.fish_per_tank_per_year.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.fish_per_tank_per_year.id_for_label }}">{{ tankdesignparameters_form.fish_per_tank_per_year.label }}</label>
+  <div class="col-sm-5  {% if tankdesignparameters_form.fish_per_tank_per_year.errors %} has-error{% endif %}">
     {{ tankdesignparameters_form.fish_per_tank_per_year|add_class:"form-control" }}
     {% for error in tankdesignparameters_form.fish_per_tank_per_year.errors %}
     <span class="help-block">{{ error }}</span>
@@ -86,9 +86,9 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label class="control-label" for="{{ tankdesignparameters_form.num_of_tanks.id_for_label }}">{{ tankdesignparameters_form.num_of_tanks.label }}</label>
-  <div class="{% if tankdesignparameters_form.num_of_tanks.errors %} has-error{% endif %}">
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ tankdesignparameters_form.num_of_tanks.id_for_label }}">{{ tankdesignparameters_form.num_of_tanks.label }}</label>
+  <div class="col-sm-5  {% if tankdesignparameters_form.num_of_tanks.errors %} has-error{% endif %}">
     {{ tankdesignparameters_form.num_of_tanks|add_class:"form-control" }}
     {% for error in tankdesignparameters_form.num_of_tanks.errors %}
     <span class="help-block">{{ error }}</span>
