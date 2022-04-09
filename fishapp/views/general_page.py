@@ -105,7 +105,9 @@ from investments_appraisal.forms import  FinancingForm, MacroeconomicParametersF
 @login_required(login_url="account_login")
 def add_model_specs_page_mentor(request, model_id):
 
-	usermodel = get_object_or_404(UserModel,pk=model_id)
+	#usermodel = get_object_or_404(UserModel,pk=model_id)
+	#filter to this user only: each user restricted to own datga
+	usermodel = get_object_or_404(UserModel,user=request.user, pk=model_id)
 	simulation_iterations=usermodel.simulation_iterations 
 	interva_l =min(max(simulation_iterations/10,50000),150000)
 	user_modeltype=	usermodel.model_type.uniqueid

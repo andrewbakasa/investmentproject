@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from pickle import FALSE
 from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -36,7 +37,7 @@ By Vitor Freitas, software developer and researcher Brazil
 #DEBUG = config('DEBUG', cast=bool)
 DEBUG = config('DEBUG', default=True, cast=bool)
 #DEBUG = os.getenv('DEBUG', False) == 'True'
-
+#DEBUG=False
 #ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')]) 
 # or short method hereunder
 # |  |
@@ -47,9 +48,7 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
-    # 'django_plotly_dash.apps.DjangoPlotlyDashConfig',
-    # 'channels',
-    # 'channels_redis',
+   
     'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -61,11 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'widget_tweaks',
     'silverstrike',
-    # 'customers.apps.CustomersConfig',
-    # 'tenders.apps.TendersConfig',
-    # 'contracts.apps.ContractsConfig',
-    # 'invoices.apps.InvoicesConfig',
-    # 'employees',
+   
     'allauth',
     'allauth.account',
     #addded 18 Oct 2021
@@ -77,18 +72,11 @@ INSTALLED_APPS = [
      
     
     'django_filters',
-    #'mlearning',
-   
     'investments_appraisal.apps.InvestmentsAppraisalConfig',
     'fishapp.apps.FishappConfig',
-    'beefapp.apps.BeefappConfig',
-    #'rooms',
-    #'ajaximage',
-   #'kitten',
-    'import_export',
-   
+    'beefapp.apps.BeefappConfig',   
+    'import_export',   
     "common",
-    #  "tempus_dominus",
     
 ]
 
@@ -311,15 +299,15 @@ During testing, ensure that the STATICFILES_STORAGE setting is set to something 
 Here's a simple way to do that in your settings.py:
  """
 import sys
-print('in Settings:',sys.argv)
-TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
-print('TESTING?:',TESTING)
+# print('in Settings:',sys.argv)
+# TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
+# print('TESTING?:',TESTING)
 
-STATICFILES_STORAGE = (
-    'django.contrib.staticfiles.storage.StaticFilesStorage'
-    if TESTING
-    else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-)
+# STATICFILES_STORAGE = (
+#     'django.contrib.staticfiles.storage.StaticFilesStorage'
+#     if TESTING
+#     else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# )
 #STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 WHITENOISE_AUTOREFRESH = True
@@ -380,6 +368,43 @@ LOGGING = {
     },
 }
 
+# Debugging in heroku live
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': ('%(asctime)s [%(process)d] [%(levelname)s] ' +
+                       'pathname=%(pathname)s lineno=%(lineno)s ' +
+                       'funcname=%(funcName)s %(message)s'),
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        }
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'testlogger': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
+    }
+}
+
+DEBUG_PROPAGATE_EXCEPTIONS = True
+COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', False)
+
 # Configure Django App for Heroku.
 import django_on_heroku
 django_on_heroku.settings(locals())
@@ -404,5 +429,5 @@ When I removed comments, I was able to render the page and 500 error was gone.
 For what it's worth, you'll face the same issue if you have an html comment in your code that calls the template tag "static" (probably the behavior is the same for every commented template tag), this was my case:
 
 <!-- <img  src="{% static 'main_website/images/image.jpg' %}" alt=""> -->
-removing the comment resoled the 500 error (which also, was not being logged).
+removing the comment resolved the 500 error (which also, was not being logged).
 """
