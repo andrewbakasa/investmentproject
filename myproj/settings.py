@@ -42,7 +42,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # or short method hereunder
 # |  |
 # V  V
-ALLOWED_HOSTS =['*']# config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())#['*']
 SITE_ID = 1
 
 # Application definition
