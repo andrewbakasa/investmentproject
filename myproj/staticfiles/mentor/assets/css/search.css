@@ -9,24 +9,24 @@
   .search-box {
     position: relative;
     width: 100%;
-    max-width: 360px;
-    height: 60px;
+    max-width: 270px;/*360 original*/
+    height: 40px;/*60 original*/
     border-radius: 120px;
     margin: 0 auto;
   }
   .search-icon, .go-icon {
     position: absolute;
     top: 0;
-    height: 60px;
-    width: 86px;
-    line-height: 61px;
+    height: 40px;/*60 original*/
+    width: 66px;/*86 original*/
+    line-height: 41px;/*61 original*/
     text-align: center;
     color:lightgreen
   }
   .search-icon {
     left: 0;
     pointer-events: none;
-    font-size: 1.22em;
+    font-size: 1.02em;/* 122em*/
     will-change: transform;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
@@ -50,7 +50,7 @@
   .go-icon {
     right: 0;
     pointer-events: none;
-    font-size: 1.38em;
+    font-size: 1.08em;/*1.38em*/
     will-change: opacity;
     cursor: default;
     opacity: 0;
@@ -79,14 +79,14 @@
   .search-border {
     display: block;
     width: 100%;
-    max-width: 360px;
-    height: 60px;
+    max-width: 270px;/*360 original*/
+    height: 40px;/*60 original*/
   }
   .border {
     fill: none;
     stroke: lightgreen;
-    stroke-width: 3;
-    stroke-miterlimit: 5;
+    stroke-width: 2;/*3 original*/
+    stroke-miterlimit: 3;/*5 orignal*/
   }
   .border {
     stroke-dasharray: 740;
@@ -114,9 +114,9 @@
     border-radius: 120px;
     border: none;
     background: rgba(255,255,255,0);
-    padding: 0 68px 0 68px;
+    padding: 0 48px 0 30px; /*0 68px 0 68px*/
     color: lightgreen;
-    font-size: 1.32em;
+    font-size: 1.02em;/*1.3em*/
     font-weight: 400;
     letter-spacing: -0.015em;
     outline: none;
