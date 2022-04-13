@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-#handler404 = 'app.views.custom_404'
 
 urlpatterns = [
     path('acc/', include('silverstrike.urls')),
