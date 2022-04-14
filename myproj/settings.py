@@ -314,6 +314,5 @@ When I removed comments, I was able to render the page and 500 error was gone.
 
 For what it's worth, you'll face the same issue if you have an html comment in your code that calls the template tag "static" (probably the behavior is the same for every commented template tag), this was my case:
 
-<!-- <img  src="{% static 'main_website/images/image.jpg' %}" alt=""> -->
 removing the comment resolved the 500 error (which also, was not being logged).
 """

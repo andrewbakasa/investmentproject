@@ -1,4 +1,4 @@
-{% extends 'investments_appraisal/mentor/index.html' %}<!--investments_appraisal/main.html---->
+{% extends 'investments_appraisal/mentor/index.html' %}
 {% load i18n %}
 {% load static %}
 {% load tags %}
@@ -103,19 +103,128 @@
   {% block scripts %}
        <!-- Search Button JS -->
        <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+       
       <script>
+          function getToken(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+          var csrftoken = getToken('csrftoken');
+          var display_models_ajax_url= "{% url 'display_models_ajax' %}"  
+      
           $(document).ready(function (){ 
-            $("#models a").addClass( "active")  
-            $('.project-content[ready]').each( function (){
-                // _attr= $(this)
-                
-                // if (typeof _attr !== "undefined" && _attr !== false && _attr !== null){
-                    $(this).addClass('model-complete')  
-                // }
-
-            })
+                $("#models a").addClass( "active")  
+                $('.project-content[ready]').each( function (){
+                    $(this).addClass('model-complete')
+                })
                     
           })
+        
+          function append_html(counter,val){
+
+            var simulation_checked=''
+                            if (val.simulation_run) {
+                                simulation_checked='<i style="color:blue;" class="bi bi-check-circle"></i>'
+                            }else{
+                                
+                                simulation_checked=' <i class="bi-square"></i>'
+                            }
+                            var design_complete_checked=''
+                            if (val.design_complete) {
+                                design_complete_checked='<i style="color:blue;" class="bi bi-check-circle"></i>'
+                            }else{
+                                
+                                design_complete_checked=' <i class="bi-square"></i>'
+                            }
+                            
+                            var eye_style=''
+                            var ready_attr=''
+                            var model_class_added=''
+                            if (val.design_complete) {
+                                eye_style='style="color:blue"'
+                                ready_attr='ready'
+                                model_class_added= 'model-complete'
+                            }else{
+                                
+                                eye_style='style="color:inherit"'
+                            }
+
+                            var js_date_created = new Date(val.date_created)
+                            //append to post
+                            counter=  counter +1
+                            var baseimageURL = "{% static 'mentor/assets/img/models/' %}"
+                            imgval= baseimageURL + val.uniqueid +'.jpg'
+                            a_html=`
+                                <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
+                                <div class="project-item umodel-item">
+                                
+                                    <img src ="${imgval}" class="umodel-img" alt="">
+                                
+                                    <div ${ready_attr} class="project-content ${model_class_added}">
+                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="link">
+                                            <h3><a href="/select_model_mentor/${val.id}/">${val.name}</a></h3>
+                                 
+                                            <p class="price">${val.currency}</p>
+                                        </div> 
+                                    
+
+                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="design">
+                                            <div class="modelModelType modelData" name="simulation_run" >
+                                                Simulations${simulation_checked} 
+                                            </div>
+                                            <div class="modelModelType modelData" name="design_complete" >
+                                                Ready${design_complete_checked} 
+                                            </div>
+                                        </div> 
+                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="iterations">
+                                            
+                                            <div class="modelModelType modelData" name="simulation_iterations" >
+                                                Iterations: ${val.simulation_iterations}
+                                            </div>
+                                            <div class="modelModelType modelData" name="npv_bin_size" >
+                                                Bin :${val.npv_bin_size}
+                                            </div>
+                                        </div>
+                                    <p class="modelModelType modelData" name="date_created" >Date Created: ${js_date_created}</p>
+                                
+                                    <p name="description" >${val.description}</p>
+
+                                    <p class="text-right modelAction modelData" name="action">
+                                        <!-- SHOW MODEL -->
+                                        <a href="/select_model_mentor/${val.id}/"
+                                        ${eye_style} data-toggle="tooltip" data-placement="bottom" 
+                                        title='View Model'><i class="fas fa-eye"></i>
+                                        </a>
+                                        <!-- EDIT MODEL -->
+                                        <a class="model-edit show-form-update" href="#" data-url="/update_model/${val.id}/" 
+                                        data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                        title='Edit Model'><i class="fas fa-edit"></i>
+                                        </a>
+                                        <!-- DELETE MODEL -->
+                                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                        data-object-name="${val.name}"  data-model-id="${val.id}" 
+                                        data-delete-url="/delete_bussiness_model_ajax/${val.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                        title='Delete' ><i class="fas fa-trash"></i>
+                                        </a>
+                                        </p>
+                                    
+                                    
+                                    </div>
+                                </div>
+                                </div>` ;
+                return a_html
+          }
 
           $("body").on("keyup", "#search", function(){
             var search_val = $(this).val().toLowerCase();
@@ -169,96 +278,8 @@
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
                         $.each(response.data.results, function(i, val) {
-                            var simulation_checked=''
-                            if (val.simulation_run) {
-                                simulation_checked='<i style="color:blue;" class="bi bi-check-circle"></i>'
-                            }else{
-                                
-                                simulation_checked=' <i class="bi-square"></i>'
-                            }
-                            var design_complete_checked=''
-                            if (val.design_complete) {
-                                design_complete_checked='<i style="color:blue;" class="bi bi-check-circle"></i>'
-                            }else{
-                                
-                                design_complete_checked=' <i class="bi-square"></i>'
-                            }
-                            
-                            var eye_style=''
-                            var ready_attr=''
-                            var model_class_added=''
-                            if (val.design_complete) {
-                                eye_style='style="color:blue"'
-                                ready_attr='ready'
-                                model_class_added= 'model-complete'
-                            }else{
-                                
-                                eye_style='style="color:inherit"'
-                            }
-
-                            var js_date_created = new Date(val.date_created)
-                            //append to post
-                            counter=  counter +1
-                            a_html=`
-                                <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                                <div class="project-item umodel-item">
-                                
-                                    <img src ="{% static 'mentor/assets/img/models/${val.uniqueid}.jpg' %}" class="umodel-img" alt="">
-                                
-                                    <div ${ready_attr} class="project-content ${model_class_added}">
-                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="link">
-                                            <h3><a href="/'select_model_mentor/${val.id}/">${val.name}</a></h3>
-                                 
-                                            <p class="price">${val.currency}</p>
-                                        </div> 
-                                    
-
-                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="design">
-                                            <div class="modelModelType modelData" name="simulation_run" >
-                                                Simulations${simulation_checked} 
-                                            </div>
-                                            <div class="modelModelType modelData" name="design_complete" >
-                                                Ready${design_complete_checked} 
-                                            </div>
-                                        </div> 
-                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="iterations">
-                                            
-                                            <div class="modelModelType modelData" name="simulation_iterations" >
-                                                Iterations: ${val.simulation_iterations}
-                                            </div>
-                                            <div class="modelModelType modelData" name="npv_bin_size" >
-                                                Bin :${val.npv_bin_size}
-                                            </div>
-                                        </div>
-                                    <p class="modelModelType modelData" name="date_created" >Date Created: ${js_date_created}</p>
-                                
-                                    <p name="description" >${val.description}</p>
-
-                                    <p class="text-right modelAction modelData" name="action">
-                                        <!-- SHOW MODEL -->
-                                        <a href="/select_model_mentor/${val.id}/"
-                                        ${eye_style} data-toggle="tooltip" data-placement="bottom" 
-                                        title='View Model'><i class="fas fa-eye"></i>
-                                        </a>
-                                        <!-- EDIT MODEL -->
-                                        <a class="model-edit show-form-update" href="#" data-url="/update_model/${val.id}/" 
-                                        data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                        title='Edit Model'><i class="fas fa-edit"></i>
-                                        </a>
-                                        <!-- DELETE MODEL -->
-                                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                        data-object-name="${val.name}"  data-model-id="${val.id}" 
-                                        data-delete-url="/delete_bussiness_model_ajax/${val.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                        title='Delete' ><i class="fas fa-trash"></i>
-                                        </a>
-                                        </p>
-                                    
-                                    
-                                    </div>
-                                </div>
-                                </div>` ;
-
-                     
+                           
+                            a_html=append_html(counter,val)
                             // add each model on every line
                             $('#project_div').append(a_html)
 
@@ -271,39 +292,9 @@
           
           
           });
-          function editpages(totalpages){
-            $("#page_section").html('');
-            html_a= `<div id= "page_section" class="pagination">`;
-            for (i=1;i <= totalpages; i++){
-              html_a= html_a + `<a class='a_page_nav' style="margin-left: 5px; " href ="${i}">${i}</a>`; 
-            }
-            html_a= html_a + ` </div>`;
-            $("#page_section").html(html_a);
-          }
-          function add_model_class(){
-            $('.project-content[ready]').each( function (){
-                $(this).addClass('model-complete')
-            })  
-          }
-          var display_models_ajax_url= "{% url 'display_models_ajax' %}"  
-      
-          function getToken(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-          var csrftoken = getToken('csrftoken');
-          $(document).ready(function (){     
+         
+          
+          
           
           $('body').on('click', '.a_page_nav', function (event) {
                 // preventing default actions
@@ -329,96 +320,8 @@
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
                         $.each(response.data.results, function(i, val) {
-                            var simulation_checked=''
-                            if (val.simulation_run) {
-                                simulation_checked='<i style="color:blue;" class="bi bi-check-circle"></i>'
-                            }else{
-                                
-                                simulation_checked=' <i class="bi-square"></i>'
-                            }
-                            var design_complete_checked=''
-                            if (val.design_complete) {
-                                design_complete_checked='<i style="color:blue;" class="bi bi-check-circle"></i>'
-                            }else{
-                                
-                                design_complete_checked=' <i class="bi-square"></i>'
-                            }
-                            
-                            var eye_style=''
-                            var ready_attr=''
-                            var model_class_added=''
-                            if (val.design_complete) {
-                                eye_style='style="color:blue"'
-                                ready_attr='ready'
-                                model_class_added= 'model-complete'
-                            }else{
-                                
-                                eye_style='style="color:inherit"'
-                            }
 
-                            var js_date_created = new Date(val.date_created)
-                            //append to post
-                            counter=  counter +1
-                            a_html=`
-                                <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                                <div class="project-item umodel-item">
-                                
-                                    <img src ="{% static 'mentor/assets/img/models/${val.uniqueid}.jpg' %}" class="umodel-img" alt="">
-                                
-                                    <div ${ready_attr} class="project-content ${model_class_added}">
-                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="link">
-                                            <h3><a href="/'select_model_mentor/${val.id}/">${val.name}</a></h3>
-                                 
-                                            <p class="price">${val.currency}</p>
-                                        </div> 
-                                    
-
-                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="design">
-                                            <div class="modelModelType modelData" name="simulation_run" >
-                                                Simulations${simulation_checked} 
-                                            </div>
-                                            <div class="modelModelType modelData" name="design_complete" >
-                                                Ready${design_complete_checked} 
-                                            </div>
-                                        </div> 
-                                        <div class="d-flex justify-content-between align-items-center mb-3"  name="iterations">
-                                            
-                                            <div class="modelModelType modelData" name="simulation_iterations" >
-                                                Iterations: ${val.simulation_iterations}
-                                            </div>
-                                            <div class="modelModelType modelData" name="npv_bin_size" >
-                                                Bin :${val.npv_bin_size}
-                                            </div>
-                                        </div>
-                                    <p class="modelModelType modelData" name="date_created" >Date Created: ${js_date_created}</p>
-                                
-                                    <p name="description" >${val.description}</p>
-
-                                    <p class="text-right modelAction modelData" name="action">
-                                        <!-- SHOW MODEL -->
-                                        <a href="/select_model_mentor/${val.id}/"
-                                        ${eye_style} data-toggle="tooltip" data-placement="bottom" 
-                                        title='View Model'><i class="fas fa-eye"></i>
-                                        </a>
-                                        <!-- EDIT MODEL -->
-                                        <a class="model-edit show-form-update" href="#" data-url="/update_model/${val.id}/" 
-                                        data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                        title='Edit Model'><i class="fas fa-edit"></i>
-                                        </a>
-                                        <!-- DELETE MODEL -->
-                                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                        data-object-name="${val.name}"  data-model-id="${val.id}" 
-                                        data-delete-url="/delete_bussiness_model_ajax/${val.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                        title='Delete' ><i class="fas fa-trash"></i>
-                                        </a>
-                                        </p>
-                                    
-                                    
-                                    </div>
-                                </div>
-                                </div>` ;
-
-                     
+                            a_html=append_html(counter,val)
                             // add each model on every line
                             $('#project_div').append(a_html)
 
@@ -431,18 +334,20 @@
                 });
                 add_model_class()
             });
-          })
-
+          
+        
+          
+          
+          
+          
+          
           $('#confirmdelete').on('show.bs.modal', function(e) {
-                //console.log('here')
                 var name = $(e.relatedTarget).data('object-name');
                 var url = $(e.relatedTarget).data('delete-url');
                 var model_id = $(e.relatedTarget).data('model-id');
                 $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
-                //$('#confirmdelete .modal-footer a').attr('href', url);
                 $('#confirmdelete .modal-footer input').attr('data-url', url);
                 $('#confirmdelete .modal-footer input').attr('model-id', model_id);
-                //console.log('model-id', model_id)
             });
           
           function updatePaging(pages){ 
@@ -682,13 +587,7 @@
                 contentType: false,
                 success: function(data){ 
                     //console.log('added data' ,data.model)
-                    if(data.model){ 
-                        //console.log('getting inside: desired')
-                        //console.log($('#modal_add_new_model'))
-                        //---------HIDE ADD(+)----------------------              
-                        //$('#modal_add_new_model').modal('hide'); ---This failed
-                        // this working 26 March 2022
-                        // Trigger close
+                    if(data.model){
                         $('.close-modal').click()
                         //update paging
                         if (data.total_pages){
@@ -751,13 +650,6 @@
 
   {% endblock %}
 
-<!--   
-
-<script>
-   var display_models_ajax_url= "{% url 'display_models_ajax' %}"  
- </script>
- <script src="{% static 'basic_ui/js/base_models.js' %}"></script>
--->
 
 {% block content_custom_menu_navbar %}
 <!-- ======= Header ======= -->
