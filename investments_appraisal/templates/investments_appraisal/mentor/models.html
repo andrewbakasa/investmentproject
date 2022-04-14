@@ -116,8 +116,8 @@
             })
                     
           })
-          
-          $("#search").on("keyup", function() {
+
+          $("body").on("keyup", "#search", function(){
             var search_val = $(this).val().toLowerCase();
             search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
             if (search_val.length == 0){

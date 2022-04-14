@@ -11,6 +11,7 @@ import pandas as pd
 from beefapp.beef_bus_model import BeefBusinessReport
 from beefapp.models import FeedlotDesignParameters
 from common.data_utils import create_downloads_instance
+from common.utils import get_current_user_groups
 from investments_appraisal.models import *
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -184,10 +185,10 @@ def get_model_spreadsheets(request, model_id):
     else:
         input_vars= breport.para_list_by_grad
     
-    #print(input_vars)
+    user_group_set =get_current_user_groups(request.user)
+    premium_user = True if 'premium_user' in user_group_set else False
 
-
-    if simulation_run:
+    if simulation_run and premium_user:
         if simulation_iterations>0:
             max_allowed=1000000
             min_allowed=100

@@ -28,11 +28,14 @@
   <!-- </hr> -->
 
     <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
-
-        {% for model in first_page %}
-        
-       
-
+        {% if not first_page %}
+          <div class="col-lg-12 text-center">
+            <p>No records found</p>
+            <p>You are welcome to creating financial models</p>
+            <p>Start new model by clicking the red button above</p>
+          </div>
+        {% else %}
+          {% for model in first_page %}
             <div id="div-{{model.id}}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
               <div class="project-item umodel-item">
              
@@ -98,7 +101,7 @@
             </div> <!-- End Project Item-->
        
         {% endfor %}  
-
+        {% endif %} 
   
 
     </div>

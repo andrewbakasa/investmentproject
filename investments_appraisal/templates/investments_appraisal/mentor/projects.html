@@ -57,8 +57,8 @@
             $("#projects a").addClass( "active") 
             console.log('added projects active')             
           })
-
-          $("#search").on("keyup", function() {
+          $("body").on("keyup", "#search", function(){
+          //$("#search").on("keyup", function() {
             var search_val = $(this).val().toLowerCase();
             search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
             //console.log('stripped:', search_val)

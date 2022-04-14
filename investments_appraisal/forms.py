@@ -4,6 +4,8 @@ from django import forms
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
+
+from common.utils import get_current_user_groups
 from .models import *
 #from employees.models import CompanyUser
 from django.forms.widgets import CheckboxSelectMultiple
@@ -84,13 +86,15 @@ class UserModelFormUpdate(forms.ModelForm):
         super(UserModelFormUpdate,self).__init__(*args, **kwargs)
        
        
-        self.fields['user'].widget.attrs['readonly']=True       
+        #self.fields['user'].widget.attrs['readonly']=True   
+        print(self.fields['user'])    
         # self.fields['user'].disabled=True
+        # if not self.check_if_premium_user():
+        #     self.fields['simulation_run'].widget.attrs['readonly']=True
 
     class Meta:
         model = UserModel
-        fields = ['name','model_type', 'currency','simulation_iterations', 
-        'simulation_run', 'npv_bin_size', 'user']
+        fields = ['name','model_type', 'currency','simulation_iterations',  'user', 'simulation_run', 'npv_bin_size']
     
     def clean_simulation_iterations(self):
         simulation_iterations = self.cleaned_data['simulation_iterations']
@@ -99,6 +103,28 @@ class UserModelFormUpdate(forms.ModelForm):
           
             raise ValidationError(_(f'An model with {simulation_iterations} runs-is greather than allowed {val}'))
         return simulation_iterations
+
+    def clean_simulation_run(self):
+        simulation_run = self.cleaned_data['simulation_run']
+        if simulation_run == True:
+            if 'user' in self.cleaned_data:
+                user = self.cleaned_data['user']
+                user_group_set =get_current_user_groups(user)   
+                premium_user = True if 'premium_user' in user_group_set else False
+                if premium_user == False:
+                    raise ValidationError(_(f'To have this right please upgrade your account'))
+            else:
+                raise ValidationError(_(f'User not specified'))
+        return simulation_run
+
+    def check_if_premium_user(self):
+        if 'user' in self.cleaned_data:
+            user = self.cleaned_data['user']
+            user_group_set =get_current_user_groups(user)   
+            premium_user = True if 'premium_user' in user_group_set else False
+            return premium_user
+        else:
+            return False
 
     def clean_name(self): 
          #print(data)

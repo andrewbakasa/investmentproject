@@ -71,7 +71,7 @@ $(document).ready(function(){
             $('#run_simu').css('display', 'none');
             setTimeout(function () {                       
                 $('.progressBar').css("display", "block");                         
-            }, 1.1*intervalLength);    
+            }, 1.5*intervalLength);    
             $.ajax({
                 type: 'GET',
                     cache: false,

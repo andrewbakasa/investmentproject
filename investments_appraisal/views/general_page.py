@@ -567,22 +567,22 @@ def models(request):
 	# articles per page
 	
 	if not ('perpage' in request.session):
-		print('session[perpage] on set')
+		#print('session[perpage] on set')
 		obj= UserPreference.objects.filter(user=request.user).first()
 		if obj:
-			print('userpref found')
+			#print('userpref found')
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
 			request.session['perpage']= 3
 	else:
-		print('2. session[perpage] is...')
+		#print('2. session[perpage] is...')
 		obj= UserPreference.objects.filter(user=request.user).first()
 		if obj:
-			print('2.userpref found')
+			#print('2.userpref found')
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
 			request.session['perpage']= 3
-		print('2. session[perpage] =', request.session['perpage'])
+		#print('2. session[perpage] =', request.session['perpage'])
 	
 
 	per_page=request.session['perpage']
@@ -1525,6 +1525,7 @@ def save_all_usermodel(request,form,template_name):
 				data['html_form'] = render_to_string(template_name,{'form':form},request=request)
 				return JsonResponse(data)
 			else:
+				
 			
 				form.save()
 				pk = form.instance.id

@@ -10,7 +10,7 @@
     <!-- <a href="index.html" class="logo me-auto"><img src="{% static 'mentor/assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
     <nav id="navbar" class="navbar order-last order-lg-0">
-      <ul>
+      <ul id="navbar-ul">
         <li id="index"><a href="{% url 'index' %}">Home</a></li>
         <li id="about"><a href="{% url 'about' %}">About</a></li>
         <li id="projects"><a href="{% url 'projects' %}">Projects</a></li>
@@ -66,7 +66,7 @@
     </nav><!-- .navbar -->
     
     {% block searchbutton %}
-    <div class="search-container" style="margin-left: 5px;">
+    <div id ="searchbutton" class="search-container" style="margin-left: 15px;">
       <div class="search-box">
           <div class="search-icon"><i class="fa fa-search search-icon"></i></div>
           <form action="" class="search-form">

@@ -1,6 +1,13 @@
 import datetime
 import pandas as pd
 
+
+def get_current_user_groups(user):
+    user_set=[]
+    if user.groups.exists():
+        user_set = list(user.groups.values_list('name',flat = True)) 
+    return user_set
+	
 def clip_trailing_chars(inputstr, max_len=25):
     return "{}{} ".format(inputstr[:max_len], "... " if len(inputstr)> max_len else "")
 
