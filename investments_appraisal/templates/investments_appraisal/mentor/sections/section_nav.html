@@ -36,7 +36,7 @@
             <li><a href="#">Drop Down 4</a></li>
           </ul>
         </li> -->
-
+        <li><a href="{% url 'contact' %}">Contact</a></li>
         {% if request.user.is_authenticated %}
         <li class="nav-item dropdown user user-menu">
             <a href="#" class="nav-link" id="navbarDropdownMenuAvatar" data-toggle="dropdown">
@@ -61,7 +61,7 @@
             </ul>
         </li>
         {% endif %}
-        <li><a href="{% url 'contact' %}">Contact</a></li>
+        
       </ul>
       <i class="bi bi-list mobile-nav-toggle"></i>
     </nav><!-- .navbar -->

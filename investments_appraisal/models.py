@@ -14,6 +14,14 @@ def get_curr_year():
     current_year = datetime.datetime.now().year
     return int(current_year)
 
+class SimulationParameters(models.Model):
+    max_simulation_iter = models.IntegerField(default=100)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    class Meta:
+        ordering = ['-date_created']
+
+    def __str__(self):
+        return self.date_created 
 class NewsSubscribe(models.Model):
     email = models.CharField(max_length=200, unique=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)

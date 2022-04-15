@@ -98,7 +98,12 @@ class UserModelFormUpdate(forms.ModelForm):
     
     def clean_simulation_iterations(self):
         simulation_iterations = self.cleaned_data['simulation_iterations']
-        val =100000
+        obj =SimulationParameters.objects.first()   
+        if obj:
+            val= obj.max_simulation_iter
+        else:
+            val=100
+
         if simulation_iterations>val:
           
             raise ValidationError(_(f'An model with {simulation_iterations} runs-is greather than allowed {val}'))
