@@ -8,8 +8,10 @@ from . import views
 
 
 urlpatterns = [
-    
-    path('hh/', views.general_page.home_page, name="home_page"),
+    path('users_last_login/', views.general_page.get_users_last_login, name="ulogin"),
+    path('get_users_last_login_ajax/', views.general_page.get_users_last_login_ajax, name="get_users_last_login_ajax"),
+  
+    path('home/', views.general_page.home_page, name="home_page"),
     path('models/', views.general_page.user_models, name="user_models"),
     path('display_models/', views.general_page.display_models, name="display_pagination"),
     path('display_models_ajax/', views.general_page.display_models_ajax, name="display_models_ajax"),

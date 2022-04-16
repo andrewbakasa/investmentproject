@@ -1,7 +1,7 @@
 
 from django.urls import include, path
 from django.views.generic import TemplateView
-
+from . import views
 from common.views import (
     #CreateUserView,
     DocumentDeleteView,
@@ -30,6 +30,7 @@ app_name = "common"
 
 urlpatterns = [
     path("", landing_page, name="landing_page"),
+    
     path("dashboard/", HomeView.as_view(), name="dashboard"),
     path("profile/", ProfileView.as_view(), name="profile"),
   

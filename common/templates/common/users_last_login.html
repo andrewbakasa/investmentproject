@@ -1,0 +1,153 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Users Last Login</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+{% block content %}
+
+ 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+  
+  </div>
+  <!-- End Breadcrumbs -->
+
+  <!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+  
+    <div class="container" data-aos="fade-up">
+       <!-- ======= Breadcrumbs ======= -->
+        <div class="row">
+            <ol class="breadcrumb" >
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
+                <li class="breadcrumb-item"><a href="#">{% trans 'Users' %}</a></li>
+                <li class="class="breadcrumb-item active">{{ account }}</li>    
+            </ol>
+        </div> 
+   
+  
+        <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-body">
+                        {%if users%}
+                        <h3 style="text-align:center;">Last Login Users: {{total}}</h3>
+                        <hr>
+                        <div class="table-responsive">
+                            <table id="usersTable" class="table table-hover">
+                                <thead class="thead-dark">
+                                <th>Last Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Staff Status</th>
+                                <th>Superuser Status</th>
+                                <th>Date Joined</th>
+                                <th>Last Login</th>
+                                <th>Count</th>
+                                </thead>
+                                <tbody id="users-table-tbody">
+                                {% for item in users  %}
+                                <tr id="userid-{{item.id}}" >
+                                    <td>{{item.user.last_name}}</td>
+                                    <td>{{item.user.username}}</td>
+                                    <td>{{item.user.email}}</td>
+                                    <td>{{item.user.is_staff}}</td>
+                                    <td>{{item.user.is_superuser}}</td>
+                                    <td>{{item.user.date_joined | date:"SHORT_DATE_FORMAT" }}</td>
+                                    <td class="userAction userData" name="last_login">{{item.last_login}}</td>
+                                    <td class="userAction userData" name="login_count">{{item.login_count}}</td>
+
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                           
+                        </div>
+
+                        {%else%}
+
+                        <h3>No online employees available</h3>
+
+                        {%endif%}
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+          
+          
+    
+  
+      </div>
+    
+    
+  
+    </div>
+   
+  </section><!-- End User Section -->
+  
+
+ 
+
+ 
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+{% block scripts %}
+
+<script>
+  $(document).ready(function(){
+    
+   var myVar = setInterval(myTimer, 15000)//15sec;
+
+    var dataurl=`/common/get_users_last_login_ajax/`
+                        
+    function myTimer() {
+
+        $.ajax({
+            type: 'GET',
+            url:  dataurl, 
+            dataType: 'json',
+        }).done(function (data) {
+            $(function () {
+                var arr = data.data
+                arr.forEach(function (item, index) {
+                    //console.log(item, index);
+                    updateLatLogin(item)
+                });
+                
+            });
+		});
+    }
+              
+    function updateLatLogin(data){
+				$("#userid-" + data.id).children(".userData").each(function() {
+					var attr = $(this).attr("name");
+					if (attr == "last_login") {
+					    a_html =`${data.last_login}`;
+						$(this).html(a_html)
+					}
+				});
+			}
+
+  });
+  </script>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 def unauthenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('customer_home')
+            return redirect('home_page')
         else:
             return view_func(request, *args, **kwargs)
     
@@ -32,13 +32,12 @@ def admin_only(view_func):
         group = None
         if request.user.groups.exists():
             groups = request.user.groups.all()
-            group = groups[0].name
-        if group == 'customer' and len(groups)==1:
-            return redirect('clients_home')
-        if group == 'admin' or group =='ceo' or group =="manager" or group =="editor" or group =="datacapture":
-            return view_func(request, *args, **kwargs)
+            for gr in groups:
+                if gr.name == 'admin':
+                    return view_func(request, *args, **kwargs)           
+            return redirect('home_page')
         else:
-            return redirect('clients_home')
+            return redirect('home_page')
     
     return wrapper_func
 # for CBV & FBV
@@ -53,10 +52,10 @@ def registered_user_only_with_client_routing():
             if group  == 'customer' or group  == 'visitor':
                 #some users has customer role with other role like admin
                 if len(groups)==1 :
-                    return redirect('clients_home')
+                    return redirect('home_page')
                 elif len(groups)==2:
                     if groups[0].name in ['visitor', 'customer'] and groups[1].name in ['visitor', 'customer']:
-                        return redirect('clients_home')
+                        return redirect('home_page')
                     else:
                         return view_func(request, *args, **kwargs)
                 else:

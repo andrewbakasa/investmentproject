@@ -55,6 +55,11 @@
                     <a class="dropdown-item" href="{% url 'upload_form_user_pref' %}" >Settings</a>
                     
                 </li>
+                {% if request.user.is_superuser %}
+                <li>
+                  <a class="dropdown-item" href="{% url 'ulogin' %}" >Users Logged in</a>                  
+                </li>
+                {% endif %}
                 <li>
                     <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
                 </li>

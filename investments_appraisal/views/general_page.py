@@ -116,6 +116,34 @@ from investments_appraisal.forms import  ContactUsForm, FinancingForm, Macroecon
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models.expressions import F
+
+@login_required(login_url="account_login")
+@admin_only
+def get_users_last_login(request):
+    queryset = UserProfile.objects.order_by('-last_login')
+    context = {
+        "users": queryset,
+        "dashboard_page": "active",
+        "total": queryset.count(),
+    }
+
+    return render(request, 'investments_appraisal/users_last_login.html', context)
+
+login_required(login_url="account_login")
+@admin_only  
+def get_users_last_login_ajax(request):
+    if request.method == 'GET' and request.is_ajax():
+
+        queryset = UserProfile.objects.order_by('-last_login') 
+
+        
+        #%H:%M:%S
+        item_object =data = [{'id': user.pk, 'last_login': user.last_login.strftime("%b. %d, %Y, %I:%M %p")} for user in queryset]# queryset_to_dict(queryset)
+                
+        return JsonResponse({'error': False, 'data': item_object})
+    return JsonResponse({'status': 'Fail', 'message': 'Error, must be an Ajax call.'})
+
+
 def search(request):
 	return render(request, 'investments_appraisal/mentor/search.html',{})	
 def display_models(request):
@@ -505,7 +533,7 @@ def user_models(request):
 
 def home_page(request):
 	
-	return render(request, 'investments_appraisal/base.html', {})
+	return render(request, 'investments_appraisal/mentor/index.html', {})
 
 def about(request):
 	#1. Projects Count

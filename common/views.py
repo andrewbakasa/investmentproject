@@ -19,6 +19,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from .decorators import unauthenticated_user, allowed_users, admin_only
+
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -38,6 +40,10 @@ from common.models import (
 )
 
 from django.contrib.auth.models import User
+
+from investments_appraisal.models import UserProfile
+
+
 def handler404(request, exception):
     return render(request, "404.html", status=404)
 

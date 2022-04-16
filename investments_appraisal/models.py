@@ -148,10 +148,12 @@ class UserModelQuerySet(models.QuerySet):
 class ModelCategory(models.Model):
     name = models.CharField(max_length=60, unique=True)
     description = models.TextField()
+    #this unique id points to apps: ensure there is no break
+    #that lead to crash due to template not found
     uniqueid = models.CharField(max_length=200, unique=True)# beef01, fish01, 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     likes = models.IntegerField(default=0)
-    hits = models.IntegerField(default=0)
+    hits = models.IntegerField(default=0)# downloads
     	
     class Meta:
         ordering = ['name']
@@ -344,6 +346,9 @@ class UserProfile(models.Model):
     sex = models.CharField(max_length=200, blank=True, null=True)
     profession = models.CharField(max_length=200, blank=True, null=True) 
     aboutyou = models.TextField(blank=True, null=True, verbose_name='About Me') 
+    last_login= models.DateTimeField(blank=True, null=True)
+    login_count=models.IntegerField(default=0)
+
   
     def __str__(self):
         return str(self.user)
