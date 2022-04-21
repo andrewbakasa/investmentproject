@@ -1,0 +1,82 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Users Comments</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+  </div>
+  <!-- End Breadcrumbs -->
+ 
+<section style= 'padding: 5px 0;' id="projects" class="projects">  
+    <div class="container" data-aos="fade-up">
+       <!-- ======= Breadcrumbs ======= -->
+        <div class="row">
+            <ol class="breadcrumb" >
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
+                <li class="breadcrumb-item"><a href="#">{% trans 'Upcoming Module' %}</a></li>
+            </ol>
+        </div> 
+   
+    
+
+        <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-body text-center">
+                        </br>
+                        <h2>Coming soon</h2>
+                        </br>
+                        </br>
+                        </br>
+                        </br>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+          
+          
+    
+  
+      </div>
+    
+    
+  
+    </div>
+   
+  </section><!-- End User Section -->
+  
+
+ 
+
+ 
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+
+{% block scripts %}
+<script>
+  $(document).ready(function (){ 
+    $("#investments a:first").addClass( "active") 
+    // $("#pricing a").addClass( "active")              
+  })
+  </script>
+{% endblock %}

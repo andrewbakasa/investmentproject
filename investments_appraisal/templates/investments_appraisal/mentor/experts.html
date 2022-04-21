@@ -26,7 +26,9 @@
     <div class="breadcrumbs">
       <div class="container">
         <h2>Experts</h2>
-        <p>Est dolorum ut non facere possimus quibusdam eligendi voluptatem. Quia id aut similique quia voluptas sit quaerat debitis. Rerum omnis ipsam aperiam consequatur laboriosam nemo harum praesentium. </p>
+        <p>
+          These are expert who can assist
+        </p>
       </div>
     </div><!-- End Breadcrumbs -->
 
@@ -52,9 +54,8 @@
   {% block scripts %}
   <script>
     $(document).ready(function (){ 
-      // $("#index").removeClass( "active")
-      $("#experts a").addClass( "active") 
-      console.log('added experts active')             
+      $("#investments  a:first").addClass( "active") 
+      $("#experts a").addClass( "active")              
     })
     </script>
   {% endblock %}

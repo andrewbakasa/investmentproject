@@ -1,4 +1,4 @@
-{% extends 'investments_appraisal/mentor/index.html' %}<!--investments_appraisal/main.html---->
+{% extends 'investments_appraisal/mentor/index.html' %}
 {% load i18n %}
 {% load static %}
 {% load tags %}
@@ -26,7 +26,9 @@
    <div class="breadcrumbs" data-aos="fade-in">
     <div class="container">
       <h2>Pricing</h2>
-      <p>Est dolorum ut non facere possimus quibusdam eligendi voluptatem. Quia id aut similique quia voluptas sit quaerat debitis. Rerum omnis ipsam aperiam consequatur laboriosam nemo harum praesentium. </p>
+      <p>
+       Choose the plan that suites your situation
+       </p>
     </div>
   </div><!-- End Breadcrumbs -->
 
@@ -52,9 +54,8 @@
   {% block scripts %}
   <script>
     $(document).ready(function (){ 
-      // $("#index").removeClass( "active")
-      $("#pricing a").addClass( "active") 
-      console.log('added pricing active')             
+      $("#investments a:first").addClass( "active") 
+      $("#pricing a").addClass( "active")              
     })
     </script>
   {% endblock %}

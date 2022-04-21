@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import datetime
+from os import access
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -40,12 +41,51 @@ class Downloads(models.Model):
 
     def __str__(self):
         return self.user.username if self.user else self.model_type.name
-        
+
+class Events(models.Model):
+
+    PRODUCT_LAUNCH = 1
+    SYSTEM_UPGRADE = 2
+    ANOUNCEMENT = 3
+    EVENT_TYPES = (
+        (PRODUCT_LAUNCH, _('PRODUCT_LAUNCH')),
+        (SYSTEM_UPGRADE, _('SYSTEM_UPGRADE')),
+        (ANOUNCEMENT, _('ANOUNCEMENT')),
+    )
+
+   
+    title = models.CharField(max_length=200, null=True )
+    event_type = models.IntegerField(choices=EVENT_TYPES, default=PRODUCT_LAUNCH)
+    accessible= models.BooleanField(default=False)
+    summary = models.TextField(null=True, blank=True)
+    date = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        ordering = ['date']
+
+    def __str__(self):
+        return self.title 
+   
+
+class PurchasePlan(models.Model):
+    name = models.CharField(max_length=200, null=True )
+    email = models.CharField(max_length=200, null=True, blank=True)
+    userplan = models.CharField(max_length=200)
+    deleted = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        ordering = ['-date_created']
+
+    def __str__(self):
+        return self.subject     
 class ContactUs(models.Model):
     name = models.CharField(max_length=200, null=True )
     email = models.CharField(max_length=200, null=True, blank=True)
     subject = models.CharField(max_length=200)
     message = models.TextField()
+    deleted = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
@@ -199,7 +239,7 @@ class UserModel(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     last_modified = models.DateTimeField(auto_now=True,null=True)
     locked = models.BooleanField(default=False)
-    simulation_iterations =models.IntegerField(default=1000)
+    simulation_iterations =models.IntegerField(default=100)
     simulation_run =models.BooleanField(default=False)
     npv_bin_size= models.IntegerField(default=10)
     design_complete =models.BooleanField(default=False)

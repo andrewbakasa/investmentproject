@@ -302,7 +302,12 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['age', 'country', 'sex', 'profession' ,'aboutyou']
   
-    
+ 
+class PurchasePlanForm(forms.ModelForm):
+    class Meta:
+        model = PurchasePlan
+        fields = ['name', 'email' ,'userplan']
+
 class ContactUsForm(forms.ModelForm):
     class Meta:
         model = ContactUs

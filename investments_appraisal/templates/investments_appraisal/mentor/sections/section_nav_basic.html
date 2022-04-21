@@ -1,0 +1,70 @@
+{% load static %}
+{% load i18n %}
+{% load account %}
+
+<h1 class="logo me-auto"><a href="{% url 'index' %}">Investafin</a></h1>
+<nav id="navbar" class="navbar order-last order-lg-0">
+    <ul id="navbar-ul">
+        <li id="index"><a href="{% url 'index' %}">Home</a></li>
+        <li id="about"><a href="{% url 'about' %}">About</a></li>
+        <li id="projects"><a href="{% url 'projects' %}">Projects</a></li>
+        <li id="models"><a href="{% url 'models' %}">Models</a></li>
+
+        <li id="investments" class="dropdown"><a href="#"><span>Investments</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+                <li class="dropdown"><a href="#"><span>Investors</span> <i class="bi bi-chevron-right"></i></a>
+                  <ul>
+                    <li><a href="{% url 'commingsoon' %}">I am an Investor</a></li>
+                    <li><a href="{% url 'commingsoon' %}">Explore Investments</a></li>
+                    <li><a href="{% url 'commingsoon' %}">Premium Investments</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#"><span>Enterprenuer</span> <i class="bi bi-chevron-right"></i></a>
+                  <ul>
+                    <li><a href="{% url 'commingsoon' %}">Pitch My Business</a></li>
+                    <li><a href="{% url 'commingsoon' %}">Register My Business</a></li>
+                    <li><a href="{% url 'commingsoon' %}">Market Analytics</a></li>
+                  </ul>
+                </li>
+                <li id="events"><a href="{% url 'events' %}">Events</a></li>
+                <li id="pricing"><a href="{% url 'pricing' %}">Pricing</a></li>
+                <li id="experts"><a href="{% url 'experts' %}">Experts</a></li>
+            </ul>
+        </li> 
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+        {% if request.user.is_authenticated %}
+          <li class="nav-item dropdown user user-menu">
+              <a href="#" class="nav-link" id="navbarDropdownMenuAvatar" data-toggle="dropdown">
+              <i class="fas fa-user" aria-hidden="true"></i>
+              <span class="hidden-xs">{% user_display user %}</span>
+              </a>
+          
+
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+
+                    <li>
+                        <a class="dropdown-item" href="{% url 'upload_form_user_profile' %}" >My profile</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'upload_form_user_pref' %}" >Settings</a>
+                        
+                    </li>
+                    {% if request.user.is_superuser %}
+                        <li>
+                          <a class="dropdown-item" href="{% url 'ulogin' %}" >Users Logged in</a>                  
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="{% url 'ucomments' %}" >Users Comments</a>                  
+                        </li>
+                        
+                    {% endif %}
+                    <li>
+                        <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
+                    </li>
+              </ul>
+          </li>
+        {% endif %}
+      
+    </ul>
+    <i class="bi bi-list mobile-nav-toggle"></i>
+</nav><!-- .navbar -->

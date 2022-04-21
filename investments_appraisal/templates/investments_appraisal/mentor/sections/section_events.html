@@ -1,33 +1,39 @@
+{% load i18n %}
 {% load static %}
+{% load tags %}
+{% load humanize %}
 <section id="events" class="events">
   <div class="container" data-aos="fade-up">
 
     <div class="row">
-      <div class="col-md-6 d-flex align-items-stretch">
-        <div class="card">
-          <div class="card-img">
-            <img src="{% static 'mentor/assets/img/events-1.jpg' %}" alt="...">
+      {% if events %}
+        {% for event in events %}
+          <div class="col-md-6 d-flex align-items-stretch">
+            <div class="card">
+                <div class="card-img">
+                  <!-- failing loadd event.eventype; resoted to double wuth -->
+                    {% with eventtype=event.event_type|stringformat:"s" %}
+                        {% with image_name="mentor/assets/img/events-"|add:eventtype|stringformat:"s"|add:".jpg" %}
+                          <img src="{% static image_name %}" alt="...">
+                        {% endwith %}
+                    {% endwith %}
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title"><a href="">{{event.title}}</a></h5>
+                  <p class="fst-italic text-center">{{event.date}}</p>
+                  <p class="card-text">
+                    {{event.summary}}
+                  </p>
+                </div>
+            </div>
           </div>
-          <div class="card-body">
-            <h5 class="card-title"><a href="">Introduction to webdesign</a></h5>
-            <p class="fst-italic text-center">Sunday, September 26th at 7:00 pm</p>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod tempor ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat</p>
-          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-lg-12 text-center">
+          <p>No Events</p>
         </div>
-      </div>
-      <div class="col-md-6 d-flex align-items-stretch">
-        <div class="card">
-          <div class="card-img">
-            <img src="{% static 'mentor/assets/img/events-2.jpg' %}" alt="...">
-          </div>
-          <div class="card-body">
-            <h5 class="card-title"><a href="">Marketing Strategies</a></h5>
-            <p class="fst-italic text-center">Sunday, November 15th at 7:00 pm</p>
-            <p class="card-text">Sed ut perspiciatis unde omnis iste natus error sit voluptatem doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo</p>
-          </div>
-        </div>
-
-      </div>
+      {% endif %}
+     
     </div>
 
   </div>

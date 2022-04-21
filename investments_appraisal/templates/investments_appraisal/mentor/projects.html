@@ -74,11 +74,6 @@
              // click first page
             page_no=1
 
-            // in future this is short hand
-           // $(".a_page_nav:eq(" +  page_no  +")").trigger('click');
-
-
-
              // ajax call
              $.ajax({
                     type: "POST",
@@ -91,7 +86,6 @@
                     // handle a successful response
                     success: function (response) {
                         $('#project_div').html('')
-                        var per_page=4
                         var num_of_pages=1
                         if (response.data.per_page){
                             per_page=response.data.per_page
@@ -215,7 +209,6 @@
                     // handle a successful response
                     success: function (response) {
                         $('#project_div').html('')
-                        var per_page=4
                         if (response.data.per_page){
                             per_page=response.data.per_page
                         }

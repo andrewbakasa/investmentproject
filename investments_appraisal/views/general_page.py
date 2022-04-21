@@ -108,7 +108,7 @@ from django.shortcuts import get_object_or_404, render
 
 from investments_appraisal.models import *
 
-from investments_appraisal.forms import  ContactUsForm, FinancingForm, MacroeconomicParametersForm, NewsSubscribeForm, TimingAssumptionForm, TimingAssumptionFormUpdate, \
+from investments_appraisal.forms import  ContactUsForm, FinancingForm, MacroeconomicParametersForm, NewsSubscribeForm, PurchasePlanForm, TimingAssumptionForm, TimingAssumptionFormUpdate, \
 	 UserBusinessModelForm, PricesForm,DepreciationForm ,TaxesForm, UserModelFormUpdate, UserPreferenceForm, UserProfileForm, WorkingCapitalForm
 
 
@@ -116,6 +116,22 @@ from investments_appraisal.forms import  ContactUsForm, FinancingForm, Macroecon
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models.expressions import F
+
+
+
+
+@login_required(login_url="account_login")
+@admin_only
+def get_users_comments(request):
+    queryset = ContactUs.objects.filter(deleted=False).order_by('-date_created')
+    context = {
+        "comments": queryset,
+        "dashboard_page": "active",
+        "total": queryset.count(),
+    }
+
+    return render(request, 'investments_appraisal/user_comments.html', context)
+
 
 @login_required(login_url="account_login")
 @admin_only
@@ -270,14 +286,8 @@ def display_models_ajax_filter(request,slug, *args, **kwargs):
 			data["results"]=[]
 			return JsonResponse({"data":data})
 	
-		#print(type(ob))
-		# results = list(obj_paginator.page(page_no).object_list.values('id','model_type','name','currency','npv_bin_size',		
-		#                                                  'simulation_iterations','simulation_run'))
 		results=[] 												 
-		for i in obj_paginator.page(page_no).object_list:
-			
-			#print('json.dumps', json.dumps({'created':i.date_created}) )
-			#print(i.id, i.name, i.model_type, i.currency, i.npv_bin_size, i.simulation_run, i.date_created)
+		for i in obj_paginator.page(page_no).object_list:			
 			cdate= i.date_created.ctime()
 			item_object = model_to_dict(i)
 			item_object['model_type']=i.model_type.name
@@ -567,7 +577,42 @@ def about(request):
 def contact(request):
 	return render(request, 'investments_appraisal/mentor/contact.html', {})
 
+def commingsoon(request) :
+	context= {
+		}
+	return render(request, 'investments_appraisal/commingsoon.html', context)
+def buy(request,type):
+	email=''
+	if request.user.is_authenticated:
+		email= request.user.email
+	if type=='free':
+		context= {
+              'user_plan':'free plan',
+			  'email':	email,
 
+		}
+	elif type=='standard':
+		context= {
+ 		'user_plan':'standard plan',
+		 'email':	email,
+		}
+	elif type=='business':
+		context= {
+ 		'user_plan':'business plan',
+		 'email':	email,
+		}
+	elif type=='ultimate':
+		context= {
+ 		'user_plan':'ultimate plan',
+		 'email':	email,
+		}	
+	else:
+		context= {
+ 			'user_plan':'other plan',
+			 'email':	email,
+		}
+
+	return render(request, 'investments_appraisal/mentor/buy.html', context)
 def projects(request):
 	models= ModelCategory.objects.all()
 	
@@ -636,7 +681,15 @@ def experts(request):
 	return render(request, 'investments_appraisal/mentor/experts.html', {})
 
 def events(request):
-	return render(request, 'investments_appraisal/mentor/events.html', {})
+	current_time = datetime.datetime.now()
+	#only future events that are visible
+	qs= Events.objects.filter(date__gte=current_time,accessible=True)
+
+	context = {
+		'events':qs,
+	}
+
+	return render(request, 'investments_appraisal/mentor/events.html', context)
 
 def pricing(request):
 	return render(request, 'investments_appraisal/mentor/pricing.html', {})
@@ -1438,6 +1491,37 @@ def delete_bussiness_model(request, model_id):
 		return HttpResponseRedirect(reverse('order', args=(model_id,)))
 
 @login_required(login_url="account_login")
+@admin_only
+def delete_comment_ajax(request,id, *args, **kwargs):
+	if request.method == 'POST':
+		if request.is_ajax():
+			
+			model_ = get_object_or_404(ContactUs, pk=id)
+			model_.deleted=True
+			model_.save()
+			#model_.delete()
+			item_object = model_to_dict(model_)
+
+			#total_pages= get_total_pages(request)
+			data= {}
+			#data['total_pages']=total_pages
+			#data['deleted_page']=page_no
+			
+			data['model']=item_object
+			
+			messages.success(request, "Successfully deleted  record")
+			
+			return JsonResponse({'error': False, 'data': data})
+			
+		else:
+			return JsonResponse({'error': True, 'data': "errors encontered"})
+	else:
+		error = {
+			'message': 'Error, must be an Ajax call.'
+		}
+		return JsonResponse(error, content_type="application/json")
+
+@login_required(login_url="account_login")
 def delete_bussiness_model_ajax(request, model_id, page_no, *args, **kwargs):
 	if request.method == 'POST':
 		#print(request.POST)
@@ -1578,7 +1662,29 @@ def save_all_usermodel(request,form,template_name):
 	data['error']= errors
 	return JsonResponse(data)
 
- 
+
+def purchase_plan_ajax(request,  *args, **kwargs):
+	if request.method == 'POST':
+		if request.is_ajax():
+			form = PurchasePlanForm(request.POST or None)
+			form.instance.user =request.user
+			if form.is_valid():
+				form.save()
+				
+			else:
+				errors = form.errors
+				return JsonResponse({'error': True, 'data': errors})  
+			
+			latest =  PurchasePlan.objects.latest('id').id
+			record =  PurchasePlan.objects.get(pk=latest)
+			item_object = model_to_dict(record)
+			return JsonResponse({'error': False, 'data': item_object})
+		else:
+			return JsonResponse({'error': True, 'data': "Request not ajax"})
+	else:
+		return JsonResponse({'error': True, 'data': "Request not ajax"})
+
+
 def contact_us_ajax(request,  *args, **kwargs):
 	if request.method == 'POST':
 		if request.is_ajax():

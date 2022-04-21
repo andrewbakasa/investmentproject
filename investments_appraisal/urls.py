@@ -8,6 +8,9 @@ from . import views
 
 
 urlpatterns = [
+    
+    path('commingsoon/', views.general_page.commingsoon, name="commingsoon"),
+    path('users_comments/', views.general_page.get_users_comments, name="ucomments"),
     path('users_last_login/', views.general_page.get_users_last_login, name="ulogin"),
     path('get_users_last_login_ajax/', views.general_page.get_users_last_login_ajax, name="get_users_last_login_ajax"),
   
@@ -67,6 +70,8 @@ urlpatterns = [
    
   
    path('delete_bussiness_model_ajax/<int:model_id>/<int:page_no>/', views.general_page.delete_bussiness_model_ajax, name="delete_bussiness_model"),
+   path('delete_comment_ajax/<int:id>/', views.general_page.delete_comment_ajax, name="delete_comment_ajax"),
+  
    
   
     # new records
@@ -84,6 +89,9 @@ urlpatterns = [
 
     path('contact_us/ajax/',
         views.general_page.contact_us_ajax,  name='contact_us_ajax'),  
+    
+    path('purchase_plan/ajax/',
+        views.general_page.purchase_plan_ajax,  name='purchase_plan_ajax'),
     
     path('news_subscribe/ajax/',
         views.general_page.news_subscribe_ajax,  name='news_subscribe_ajax'),  
@@ -111,5 +119,9 @@ urlpatterns = [
     # path('model-details/<int:id>/', views.general_page.model_details, name="model-details"),
 
     path('search/', views.general_page.search, name="search"),
- 
+
+    path('buy/free/', views.general_page.buy,{'type': 'free'}, name="buy_free"),
+    path('buy/standard/', views.general_page.buy,{'type': 'standard'}, name="buy_standard"),
+    path('buy/business/', views.general_page.buy,{'type': 'business'}, name="buy_business"),
+    path('buy/ultimate/', views.general_page.buy,{'type': 'ultimate'}, name="buy_ultimate"),
 ]

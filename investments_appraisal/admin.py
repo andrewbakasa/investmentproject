@@ -21,4 +21,5 @@ admin.site.register(ContactUs)
 admin.site.register(Downloads)
 admin.site.register(UserProfile)
 admin.site.register(ModelCategoryDetails)
+admin.site.register(Events)
 
