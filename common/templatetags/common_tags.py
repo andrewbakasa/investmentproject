@@ -2,6 +2,9 @@ from django import template
 
 register = template.Library()
 
+from django import template
+
+register = template.Library()
 
 def is_document_file_image(ext):
     image_ext_list = [

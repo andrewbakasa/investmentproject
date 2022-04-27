@@ -1,0 +1,98 @@
+{% load static %}
+<section id="cource-details-tabs" class="cource-details-tabs">
+  <div class="container" data-aos="fade-up">
+
+    <div class="row">
+      <div class="col-lg-3">
+        <ul class="nav nav-tabs flex-column">
+          <li class="nav-item">
+            <a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">Business Logic</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-2">Investment Summary</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-3">ROI</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-4">Shareholding Strategy</a>
+          </li>         
+         
+        </ul>
+      </div>
+      <div class="col-lg-9 mt-4 mt-lg-0">
+        <div class="tab-content">
+          <div class="tab-pane active show" id="tab-1">
+            <div class="row">
+              <div class="col-lg-8 details order-2 order-lg-1">
+                <h3>Business Logic</h3>
+                <p class="fst-italic">
+                  {{model.name}}</p>
+                <p>
+                  {{model.details.strategy}}
+                </p>
+              </div>
+              <div class="col-lg-4 text-center order-1 order-lg-2">
+                <img src="{% static 'mentor/assets/img/project-details-tab-1.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="tab-2">
+            <div class="row">
+              <div class="col-lg-8 details order-2 order-lg-1">
+                <h3>Common Practices</h3>
+                <p class="fst-italic">
+                  Summary:</p>
+                   
+                  
+                  <p> Feedlots</br>
+                    {{model.details.summary}}
+
+                 
+                  </p>
+              </div>
+              <div class="col-lg-4 text-center order-1 order-lg-2">
+                <img src="{% static 'mentor/assets/img/project-details-tab-2.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="tab-3">
+            <div class="row">
+              <div class="col-lg-8 details order-2 order-lg-1">
+                <h3>The profit margin</h3>
+                <p class="fst-italic">ROI.
+                </p>
+                <p>Price margin</p>
+                <p>
+                  {{model.details.roi}}
+                </p>
+               
+              </div>
+              <div class="col-lg-4 text-center order-1 order-lg-2">
+                <img src="{% static 'mentor/assets/img/project-details-tab-3.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="tab-4">
+            <div class="row">
+              <div class="col-lg-8 details order-2 order-lg-1">
+                <h3> Shareholding</h3>
+                <p class="fst-italic">
+                  Shareholding Strategy
+                </p>
+                <p>
+                  {{model.details.shareholding}}
+                  </p>
+              </div>
+              <div class="col-lg-4 text-center order-1 order-lg-2">
+                <img src="{% static 'mentor/assets/img/project-details-tab-4.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section><!-- End Cource Details Tabs Section -->

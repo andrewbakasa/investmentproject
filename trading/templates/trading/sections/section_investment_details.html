@@ -1,0 +1,69 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+<section style= 'padding: 5px 0;' id="project-details" class="project-details">
+  <div class="container" data-aos="fade-up">
+     <!-- ======= Breadcrumbs ======= -->
+     <div class="row">
+      <ol class="breadcrumb" >
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}">{% trans 'Back to Investments' %}</a></li>
+        {% if is_user_investor%}
+          <li  class="breadcrumb-item active">
+            
+              <a id="breadcrumb_changeto_edit" class="model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
+              data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                title='Edit Investment Pledge'><i  style="color:green"  class="fas fa-edit"></i>
+            </a>
+          </li>         
+        {%else %}
+          <li  class="breadcrumb-item active">
+              <a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
+                title='Add New Investment'><i style="color:red"  class="fas fa-plus"></i>
+              </a>
+          </li> 
+        {% endif%}
+        <li class="breadcrumb-item" >
+          <label id="total_projects_searched"></label>
+        </li>  
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8">     
+         <img src ="{% static 'mentor/assets/img/projects/'|add:model.category.uniqueid|add:'.jpg' %}" class="img-fluid"alt="">
+        <h3>{{model.details.motto}}</h3>
+        <p>
+          {{model.description}}
+        </p>
+      </div>
+      <div class="col-lg-4">
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Creater</h5>
+          <p><a href="#">{{model.creater}}</a></p>
+        </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Sector</h5>
+          <p>{{model.category}}</p>
+        </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Investors #</h5>
+          <p id="investors_count">{{model.investors_count}}</p>
+        </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>Current Investment</h5>
+          <p id="current_investment">${{model.current_investment}}</p>
+        </div>
+
+        
+
+      </div>
+    </div>
+
+  </div>
+</section><!-- End Cource Details Section -->

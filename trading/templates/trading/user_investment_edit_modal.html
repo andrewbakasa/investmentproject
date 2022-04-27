@@ -1,0 +1,81 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+<div class="modal-header">
+    <h4 class="modal-title" id="myModalLabel">Edit Investment [{{usermodel}}]</h4>
+    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>       
+</div>
+
+<div class="modal-body">
+    <form class="model-form-edit form-horizontal" enctype="multipart/form-data" method="post" data-url="{% url 'update_investment_ajax' pk=form.instance.id %}">
+      {% csrf_token %}
+      
+        <div class="modal-body">
+
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                <div class="col-sm-9 {% if form.name.errors %} has-error{% endif %}">
+                  {{ form.name|add_class:"form-control" }}
+                  {% for error in form.name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                </div>
+            </div>
+        
+            </br>
+            <div class="form-group row">  
+                <label class="col-sm-3 col-form-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                <div class="col-sm-9 {% if form.description.errors %} has-error{% endif %}">
+                  {{ form.description|add_class:"form-control" }}
+                  {% for error in form.description.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                </div>
+            </div>
+        
+           </br>
+
+              <div class="form-group row">               
+                  <label class="col-sm-3 col-form-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                  <div class="col-sm-9 {% if form.category.errors %} has-error{% endif %}">
+                    {{ form.category|add_class:"form-control" }}
+                    {% for error in form.category.errors %}
+                    <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  </div>
+              </div>
+           </br>
+            <div class="form-group row">  
+              <label class="col-sm-3 col-form-label" for="{{ form.total_value.id_for_label }}">{{ form.total_value.label }}</label>
+              <div class="col-sm-9 {% if form.total_value.errors %} has-error{% endif %}">
+                {{ form.total_value|add_class:"form-control" }}
+                {% for error in form.total_value.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+          </div> 
+          </br>
+      <div id="public_toggle_form-errors" class="form-error2" style='display:none'>
+      </div>
+      </div>
+
+  <!--Footer-->
+  <div class="modal-footer">
+    <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+        type="reset">Close
+    </button>
+    <button class="btn btn-danger" type="submit">Save</button>
+
+    
+  </div>
+</form>
+
+
+
+

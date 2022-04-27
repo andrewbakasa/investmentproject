@@ -1,0 +1,207 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Users Comments</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+  </div>
+  <!-- End Breadcrumbs -->
+  <!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">  
+    <div class="container" data-aos="fade-up">
+       <!-- ======= Breadcrumbs ======= -->
+        <div class="row">
+            <ol class="breadcrumb" >
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
+               
+                <li class="breadcrumb-item" >
+                    <label id="total_projects_searched"></label>
+                </li>  
+            </ol>
+
+      
+        </div> 
+   
+      
+
+        <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-body">
+                        {%if models %}
+                        <h4 style="text-align:center;">Users Investments: [{{total}}]  T:${{total_sum}} Av:$ {{average}}</h4>
+                        <hr>
+                        <div class="table-responsive">
+                            <table id="usersTable" class="table table-hover">
+                                <thead class="thead-dark">
+                                <th style="width: 1%" >#</th>    
+                                <th style="width: 9%" >Investor Name</th>
+                                <th style="width: 18%" >summary</th>
+                                <th style="width: 15%" >total_value</th>
+                                <th style="width: 15%" >myinvest</th>
+                                <th style="width: 15%" >cat_name</th>
+                                <th style="width: 12%" >Owner</th>
+                                <th style="width: 5%" class="text-right">Actions</th>
+                                </thead>
+                                <tbody id="users-table-tbody">
+                                {% for item in models  %}
+                                <tr id="comment-{{item.id}}" >
+                                    <td>{{forloop.counter}}</td>
+                                    <td class="modelData" name="name" >{{item.inv_name}}</td>
+                                    <td class="modelData" name="description" >{{item.summary}}</td>
+                                    <td class="modelData" name="category" >{{item.total_value}}</td>
+                                    <td class="modelData" name="total_value" >${{item.myinvest}}</td>
+                                    <td class="modelData" name="current_investment" >{{item.cat_name}}</td>
+                                    
+                                    <td class="modelData" name="date_created" >{{item.email }}</td>
+                                    <td class="text-right modelAction modelData" name="action">
+                                        <a href="#"
+                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Pitch Business'><i class="fa fa-eye"></i>
+                                        </a>
+                                         
+                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                          data-object-name="{{ item.inv_name }}"  data-comment-id="{{item.id}}" 
+                                          data-delete-url="{% url 'delete_investor_ajax' item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                          title='Delete' > <i class="fa fa-trash "></i> 
+                                        </a>
+                                      </td>
+                                   
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                           
+                        </div>
+
+                        {%else%}
+
+                        <h3>No investments available</h3>
+
+                        {%endif%}
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+          
+          
+    
+  
+      </div>
+    
+    
+  
+    </div>
+   
+  </section><!-- End User Section -->
+  
+
+ 
+
+ 
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+
+{% block modal_divs %}
+   
+
+    <!-- Delete confirmation modal -->
+    <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" comment-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %} 
+
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function (){ 
+        $("#investments a:first").addClass( "active") 
+        $("#investors a:first").addClass( "active") 
+        $("#exploreinvestments a:first").addClass( "active") 
+    })
+     $('#confirmdelete').on('show.bs.modal', function(e) {
+        var name = $(e.relatedTarget).data('object-name');
+        var url = $(e.relatedTarget).data('delete-url');
+        var comment_id = $(e.relatedTarget).data('comment-id');
+        $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
+        $('#confirmdelete .modal-footer input').attr('data-url', url);
+        $('#confirmdelete .modal-footer input').attr('comment-id', comment_id);
+    });
+
+    $('body').on('click', '.delete-button', function (e) {
+            e.preventDefault();
+            var tr_id =$('#delete-button').attr('comment-id')
+            row = $('#comment-'+ tr_id.trim());
+            var formData = {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            };
+            $.ajax({
+                type: 'POST',      
+                url:   $('#delete-button').attr('data-url'), 
+                encode: true,
+                contentType: 'application/x-www-form-urlencoded',
+                crossDomain: false,
+                dataType: 'json',
+                data: formData,     // our data object
+                success: function (data) {
+                    $('.close-modal').click()               
+                    row.fadeOut(1000, function () {
+                        //remove the row deleted
+                        $(this).remove();
+                        // if deleted page make the page disappear, point to prev page
+                        
+                       
+                    });
+                    // if deleting page one and there are more pages behind.... push al those pages
+                  
+                },
+                error: function (exception) {
+                    alert('Exeption:' + exception);
+                }
+            });
+        });
+          
+        
+    
+</script>
+{% endblock %}

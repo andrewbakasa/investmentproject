@@ -17,7 +17,12 @@ from dateutil.parser import parse
 
 from .models import UserProfile
 
+import threading
 
+request_local = threading.local()
+
+def get_request():
+    return getattr(request_local, 'request', None)
 class LastUserActivityMiddleware:
 
     def __init__(self, get_response):

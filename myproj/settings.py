@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     
     'django_filters',
     'investments_appraisal.apps.InvestmentsAppraisalConfig',
+    'trading.apps.TradingConfig',
     'fishapp.apps.FishappConfig',
     'beefapp.apps.BeefappConfig',   
     'import_export',   
@@ -67,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'investments_appraisal.middlewares.LastUserActivityMiddleware',
+    #'common.get_username.RequestMiddleware',
 ]
 
 CORS_ORIGIN_WHITELIST = (

@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Projects</title>
+    <title>Investments</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -28,7 +28,7 @@
   </div><!-- End Breadcrumbs -->
 
  <!-- ======= Projects Section ======= -->  
-   {% include 'investments_appraisal/mentor/sections/section_projects.html' %} 
+   {% include 'trading/sections/section_investments.html' %} 
   
  
 </main><!-- End #main -->
@@ -50,25 +50,88 @@
       <script src="{% static 'mentor/assets/js/search.js' %}"></script>
       <script>
          //first timme
-          var display_projects_ajax_url= "{% url 'display_projects_ajax' %}"  
-      
+          var display_investment_ajax_url= "{% url 'display_investment_ajax' %}"  
+           
+          function append_html(counter,val){
+              var simulation_checked=''
+              if (val.simulation_run) {
+                  simulation_checked='checked'
+              }
+
+              var eye_style=''
+              var ready_attr=''
+              var model_class_added=''
+              if (val.userIsInvestor) {
+                  eye_style='style="color:blue"'
+                  ready_attr='myinvestment'
+                  model_class_added= 'model-complete'
+              }else{
+                  
+                  eye_style='style="color:inherit"'
+              }
+
+              var design_complete_checked=''
+              if (val.design_complete) {
+                  design_complete_checked='checked'
+              }
+              var js_date_created = new Date(val.date_created)
+              //append to post
+             
+              counter=  counter+1
+              var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
+              imgval= baseimageURL + val.uniqueid +'.jpg'
+
+              a_html=`
+              <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                <div ${ready_attr} class="project-item ${model_class_added}">
+                  <img src="${imgval}" class="img-fluid" alt="...">
+                  <div class="project-content">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h4>${val.name}</h4>
+                      
+                    </div>
+
+                    <h3><a href="/trading/investment-details/${val.id}/">${val.name}</a></h3>
+                    <p>${val.description}</p>
+                    <div class="trainer d-flex justify-content-between align-items-center">
+                      <div class="trainer-rank d-flex align-items-center">
+                        <i class="bx bx-download"></i>&nbsp;${val.hits}
+                      </div>
+                      <div class="trainer-rank d-flex align-items-center">
+                          <a class="model-likes" href="#" data-url="/trading/update_investment_likes/${val.id}/" 
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
+                          </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div> ` ;
+                        
+            
+  return a_html
+}
+
+          
           $(document).ready(function (){ 
-            // $("#index").removeClass( "active")
-            $("#projects a").addClass( "active") 
-            console.log('added projects active')             
+              $("#investments a:first").addClass( "active") 
+              $("#investors a:first").addClass( "active") 
+              $("#iamaninvestor a:first").addClass( "active")
+
+              $('.project-item[myinvestment]').each( function (){
+                    $(this).addClass('model-complete')
+                })
           })
           $("body").on("keyup", "#search", function(){
-          //$("#search").on("keyup", function() {
             var search_val = $(this).val().toLowerCase();
             search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
-            //console.log('stripped:', search_val)
             if (search_val.length == 0){
                 //change here
-                display_projects_ajax_url = "{% url 'display_projects_ajax' %}"
+                display_investment_ajax_url = "{% url 'display_investment_ajax' %}"
           
             }else{
               //change here
-              display_projects_ajax_url = `{% url 'project_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
+              display_investment_ajax_url = `{% url 'investment_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
           
             }
              // click first page
@@ -78,7 +141,7 @@
              $.ajax({
                     type: "POST",
                     // define url name
-                    url: display_projects_ajax_url, 
+                    url: display_investment_ajax_url, 
                     data : {    
                         page_no : page_no, 
                         csrfmiddlewaretoken: csrftoken,
@@ -111,48 +174,7 @@
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
                         $.each(response.data.results, function(i, val) {
-                            var simulation_checked=''
-                            if (val.simulation_run) {
-                                simulation_checked='checked'
-                            }
-                            var design_complete_checked=''
-                            if (val.design_complete) {
-                                design_complete_checked='checked'
-                            }
-                            var js_date_created = new Date(val.date_created)
-                            //append to post
-                           
-                            counter=  counter+1
-                            var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
-                            imgval= baseimageURL + val.uniqueid +'.jpg'
-            
-                            a_html=`
-                            <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
-                              <div class="project-item">
-                                <img src="${imgval}" class="img-fluid" alt="...">
-                                <div class="project-content">
-                                  <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4>${val.name}</h4>
-                                    
-                                  </div>
-    
-                                  <h3><a href="/project-details/${val.id}/">${val.name}</a></h3>
-                                  <p>${val.description}</p>
-                                  <div class="trainer d-flex justify-content-between align-items-center">
-                                    <div class="trainer-rank d-flex align-items-center">
-                                      <i class="bx bx-download"></i>&nbsp;${val.hits}
-                                    </div>
-                                    <div class="trainer-rank d-flex align-items-center">
-                                        <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" 
-                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
-                                        </a>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div> ` ;
-                          
+                            a_html=append_html(counter,val)
                             // add each model on every line
                             $('#project_div').append(a_html)
                         });
@@ -190,8 +212,9 @@
                 return cookieValue;
             }
           var csrftoken = getToken('csrftoken');
-          $(document).ready(function (){     
-          
+          $(document).ready(function (){ 
+            
+         
           $('body').on('click', '.a_page_nav', function (event) {
                 // preventing default actions
                 console.log($(this).attr('href'))
@@ -201,7 +224,7 @@
                 $.ajax({
                     type: "POST",
                     // define url name
-                    url: display_projects_ajax_url, 
+                    url: display_investment_ajax_url, 
                     data : {    
                         page_no : page_no, 
                         csrfmiddlewaretoken: csrftoken,
@@ -215,50 +238,10 @@
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
                         $.each(response.data.results, function(i, val) {
-                            var simulation_checked=''
-                            if (val.simulation_run) {
-                                simulation_checked='checked'
-                            }
-                            var design_complete_checked=''
-                            if (val.design_complete) {
-                                design_complete_checked='checked'
-                            }
-                            var js_date_created = new Date(val.date_created)
-                            //append to post
-                           
-                            counter=  counter+1
-                            var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
-                            imgval= baseimageURL + val.uniqueid +'.jpg'
-            
-                            a_html=`
-                            <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
-                              <div class="project-item">
-                                <img src="${imgval}" class="img-fluid" alt="...">
-                                <div class="project-content">
-                                  <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4>${val.name}</h4>
-                                    
-                                  </div>
-    
-                                  <h3><a href="/project-details/${val.id}/">${val.name}</a></h3>
-                                  <p>${val.description}</p>
-                                  <div class="trainer d-flex justify-content-between align-items-center">
-                                    <div class="trainer-rank d-flex align-items-center">
-                                      <i class="bx bx-download"></i>&nbsp;${val.hits}
-                                    </div>
-                                    <div class="trainer-rank d-flex align-items-center">
-                                        <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" 
-                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
-                                        </a>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div> ` ;
-                          
+                            a_html=append_html(counter,val)
                             // add each model on every line
                             $('#project_div').append(a_html)
+                            
                         });
                         },
                         error: function () {
@@ -285,7 +268,7 @@
                           const ref="#div-" + response.data.id
                           val= $(ref).children().find('.trainer').find('a')
                         
-                          htmal_a= `<a class="model-likes" href="#" data-url="/update_model_likes/${response.data.id}/" 
+                          htmal_a= `<a class="model-likes" href="#" data-url="/trading/update_investment_likes/${response.data.id}/" 
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
                           $(val).html(htmal_a)

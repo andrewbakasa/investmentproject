@@ -1,0 +1,434 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Users Comments</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+  </div>
+  <!-- End Breadcrumbs -->
+  <!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">  
+    <div class="container" data-aos="fade-up">
+       <!-- ======= Breadcrumbs ======= -->
+        <div class="row">
+            <ol class="breadcrumb" >
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
+                <li class="breadcrumb-item active">
+                    <a href="#"   style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
+                      title='Add New Business'><i style="color:red"  class="fas fa-plus"></i>
+                    </a>
+                </li> 
+                <li class="breadcrumb-item" >
+                    <label id="total_projects_searched"></label>
+                </li>  
+            </ol>
+
+      
+        </div> 
+   
+      
+     
+
+        <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-body">
+                        {%if models %}
+                        <h4 style="text-align:center;">Users Business: [{{total}}]</h4>
+                        <hr>
+                        <div class="table-responsive">
+                            <table id="usersTable" class="table table-hover">
+                                <thead class="thead-dark">
+                                <th style="width: 1%" >#</th>    
+                                <th style="width: 9%" >Name</th>
+                                <th style="width: 18%" >description</th>
+                                <th style="width: 15%" >category</th>
+                                <th style="width: 15%" >Value</th>
+                                <th style="width: 10%" >Current</th>
+                                <th style="width: 10%" >Investors</th>
+                                <th style="width: 12%" >Date Created</th>
+                                <th style="width: 5%" class="text-right">Actions</th>
+                                </thead>
+                                <tbody id="users-table-tbody">
+                                {% for item in models  %}
+                                <tr id="comment-{{item.id}}" >
+                                    <td>{{forloop.counter}}</td>
+                                    <td class="modelData" name="name" >{{item.name}}</td>
+                                    <td class="modelData" name="description" >{{item.description}}</td>
+                                    <td class="modelData" name="category" >{{item.category}}</td>
+                                    <td class="modelData" name="total_value" >${{item.total_value}}</td>
+                                    <td class="modelData" name="current_investment" >${{item.current_investment}}</td>
+                                    <td class="modelData" name="investors_count" >{{item.investors_count}}</td>
+                                 
+                                        
+                                    <td class="modelData" name="date_created" >{{item.date_created }}</td>
+                                    <td class="text-right modelAction modelData" name="action">
+                                        <a href="#"
+                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Pitch Business'><i class="fa fa-eye"></i>
+                                        </a>
+
+                                         <!-- EDIT MODEL -->
+                                        <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
+                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Edit Model'><i  class="fas fa-edit"></i>
+                                        </a>
+                                         
+                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                          data-object-name="{{ item.name }}"  data-comment-id="{{item.id}}" 
+                                          data-delete-url="{% url 'delete_investment_ajax' item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                          title='Delete' > <i class="fa fa-trash "></i> 
+                                        </a>
+
+                                       
+                                      </td>
+                                   
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                           
+                        </div>
+
+                        {%else%}
+
+                        <h3>No businesses available</h3>
+
+                        {%endif%}
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+          
+          
+    
+  
+      </div>
+    
+    
+  
+    </div>
+   
+  </section><!-- End User Section -->
+  
+
+ 
+
+ 
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+
+
+{% block modal_divs %}
+    <!-- EDIT DISPLAY HOLDER -->
+    <div class="modal fade" id="modal-usermodel">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
+     <!-- Delete confirmation modal -->
+     <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" comment-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal: modalAdd New Investment -->
+    <div class="modal fade" id="modal_add_new_business" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" style="overflow-y: auto !important">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add Your Business</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <!--Body-->
+                <div class="modal-body">
+
+                    {% include 'trading/user_business_modal.html' %}
+            
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function (){ 
+        $("#investments a:first").addClass( "active") 
+        $("#enterprenuer a:first").addClass( "active") 
+        $("#registerbusiness a:first").addClass( "active") 
+    })
+     $('#confirmdelete').on('show.bs.modal', function(e) {
+        var name = $(e.relatedTarget).data('object-name');
+        var url = $(e.relatedTarget).data('delete-url');
+        var comment_id = $(e.relatedTarget).data('comment-id');
+        $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
+        $('#confirmdelete .modal-footer input').attr('data-url', url);
+        $('#confirmdelete .modal-footer input').attr('comment-id', comment_id);
+    });
+
+    $('body').on('click', '.delete-button', function (e) {
+            e.preventDefault();
+            var tr_id =$('#delete-button').attr('comment-id')
+            row = $('#comment-'+ tr_id.trim());
+            var formData = {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            };
+            $.ajax({
+                type: 'POST',      
+                url:   $('#delete-button').attr('data-url'), 
+                encode: true,
+                contentType: 'application/x-www-form-urlencoded',
+                crossDomain: false,
+                dataType: 'json',
+                data: formData,     // our data object
+                success: function (data) {
+                    $('.close-modal').click()               
+                    row.fadeOut(1000, function () {
+                        //remove the row deleted
+                        $(this).remove();
+                        // if deleted page make the page disappear, point to prev page
+                        
+                       
+                    });
+                    // if deleting page one and there are more pages behind.... push al those pages
+                  
+                },
+                error: function (exception) {
+                    alert('Exeption:' + exception);
+                }
+            });
+        });
+        
+          //------LOAD THE FORM ON MODAL DIV----------
+          $('body').on('click', '.show-form-update', function(e){
+              e.stopPropagation() 
+              var btn = $(this);// fix button  delay
+              $.ajax({
+              url: btn.attr("data-url"),
+              type: 'get',
+              dataType:'json',
+              beforeSend: function(){
+                  $('#modal-usermodel').modal('show');
+              },
+              success: function(data){
+                  $('#modal-usermodel .modal-content').html(data.html_form);
+              }
+              });
+          })
+          //EDIT  MODEL
+        //ADD MODEL FORM
+        $('body').on("submit",".model-form-add",function(e){
+              e.preventDefault();            
+              var data = new FormData(this);
+              var formData
+              var form = $(this);
+          
+              $.ajax({
+                  url: form.attr('data-url'),
+                  //data: form.serialize(),
+                  data : data,
+                  type: form.attr('method'),
+                  dataType: 'json',
+                  processData:false,
+                  contentType: false,
+                  success: function(data){ 
+                      //console.log('added data' ,data.model)
+                      if(data.model){
+                          $('.close-modal').click()
+                          //update paging
+                          if (data.total_pages){
+                              updatePaging(data.total_pages)
+                          }
+                         
+                         // $('.a_page_nav:first-child').trigger('click');
+                          //----------------------------------
+                         
+
+                        //   a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
+                        //            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        //             title='Edit Investment Pledge'><i  style="color:green"  class="fas fa-edit"></i>
+                        //         </a>`
+
+                        //    $('#breadcrumb_changeto_edit').html(a_html)
+                        
+                          
+
+                      } else {
+                          // ADDITION NOT SUCCESSFUL
+                          $('#public_toggle_form-errors').html('');
+                          if (data['error']) {
+                              var form_vars=['__all__','name','description','category', 'total_value','creater']
+                              for (let p=0; p < form_vars.length; p++ ){
+                                  let name_var = form_vars[p]
+                                  if (data['error'][name_var]){
+                                      a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
+                                      </div> ` ;
+                                      $('#public_toggle_form-errors').append(a_html)
+                                  }
+                              }
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+                              //-----------------------
+                          } else  {
+                              // Data locked:  No edit allowed
+                              $('#public_toggle_form-errors').html('');
+                              a_html = 	`<div class='alert alert-danger alert dismissable'>
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span></button>${data['locked']}
+                              </div> ` ;
+                              $('#public_toggle_form-errors').append(a_html)
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+
+                          } 
+                      //LAST ELSE--------------------------------------                
+                      }
+                  //END SUCCESS
+                  }
+              // END AJAX
+              })
+              return false;
+          })
+              
+          
+        $('body').on("submit",".model-form-edit",function(e){
+              e.preventDefault();
+              var data = new FormData(this);
+              var formData
+              var form = $(this);
+            
+              var url=form.attr('data-url')
+              $.ajax({
+                  url: form.attr('data-url'),
+                  data : data,
+                  type: form.attr('method'),
+                  dataType: 'json',
+                  processData:false,
+                  contentType: false,
+                  success: function(data){
+                      if(data.model){
+                          
+                          //updateTable(data.model);
+                          //hide the form after editing
+                          console.log('DATAMODEL:::', data.model)
+                          $('#modal-usermodel').modal('hide');
+                          $('.close-modal').click()
+                          if (data.model.current_investment){
+                            $('#current_investment').html(`${data.model.current_investment}`);
+                          }
+                          if (data.model.investors_count){
+                            $('#investors_count').html(`${data.model.investors_count}`);
+                          }
+                        
+
+                          
+                      } else {
+                          $('#public_toggle_form-errors').html('');
+                          if (data.error) {
+                              var form_vars=['__all__','investment','user','name', 'description','value']//,
+                      
+                              for (let p=0; p < form_vars.length; p++ ){
+                                  let name_var = form_vars[p]
+                                  if (data.error[name_var]){
+                                  a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
+                                  </div> ` ;
+                                  $('#public_toggle_form-errors').append(a_html)
+                                  
+                                  }
+                              }
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                              }, 4000);
+                          //-----------------------
+                          } else  {
+                              // Data locked:  No edit allowed
+                              $('#public_toggle_form-errors').html('');
+                              a_html = 	`<div class='alert alert-danger alert dismissable'>
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span></button>${data['locked']}
+                              </div> ` ;
+                              $('#public_toggle_form-errors').append(a_html)
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+                          } 
+                      //LAST ELSE--------------------------------------                
+                      }
+                  //END SUCCESS
+                  }
+              // END AJAX
+              })
+              return false;
+          })
+       
+    
+</script>
+{% endblock %}

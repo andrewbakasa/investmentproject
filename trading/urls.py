@@ -1,0 +1,34 @@
+from django.urls import include, path
+from django.views.generic import TemplateView
+
+
+from django.urls import path
+from . import views
+
+
+
+urlpatterns = [
+    
+   # users
+    path('', views.home, name="trading_home"), 
+    path('view/<int:model_id>/', views.project_details, name="view_trading"),
+    path('investment-details/<int:id>/', views.investment_details, name="investment-details"), 
+    
+    path('display_investment_ajax/', views.display_investment_ajax, name="display_investment_ajax"),
+    path('investment_search/<str:slug>/', views.investment_search_ajax,  name='investment_search_ajax'), 
+
+    path('update_investment_likes/<int:id>/',views.update_investment_likes_ajax,  name='update_investment_likes'),
+    path('user_inv/', views.get_user_investments, name="user_investments"),
+    path('user_bus/', views.get_user_businesses, name="user_businesses"),
+
+    path('u_investment_jax/', views.create_userinvestment_ajax, name="create_userinvestment_ajax"),
+    path('u_investor_jax/', views.create_userinvestor_ajax, name="create_userinvestor_ajax"),
+    path('update_investor/<str:pk>/', views.userinvestor_update_ajax, name="update_investor"),
+    path('delete_investor_ajax/<int:id>/', views.delete_investor_ajax, name="delete_investor_ajax"),
+  
+    path('u_business_jax/', views.create_userbusiness_ajax, name="create_userbusiness_ajax"),
+    path('delete_investment_ajax/<int:id>/', views.delete_investment_ajax, name="delete_investment_ajax"),
+    path('update_investment_ajax/<str:pk>/', views.update_investment_ajax, name="update_investment_ajax"),
+   
+  
+]

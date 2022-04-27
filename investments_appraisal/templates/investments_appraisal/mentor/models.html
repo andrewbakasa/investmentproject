@@ -25,21 +25,12 @@
   <div class="breadcrumbs">
   
   </div>
-  <!-- End Breadcrumbs -->
-
-
- <!-- ======= Models Section ======= -->  
+   <!-- End Breadcrumbs -->
+   <!-- ======= Models Section ======= -->  
    {% include 'investments_appraisal/mentor/sections/section_models.html' %} 
-  
-  
-  
- 
-  
 </main><!-- End #main -->
 
-
 {%endblock content%}
-
 {% block modal_divs %}
     <!-- EDIT DISPLAY HOLDER -->
     <div class="modal fade" id="modal-usermodel">
@@ -286,7 +277,6 @@
                         editpages(num_of_pages)
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
-                        //console.log('Test',response.data.results )
                         $.each(response.data.results, function(i, val) {
                            
                             a_html=append_html(counter,val)
@@ -453,6 +443,7 @@
           //EDIT  MODEL
           
           $('body').on("click",".close-modal",function(e){
+              e.stopPropagation()
             //   Was giving error. Could not close modal forma after clkick x or Close button
             //  2 hours to solve. eish!! 27 March 2022 from 1000hrs-1215hrs
             // Glory be to Jesus
