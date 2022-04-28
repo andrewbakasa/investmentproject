@@ -29,6 +29,9 @@ urlpatterns = [
     path('u_business_jax/', views.create_userbusiness_ajax, name="create_userbusiness_ajax"),
     path('delete_investment_ajax/<int:id>/', views.delete_investment_ajax, name="delete_investment_ajax"),
     path('update_investment_ajax/<str:pk>/', views.update_investment_ajax, name="update_investment_ajax"),
-   
+    
+    path('edit_model_investment_paragraph_ajax/<int:id>/', views.edit_model_investment_paragraph_ajax, name="edit_model_investment_paragraph_ajax"),
+    path('add_model_investment_paragraph_ajax/<int:id>/', views.add_model_investment_paragraph_ajax, name="add_model_investment_paragraph_ajax"),
+  
   
 ]

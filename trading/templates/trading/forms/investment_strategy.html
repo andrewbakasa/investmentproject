@@ -1,0 +1,60 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+ <!-- modal Add modal_add_model_paragraph -->
+ <div class="modal fade" id="modal_add_investment_strategy" tabindex="-1" role="dialog"
+ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+ <div class="modal-dialog" role="document">
+         <div class="modal-content">
+             <!--Header-->
+             <div class="modal-header">
+                 <h4 class="modal-title" id="paragraph_label"> {% if investment_details %} Edit {% else %}  Add {% endif %} paragraph:</h4>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">×</span>
+                 </button>
+             </div>
+             <!--Body-->
+             <div class="modal-body">
+
+                         
+                <form method="POST" id='form-paragraph'
+                    {% if investment_details %} class="investment-form-edit form-horizontal" data-url="{% url 'edit_model_investment_paragraph_ajax' investment_details.id %}" 
+                    {% else %}  class="investment-form-add form-horizontal"   data-url="{% url 'add_model_investment_paragraph_ajax' model.id %}" 
+                
+                    {% endif %} > 
+                    {% csrf_token %}
+
+                    <div class="form-group row">
+                        <div class="col-sm-4 {% if investment_strategy_form.investment.errors %} has-error{% endif %}" style="display:none">
+                          {{ investment_strategy_form.investment|add_class:"form-control hidden" }}
+                          {% for error in investment_strategy_form.investment.errors %}
+                          <span class="help-block">{{ error }}</span>
+                          {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label" for="{{ investment_strategy_form.strategy.id_for_label }}">{{ investment_strategy_form.strategy.label }}</label>
+                        <div class="col-sm-8  {% if investment_strategy_form.strategy.errors %} has-error{% endif %}">
+                          {{ investment_strategy_form.strategy|add_class:"form-control" }}
+                          {% for error in investment_strategy_form.strategy.errors %}
+                          <span class="help-block">{{ error }}</span>
+                          {% endfor %}
+                        </div>
+                    </div>
+
+             </div> 
+            <!--Footer-->
+            <div class="modal-footer">
+                <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+                    type="reset">Close
+                </button>  
+                <button class="btn btn-danger" type="submit" id ="submit_paragraph">Save</button>
+            
+            </div>
+            </form>
+         </div>
+ </div>
+</div>

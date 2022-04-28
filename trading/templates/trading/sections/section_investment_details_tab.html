@@ -25,11 +25,23 @@
           <div class="tab-pane active show" id="tab-1">
             <div class="row">
               <div class="col-lg-8 details order-2 order-lg-1">
-                <h3>Business Logic</h3>
+                <h3>Business Strategy</h3>
                 <p class="fst-italic">
-                  {{model.name}}</p>
+                  Strategy</p>
                 <p>
                   {{model.details.strategy}}
+                  
+                  {% if model.details.strategy and is_user_record_owner %}
+                    </br>
+                    <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                    data-target="#modal_add_investment_strategy"> <i class="fa fa-edit"></i></a>
+
+                  {% elif is_user_record_owner %}
+                    <!-- Add For First Time -->
+                    <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                    data-target="#modal_add_investment_strategy"> <i class="fa fa-plus"></i></a>
+                   
+                  {% endif%}
                 </p>
               </div>
               <div class="col-lg-4 text-center order-1 order-lg-2">
@@ -40,13 +52,22 @@
           <div class="tab-pane" id="tab-2">
             <div class="row">
               <div class="col-lg-8 details order-2 order-lg-1">
-                <h3>Common Practices</h3>
+                <h3>Summary</h3>
                 <p class="fst-italic">
                   Summary:</p>
-                   
-                  
-                  <p> Feedlots</br>
                     {{model.details.summary}}
+                 
+                    {% if model.details.summary and is_user_record_owner %}
+                        </br>
+                        <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                        data-target="#modal_add_investment_summary"> <i class="fa fa-edit"></i></a>
+                       
+                    {% elif is_user_record_owner %}
+                        <!-- Add For First Time -->
+                        <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                        data-target="#modal_add_investment_summary"> <i class="fa fa-plus"></i></a>
+                         
+                    {% endif%}
 
                  
                   </p>
@@ -62,9 +83,21 @@
                 <h3>The profit margin</h3>
                 <p class="fst-italic">ROI.
                 </p>
-                <p>Price margin</p>
+                
                 <p>
                   {{model.details.roi}}
+                
+                  {% if model.details.roi and is_user_record_owner %}
+                      </br>
+                      <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                      data-target="#modal_add_investment_roi"> <i class="fa fa-edit"></i></a>
+                       
+                  {% elif is_user_record_owner %}
+                      <!-- Add For First Time -->
+                      <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                      data-target="#modal_add_investment_roi"> <i class="fa fa-plus"></i></a>
+                      
+                  {% endif%}
                 </p>
                
               </div>
@@ -82,7 +115,18 @@
                 </p>
                 <p>
                   {{model.details.shareholding}}
-                  </p>
+                
+                  {% if model.details.shareholding and is_user_record_owner %}
+                </br>
+                  <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                  data-target="#modal_add_investment_shareholding"> <i class="fa fa-edit"></i></a>
+                  {% elif is_user_record_owner %}
+                    <!-- Add For First Time -->
+                    <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                    data-target="#modal_add_investment_shareholding"> <i class="fa fa-plus"></i></a>
+                  {% endif%}
+
+                </p>
               </div>
               <div class="col-lg-4 text-center order-1 order-lg-2">
                 <img src="{% static 'mentor/assets/img/project-details-tab-4.png" alt="" class="img-fluid">
@@ -96,3 +140,7 @@
 
   </div>
 </section><!-- End Cource Details Tabs Section -->
+{% include 'trading/forms/investment_summary.html' %}
+{% include 'trading/forms/investment_strategy.html' %}
+{% include 'trading/forms/investment_roi.html' %}
+{% include 'trading/forms/investment_shareholding.html' %}

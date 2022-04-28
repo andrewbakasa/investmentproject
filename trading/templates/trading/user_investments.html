@@ -46,7 +46,7 @@
                 <div class="box">
                     <div class="box-body">
                         {%if models %}
-                        <h4 style="text-align:center;">Users Investments: [{{total}}]  T:${{total_sum}} Av:$ {{average}}</h4>
+                        <h4 style="text-align:center;">Users Investments: [{{total}}]  Total:${{total_sum|intcomma}} Aver:$ {{average| floatformat:1 | intcomma}}</h4>
                         <hr>
                         <div class="table-responsive">
                             <table id="usersTable" class="table table-hover">

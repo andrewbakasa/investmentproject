@@ -171,17 +171,7 @@
                                 </a>`
 
                            $('#breadcrumb_changeto_edit').html(a_html)
-                            //   $("#breadcrumb_changeto_edit").css("style", "color:green") 
-                            // $("#breadcrumb_changeto_edit").attr("title", "Edit Investment Pledge")
-                            // $("#breadcrumb_changeto_edit").attr("data-url", `"/trading/update_investor/${data.model.investor_id}/"`)
-                           
-                            // $("#breadcrumb_changeto_edit").addClass("model-edit show-form-update")
-                            // $("#breadcrumb_changeto_edit").attr("data-target", "modal-edit-product-div")
-                            // $("#breadcrumb_changeto_edit").attr("data-toggle", "tooltip")
-                            // $("#breadcrumb_changeto_edit").find('i').removeClass("fas fa-plus")
-                            // $("#breadcrumb_changeto_edit").find('i').addClass("fas fa-edit")
-
-                          
+                             
 
                       } else {
                           // ADDITION NOT SUCCESSFUL
@@ -266,6 +256,149 @@
                           $('#public_toggle_form-errors').html('');
                           if (data.error) {
                               var form_vars=['__all__','investment','user','name', 'description','value']//,
+                      
+                              for (let p=0; p < form_vars.length; p++ ){
+                                  let name_var = form_vars[p]
+                                  if (data.error[name_var]){
+                                  a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
+                                  </div> ` ;
+                                  $('#public_toggle_form-errors').append(a_html)
+                                  
+                                  }
+                              }
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                              }, 4000);
+                          //-----------------------
+                          } else  {
+                              // Data locked:  No edit allowed
+                              $('#public_toggle_form-errors').html('');
+                              a_html = 	`<div class='alert alert-danger alert dismissable'>
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span></button>${data['locked']}
+                              </div> ` ;
+                              $('#public_toggle_form-errors').append(a_html)
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+                          } 
+                      //LAST ELSE--------------------------------------                
+                      }
+                  //END SUCCESS
+                  }
+              // END AJAX
+              })
+              return false;
+          })
+        
+
+          //ADD MODEL FORM
+          $('body').on("submit",".investment-form-add",function(e){
+              e.preventDefault();            
+              var data = new FormData(this);
+              var formData
+              var form = $(this);
+          
+              $.ajax({
+                  url: form.attr('data-url'),
+                  //data: form.serialize(),
+                  data : data,
+                  type: form.attr('method'),
+                  dataType: 'json',
+                  processData:false,
+                  contentType: false,
+                  success: function(response){ 
+                      //console.log('added data' ,data.model)
+                      if(response.data.model){
+                          $('.close-modal').click()
+                          //update paging
+                          if (data.total_pages){
+                              updatePaging(data.total_pages)
+                          }
+                        
+                            
+
+                      } else {
+                          // ADDITION NOT SUCCESSFUL
+                          $('#public_toggle_form-errors').html('');
+                          if (response.data['error']) {
+                              var form_vars=['__all__','investment','strategy','summary', 'roi','shareholding']
+                              for (let p=0; p < form_vars.length; p++ ){
+                                  let name_var = form_vars[p]
+                                  if (data['error'][name_var]){
+                                      a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
+                                      </div> ` ;
+                                      $('#public_toggle_form-errors').append(a_html)
+                                  }
+                              }
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+                              //-----------------------
+                          } else  {
+                              // Data locked:  No edit allowed
+                              $('#public_toggle_form-errors').html('');
+                              a_html = 	`<div class='alert alert-danger alert dismissable'>
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span></button>${data['locked']}
+                              </div> ` ;
+                              $('#public_toggle_form-errors').append(a_html)
+                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+
+                              window.setTimeout(function() {
+                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $("#public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+
+                          } 
+                      //LAST ELSE--------------------------------------                
+                      }
+                  //END SUCCESS
+                  }
+              // END AJAX
+              })
+              return false;
+          })
+          
+          $('body').on("submit",".investment-form-edit",function(e){
+              e.preventDefault();
+              var data = new FormData(this);
+              var formData
+              var form = $(this);
+            
+              var url=form.attr('data-url')
+              $.ajax({
+                  url: form.attr('data-url'),
+                  data : data,
+                  type: form.attr('method'),
+                  dataType: 'json',
+                  processData:false,
+                  contentType: false,
+                  success: function(response){
+                    console.log('Entry', response.data)
+                      if(response.data.model){
+                          //updateTable(data.model);
+                          $('#modal-usermodel').modal('hide');
+                          $('.close-modal').click()
+                      } else {
+                          $('#public_toggle_form-errors').html('');
+                          if (response.data.error) {
+                              var form_vars=['__all__','investment','strategy','summary', 'roi','shareholding']//,
                       
                               for (let p=0; p < form_vars.length; p++ ){
                                   let name_var = form_vars[p]

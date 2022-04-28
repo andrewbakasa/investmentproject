@@ -6,7 +6,7 @@ from investments_appraisal.models import ModelCategory, UserModel, UserPreferenc
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 
-from trading.forms import InvestorForm, InvestorFormUpdate, UserInvestmentForm, UserInvestmentFormUpdate
+from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, UserInvestmentForm, UserInvestmentFormUpdate
 from .models import *
 from django.db.models.expressions import F
 from django.contrib.auth.decorators import login_required 
@@ -38,6 +38,8 @@ def get_user_businesses(request):
 def get_user_investments(request):
     queryset = Investor.objects.filter(user=request.user).first()  
     df=queryset.trading_df
+    #df['id']= df['id'].astype()
+    df['id'] = pd.to_numeric(df.id)
     # print(df.columns)
     # inv_name', 'summary', 'total_value', 'username', 'first_name',
     # 'last_name', 'email', 'cat_name', 'cat_descript', 'uniqueid'
@@ -189,8 +191,8 @@ def display_investment_ajax(request):
         return JsonResponse({"data":data})
 @login_required
 def investment_details(request,id):
-    model = get_object_or_404(Investment,pk=id)
-    id =model.id
+    investmet_obj = get_object_or_404(Investment,pk=id)
+    id =investmet_obj.id
     is_user_investor=False
     investor_id=1
     obj=Investor.objects.filter(user=request.user, investment=id) 
@@ -199,18 +201,39 @@ def investment_details(request,id):
         investor_id=obj.first().id
 
    
-    form = InvestorForm(initial={'user': request.user, 'investment': model})
+    form = InvestorForm(initial={'user': request.user, 'investment': investmet_obj})
+
+
+        #4. Model Taxes
+    invest_details = InvestmentDetails.objects.filter(investment=investmet_obj).first()
+    if invest_details :	
+        investment_summary_form = InvestmentSummaryForm(instance=invest_details)
+        investment_strategy_form = InvestmentStrategyForm(instance=invest_details)
+        investment_shareholding_form = InvestmentShareholdingForm(instance=invest_details)
+        investment_roi_form = InvestmentROIForm(instance=invest_details)
+    else:
+        investment_summary_form = InvestmentSummaryForm(initial={'investment': investmet_obj})	
+        investment_strategy_form = InvestmentStrategyForm(initial={'investment': investmet_obj})
+        investment_shareholding_form = InvestmentShareholdingForm(initial={'investment': investmet_obj})	
+        investment_roi_form = InvestmentROIForm(initial={'investment': investmet_obj})	
+
     context = {
-        'model':model,
+        'model':investmet_obj,
         "is_user_investor": is_user_investor,
+        "is_user_record_owner": True if investmet_obj.creater == request.user else False,
         "user": request.user,
         'form': form,
-        'investor_id': investor_id
+        'investor_id': investor_id,
+        "investment_details": invest_details,
+        "investment_summary_form": investment_summary_form,
+        "investment_strategy_form": investment_strategy_form,
+        "investment_shareholding_form": investment_shareholding_form,
+        'investment_roi_form': investment_roi_form,
     }
     return render(request, 'trading/investment-details.html', context)
 
 
-
+@login_required
 def home(request):
 	models= Investment.objects.all()
 	
@@ -433,7 +456,7 @@ def dataframe_to_list_dict(df, isDataFrame):
         columns_list = df_col_list.tolist()
    
     
-   
+    
     item_counter = 1
     
     for i_record in lst:
@@ -445,12 +468,12 @@ def dataframe_to_list_dict(df, isDataFrame):
 
         #--- each row makes a dict of cols-----
         for k in range(len(df_col_list)):
-            col_name = df_col_list[k]
-            #A-comp-->A
-            #B-comp --->B
-            col_name= str(col_name).split('-')[0]
-            #print(col_name)
-            record_dict[col_name]=i_record[k]
+            col_name = df_col_list[k]          
+            if col_name =='id':
+                #change to integer
+                record_dict[col_name]=int(i_record[k])
+            else:
+                record_dict[col_name]=i_record[k]
        
         item_counter +=1 
         output_list.append(record_dict)
@@ -564,3 +587,86 @@ def save_all_user_investment(request,form,template_name):
     data['html_form'] = render_to_string(template_name,context,request=request)
     data['error']= errors
     return JsonResponse(data)
+
+
+@login_required(login_url="account_login")
+def edit_model_investment_paragraph_ajax(request, id, *args, **kwargs):
+    if request.method == 'POST':
+        print(request.POST)
+        if request.is_ajax():
+            _instance = get_object_or_404(InvestmentDetails, pk=id)
+            try:
+                for i in request.POST:
+                    if i=='summary':
+                        _instance.summary = request.POST[i]
+                    elif i=='shareholding':
+                        _instance.shareholding =request.POST[i]
+                    elif i=='roi':
+                        _instance.roi =request.POST[i]
+                    elif i=='strategy':
+                        _instance.strategy =request.POST[i]
+
+                _instance.save()
+                _item_object = model_to_dict(InvestmentDetails.objects.get(pk=id))
+                data= {}
+                data['model']=_item_object		
+            
+                return JsonResponse({'error': False, 'data': data})
+            
+            except (KeyError, InvestmentDetails.DoesNotExist):
+                #errors = form.errors
+                errors= {'__all__': ['No data changed']} 
+                return JsonResponse({'erro': True, 'data': errors})
+            else:
+                return JsonResponse({'error': False, 'data': _item_object})
+        else:
+            return JsonResponse({'error': True, 'data': "errors encontered"})
+    else:
+        error = {
+            'message': 'Error, must be an Ajax call.'
+        }
+        return JsonResponse(error, content_type="application/json")
+
+@login_required(login_url="account_login")
+def add_model_investment_paragraph_ajax(request, id, *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax(): 
+            #investment_id = request.POST['investment']			
+          
+            investment = get_object_or_404(Investment,pk=id)
+           
+            for i in request.POST:
+                if i=='summary':
+                    record = InvestmentDetails.objects.create(investment=investment, summary=request.POST[i])
+                    record.save()
+                elif i=='shareholding':
+                    record = InvestmentDetails.objects.create(investment=investment, shareholding=request.POST[i])
+                    record.save()
+                elif i=='roi':
+                    record = InvestmentDetails.objects.create(investment=investment, roi=request.POST[i])
+                    record.save()
+                elif i=='strategy':
+                    record = InvestmentDetails.objects.create(investment=investment, strategy=request.POST[i])
+                    record.save()
+           
+            
+            
+
+            latest = InvestmentDetails.objects.latest('id').id
+            _instance = InvestmentDetails.objects.get(pk=latest)
+            item_object = model_to_dict(_instance)
+            data= {}
+            data['model']=item_object		
+            
+            return JsonResponse({'error': False, 'data': data})
+            #item_object['model_id']=investment_id
+            #item_object['model_name']=i.usermodel.name
+            #print("returned data", item_object)
+                
+        else:
+            return JsonResponse({'error': True, 'data': "errors encontered"})
+    else:
+        error = {
+            'message': 'Error, must be an Ajax call.'
+        }
+        return JsonResponse(error, content_type="application/json")

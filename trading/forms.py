@@ -114,3 +114,118 @@ class UserInvestmentFormUpdate(forms.ModelForm):
         model = Investment
         fields = ['name','description','category', 'total_value']
   
+
+
+
+class InvestmentDetailsForm(forms.ModelForm):   
+    def __init__(self, user=None, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(InvestmentDetailsForm,self).__init__(*args, **kwargs)
+        self.user_alias = user
+       
+        initial_arguments= kwargs.get('instance', None)
+        self.fields['investment'].widget.attrs['readonly']=True  
+        if initial_arguments:
+            if initial_arguments.investment:
+                self.fields['investment']=initial_arguments.investment     
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','strategy','summary', 'roi','shareholding']
+    
+class InvestmentDetailsFormUpdate(forms.ModelForm):    
+    def __init__(self, *args, **kwargs):
+        super(InvestmentDetailsFormUpdate,self).__init__(*args, **kwargs)
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','strategy','summary', 'roi','shareholding']
+  
+
+
+class InvestmentSummaryForm(forms.ModelForm):   
+    def __init__(self, user=None, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(InvestmentSummaryForm,self).__init__(*args, **kwargs)
+        self.user_alias = user
+       
+        initial_arguments= kwargs.get('instance', None)
+        self.fields['investment'].widget.attrs['readonly']=True  
+        if initial_arguments:
+            if initial_arguments.investment:
+                self.fields['investment']=initial_arguments.investment     
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','summary']
+    
+class InvestmentSummaryFormUpdate(forms.ModelForm):    
+    def __init__(self, *args, **kwargs):
+        super(InvestmentSummaryFormUpdate,self).__init__(*args, **kwargs)
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','summary',]
+
+class InvestmentStrategyForm(forms.ModelForm):   
+    def __init__(self, user=None, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(InvestmentStrategyForm,self).__init__(*args, **kwargs)
+        self.user_alias = user
+       
+        initial_arguments= kwargs.get('instance', None)
+        self.fields['investment'].widget.attrs['readonly']=True  
+        if initial_arguments:
+            if initial_arguments.investment:
+                self.fields['investment']=initial_arguments.investment     
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','strategy']
+    
+class InvestmentStrategyFormUpdate(forms.ModelForm):    
+    def __init__(self, *args, **kwargs):
+        super(InvestmentStrategyFormUpdate,self).__init__(*args, **kwargs)
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','strategy',]
+
+
+class InvestmentShareholdingForm(forms.ModelForm):   
+    def __init__(self, user=None, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(InvestmentShareholdingForm,self).__init__(*args, **kwargs)
+        self.user_alias = user
+       
+        initial_arguments= kwargs.get('instance', None)
+        self.fields['investment'].widget.attrs['readonly']=True  
+        if initial_arguments:
+            if initial_arguments.investment:
+                self.fields['investment']=initial_arguments.investment     
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','shareholding']
+    
+class InvestmentShareholdingFormUpdate(forms.ModelForm):    
+    def __init__(self, *args, **kwargs):
+        super(InvestmentShareholdingFormUpdate,self).__init__(*args, **kwargs)
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','shareholding',]
+
+class InvestmentROIForm(forms.ModelForm):   
+    def __init__(self, user=None, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(InvestmentROIForm,self).__init__(*args, **kwargs)
+        self.user_alias = user
+       
+        initial_arguments= kwargs.get('instance', None)
+        self.fields['investment'].widget.attrs['readonly']=True  
+        if initial_arguments:
+            if initial_arguments.investment:
+                self.fields['investment']=initial_arguments.investment     
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','roi']
+    
+class InvestmentROIFormUpdate(forms.ModelForm):    
+    def __init__(self, *args, **kwargs):
+        super(InvestmentROIFormUpdate,self).__init__(*args, **kwargs)
+    class Meta:
+        model = InvestmentDetails
+        fields = ['investment','roi',]
