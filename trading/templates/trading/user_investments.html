@@ -66,8 +66,8 @@
                                     <td>{{forloop.counter}}</td>
                                     <td class="modelData" name="name" >{{item.inv_name}}</td>
                                     <td class="modelData" name="description" >{{item.summary}}</td>
-                                    <td class="modelData" name="category" >{{item.total_value}}</td>
-                                    <td class="modelData" name="total_value" >${{item.myinvest}}</td>
+                                    <td class="modelData" name="category" >{{item.total_value| intcomma}}</td>
+                                    <td class="modelData" name="total_value" >${{item.myinvest| intcomma}}</td>
                                     <td class="modelData" name="current_investment" >{{item.cat_name}}</td>
                                     
                                     <td class="modelData" name="date_created" >{{item.email }}</td>

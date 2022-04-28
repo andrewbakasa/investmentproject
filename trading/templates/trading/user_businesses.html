@@ -73,9 +73,9 @@
                                     <td class="modelData" name="name" >{{item.name}}</td>
                                     <td class="modelData" name="description" >{{item.description}}</td>
                                     <td class="modelData" name="category" >{{item.category}}</td>
-                                    <td class="modelData" name="total_value" >${{item.total_value}}</td>
-                                    <td class="modelData" name="current_investment" >${{item.current_investment}}</td>
-                                    <td class="modelData" name="investors_count" >{{item.investors_count}}</td>
+                                    <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
+                                    <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
+                                    <td class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
                                  
                                         
                                     <td class="modelData" name="date_created" >{{item.date_created }}</td>
