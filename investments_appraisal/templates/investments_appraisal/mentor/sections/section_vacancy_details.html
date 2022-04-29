@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+<section style= 'padding: 5px 0;' id="project-details" class="project-details">
+  <div class="container" data-aos="fade-up">
+     <!-- ======= Breadcrumbs ======= -->
+     <div class="row">
+      <ol class="breadcrumb" >
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'jobs' %}">{% trans 'Back to Vacancies' %}</a></li>
+      
+        <li class="breadcrumb-item" >
+          <label id="total_projects_searched"></label>
+        </li>  
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">     
+      
+        <p>
+          {{model.description}}
+        </p>
+        <ul class="" >
+          {% for i in  model.specifications %}
+            <li class="" >{{i.details}}</li>          
+          {% endfor %} 
+        </ul>
+        <div class="text-center">
+          <a href="{% url 'jobs' %}" class="more-btn">Back<i class="bx bx-chevron-right"></i></a>
+        </div>
+      </div>
+    
+    </div>
+
+  </div>
+</section><!-- End Cource Details Section -->

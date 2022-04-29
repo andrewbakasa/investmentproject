@@ -23,7 +23,7 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.core.mail import send_mail
 from django.conf import settings
-from common.models import ModifiedRecord
+from common.models import ModifiedRecord, Vacancy
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -680,6 +680,16 @@ def models(request):
 def experts(request):
 	return render(request, 'investments_appraisal/mentor/experts.html', {})
 
+def jobs(request):
+	current_time = datetime.datetime.now()
+	#only future events that are visible
+	qs= Vacancy.objects.filter(due_date__gte=current_time,accessible=True)
+
+	context = {
+		'vacancies':qs,
+	}
+	return render(request, 'investments_appraisal/mentor/jobs.html', context)
+
 def events(request):
 	current_time = datetime.datetime.now()
 	#only future events that are visible
@@ -701,6 +711,11 @@ def project_details(request,id):
 	context ={'model':model}
 	return render(request, 'investments_appraisal/mentor/project-details.html', context)
 
+def vacancy_details(request,id):
+	model = get_object_or_404(Vacancy,pk=id)
+	
+	context ={'model':model}
+	return render(request, 'investments_appraisal/mentor/job-details.html', context)
 
 @login_required(login_url="account_login")
 def select_model_specs_page(request, model_id):

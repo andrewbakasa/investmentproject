@@ -5,3 +5,5 @@ from .models import *
 
 
 admin.site.register(ModifiedRecord)
+admin.site.register(Vacancy)
+admin.site.register(VacancyRequirement)

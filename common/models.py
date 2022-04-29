@@ -265,3 +265,50 @@ class ModifiedRecord(models.Model):
         ordering = ['-date_created']    
 
     objects = ModifiedRecordQuerySet.as_manager() 
+
+
+class Vacancy(models.Model):
+
+    ENGINEERING = 1
+    MANAGEMENT = 2
+    SUPPORT = 3
+    VACANCY_TYPES = (
+        (ENGINEERING, _('ENGINEERING')),
+        (MANAGEMENT, _('MANAGEMENT')),
+        (SUPPORT, _('SUPPORT')),
+    )   
+  
+    name = models.CharField(max_length=60,)
+    description = models.TextField()
+    vacancy_number = models.CharField(max_length=200) 
+    vacancy_type = models.IntegerField(choices=VACANCY_TYPES, default=ENGINEERING)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    due_date = models.DateTimeField()
+    accessible= models.BooleanField(default=False)
+    total = models.IntegerField(default=1)
+    	
+    class Meta:
+        #ascending : least date first
+        ordering = ['due_date']
+
+    def __str__(self):
+        return str(self.name)
+    
+    @property
+    def specifications(self):
+        qs = self.vacancyrequirement_set.all()
+        return qs
+
+class VacancyRequirement(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
+    specs = models.CharField(max_length=60)
+    details = models.TextField() 
+    priority= models.IntegerField(default=1)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    	
+    class Meta:
+        ordering = ['priority','date_created']
+
+    def __str__(self):
+        return str(self.specs)
+        

@@ -112,12 +112,14 @@ urlpatterns = [
 
     path('umodels/', views.general_page.models, name="models"),
     path('experts/', views.general_page.experts, name="experts"),
+    path('jobs/', views.general_page.jobs, name="jobs"),
     path('events/', views.general_page.events, name="events"),
     path('pricing/', views.general_page.pricing, name="pricing"),
     path('contact/', views.general_page.contact, name="contact"),
     path('project-details/<int:id>/', views.general_page.project_details, name="project-details"),
     # path('model-details/<int:id>/', views.general_page.model_details, name="model-details"),
 
+    path('vacancy-details/<int:id>/', views.general_page.vacancy_details, name="vacancy-details"),
     path('search/', views.general_page.search, name="search"),
 
     path('buy/free/', views.general_page.buy,{'type': 'free'}, name="buy_free"),

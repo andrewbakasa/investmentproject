@@ -168,6 +168,10 @@
         $('#confirmdelete .modal-footer input').attr('comment-id', comment_id);
     });
 
+    // $('body').on('click', '.close-modal', function (e) {
+    //     $('.close-modal').click() 
+    //     console.log('llllllllllll')
+    // })
     $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
             var tr_id =$('#delete-button').attr('comment-id')

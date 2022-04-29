@@ -1,0 +1,60 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+   <title>Vacancies</title>
+{% endblock %}
+
+
+{% block stylesheets %}
+ 
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+{% block content %}
+
+ 
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+      <div class="container">
+        <h2>Vacancies</h2>
+       
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+  <!-- ======= Experts Section ======= -->
+   {% include 'investments_appraisal/mentor/sections/section_jobs.html' %} 
+  
+  
+  
+</main><!-- End #main -->
+
+
+{%endblock content%}
+
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  {% block scripts %}
+  <script>
+    $(document).ready(function (){ 
+      $("#investments  a:first").addClass( "active") 
+      $("#jobs a").addClass( "active")              
+    })
+    </script>
+  {% endblock %}
+
