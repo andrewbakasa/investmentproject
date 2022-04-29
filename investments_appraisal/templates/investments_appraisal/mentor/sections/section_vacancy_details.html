@@ -18,15 +18,27 @@
 
     <div class="row">
       <div class="col-lg-12">     
-      
+        <h3>Job Summary</h3>
         <p>
           {{model.description}}
         </p>
+        <h3>Duties</h3>
         <ul class="" >
-          {% for i in  model.specifications %}
+          {% for i in  model.duties %}
             <li class="" >{{i.details}}</li>          
           {% endfor %} 
         </ul>
+        <h3>Skills-Education</h3>
+        <ul class="" >
+          {% for i in  model.skills %}
+            <li class="" >{{i.details}}</li>          
+          {% endfor %} 
+        </ul>
+      </br>
+      <p>
+        Send your application to <b>{{model.email}}</b> <i>before</i>  <b>{{model.due_date}}</b>
+      </p>
+
         <div class="text-center">
           <a href="{% url 'jobs' %}" class="more-btn">Back<i class="bx bx-chevron-right"></i></a>
         </div>

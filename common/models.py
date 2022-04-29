@@ -22,6 +22,8 @@ from common.templatetags.common_tags import (
 
 from django.utils import timezone
 
+from common.utils import clip_trailing_chars
+
 
 def img_url(self, filename):
     hash_ = int(time.time())
@@ -286,7 +288,7 @@ class Vacancy(models.Model):
     due_date = models.DateTimeField()
     accessible= models.BooleanField(default=False)
     total = models.IntegerField(default=1)
-    	
+    email= models.EmailField(max_length=255,default="hr@gmail.com")	
     class Meta:
         #ascending : least date first
         ordering = ['due_date']
@@ -295,13 +297,16 @@ class Vacancy(models.Model):
         return str(self.name)
     
     @property
-    def specifications(self):
-        qs = self.vacancyrequirement_set.all()
+    def duties(self):
+        qs = self.vacancyduty_set.all()
         return qs
-
-class VacancyRequirement(models.Model):
+    
+    @property
+    def skills(self):
+        qs = self.vacancyskill_set.all()
+        return qs
+class VacancyDuty(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
-    specs = models.CharField(max_length=60)
     details = models.TextField() 
     priority= models.IntegerField(default=1)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -309,6 +314,19 @@ class VacancyRequirement(models.Model):
     class Meta:
         ordering = ['priority','date_created']
 
-    def __str__(self):
-        return str(self.specs)
-        
+    def __str__(self):     
+        return "{}. {} : {}".format(self.priority, self.vacancy.name, clip_trailing_chars(self.details,50))
+  
+
+class VacancySkill(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
+    details = models.TextField() 
+    priority= models.IntegerField(default=1)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    	
+    class Meta:
+        ordering = ['priority','date_created']
+
+    def __str__(self):     
+        return "{}. {} : {}".format(self.priority, self.vacancy.name, clip_trailing_chars(self.details,50))
+  

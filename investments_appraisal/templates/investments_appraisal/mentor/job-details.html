@@ -49,9 +49,10 @@
   {% block scripts %}
   <script>
     $(document).ready(function (){ 
-      // $("#index").removeClass( "active")
-      $("#projects a").addClass( "active") 
-      console.log('added projects active')             
+     
+      $("#investments a:first").addClass( "active")
+      $("#jobs a").addClass( "active")   
+               
     })
     </script>
   {% endblock %}

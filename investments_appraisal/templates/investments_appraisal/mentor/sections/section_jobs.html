@@ -22,13 +22,11 @@
                   <h5 class="card-title"><a href="">{{vacant.name}}</a></h5>
                   <p class="fst-italic text-center">{{vacant.due_date}}</p>
                   <p class="card-text">
-                    {{vacant.description}}
+                    {{vacant.description|truncatechars:100}}
                   </p>
-                </div>
-                <div class="text-center">
                   <a href="{% url 'vacancy-details' vacant.id %}" class="more-btn">More<i class="bx bx-chevron-right"></i></a>
                 </div>
-               
+            
             </div>
           </div>
         {% endfor %}

@@ -687,6 +687,7 @@ def jobs(request):
 
 	context = {
 		'vacancies':qs,
+		"total":qs.count()
 	}
 	return render(request, 'investments_appraisal/mentor/jobs.html', context)
 
@@ -714,7 +715,7 @@ def project_details(request,id):
 def vacancy_details(request,id):
 	model = get_object_or_404(Vacancy,pk=id)
 	
-	context ={'model':model}
+	context ={'model':model }
 	return render(request, 'investments_appraisal/mentor/job-details.html', context)
 
 @login_required(login_url="account_login")
