@@ -305,6 +305,11 @@ class Vacancy(models.Model):
     def skills(self):
         qs = self.vacancyskill_set.all()
         return qs
+    
+    @property
+    def offer(self):
+        qs = self.vacancyoffer_set.all()
+        return qs
 class VacancyDuty(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
     details = models.TextField() 
@@ -319,6 +324,19 @@ class VacancyDuty(models.Model):
   
 
 class VacancySkill(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
+    details = models.TextField() 
+    priority= models.IntegerField(default=1)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    	
+    class Meta:
+        ordering = ['priority','date_created']
+
+    def __str__(self):     
+        return "{}. {} : {}".format(self.priority, self.vacancy.name, clip_trailing_chars(self.details,50))
+
+
+class VacancyOffer(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
     details = models.TextField() 
     priority= models.IntegerField(default=1)
