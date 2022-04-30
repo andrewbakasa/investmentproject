@@ -458,12 +458,13 @@ class ExcelReport():
                 #print(item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
+
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
-                self._write_row_title_and_value4(output_sheet, colHeader, colValue, colUnits, row_index, 
+                a=self._write_row_title_and_value4(output_sheet, colHeader, colValue, colUnits, row_index, 
                         ic_parameters[item]['title'], ic_parameters[item]['value'], cell_display_val, 
-                        self._get_number_formats(_unit), _unit)
+                        self._get_number_formats(_unit), _unit=='BLANK')
                 
-                                   
+                #print(a)                   
                 if not (item in self.track_inputs['output_funding']):
                     self.track_inputs['output_funding'][item] = {}
 
@@ -535,11 +536,9 @@ class ExcelReport():
                 _unit = _unit.upper()
                
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
-                self._write_row_title_and_value4(output_sheet, colHeader, colValue, colUnits, row_index, 
+                a= self._write_row_title_and_value4(output_sheet, colHeader, colValue, colUnits, row_index, 
                         ic_parameters[item]['title'], ic_parameters[item]['value'], cell_display_val, 
                         self._get_number_formats(_unit), _unit=='BLANK')
-                
-             
                                    
                 if not (item in self.track_inputs['output_financial']):
                     self.track_inputs['output_financial'][item] = {}
@@ -999,9 +998,10 @@ class ExcelReport():
                                     w_sheet, write_colHeader, write_colValue, 
                                     write_colUnits,row_index, header_title , 
                                     input_value, ref_formular_unit, val_number_format= 'General', 
-                                    blank_UNITS =False,  valfield_style='Explanatory Text'):
-
-        #print("inside _write_row_title_and_value4:  Numberformat>>>>>>>>>>>", val_number_format)
+                                    blank_UNITS = False,  
+                                    valfield_style='Explanatory Text'):
+        
+      
         #----Tis function write eader and value as excel row wit formatin
         w_sheet.cell('%s%s'%(write_colHeader, row_index)).value = header_title
         w_sheet['%s%s'%(write_colHeader, row_index)].font = self.description_font
@@ -1013,10 +1013,12 @@ class ExcelReport():
         w_sheet['%s%s'%(write_colValue, row_index)].number_format= val_number_format
         w_sheet['%s%s'%(write_colValue, row_index)].font = self.description_font2
        
-        if blank_UNITS==False:
+        if blank_UNITS == False:
             w_sheet.cell('%s%s'%(write_colUnits, row_index)).value = ref_formular_unit
             w_sheet['%s%s'%(write_colUnits, row_index)].style= valfield_style
-        
+       
+        return [w_sheet,write_colHeader, write_colValue, write_colUnits,row_index, header_title ,  
+               input_value, ref_formular_unit, val_number_format,blank_UNITS]
     
        
     def _add_financing_section(self, w_sheet, row_index,total_wsheet_cols):

@@ -61,10 +61,13 @@
               var eye_style=''
               var ready_attr=''
               var model_class_added=''
+              var inlinestyle=''
               if (val.userIsInvestor) {
                   eye_style='style="color:blue"'
                   ready_attr='myinvestment'
                   model_class_added= 'model-complete'
+                  inlinestyle="style ='background-color:beige';"
+                  
               }else{
                   
                   eye_style='style="color:inherit"'
@@ -81,9 +84,11 @@
               var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
               imgval= baseimageURL + val.uniqueid +'.jpg'
 
+             
+
               a_html=`
-              <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch">
-                <div ${ready_attr} class="project-item ${model_class_added}">
+              <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
+                <div ${ready_attr} class="project-item umodel-item ${model_class_added}" ${inlinestyle}>
                   <img src="${imgval}" class="img-fluid" alt="...">
                   <div class="project-content">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -108,19 +113,22 @@
                 </div>
               </div> ` ;
                         
-            
+                  
   return a_html
 }
 
-          
+          function set_model_complete(){
+            $('.project-item[myinvestment]').each( function (){
+                    $(this).addClass('model-complete')
+                    $(this).css("background-color","beige")
+              })
+          }
           $(document).ready(function (){ 
               $("#investments a:first").addClass( "active") 
               $("#investors a:first").addClass( "active") 
               $("#iamaninvestor a:first").addClass( "active")
-
-              $('.project-item[myinvestment]').each( function (){
-                    $(this).addClass('model-complete')
-                })
+              set_model_complete()
+              
           })
           $("body").on("keyup", "#search", function(){
             var search_val = $(this).val().toLowerCase();
@@ -178,6 +186,8 @@
                             // add each model on every line
                             $('#project_div').append(a_html)
                         });
+                        set_model_complete()
+
                         },
                         error: function () {
                             alert('Error Occured');
