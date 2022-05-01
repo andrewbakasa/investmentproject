@@ -54,7 +54,7 @@
                         <h4 style="text-align:center;">Users Business: [{{total}}]</h4>
                         <hr>
                         <div class="table-responsive">
-                            <table id="usersTable" class="table table-hover">
+                            <table id="userBusinessTable" class="table table-hover">
                                 <thead class="thead-dark">
                                 <th style="width: 1%" >#</th>    
                                 <th style="width: 9%" >Name</th>
@@ -66,9 +66,9 @@
                                 <th style="width: 12%" >Date Created</th>
                                 <th style="width: 5%" class="text-right">Actions</th>
                                 </thead>
-                                <tbody id="users-table-tbody">
+                                <tbody id="userbusiness-table-tbody">
                                 {% for item in models  %}
-                                <tr id="comment-{{item.id}}" >
+                                <tr id="item-{{item.id}}" >
                                     <td>{{forloop.counter}}</td>
                                     <td class="modelData" name="name" >{{item.name}}</td>
                                     <td class="modelData" name="description" >{{item.description}}</td>
@@ -92,7 +92,7 @@
                                         </a>
                                          
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                          data-object-name="{{ item.name }}"  data-comment-id="{{item.id}}" 
+                                          data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
                                           data-delete-url="{% url 'delete_investment_ajax' item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                                           title='Delete' > <i class="fa fa-trash "></i> 
                                         </a>
@@ -164,7 +164,7 @@
                     <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
 
                     <input type="button" class="delete-button  btn btn-danger" id="delete-button"
-                            name="delete-button" value="Yes" data-url="" tr-id="" comment-id="">
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
                 </div>
             </div>
         </div>
@@ -208,16 +208,16 @@
      $('#confirmdelete').on('show.bs.modal', function(e) {
         var name = $(e.relatedTarget).data('object-name');
         var url = $(e.relatedTarget).data('delete-url');
-        var comment_id = $(e.relatedTarget).data('comment-id');
+        var comment_id = $(e.relatedTarget).data('item-id');
         $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
         $('#confirmdelete .modal-footer input').attr('data-url', url);
-        $('#confirmdelete .modal-footer input').attr('comment-id', comment_id);
+        $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
     });
 
     $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
-            var tr_id =$('#delete-button').attr('comment-id')
-            row = $('#comment-'+ tr_id.trim());
+            var tr_id =$('#delete-button').attr('item-id')
+            row = $('#item-'+ tr_id.trim());
             var formData = {
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             };
@@ -246,12 +246,11 @@
                 }
             });
         });
-    //     $('body').on('click', '.close-modal', function (e) {
-    //     $('.close-modal').click() 
-    //     console.log('llllllllllll')
-    // })
+        $('body').on('click', '.close-modal', function (e) {
+            $('#modal-usermodel').modal('hide'); 
+        })
           //------LOAD THE FORM ON MODAL DIV----------
-          $('body').on('click', '.show-form-update', function(e){
+        $('body').on('click', '.show-form-update', function(e){
               e.stopPropagation() 
               var btn = $(this);// fix button  delay
               $.ajax({
@@ -285,24 +284,15 @@
                   success: function(data){ 
                       //console.log('added data' ,data.model)
                       if(data.model){
+                          console.log(data.model)
+                          appendTable(data.model)
                           $('.close-modal').click()
                           //update paging
                           if (data.total_pages){
                               updatePaging(data.total_pages)
                           }
                          
-                         // $('.a_page_nav:first-child').trigger('click');
-                          //----------------------------------
-                         
-
-                        //   a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
-                        //            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                        //             title='Edit Investment Pledge'><i  style="color:green"  class="fas fa-edit"></i>
-                        //         </a>`
-
-                        //    $('#breadcrumb_changeto_edit').html(a_html)
-                        
-                          
+                      
 
                       } else {
                           // ADDITION NOT SUCCESSFUL
@@ -351,8 +341,66 @@
               })
               return false;
           })
-              
-          
+        function appendTable(item){  
+            console.log(item) 
+            var js_date_created = new Date(item.date_created) 
+            a_html =`
+                <tr id="item-${item.id}" >
+                    <td><i class="fa fa-edit"></i></td>
+                    <td class="modelData" name="name" >${item.name}</td>
+                    <td class="modelData" name="description" >${item.description}</td>
+                    <td class="modelData" name="category" >${item.category}</td>
+                    <td class="modelData" name="total_value" >${item.total_value}</td>
+                    <td class="modelData" name="current_investment" >${item.current_investment}</td>
+                    <td class="modelData" name="investors_count" >${item.investors_count}</td>
+                    
+                        
+                    <td class="modelData" name="date_created" >${js_date_created}</td>
+                    <td class="text-right modelAction modelData" name="action">
+                        <a href="#"
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Pitch Business'><i class="fas fa-eye"></i>
+                        </a>
+
+                            <!-- EDIT MODEL -->
+                        <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${item.id}/" 
+                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Edit Model'><i  class="fas fa-edit"></i>
+                        </a>
+                            
+                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                            data-object-name="${ item.name }"  data-item-id="${item.id}" 
+                            data-delete-url="/trading/delete_investment_ajax/${item.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            title='Delete' > <i class="fa fa-trash "></i> 
+                        </a>
+
+                        
+                        </td>
+                    
+                </tr>
+                 `
+                $("#userbusiness-table-tbody").append(a_html) 
+            }
+      
+        function updateTable(item){
+            //after edit update the table
+            $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
+                console.log(item.name)
+                var attr = $(this).attr("name");
+                if (attr == "description") {
+                    $(this).text(item.description);
+                } else if (attr == "category") {
+                    $(this).text(item.category);
+                } else if (attr == "name") {
+                    $(this).text(item.name);   
+                } else if (attr == "total_value") {
+                    $(this).text(item.total_value);
+                } else if (attr == "current_investment") {
+                    $(this).text(item.current_investment);
+                
+                } 
+            });
+        }  
         $('body').on("submit",".model-form-edit",function(e){
               e.preventDefault();
               var data = new FormData(this);
@@ -369,12 +417,10 @@
                   contentType: false,
                   success: function(data){
                       if(data.model){
-                          
-                          //updateTable(data.model);
-                          //hide the form after editing
-                          console.log('DATAMODEL:::', data.model)
+                          console.log(data.model)
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
+                          updateTable(data.model);
                           if (data.model.current_investment){
                             $('#current_investment').html(`${data.model.current_investment}`);
                           }

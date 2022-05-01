@@ -380,9 +380,12 @@ def create_all_user_business(request,form,template_name):
             latest = Investment.objects.latest('id').id
             record = Investment.objects.get(pk=latest)
             item_object = model_to_dict(record)
-
+            item_object['category']=record.category.name
+            item_object['creater']=record.creater.username 
+            item_object['current_investment']= record.current_investment
+            item_object['investors_count']= record.investors_count
+            item_object['date_created']= record.date_created.ctime()
             data['model'] = item_object
-            #data['total_pages']=total_pages
         else:
             data['form_is_valid'] = False
             # print('nofield errors: ',form.non_field_errors)

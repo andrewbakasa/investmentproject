@@ -1257,7 +1257,6 @@ class FishBusinessReport(BaseModel):
         self.excel_obj._link_tank_design_parameters_to_model_selected(wb["Inputs"])
         self.excel_obj._update_sensitivity(wb["Sens"],self)
         #updated here again.... 02 Feb 2022
-        #paid salary 110K
         # iam sure it will work
         # i love Programming
         # I love God

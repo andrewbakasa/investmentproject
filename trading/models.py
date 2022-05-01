@@ -127,7 +127,8 @@ class Investor(models.Model):
         if investments_df.shape[0]>0 and investors_df.shape[0] > 0 : 
             investments_df['investment_id'] = investments_df['id']
             # mwrge
-            df =pd.merge(investments_df, investors_df, on='investment_id',how="left").drop(['id_x',
+            pd.merge_asof
+            df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop(['id_x',
                         'likes','hits','date_created_y','date_created_x','description_y'
                         ,'name_y','user_id','investment_id'], axis=1).rename(
                         {'id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
@@ -156,8 +157,10 @@ class Investor(models.Model):
             # 'username', 'first_name', 'last_name', 'email', 'id', 'cat_name',
             # 'cat_descript', 'uniqueid'
         else:
-            return df
-        return df
+            #select only for current user
+            return df#[~df['id'].isna()]
+        #select only for current user
+        return df#[~df['id'].isna()]
 
 class Enterprenuer(models.Model):
     investment = models.OneToOneField(Investment, on_delete=models.SET_NULL, null=True)
