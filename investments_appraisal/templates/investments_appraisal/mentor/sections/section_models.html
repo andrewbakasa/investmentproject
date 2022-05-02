@@ -35,7 +35,9 @@
               <p>Start new model by clicking the red button above</p>
             </div>
           {% else %}
+             
               {% for model in first_page %}
+                
                 <div id="div-{{model.id}}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
                       <div class="project-item umodel-item">
                     
@@ -105,13 +107,29 @@
       
     
       <div id= "page_section" class="pagination">
-        Pages
-        {% for i in page_range %}
-        <a class='a_page_nav' style="margin-left: 5px; " href ="{{i}}">{{i}}</a>
-        {% endfor %}
-      </div>
+        <ul class="pagination newpagination">
+            {% if current_page.has_previous %}
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+            </span>
+    
+            {% if current_page.has_next %}
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+               
+            {% endif %}
+          </ul>
+       </div>
+
+     
     
 
   </div>
  
+
+  
 </section><!-- End Projects Section -->

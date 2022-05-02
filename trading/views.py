@@ -108,12 +108,30 @@ def investment_search_ajax(request,slug, *args, **kwargs):
             page_no = request.POST.get('page_no', None) 
             num_of_pages= int(obj_paginator.num_pages)
             totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(page_no)    
+            
             
             data={}	
             data["per_page"]=per_page
             data["page_no"]=page_no
             data["num_of_pages"]=num_of_pages
             data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+        
+
             
             if int(page_no)>int(num_of_pages):			
                 data["results"]=[]
@@ -144,17 +162,16 @@ def display_investment_ajax(request):
     # range iterator of page numbers
     page_range = obj_paginator.page_range
 
-    context = {
-        'obj_paginator':obj_paginator,
-        'first_page':first_page,
-        'page_range':page_range
-    }
+   
     #
     if request.method == 'POST':
         #getting page number
         page_no = request.POST.get('page_no', None) 
         num_of_pages= int(obj_paginator.num_pages)
         totalrecords= int(obj_paginator.count)
+		
+        current_page = obj_paginator.get_page(page_no)
+
             
         
         
@@ -163,16 +180,27 @@ def display_investment_ajax(request):
         data["page_no"]=page_no
         data["num_of_pages"]=num_of_pages
         data["totalrecords"]=totalrecords
+        #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages  
         if int(page_no)>int(num_of_pages):			
             data["results"]=[]
             return JsonResponse({"data":data})
 
         results=[] 
 
-        #name 
-        #description 
-        #uniqueid  
-        #date_created 
+       
 
         for i in obj_paginator.page(page_no).object_list:
             
@@ -189,6 +217,9 @@ def display_investment_ajax(request):
         
         
         return JsonResponse({"data":data})
+
+
+        
 @login_required
 def investment_details(request,id):
     investmet_obj = get_object_or_404(Investment,pk=id)
@@ -243,12 +274,17 @@ def home(request):
 	obj_paginator = Paginator(models, per_page)
 	# list of objects on first page
 	first_page = obj_paginator.page(1).object_list
+	current_page = obj_paginator.get_page(1)
 	# range iterator of page numbers
 	page_range = obj_paginator.page_range
 
+	
+	
 	context = {
 		'obj_paginator':obj_paginator,
 		'first_page':first_page,
+		
+		'current_page':current_page,
 		'page_range':page_range
 	}
 	

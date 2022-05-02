@@ -40,7 +40,7 @@
             }   
             $('.pagination').html('');
             for (let i = 1; i < pages+1; i++) {
-                a_html = 	`<a class='a_page_nav' style="margin-left: 5px; " href="${i}">${i}</a>` ;
+                a_html = 	`<li></li><a class='a_page_nav' style="margin-left: 5px; " href="${i}">${i}</a></li>` ;
                 $('.pagination').append(a_html)
             }
         }

@@ -3,4 +3,6 @@ __pycache__/
 additionaldata
 .env
 myproj/static
+investments_appraisal/templates/investments_appraisal/mentor/sections/test.html
+
 

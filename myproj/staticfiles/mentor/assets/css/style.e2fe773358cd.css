@@ -1330,6 +1330,10 @@ section {
 /*--------------------------------------------------------------
 # Model complete
 --------------------------------------------------------------*/
+
+.pagination-active {
+  color: grey;
+}
 .model-complete {
   background-color: beige;  
   /* border-style: solid; */

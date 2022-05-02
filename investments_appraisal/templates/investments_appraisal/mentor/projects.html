@@ -50,8 +50,41 @@
       <script src="{% static 'mentor/assets/js/search.js' %}"></script>
       <script>
          //first timme
-          var display_projects_ajax_url= "{% url 'display_projects_ajax' %}"  
-      
+          var display_projects_ajax_url= "{% url 'display_projects_ajax' %}"
+          function updatePaging2(data){
+            var has_previous=''
+            console.log(data)
+            if (data.has_previous){
+                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+            
+            }       
+            var has_next= ''          
+            if (data.has_next){
+                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                    `; 
+            }       
+            a_html=`
+            <div id= "page_section" class="pagination">
+                <ul class="pagination newpagination">
+                    ${has_previous}            
+                    <span class="current">
+                        Page ${ data.current_page } of ${ data.last }.
+                    </span>                   
+                    ${has_next}
+                </ul>
+                </div>`
+                $("#page_section").html(a_html)
+          }
+   
+          function removeClass(objClicked){
+            $("#page_section ul").children().each(function() {
+                var attr = $(this).find('a').removeClass("pagination-active");
+            })
+            objClicked.addClass('pagination-active');
+
+          }
           $(document).ready(function (){ 
             // $("#index").removeClass( "active")
             $("#projects a").addClass( "active") 
@@ -107,7 +140,8 @@
                         
                         html_a= `<label id="total_projects_searched"><i>${records}</i></label>`
                         $('#total_projects_searched').html(html_a)
-                        editpages(num_of_pages)
+                        
+                        updatePaging2(response.data)
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
                         $.each(response.data.results, function(i, val) {
@@ -164,15 +198,7 @@
           
           
           });
-          function editpages(totalpages){
-            $("#page_section").html('');
-            html_a= `<div id= "page_section" class="pagination">`;
-            for (i=1;i <= totalpages; i++){
-              html_a= html_a + `<a class='a_page_nav' style="margin-left: 5px; " href ="${i}">${i}</a>`; 
-            }
-            html_a= html_a + ` </div>`;
-            $("#page_section").html(html_a);
-          }
+         
          
           function getToken(name) {
                 let cookieValue = null;
@@ -197,6 +223,7 @@
                 console.log($(this).attr('href'))
                 event.preventDefault();
                 var page_no = $(this).attr('href');
+                var objthis = $(this)
                 // ajax call
                 $.ajax({
                     type: "POST",
@@ -208,6 +235,8 @@
                     },
                     // handle a successful response
                     success: function (response) {
+                      updatePaging2(response.data)
+                        //removeClass(objthis)
                         $('#project_div').html('')
                         if (response.data.per_page){
                             per_page=response.data.per_page
