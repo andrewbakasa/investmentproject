@@ -51,9 +51,10 @@
 
   {% block scripts %}
   <script>
-    $(document).ready(function (){ 
-      $("#investments a:first").addClass( "active")
-      $("#events a").addClass( "active")            
+    $(document).ready(function (){      
+       $("#investments a:first").addClass( "active") 
+       $("#extra a:first").addClass( "active") 
+       $("#events a:first").addClass( "active")           
     })
     </script>
   {% endblock %}

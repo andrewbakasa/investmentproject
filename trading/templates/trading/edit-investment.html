@@ -28,11 +28,11 @@
    </div>
    <!-- End Breadcrumbs -->
     <!-- ======= Project Details Section ======= -->
-  {% include 'trading/sections/section_investment_details.html' %} 
+  {% include 'trading/sections/section_investment_details_edit.html' %} 
   <!-- Each project write it own DATA -->
   {% if model.category.uniqueid %}   
       <!-- ======= Project Details Tabs Section ======= -->
-    {% with template_tab_name="trading/sections/section_investment_details_tab.html" %}
+    {% with template_tab_name="trading/sections/section_investment_details_tab_edit.html" %}
       {% include template_tab_name %}
     {% endwith %}
   {% endif %}
@@ -158,19 +158,20 @@
                           //click first instance of page_class to show newly addition
                           $('.a_page_nav:first-child').trigger('click');
                           //----------------------------------
-                          if (data.model.current_investment){
+                          if (data.model.current_investment_percent){
                               $('#current_investment').html(`${data.model.current_investment_percent} %`);
                           }
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
+                          
                           if (data.model.investors_count){
                               $('#investors_count').html(`${data.model.investors_count}`);
                           }
 
                           a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                    title='Edit Investment Pledge'><i  style="color:green"  class="fas fa-edit"></i>
+                                    title='Edit EQUITY'><i  style="color:green"  class="fas fa-edit"></i>
                                 </a>`
 
                            $('#breadcrumb_changeto_edit').html(a_html)
@@ -246,7 +247,7 @@
                           console.log('DATAMODEL:::', data.model)
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
-                          if (data.model.current_investment){
+                          if (data.model.current_investment_percent){
                             $('#current_investment').html(`${data.model.current_investment_percent} %`);
                           }
                           if (data.model.current_investment){

@@ -13,7 +13,8 @@ urlpatterns = [
     path('', views.home, name="trading_home"), 
     path('view/<int:model_id>/', views.project_details, name="view_trading"),
     path('investment-details/<int:id>/', views.investment_details, name="investment-details"), 
-    
+    path('edit-investment/<int:id>/', views.edit_investment, name="edit-investment"), 
+  
     path('display_investment_ajax/', views.display_investment_ajax, name="display_investment_ajax"),
     path('investment_search/<str:slug>/', views.investment_search_ajax,  name='investment_search_ajax'), 
 

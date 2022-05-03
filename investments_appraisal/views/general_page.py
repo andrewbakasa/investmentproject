@@ -257,7 +257,7 @@ def display_projects_ajax(request):
 			item_object = model_to_dict(i)
 			item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
 			item_object['date_created']=f'{i.date_created.ctime()}'
-			print(item_object)
+			#print(item_object)
 			results.append(item_object)
 		
 		data["results"]=results
@@ -283,11 +283,7 @@ def display_models_ajax_filter(request,slug, *args, **kwargs):
 	# range iterator of page numbers
 	page_range = obj_paginator.page_range
 
-	context = {
-		'obj_paginator':obj_paginator,
-		'first_page':first_page,
-		'page_range':page_range
-	}
+	
 	#
 	if request.method == 'POST':
 		#getting page number
@@ -334,7 +330,7 @@ def display_models_ajax_filter(request,slug, *args, **kwargs):
 			#item_object['date_created']='new Date("%s")' % i.date_created.ctime()
 			item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
 			item_object['date_created']=f'{i.date_created.ctime()}'
-			print(item_object)
+			#print(item_object)
 			results.append(item_object)
 		
 		data["results"]=results
@@ -409,12 +405,12 @@ def display_models_ajax(request):
 			#item_object['date_created']='new Date("%s")' % i.date_created.ctime()
 			item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
 			item_object['date_created']=f'{i.date_created.ctime()}'
-			print(item_object)
+			#print(item_object)
 			results.append(item_object)
 		
 		data["results"]=results
 		
-		print(data)
+		#print(data)
 		return JsonResponse({"data":data})
 
 
@@ -465,7 +461,7 @@ def create_usermodel_instance(request):
 		if UserModel.objects.filter(Q(name = data['name']) & Q(user = request.user)).exists():
 			record = UserModel.objects.filter(Q(name = data['name']) & Q(user = request.user)).first()
 			dt= record.date_created.strftime('%d %b %Y')
-			print('Record Exist.....')
+			#print('Record Exist.....')
 			#error......
 			return HttpResponseRedirect(reverse('user_models',))
 		#usermodel.save()
@@ -575,8 +571,8 @@ def user_models(request):
 	# list of objects on first page
 	first_page = obj_paginator.page(1).object_list
 	current_page = obj_paginator.get_page(1)
-	print("...............")
-	print(current_page)  
+	#print("...............")
+	#print(current_page)  
 	# range iterator of page numbers
 	page_range = obj_paginator.page_range
 
@@ -807,7 +803,7 @@ def select_model_specs_page_mentor(request, model_id):
 		if 'ready' in model_views_page_mentor[uniqueid]:
 			if model_views_page_mentor[uniqueid]['ready']== True:
 				reverse_page= model_views_page_mentor[uniqueid]['view']
-				print(f'reverse: {reverse_page} {uniqueid}')
+				#print(f'reverse: {reverse_page} {uniqueid}')
 				return HttpResponseRedirect(reverse(reverse_page, args=(model_id,)))
 			else:
 				messages.success(request, "Project WIP")
@@ -1610,14 +1606,14 @@ def delete_bussiness_model_ajax(request, model_id, page_no, *args, **kwargs):
 			model_ = get_object_or_404(UserModel, pk=model_id)
 
 			model_.delete()
-			prices_item_object = model_to_dict(model_)
+			item_object = model_to_dict(model_)
 
 			total_pages= get_total_pages(request)
 			data= {}
 			data['total_pages']=total_pages
 			data['deleted_page']=page_no
 			
-			data['model']=prices_item_object
+			data['model']=item_object
 			
 			messages.success(request, "Successfully deleted  model")
 			
@@ -1851,7 +1847,7 @@ def project_search_ajax(request,slug, *args, **kwargs):
 				item_object = model_to_dict(i)
 				item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
 				item_object['date_created']=f'{i.date_created.ctime()}'
-				print(item_object)
+				#print(item_object)
 				results.append(item_object)
 				
 			data["results"]=results
@@ -1869,13 +1865,13 @@ def news_subscribe_ajax(request,  *args, **kwargs):
 				
 			else:
 				errors = form.errors
-				print('error:' , errors)
+				#print('error:' , errors)
 				return JsonResponse({'error': True, 'data': errors})  
 			
 			latest =  NewsSubscribe.objects.latest('id').id
 			record =  NewsSubscribe.objects.get(pk=latest)
 			item_object = model_to_dict(record)
-			print (item_object)
+			#print (item_object)
 			return JsonResponse({'error': False, 'data': item_object})
 		else:
 			return JsonResponse({'error': True, 'data': "Request not ajax"})
@@ -1894,7 +1890,7 @@ def update_model_likes_ajax(request,  id, *args, **kwargs):
 			
 		record = ModelCategory.objects.get(pk=id)
 		item_object = model_to_dict(record)
-		print (item_object)
+		#print (item_object)
 		return JsonResponse({'error': False, 'data': item_object})
 	else:
 		return JsonResponse({'error': True, 'data': "Request not ajax"})
@@ -1916,16 +1912,13 @@ def update_user_profile_ajax(request,  *args, **kwargs):
 			latest = UserProfile.objects.latest('id').id
 			record = UserProfile.objects.get(pk=latest)
 			item_object = model_to_dict(record)
-			print (item_object)
+			#print (item_object)
 			return JsonResponse({'error': False, 'data': item_object})
 		else:
 			return JsonResponse({'error': True, 'data': "Request not ajax"})
-	else:
-		form = UserProfileForm(instance=profile)
-		context ={}
-		context['form']=form
-		return render(request, 'investments_appraisal/mentor/user_profile.html', context)
 
+	return JsonResponse({'error': True, 'data': "Request not ajax"})
+	
 
 @login_required(login_url="account_login")
 def update_user_pref_ajax(request,  *args, **kwargs):
@@ -1941,13 +1934,13 @@ def update_user_pref_ajax(request,  *args, **kwargs):
 					request.session['perpage']=obj.perpage
 			else:
 				errors = form.errors
-				print('error:' , errors)
+				#print('error:' , errors)
 				return JsonResponse({'error': True, 'data': errors})  
 			
 			latest = UserPreference.objects.latest('id').id
 			record = UserPreference.objects.get(pk=latest)
 			item_object = model_to_dict(record)
-			print (item_object)
+			#print (item_object)
 			return JsonResponse({'error': False, 'data': item_object})
 		else:
 			return JsonResponse({'error': True, 'data': "Request not ajax"})
@@ -1968,7 +1961,15 @@ def upload_form_user_profile(request):
 	pref, created = UserProfile.objects.get_or_create(user=request.user)
 	form = UserProfileForm(instance=pref)
 	context ={}
-	context['form']=form
+	personal_record= False
+	if pref:
+		if pref.age or pref.country or pref.sex or pref.profession or pref.aboutyou:
+			personal_record=True
+
+	context={
+		'form':form,
+		'personal_record':personal_record
+	}
 	return render(request, 'investments_appraisal/mentor/user_profile.html', context)
 
 def update_user_pref(request):

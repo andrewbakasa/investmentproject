@@ -7,11 +7,12 @@
     <ul id="navbar-ul">
         <li id="index"><a href="{% url 'index' %}">Home</a></li>
         <li id="about"><a href="{% url 'about' %}">About</a></li>
-        <li id="projects"><a href="{% url 'projects' %}">Projects</a></li>
-        <li id="models"><a href="{% url 'models' %}">Models</a></li>
+       
 
         <li id="investments" class="dropdown"><a href="#"><span>Investments</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
+                <li id="projects"><a href="{% url 'projects' %}">Projects</a></li>
+                <li id="models"><a href="{% url 'models' %}">Models</a></li> 
                 <li id="investors" class="dropdown"><a href="#"><span>Investors</span> <i class="bi bi-chevron-right"></i></a>
                   <ul>
                     <li id="iamaninvestor"><a href="{% url 'trading_home' %}">I am an Investor</a></li>
@@ -21,15 +22,20 @@
                 </li>
                 <li id="enterprenuer" class="dropdown"><a href="#"><span>Enterprenuer</span> <i class="bi bi-chevron-right"></i></a>
                   <ul>
-                    <li><a href="{% url 'commingsoon' %}">Pitch My Business</a></li>
-                    <li id="registerbusiness" ><a href="{% url 'user_businesses' %}">Register My Business</a></li>
+                    <!-- <li><a href="{% url 'commingsoon' %}">Pitch My Business</a></li> -->
+                    <li id="registerbusiness" ><a href="{% url 'user_businesses' %}">My Businesses</a></li>
                     <li><a href="{% url 'commingsoon' %}">Market Analytics</a></li>
                   </ul>
                 </li>
-                <li id="events"><a href="{% url 'events' %}">Events</a></li>
-                <li id="pricing"><a href="{% url 'pricing' %}">Pricing</a></li>
-                <li id="experts"><a href="{% url 'experts' %}">Experts</a></li>
-                <li id="jobs"><a href="{% url 'jobs' %}">Vacancies</a></li>
+                <li id="extra" class="dropdown"><a href="#"><span>Events & Extras</span> <i class="bi bi-chevron-right"></i></a>
+                  <ul>
+                    <li id="events"><a href="{% url 'events' %}">Events</a></li>
+                    <li id="pricing"><a href="{% url 'pricing' %}">Pricing</a></li>
+                    <li id="experts"><a href="{% url 'experts' %}">Experts</a></li>
+                    <li id="jobs"><a href="{% url 'jobs' %}">Vacancies</a></li>
+                  </ul>
+                </li>
+                
             </ul>
         </li> 
         <li><a href="{% url 'contact' %}">Contact</a></li>

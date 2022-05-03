@@ -1,3 +1,4 @@
+
 {% extends 'investments_appraisal/mentor/index.html' %}<!--investments_appraisal/main.html---->
 {% load i18n %}
 {% load static %}
@@ -18,30 +19,14 @@
 {% endblock %}
 
 
-{% block content %}
-
- 
-<main id="main">
-   <!-- ======= Breadcrumbs ======= -->
-   <div class="breadcrumbs" data-aos="fade-in">
-    <div class="container">
-      <h2>Profile</h2>
-      <p>Personal Profile </p>
-    </div>
-  </div><!-- End Breadcrumbs -->
-
-   <!-- ======= Contact Section ======= -->
-   {% include 'investments_appraisal/mentor/sections/section_user_profile.html' %} 
-  
-  
-  
-</main><!-- End #main -->
-
-
-{%endblock content%}
-
-
-
+{% block content %} 
+    <main id="main">
+        <!-- ======= Breadcrumbs ======= -->
+        <div class="breadcrumbs">
+        </div>
+        {% include 'investments_appraisal/mentor/sections/section_user_details_tab.html' %}
+    </main><!-- End #main -->
+{% endblock content%}
  <!-- ======= Footer ======= --> 
  {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
  
@@ -49,99 +34,112 @@
   <div id="preloader"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  {% block scripts %}
-  <script>
-    $(document).ready(function (){ 
-      // $("#index").removeClass( "active")
-      $("#contact a").addClass( "active") 
-      console.log('added contact active') 
-      
-     
-      
-      $('body').on("submit",".user-profile-update",function(e){
-              e.preventDefault();
-              var data = new FormData(this);
-              var formData
-              var form = $(this);
+  {% block scripts %}  
+    <script>
+        $(document).ready(function (){ 
+        
+        $("#contact a").addClass( "active")    
+        
+        function check_tab (url){
+            //console.log('url', url)
+            if (url === "/update/user_profile/ajax/"){
+                html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">
+                            <i class="bi bi-check-circle"></i> Personal Details</a>`;
+                $("#user_profile_tab").html(html_add_check)
+            }else if (url === "another") {
+
+            }            
+        }
+        $('body').on("submit",".user-profile-update",function(e){
+                e.preventDefault();
+                var data = new FormData(this);
+                var formData
+                var form = $(this);
+                
+                var url=form.attr('data-url')
+                $.ajax({
+                    url: form.attr('data-url'),
+                    data : data,
+                    type: form.attr('method'),
+                    dataType: 'json',
+                    processData:false,
+                    contentType: false,
+                    success: function(data){
+                        if(data.error == false){
+                            check_tab(url)
+                            $('#public_toggle_form-errors').html('');
+                            a_html = 	`</br><div class='alert alert-success alert dismissable'>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button> Saved Successfully!!
+                                    </div> ` ;
+                            $('#public_toggle_form-errors').append(a_html)
+                            $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                                window.setTimeout(function() {
+                                    $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $("#public_toggle_form-errors").html('');
+                                    });
+                                }, 4000);
+                        } else {
+                             
+                            $('#public_toggle_form-errors').html('</br>');
+                            if (data.error == true) {
+                                //console.log('Error', data.error)
+                                var form_vars=['__all__','age']//,
+                        
+                                for (let p=0; p < form_vars.length; p++ ){
+                                    let name_var = form_vars[p]
+                                    if (data.data[name_var]){
+                                    a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button> ${data['data'][name_var][0]}
+                                    </div> ` ;
+                                    $('#public_toggle_form-errors').append(a_html)
+                                    
+                                    }
+                                }
+                                $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                                window.setTimeout(function() {
+                                    $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $("#public_toggle_form-errors").html('');
+                                    });
+                                }, 4000);
+                            //-----------------------
+                            } else  {
+                                // Data locked:  No edit allowed
+                                $('#public_toggle_form-errors').html('');
+                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button> ${data['locked']}
+                                </div> ` ;
+                                $('#public_toggle_form-errors').append(a_html)
+                                $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                                window.setTimeout(function() {
+                                    $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $("#public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+                            } 
+                        //LAST ELSE--------------------------------------                
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
             
-              var url=form.attr('data-url')
-              $.ajax({
-                  url: form.attr('data-url'),
-                  data : data,
-                  type: form.attr('method'),
-                  dataType: 'json',
-                  processData:false,
-                  contentType: false,
-                  success: function(data){
-                      if(data.error == false){
-                         //console.log('Success...', data)
-                        $('#public_toggle_form-errors').html('');
-                        a_html = 	`</br><div class='alert alert-success alert dismissable'>
-                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                      <span aria-hidden="true">&times;</span></button> Saved Successfully!!
-                                  </div> ` ;
-                        $('#public_toggle_form-errors').append(a_html)
-                        $('#public_toggle_form-errors').slideUp(50).fadeIn();
-                              window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
-                                  });
-                              }, 4000);
-                      } else {
-                          //console.log('Error data...', data.data)
-                          $('#public_toggle_form-errors').html('</br>');
-                          if (data.error == true) {
-                              //console.log('Error', data.error)
-                              var form_vars=['__all__','age']//,
-                      
-                              for (let p=0; p < form_vars.length; p++ ){
-                                  let name_var = form_vars[p]
-                                  if (data.data[name_var]){
-                                  a_html = 	`<div class='alert alert-danger alert dismissable'>
-                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                      <span aria-hidden="true">&times;</span></button> ${data['data'][name_var][0]}
-                                  </div> ` ;
-                                  $('#public_toggle_form-errors').append(a_html)
-                                  
-                                  }
-                              }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
-                              window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
-                                  });
-                              }, 4000);
-                          //-----------------------
-                          } else  {
-                              // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
-                              a_html = 	`<div class='alert alert-danger alert dismissable'>
-                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span></button> ${data['locked']}
-                              </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
-
-                              window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
-                                  });
-                                  }, 4000);
-                          } 
-                      //LAST ELSE--------------------------------------                
-                      }
-                  //END SUCCESS
-                  }
-              // END AJAX
-              })
-              return false;
-          })
-          
-    })
+        })
     </script>
-
-
   {% endblock %}
+
+
+
+   
+
+
+
+
 
 
 

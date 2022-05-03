@@ -69,7 +69,7 @@
             <div id= "page_section" class="pagination">
                 <ul class="pagination newpagination">
                     ${has_previous}            
-                    <span class="current">
+                    <span class="current" style="margin-left:5px">
                         Page ${ data.current_page } of ${ data.last }.
                     </span>                   
                     ${has_next}
@@ -86,9 +86,9 @@
 
           }
           $(document).ready(function (){ 
-            // $("#index").removeClass( "active")
-            $("#projects a").addClass( "active") 
-            console.log('added projects active')             
+              $("#investments a:first").addClass( "active") 
+              $("#projects a").addClass( "active") 
+                            
           })
           $("body").on("keyup", "#search", function(){
           //$("#search").on("keyup", function() {

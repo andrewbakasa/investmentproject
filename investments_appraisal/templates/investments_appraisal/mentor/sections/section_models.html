@@ -111,10 +111,11 @@
             {% if current_page.has_previous %}
                 <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
                 <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                
             {% endif %}
     
-            <span class="current">
-                Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+            <span class="current"  style="margin-left:5px">
+              Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
             </span>
     
             {% if current_page.has_next %}

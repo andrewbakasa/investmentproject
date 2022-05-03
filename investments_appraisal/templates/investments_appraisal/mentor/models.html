@@ -116,7 +116,10 @@
           var display_models_ajax_url= "{% url 'display_models_ajax' %}"  
       
           $(document).ready(function (){ 
-                $("#models a").addClass( "active")  
+                $("#investments a:first").addClass( "active") 
+                $("#models a").addClass( "active") 
+               
+
                 $('.project-content[ready]').each( function (){
                     $(this).addClass('model-complete')
                 })
@@ -142,7 +145,7 @@
             <div id= "page_section" class="pagination">
                 <ul class="pagination newpagination">
                     ${has_previous}            
-                    <span class="current">
+                    <span class="current" style="margin-left:5px" >
                         Page ${ data.current_page } of ${ data.last }.
                     </span>                   
                     ${has_next}
@@ -320,15 +323,9 @@
           
           
           });
-      
-          $('body').on('click', '.a_page_nav', function (event) {
-                // preventing default actions
-               
-                event.preventDefault();
-                var page_no = $(this).attr('href');
-                var objthis= $(this)
-                // ajax call
-                $.ajax({
+
+          function loadPageAjax(page_no){
+            $.ajax({
                     type: "POST",
                     // define url name
                     url: display_models_ajax_url, 
@@ -340,7 +337,6 @@
                     success: function (response) {
                         $('#project_div').html('')
                         updatePaging2(response.data)
-                        //removeClass(objthis)
                         if (response.data.per_page){
                             per_page=response.data.per_page
                         }
@@ -360,6 +356,15 @@
                         
                 });
                 //add_model_class()
+          }
+      
+          $('body').on('click', '.a_page_nav', function (event) {
+                // preventing default actions
+               
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                loadPageAjax(page_no)
             });
           
         
@@ -372,23 +377,7 @@
                 $('#confirmdelete .modal-footer input').attr('model-id', model_id);
             });
           
-          function updatePaging(pages){ 
-              // dynamincally add pages...
-              
-              var page_section = $('#page_section')
-              if (page_section[0]==undefined) {
-                  // console.log('...First Model: Empty Model Table')
-                  $('#models_placeholder').html('');
-                  a_html = 	usermodelhtml() ;                
-                  $('#models_placeholder').append(a_html);
-
-              }   
-              $('.newpagination').html('');
-              for (let i = 1; i < pages+1; i++) {
-                  a_html = 	`<li><a class='a_page_nav' style="margin-left: 5px; " href="${i}">${i}</a></li>` ;
-                  $('.newpagination').append(a_html)
-              }
-          }
+        
           $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
             var tr_id =$('#delete-button').attr('model-id')
@@ -406,20 +395,14 @@
                 dataType: 'json',
                 data: formData,     // our data object
                 success: function (data) {
-                    
-                    if (data.data.total_pages){
-                        //update paging numbering if need be
-                        updatePaging(data.data.total_pages)
-                    }
                      
-                    //$('#confirmdelete').modal('hide'); 
                     $('.close-modal').click()               
                     row.fadeOut(1000, function () {
                         //remove the row deleted
                         $(this).remove();
                         // if deleted page make the page disappear, point to prev page
                         //page-1
-                        if (data.data.total_pages< data.data.deleted_page){                     
+                        if (data.data.total_pages < data.data.deleted_page){                     
                             var index= parseInt(data.data.total_pages)-1
                             window.setTimeout(function() {
                                 $(".a_page_nav:eq(" +  index  +")").trigger('click');
@@ -430,14 +413,17 @@
                             // if item on the current page get to zero
                             // point to page-1
                             var total = $('#project_div').children().length
-                            //console.log('total items in dom>>>',total)
                             if (total == 0){
                                 //refresh the current pages
                                 var index= parseInt(data.data.deleted_page)-1
-                                //console.log('Empy page.. load page behind this current page', index)
-                                $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                                if (index<1){
+                                    // if deleteting first page  then scroll all into first page
+                                    index=1
+                                } 
+                                loadPageAjax(index)                                                               //console.log('Empy page.. load page behind this current page', index)
+                                //$(".a_page_nav:eq(" +  index  +")").trigger('click');
                                 //dynamically created element trigger
-                                //$(document).on('click', ".a_page_nav:eq(" +  index  +")", onClick);
+                               // $(document).on('click', ".a_page_nav:eq(" +  index  +")", onClick);
                             }
 
                         }
@@ -616,14 +602,10 @@
                     //console.log('added data' ,data.model)
                     if(data.model){
                         $('.close-modal').click()
-                        //update paging
-                        if (data.total_pages){
-                            updatePaging(data.total_pages)
-                        }
+                        //load page 1
+                        loadPageAjax(1)
                         //click first instance of page_class to show newly addition
-                        $('.a_page_nav:first-child').trigger('click');
-                        //dynamically created element trigger
-                       // $(document).on('click', ".a_page_nav:first-child", onClick);
+                     
                         //----------------------------------
                     } else {
                         // ADDITION NOT SUCCESSFUL

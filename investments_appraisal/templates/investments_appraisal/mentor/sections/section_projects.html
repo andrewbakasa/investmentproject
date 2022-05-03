@@ -10,7 +10,7 @@
             <ol class="breadcrumb" >
               <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
               <li class="breadcrumb-item" ><a href="{% url 'projects' %}">{% trans 'Projects' %}</a></li>
-            
+             
               <li class="breadcrumb-item" >
                 <label id="total_projects_searched"></label>
               </li>  
@@ -54,7 +54,7 @@
                     <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
                 {% endif %}
         
-                <span class="current">
+                <span class="current" style="margin-left:5px">
                     Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
                 </span>
         

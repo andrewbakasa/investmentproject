@@ -20,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 @login_required(login_url="account_login")
 def get_user_businesses(request):
-    queryset = Investment.objects.filter(creater=request.user)
+    queryset = Investment.objects.filter(creater=request.user)#.order_by("current_investment")
     form = UserInvestmentForm(initial={'creater': request.user})
     context = {
         "models": queryset,
@@ -264,6 +264,51 @@ def investment_details(request,id):
     return render(request, 'trading/investment-details.html', context)
 
 
+       
+@login_required
+def edit_investment(request,id):
+    #limit
+    investmet_obj = get_object_or_404(Investment,pk=id, creater=request.user)
+    id =investmet_obj.id
+    is_user_investor=False
+    investor_id=1
+    obj=Investor.objects.filter(user=request.user, investment=id) 
+    if obj:
+        is_user_investor=True
+        investor_id=obj.first().id
+
+   
+    form = InvestorForm(initial={'user': request.user, 'investment': investmet_obj})
+
+
+        #4. Model Taxes
+    invest_details = InvestmentDetails.objects.filter(investment=investmet_obj).first()
+    if invest_details :	
+        investment_summary_form = InvestmentSummaryForm(instance=invest_details)
+        investment_strategy_form = InvestmentStrategyForm(instance=invest_details)
+        investment_shareholding_form = InvestmentShareholdingForm(instance=invest_details)
+        investment_roi_form = InvestmentROIForm(instance=invest_details)
+    else:
+        investment_summary_form = InvestmentSummaryForm(initial={'investment': investmet_obj})	
+        investment_strategy_form = InvestmentStrategyForm(initial={'investment': investmet_obj})
+        investment_shareholding_form = InvestmentShareholdingForm(initial={'investment': investmet_obj})	
+        investment_roi_form = InvestmentROIForm(initial={'investment': investmet_obj})	
+
+    context = {
+        'model':investmet_obj,
+        "is_user_investor": is_user_investor,
+        "is_user_record_owner": True if investmet_obj.creater == request.user else False,
+        "user": request.user,
+        'form': form,
+        'investor_id': investor_id,
+        "investment_details": invest_details,
+        "investment_summary_form": investment_summary_form,
+        "investment_strategy_form": investment_strategy_form,
+        "investment_shareholding_form": investment_shareholding_form,
+        'investment_roi_form': investment_roi_form,
+    }
+    return render(request, 'trading/edit-investment.html', context)
+
 @login_required
 def home(request):
 	models= Investment.objects.all()
@@ -373,9 +418,11 @@ def save_all_user_investor_update(request,form,template_name):
                 parent_invest = Investment.objects.filter(investor=item_instance).first()
                 if parent_invest:
                     item_object['current_investment']=parent_invest.current_investment
+                    item_object['current_investment_percent']=parent_invest.current_investment_percent
+                    
                     item_object['investors_count']=parent_invest.investors_count
                 item_object['investor_id']=pk
-                
+                item_object['total_value']=parent_invest.total_value
                 
                 data['model'] = item_object
         else:
@@ -418,7 +465,9 @@ def create_all_user_business(request,form,template_name):
             item_object = model_to_dict(record)
             item_object['category']=record.category.name
             item_object['creater']=record.creater.username 
-            item_object['current_investment']= record.current_investment
+            item_object['current_investment']= record.current_investment            
+            item_object['current_investment_percent']=record.current_investment_percent
+                    
             item_object['investors_count']= record.investors_count
             item_object['date_created']= record.date_created.ctime()
             data['model'] = item_object
@@ -461,7 +510,9 @@ def create_all_user_investor(request,form,template_name):
             item_object = model_to_dict(record)
             parent_invest = Investment.objects.filter(investor=record).first()
             if parent_invest:
-                item_object['current_investment']=parent_invest.current_investment
+                item_object['current_investment']=parent_invest.current_investment                
+                item_object['current_investment_percent']=parent_invest.current_investment_percent
+                    
                 item_object['investors_count']=parent_invest.investors_count
             item_object['investor_id']=latest
 

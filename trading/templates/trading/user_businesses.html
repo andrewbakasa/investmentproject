@@ -36,7 +36,7 @@
                     </a>
                 </li> 
                 <li class="breadcrumb-item" >
-                    <label id="total_projects_searched"></label>
+                    <label id="total_projects_searched">Personal Businesses</label>
                 </li>  
             </ol>
 
@@ -51,7 +51,7 @@
                 <div class="box">
                     <div class="box-body">
                         {%if models %}
-                        <h4 style="text-align:center;">Users Business: [{{total}}]</h4>
+                        <h4 style="text-align:center;">My Businesses: [{{total}}]</h4>
                         <hr>
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-hover">
@@ -80,11 +80,11 @@
                                         
                                     <td class="modelData" name="date_created" >{{item.date_created }}</td>
                                     <td class="text-right modelAction modelData" name="action">
-                                        <a href="#"
+                                        <a href="{% url 'edit-investment' item.id %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Pitch Business'><i class="fa fa-eye"></i>
+                                            title='View Business'><i class="fa fa-eye"></i>
                                         </a>
-
+                                  
                                          <!-- EDIT MODEL -->
                                         <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
                                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -359,7 +359,7 @@
                     <td class="text-right modelAction modelData" name="action">
                         <a href="#"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Pitch Business'><i class="fas fa-eye"></i>
+                            title='View Business'><i class="fas fa-eye"></i>
                         </a>
 
                             <!-- EDIT MODEL -->
@@ -423,6 +423,9 @@
                           updateTable(data.model);
                           if (data.model.current_investment){
                             $('#current_investment').html(`${data.model.current_investment}`);
+                          }
+                          if (data.model.current_investment){
+                              $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
                           if (data.model.investors_count){
                             $('#investors_count').html(`${data.model.investors_count}`);

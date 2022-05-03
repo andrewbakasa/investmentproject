@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import datetime
+import math
 from os import access
 from unicodedata import category
 
@@ -42,7 +43,7 @@ class Investment(models.Model):
     total_value = models.IntegerField(default=100)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     class Meta:
-        ordering = ['-date_created']
+        ordering = ['-likes']
 
     def __str__(self):
         return self.name 
@@ -73,6 +74,14 @@ class Investment(models.Model):
 
         return total
     
+    @property
+    def current_investment_percent(self):
+        percent = 0
+        curr = self.current_investment
+        if self.total_value !=0:
+            percent= curr*100/self.total_value 
+        # between 0-100
+        return str(min(max(percent,0),100))
     
     def userIsInvestor(self, user):       
         qs = self.investor_set.filter(user=user).first()

@@ -32,7 +32,7 @@
                 <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
                
                 <li class="breadcrumb-item" >
-                    <label id="total_projects_searched"></label>
+                    <label id="total_projects_searched">Personal Investments</label>
                 </li>  
             </ol>
 
@@ -46,7 +46,7 @@
                 <div class="box">
                     <div class="box-body">
                         {%if models %}
-                        <h4 style="text-align:center;">Users Investments: [{{total}}]  Total:${{total_sum|intcomma}} Aver:$ {{average| floatformat:1 | intcomma}}</h4>
+                        <h4 style="text-align:center;">My Investments: [{{total}}]  Total:${{total_sum|intcomma}} Aver:$ {{average| floatformat:1 | intcomma}}</h4>
                         <hr>
                         <div class="table-responsive">
                             <table id="usersTable" class="table table-hover">
@@ -74,7 +74,7 @@
                                     <td class="text-right modelAction modelData" name="action">
                                         <a href="#"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Pitch Business'><i class="fa fa-eye"></i>
+                                            title='View Business'><i class="fa fa-eye"></i>
                                         </a>
                                          
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
