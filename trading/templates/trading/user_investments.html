@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Users Comments</title>
+    <title>Personal Investments</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -49,16 +49,16 @@
                         <h4 style="text-align:center;">My Investments: [{{total}}]  Total:${{total_sum|intcomma}} Aver:$ {{average| floatformat:1 | intcomma}}</h4>
                         <hr>
                         <div class="table-responsive">
-                            <table id="usersTable" class="table table-hover">
+                            <table id="usersTable" class="table table-striped">
                                 <thead class="thead-dark">
                                 <th style="width: 1%" >#</th>    
                                 <th style="width: 9%" >Investor Name</th>
-                                <th style="width: 18%" >summary</th>
-                                <th style="width: 15%" >total_value</th>
-                                <th style="width: 15%" >myinvest</th>
-                                <th style="width: 15%" >cat_name</th>
-                                <th style="width: 12%" >Owner</th>
-                                <th style="width: 5%" class="text-right">Actions</th>
+                                <th style="width: 158%" >summary</th>
+                                <th style="width: 10%" >total_value</th>
+                                <th style="width: 10%" >myinvest</th>
+                                <th style="width: 10%" >cat_name</th>
+                                <th style="width: 10%" >Owner</th>
+                                <th style="width: 7%" class="text-right">Actions</th>
                                 </thead>
                                 <tbody id="users-table-tbody">
                                 {% for item in models  %}
@@ -72,9 +72,9 @@
                                     
                                     <td class="modelData" name="date_created" >{{item.email }}</td>
                                     <td class="text-right modelAction modelData" name="action">
-                                        <a href="#"
+                                        <a href="{% url 'investment-details' item.iid %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='View Business'><i class="fa fa-eye"></i>
+                                            title='View Investment'><i class="fa fa-eye"></i>
                                         </a>
                                          
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 

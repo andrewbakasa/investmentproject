@@ -31,6 +31,20 @@ def get_user_businesses(request):
 
     return render(request, 'trading/user_businesses.html', context)
 
+@login_required(login_url="account_login")
+def view_investors(request, id):
+    investmet_obj = get_object_or_404(Investment,pk=id)    
+    queryset=Investor.objects.filter(investment=investmet_obj) 
+    #form = UserInvestmentForm(initial={'creater': request.user})
+    context = {
+        "models": queryset,
+        "total": queryset.count(),
+        "user": request.user,
+        'investment':investmet_obj
+        #'form': form,
+    }
+
+    return render(request, 'trading/business_investors.html', context)
 
     
 
@@ -40,11 +54,7 @@ def get_user_investments(request):
     df=queryset.trading_df
     #df['id']= df['id'].astype()
     df['id'] = pd.to_numeric(df.id)
-    # print(df.columns)
-    # inv_name', 'summary', 'total_value', 'username', 'first_name',
-    # 'last_name', 'email', 'cat_name', 'cat_descript', 'uniqueid'
-    # max_val = df['value'].max()
-    # min_val = df['value'].min()
+   
     sum_total = df['myinvest'].sum()
     aver_val = df['myinvest'].mean()
     # print(df)
@@ -226,7 +236,7 @@ def investment_details(request,id):
     id =investmet_obj.id
     is_user_investor=False
     investor_id=1
-    obj=Investor.objects.filter(user=request.user, investment=id) 
+    obj=Investor.objects.filter(user=request.user, investment=investmet_obj) 
     if obj:
         is_user_investor=True
         investor_id=obj.first().id
@@ -272,7 +282,7 @@ def edit_investment(request,id):
     id =investmet_obj.id
     is_user_investor=False
     investor_id=1
-    obj=Investor.objects.filter(user=request.user, investment=id) 
+    obj=Investor.objects.filter(user=request.user, investment=investmet_obj) 
     if obj:
         is_user_investor=True
         investor_id=obj.first().id
@@ -421,6 +431,7 @@ def save_all_user_investor_update(request,form,template_name):
                     item_object['current_investment_percent']=parent_invest.current_investment_percent
                     
                     item_object['investors_count']=parent_invest.investors_count
+                    
                 item_object['investor_id']=pk
                 item_object['total_value']=parent_invest.total_value
                 
@@ -469,6 +480,7 @@ def create_all_user_business(request,form,template_name):
             item_object['current_investment_percent']=record.current_investment_percent
                     
             item_object['investors_count']= record.investors_count
+            item_object['total_value']=record.total_value
             item_object['date_created']= record.date_created.ctime()
             data['model'] = item_object
         else:
@@ -514,6 +526,7 @@ def create_all_user_investor(request,form,template_name):
                 item_object['current_investment_percent']=parent_invest.current_investment_percent
                     
                 item_object['investors_count']=parent_invest.investors_count
+                item_object['total_value']=parent_invest.total_value
             item_object['investor_id']=latest
 
 

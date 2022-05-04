@@ -10,8 +10,8 @@ from . import views
 urlpatterns = [
     
     path('commingsoon/', views.general_page.commingsoon, name="commingsoon"),
-    path('users_comments/', views.general_page.get_users_comments, name="ucomments"),
-    path('users_last_login/', views.general_page.get_users_last_login, name="ulogin"),
+    path('u/comments/', views.general_page.get_users_comments, name="ucomments"),
+    path('u/last_login/', views.general_page.get_users_last_login, name="ulogin"),
     path('get_users_last_login_ajax/', views.general_page.get_users_last_login_ajax, name="get_users_last_login_ajax"),
   
     path('home/', views.general_page.home_page, name="home_page"),
@@ -97,10 +97,10 @@ urlpatterns = [
         views.general_page.news_subscribe_ajax,  name='news_subscribe_ajax'),  
     
    
-    path('upload/user_pref/',
+    path('u/pref/',
         views.general_page.upload_form_user_pref,  name='upload_form_user_pref'),  
 
-    path('upload/user_profile/',
+    path('u/profile/',
         views.general_page.upload_form_user_profile,  name='upload_form_user_profile'),
 
     path('', views.general_page.index, name="index"),#Home
@@ -110,7 +110,7 @@ urlpatterns = [
     path('project_search/<str:slug>/',
         views.general_page.project_search_ajax,  name='project_search_ajax'), 
 
-    path('umodels/', views.general_page.models, name="models"),
+    path('um/', views.general_page.models, name="models"),
     path('experts/', views.general_page.experts, name="experts"),
     path('jobs/', views.general_page.jobs, name="jobs"),
     path('events/', views.general_page.events, name="events"),

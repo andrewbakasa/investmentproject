@@ -311,7 +311,7 @@ $(document).ready(function(){
                     $("#prices_label").html(`Edit Prices: ${data['data'].model_name}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-2">
-                    <i class="bi bi-check-circle"></i>Prices Details</a>`;
+                    <i class="bi bi-check-circle"></i> Prices Details</a>`;
                     $("#price_tab").html(html_add_check)
                     
                     // change destination ajax form class
@@ -534,7 +534,7 @@ $(document).ready(function(){
                     
                    
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">
-                           <i class="bi bi-check-circle"></i>Timing Assumptions</a>`;
+                           <i class="bi bi-check-circle"></i> Timing Assumptions</a>`;
                     $("#timing_assumption_tab").html(html_add_check)
                     // change destination ajax form class
                     $("#form-timing-assumptions").attr( "class",  "model-timing-assumptions-edit")
@@ -683,7 +683,7 @@ $(document).ready(function(){
                     $("#depreciation_label").html(`Edit depreciation Assumptions: ${data['data'].model_name}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-4">
-                    <i class="bi bi-check-circle"></i>Depreciation Details</a>`;
+                    <i class="bi bi-check-circle"></i> Depreciation Details</a>`;
                     $("#depreciation_tab").html(html_add_check)
                     
                     // change destination ajax form class
@@ -829,7 +829,7 @@ $(document).ready(function(){
                     $("#taxes_accordion_button").addClass( "section-complete") 
 
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-5">
-                    <i class="bi bi-check-circle"></i>Taxes Details</a>`;
+                    <i class="bi bi-check-circle"></i> Taxes Details</a>`;
                     $("#taxes_tab").html(html_add_check)
 
                   
@@ -966,7 +966,7 @@ $(document).ready(function(){
                     $("#financing_label").html(`Edit Financing Parameters: ${data['data'].model_name}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-3">
-                    <i class="bi bi-check-circle"></i>Financing Details</a>`;
+                    <i class="bi bi-check-circle"></i> Financing Details</a>`;
                     $("#financing_tab").html(html_add_check)
 
                     // change destination ajax form class
@@ -1116,7 +1116,7 @@ $(document).ready(function(){
                     
 
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-6">
-                    <i class="bi bi-check-circle"></i>Working Details</a>`;
+                    <i class="bi bi-check-circle"></i> Working Details</a>`;
                     $("#workingcapital_tab").html(html_add_check)
                     
 
@@ -1252,7 +1252,7 @@ $(document).ready(function(){
                     $("#macroeconomicparameters_label").html(`Edit macroeconomicparameters Parameters: ${data['data'].model_name}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-7">
-                    <i class="bi bi-check-circle"></i>Macro Economic Parameters</a>`;
+                    <i class="bi bi-check-circle"></i> Macro Economic Parameters</a>`;
                     $("#macroeconomicparameters_tab").html(html_add_check)
             
                     

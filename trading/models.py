@@ -137,10 +137,10 @@ class Investor(models.Model):
             investments_df['investment_id'] = investments_df['id']
             # mwrge
             pd.merge_asof
-            df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop(['id_x',
+            df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop([
                         'likes','hits','date_created_y','date_created_x','description_y'
                         ,'name_y','user_id','investment_id'], axis=1).rename(
-                        {'id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
+                        {'id_x': 'iid','id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
                         'name_x':'inv_name' }, axis=1)
 
             if users_df.shape[0]>0:

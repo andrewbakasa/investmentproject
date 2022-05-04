@@ -79,7 +79,7 @@ class PurchasePlan(models.Model):
         ordering = ['-date_created']
 
     def __str__(self):
-        return self.subject     
+        return f'{self.userplan} : {self.email}'     
 class ContactUs(models.Model):
     name = models.CharField(max_length=200, null=True )
     email = models.CharField(max_length=200, null=True, blank=True)

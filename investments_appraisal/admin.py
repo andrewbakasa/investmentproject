@@ -23,3 +23,6 @@ admin.site.register(UserProfile)
 admin.site.register(ModelCategoryDetails)
 admin.site.register(Events)
 
+
+admin.site.register(PurchasePlan)
+

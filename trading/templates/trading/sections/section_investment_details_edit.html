@@ -51,7 +51,12 @@
         </div>
 
         <div class="project-info d-flex justify-content-between align-items-center">
-          <h5>Investors #</h5>
+          <h5>
+            <a href="{% url 'view-investors' model.id %}"
+                  style="color:lightblue" data-toggle="tooltip" data-placement="bottom" 
+                  title='View Investors List'>Investors #
+              </a>
+          </h5>
           <p id="investors_count">{{model.investors_count}}</p>
         </div>
 

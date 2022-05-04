@@ -29,7 +29,10 @@
                                 <h4>{{model.name}}</h4>
                               </div>
                               
-                              <p><h3><a href="{% url 'project-details' model.id %}">{{model.name}}</a></h3> {{model.description}}</p>
+                              <p>
+                                <h3><a href="{% url 'project-details' model.id %}">{{model.name|truncatechars:25}}</a></h3> 
+                                {{model.description|truncatechars:100}}
+                              </p>
                               <div class="trainer d-flex justify-content-between align-items-center">
                                 <div class="trainer-rank d-flex align-items-center">
                                   <i class="bx bx-download"></i>&nbsp;{{model.hits}}

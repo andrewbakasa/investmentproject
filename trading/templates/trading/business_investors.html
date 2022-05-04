@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Personal Businesses</title>
+    <title>Personal Investors List</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -29,14 +29,10 @@
         <div class="row">
             <ol class="breadcrumb" >
                 <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
-                <li class="breadcrumb-item active">
-                    <a href="#"   style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
-                      title='Add New Business'><i style="color:red"  class="fas fa-plus"></i>
-                    </a>
-                </li> 
+                <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment.id %}">{% trans 'Go To Business' %}</a></li>
+                
                 <li class="breadcrumb-item" >
-                    <label id="total_projects_searched">Personal Businesses</label>
+                    <label id="total_projects_searched">Personal Investors</label>
                 </li>  
             </ol>
 
@@ -45,24 +41,22 @@
    
       
      
-
         <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
             <div class="col-md-12">
                 <div class="box">
                     <div class="box-body">
                         {%if models %}
-                        <h4 style="text-align:center;">My Businesses: [{{total}}]</h4>
+                        <h4 style="text-align:center;"> Investors for <i>{{investment.name|truncatechars:60}}</i>: [{{total}}]</h4>
+                        <h5>{{investment.description |truncatechars:150}}</h5>
                         <hr>
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-striped">
                                 <thead class="thead-dark">
                                 <th style="width: 1%" >#</th>    
-                                <th style="width: 9%" >Name</th>
+                                <th style="width: 9%" >Email</th>
+                                <th style="width: 9%" >Title</th>
                                 <th style="width: 25%" >description</th>
-                                <th style="width: 10%" >category</th>
                                 <th style="width: 8%" >Value</th>
-                                <th style="width: 8%" >Current</th>
-                                <th style="width: 8%" >Investors</th>
                                 <th style="width: 17%" >Date Created</th>
                                 <th style="width: 7%" class="text-right">Actions</th>
                                 </thead>
@@ -70,34 +64,27 @@
                                 {% for item in models  %}
                                 <tr id="item-{{item.id}}" >
                                     <td>{{forloop.counter}}</td>
+                                    <td class="modelData" name="name" >{{item.user.email}}</td>
                                     <td class="modelData" name="name" >{{item.name}}</td>
-                                    <td class="modelData" name="description" >{{item.description}}</td>
-                                    <td class="modelData" name="category" >{{item.category}}</td>
-                                    <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
-                                    <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
-                                    <td class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
-                                 
-                                        
+                                    <td class="modelData" name="description" >{{item.description|truncatechars:45}}</td>
+                                    <td class="modelData" name="total_value" >${{item.value| intcomma}}</td>
+                                         
                                     <td class="modelData" name="date_created" >{{item.date_created }}</td>
                                     <td class="text-right modelAction modelData" name="action">
-                                        <a href="{% url 'edit-investment' item.id %}"
+                                        <a href="#"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Manage Business'><i class="fa fa-eye"></i>
+                                            title='Chat'><i class="fa fa-file-audio"></i>
                                         </a>
                                   
-                                         <!-- EDIT MODEL -->
-                                        <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
-                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Edit Model'><i  class="fas fa-edit"></i>
-                                        </a>
+<!--                                      
                                          
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                           data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
-                                          data-delete-url="{% url 'delete_investment_ajax' item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Delete' > <i class="fa fa-trash "></i> 
+                                          data-delete-url="#"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                          title='Decline Investor' > <i class="fa fa-trash "></i> 
                                         </a>
 
-                                       
+                                        -->
                                       </td>
                                    
                                 </tr>

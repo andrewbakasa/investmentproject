@@ -164,9 +164,7 @@
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
-                          if (data.model.investors_count){
-                              $('#investors_count').html(`${data.model.investors_count}`);
-                          }
+                         
 
                           a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -251,9 +249,6 @@
                           }
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
-                          }
-                          if (data.model.investors_count){
-                            $('#investors_count').html(`${data.model.investors_count}`);
                           }
                         
 

@@ -11,7 +11,7 @@ urlpatterns = [
   
     # users
     path('view_model_beef/<int:model_id>/', views.general_page.add_model_specs_page, name="view_model_beef"), 
-    path('view_model_beef_mentor/<int:model_id>/', views.general_page.add_model_specs_page_mentor, name="view_model_beef_mentor"), 
+    path('u/<int:model_id>/', views.general_page.add_model_specs_page_mentor, name="view_model_beef_mentor"), 
   
     path('check_view_model_beef/<int:model_id>/', views.general_page.check_run_requirements_ajax, name="check_model_beef"), 
   
