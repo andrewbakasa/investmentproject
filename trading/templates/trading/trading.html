@@ -85,6 +85,13 @@
             objClicked.addClass('pagination-active');
 
           } 
+          function truncChar(str,length){
+              var myTruncatedString = str.substring(0,length);              
+              if (str.length > myTruncatedString.length){
+                return myTruncatedString + "..."
+              }
+              return myTruncatedString
+          }
           function append_html(counter,val){
               var simulation_checked=''
               if (val.simulation_run) {
@@ -118,19 +125,15 @@
               imgval= baseimageURL + val.uniqueid +'.jpg'
 
              
-
+              var descript_trunc =truncChar(val.description,100)
+              var name_trunc =truncChar(val.name,25)
               a_html=`
               <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
                 <div ${ready_attr} class="project-item umodel-item ${model_class_added}" ${inlinestyle}>
                   <img src="${imgval}" class="img-fluid" alt="...">
                   <div class="project-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                      <h4>${val.name}</h4>
-                      
-                    </div>
-
-                    <h3><a href="/trading/investment-details/${val.id}/">${val.name}</a></h3>
-                    <p>${val.description}</p>
+                    <h3><a href="/trading/investment-details/${val.id}/">${name_trunc}</a></h3>
+                    <p>${descript_trunc}</p>
                     <div class="trainer d-flex justify-content-between align-items-center">
                       <div class="trainer-rank d-flex align-items-center">
                         <i class="bx bx-download"></i>&nbsp;${val.hits}

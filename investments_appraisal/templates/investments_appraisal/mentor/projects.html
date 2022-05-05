@@ -159,19 +159,16 @@
                             counter=  counter+1
                             var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
                             imgval= baseimageURL + val.uniqueid +'.jpg'
-            
+                            
+                            var descript_trunc =truncChar(val.description,100)
+                            var name_trunc =truncChar(val.name,25)
                             a_html=`
                             <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
                               <div class="project-item umodel-item">
                                 <img src="${imgval}" class="img-fluid" alt="...">
-                                <div class="project-content">
-                                  <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4>${val.name}</h4>
-                                    
-                                  </div>
-    
-                                  <h3><a href="/project-details/${val.id}/">${val.name}</a></h3>
-                                  <p>${val.description}</p>
+                                <div class="project-content">    
+                                  <h3><a href="/project-details/${val.id}/">${name_trunc}</a></h3>
+                                  <p>${descript_trunc}</p>
                                   <div class="trainer d-flex justify-content-between align-items-center">
                                     <div class="trainer-rank d-flex align-items-center">
                                       <i class="bx bx-download"></i>&nbsp;${val.hits}
@@ -199,7 +196,13 @@
           
           });
          
-         
+          function truncChar(str,length){
+              var myTruncatedString = str.substring(0,length);              
+              if (str.length > myTruncatedString.length){
+                return myTruncatedString + "..."
+              }
+              return myTruncatedString
+          }
           function getToken(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
@@ -258,19 +261,16 @@
                             counter=  counter+1
                             var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
                             imgval= baseimageURL + val.uniqueid +'.jpg'
-            
+                           
+                            var descript_trunc =truncChar(val.description,100)
+                            var name_trunc =truncChar(val.name,25)
                             a_html=`
                             <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
                               <div class="project-item umodel-item">
                                 <img src="${imgval}" class="img-fluid" alt="...">
-                                <div class="project-content">
-                                  <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4>${val.name}</h4>
-                                    
-                                  </div>
-    
-                                  <h3><a href="/project-details/${val.id}/">${val.name}</a></h3>
-                                  <p>${val.description}</p>
+                                <div class="project-content">    
+                                  <h3><a href="/project-details/${val.id}/">${name_trunc}</a></h3>
+                                  <p>${descript_trunc}</p>
                                   <div class="trainer d-flex justify-content-between align-items-center">
                                     <div class="trainer-rank d-flex align-items-center">
                                       <i class="bx bx-download"></i>&nbsp;${val.hits}

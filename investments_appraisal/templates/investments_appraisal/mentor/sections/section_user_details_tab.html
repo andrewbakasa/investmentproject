@@ -8,7 +8,7 @@
       <div class="row">
         <ol class="breadcrumb" >
           <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-          <li class="breadcrumb-item" ><a href="{% url 'models' %}">{% trans 'User Models' %}</a></li>
+          <li class="breadcrumb-item" ><a href="{% url 'models' %}">{% trans 'Financial Models' %}</a></li>
           
         </ol>
       </div> 
@@ -21,12 +21,12 @@
                   </li>
 
                 
-                  <li id='price_tab' class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab-2">{% if price_record %}<i class="bi bi-check-circle"></i> {%endif %} Expertise & Skills</a>
+                  <li id='user_extra_details_tab' class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-2">{% if user_extra_details_record %}<i class="bi bi-check-circle"></i> {%endif %} User Extra Details</a>
                   </li>
 
                   <li id='financing_tab' class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab-3">{% if financing_record %}<i class="bi bi-check-circle"></i> {%endif %} Knowledge</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-3">{% if financing_record %}<i class="bi bi-check-circle"></i> {%endif %} Expertise & Skills</a>
                   </li>
 
                   <li id='depreciation_tab' class="nav-item">
@@ -52,14 +52,13 @@
             <div class="tab-content">
 
               <div class="tab-pane active show" id="tab-1">  
-                <!-- ======= Contact Section ======= -->
+                <!-- ======= User profile Section ======= -->
                 {% include 'investments_appraisal/mentor/sections/section_user_profile.html' %} 
               </div>
               
-              <div class="tab-pane" id="tab-2">
-                
-              
-                
+              <div class="tab-pane" id="tab-2">                
+                <!-- ======= User Extra Details Section ======= -->
+                {% include 'investments_appraisal/mentor/sections/section_user_extra_details.html' %}                 
               </div>
               <div class="tab-pane" id="tab-3">
               

@@ -159,8 +159,9 @@
                           $('.a_page_nav:first-child').trigger('click');
                           //----------------------------------
                           if (data.model.current_investment){
-                              $('#current_investment').html(`${data.model.current_investment_percent} %`);
+                              $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
                           }
+                          
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
@@ -241,11 +242,12 @@
                           
                           //updateTable(data.model);
                           //hide the form after editing
-                          console.log('DATAMODEL:::', data.model)
+                          cur_round = data.model.current_investment_percent
+                          cur_round=parseFloat(cur_round).toFixed(1)
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           if (data.model.current_investment){
-                            $('#current_investment').html(`${data.model.current_investment_percent} %`);
+                            $('#current_investment').html(`${cur_round} %`);
                           }
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);

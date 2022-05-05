@@ -13,7 +13,7 @@ from datetime import date, timedelta
 from django.contrib.postgres.forms import SimpleArrayField
 
 from django.db.models import Q
-
+from django.contrib.auth.models import User
 class InvestmentOptionsModelForm(forms.ModelForm):
     # cost_of_land_per_sqm = SimpleArrayField(forms.DecimalField(decimal_places=2, max_digits=10, default =1000.0))
     # cost_of_machinery_per_pen = SimpleArrayField(forms.DecimalField(decimal_places=2, max_digits=10, default =1000))
@@ -310,7 +310,11 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['age', 'country', 'sex', 'profession' ,'aboutyou']
-  
+class UserForm(forms.ModelForm):
+    
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']  
  
 class PurchasePlanForm(forms.ModelForm):
     class Meta:

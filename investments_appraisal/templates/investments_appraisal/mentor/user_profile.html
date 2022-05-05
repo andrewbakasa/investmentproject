@@ -46,7 +46,10 @@
                 html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">
                             <i class="bi bi-check-circle"></i> Personal Details</a>`;
                 $("#user_profile_tab").html(html_add_check)
-            }else if (url === "another") {
+            }else if (url === "/update/user_extra_details/ajax/") {
+                html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-2">
+                            <i class="bi bi-check-circle"></i> User Extra Details</a>`;
+                $("#user_extra_details_tab").html(html_add_check) 
 
             }            
         }
@@ -65,23 +68,24 @@
                     processData:false,
                     contentType: false,
                     success: function(data){
+                        console.log(data)
                         if(data.error == false){
                             check_tab(url)
-                            $('#public_toggle_form-errors').html('');
+                            $('.public_toggle_form-errors').html('');
                             a_html = 	`</br><div class='alert alert-success alert dismissable'>
                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span></button> Saved Successfully!!
                                     </div> ` ;
-                            $('#public_toggle_form-errors').append(a_html)
-                            $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                            $('.public_toggle_form-errors').append(a_html)
+                            $('.public_toggle_form-errors').slideUp(50).fadeIn();
                                 window.setTimeout(function() {
-                                    $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                        $("#public_toggle_form-errors").html('');
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
                                     });
                                 }, 4000);
                         } else {
                              
-                            $('#public_toggle_form-errors').html('</br>');
+                            $('.public_toggle_form-errors').html('</br>');
                             if (data.error == true) {
                                 //console.log('Error', data.error)
                                 var form_vars=['__all__','age']//,
@@ -89,34 +93,34 @@
                                 for (let p=0; p < form_vars.length; p++ ){
                                     let name_var = form_vars[p]
                                     if (data.data[name_var]){
-                                    a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                    a_html = 	`
+                                        <div class='alert alert-danger alert dismissable'>
                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span></button> ${data['data'][name_var][0]}
-                                    </div> ` ;
-                                    $('#public_toggle_form-errors').append(a_html)
-                                    
+                                        </div>` ;
+                                    $('.public_toggle_form-errors').append(a_html)
                                     }
                                 }
-                                $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
                                 window.setTimeout(function() {
-                                    $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                        $("#public_toggle_form-errors").html('');
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
                                     });
                                 }, 4000);
                             //-----------------------
                             } else  {
                                 // Data locked:  No edit allowed
-                                $('#public_toggle_form-errors').html('');
+                                $('.public_toggle_form-errors').html('');
                                 a_html = 	`<div class='alert alert-danger alert dismissable'>
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span></button> ${data['locked']}
                                 </div> ` ;
-                                $('#public_toggle_form-errors').append(a_html)
-                                $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+                                $('.public_toggle_form-errors').append(a_html)
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
                                 window.setTimeout(function() {
-                                    $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                        $("#public_toggle_form-errors").html('');
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
                                     });
                                     }, 4000);
                             } 

@@ -109,7 +109,7 @@ from django.shortcuts import get_object_or_404, render
 from investments_appraisal.models import *
 
 from investments_appraisal.forms import  ContactUsForm, FinancingForm, MacroeconomicParametersForm, NewsSubscribeForm, PurchasePlanForm, TimingAssumptionForm, TimingAssumptionFormUpdate, \
-	 UserBusinessModelForm, PricesForm,DepreciationForm ,TaxesForm, UserModelFormUpdate, UserPreferenceForm, UserProfileForm, WorkingCapitalForm
+	 UserBusinessModelForm, PricesForm,DepreciationForm ,TaxesForm, UserForm, UserModelFormUpdate, UserPreferenceForm, UserProfileForm, WorkingCapitalForm
 
 
 
@@ -1920,6 +1920,28 @@ def update_user_profile_ajax(request,  *args, **kwargs):
 	return JsonResponse({'error': True, 'data': "Request not ajax"})
 	
 
+
+@login_required(login_url="account_login")
+def update_user_extra_details_ajax(request,  *args, **kwargs):
+	if request.method == 'POST':
+		if request.is_ajax():
+			form = UserForm(request.POST or None,instance=request.user)
+			if form.is_valid():
+				form.save()				
+			else:
+				errors = form.errors
+				return JsonResponse({'error': True, 'data': errors})  
+			
+			item_object = model_to_dict(request.user)
+			item_object['last_login']= item_object['last_login'].ctime()
+			item_object['groups']= []
+			#print(item_object)
+			return JsonResponse({'error': False, 'data': item_object})
+		else:
+			return JsonResponse({'error': True, 'data': "Request not ajax"})
+
+	return JsonResponse({'error': True, 'data': "Request not ajax"})
+
 @login_required(login_url="account_login")
 def update_user_pref_ajax(request,  *args, **kwargs):
 	pref, created = UserPreference.objects.get_or_create(user=request.user)
@@ -1966,9 +1988,19 @@ def upload_form_user_profile(request):
 		if pref.age or pref.country or pref.sex or pref.profession or pref.aboutyou:
 			personal_record=True
 
+	#userobj = get_object_or_404(User,user=request.user)
+	user_extra_details_form = UserForm(instance=request.user)
+	user_extra_details_record= False
+	if request.user and request.user.is_authenticated:
+		#print(request.user)
+		if request.user.first_name or request.user.last_name:
+			user_extra_details_record=True
+    
 	context={
 		'form':form,
-		'personal_record':personal_record
+		'personal_record':personal_record,
+		'user_extra_details_form':user_extra_details_form,
+		'user_extra_details_record':user_extra_details_record
 	}
 	return render(request, 'investments_appraisal/mentor/user_profile.html', context)
 

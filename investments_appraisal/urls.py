@@ -83,7 +83,10 @@ urlpatterns = [
 
     path('update/user_profile/ajax/',
         views.general_page.update_user_profile_ajax,  name='update_user_profile_ajax'),
-     
+
+    path('update/user_extra_details/ajax/',
+        views.general_page.update_user_extra_details_ajax,  name='update_user_extra_details_ajax'),
+
     path('update_model_likes/<int:id>/',
         views.general_page.update_model_likes_ajax,  name='update_model_likes'),
 

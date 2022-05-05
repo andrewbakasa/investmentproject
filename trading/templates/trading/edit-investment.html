@@ -108,7 +108,14 @@
         $(document).ready(function (){ 
             $("#investments a:first").addClass( "active") 
             $("#investors a:first").addClass( "active") 
-            $("#iamaninvestor a:first").addClass( "active")             
+            $("#iamaninvestor a:first").addClass( "active")  
+            
+            function numberWithCommas(x) {
+                var parts = x.toString().split(".");
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return parts.join(".");
+            }
+            
         
            //------LOAD THE FORM ON MODAL DIV----------
            $('body').on('click', '.show-form-update', function(e){
@@ -159,10 +166,10 @@
                           $('.a_page_nav:first-child').trigger('click');
                           //----------------------------------
                           if (data.model.current_investment_percent){
-                              $('#current_investment').html(`${data.model.current_investment_percent} %`);
+                              $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
                           }
                           if (data.model.current_investment){
-                              $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
+                              $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
                           }
                           
                           if (data.model.investors_count){
@@ -248,10 +255,10 @@
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           if (data.model.current_investment_percent){
-                            $('#current_investment').html(`${data.model.current_investment_percent} %`);
+                            $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
                           }
                           if (data.model.current_investment){
-                              $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
+                              $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
                           }
                           if (data.model.investors_count){
                             $('#investors_count').html(`${data.model.investors_count}`);
