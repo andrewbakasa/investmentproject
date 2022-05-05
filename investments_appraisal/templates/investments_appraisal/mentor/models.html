@@ -406,8 +406,6 @@
                             var index= parseInt(data.data.total_pages)-1
                             window.setTimeout(function() {
                                 $(".a_page_nav:eq(" +  index  +")").trigger('click');
-                                //dynamically created element trigger
-                                //$(document).on('click', ".a_page_nav:eq(" +  index  +")", onClick);
                             }, 1000);
                         }else{
                             // if item on the current page get to zero
@@ -420,10 +418,7 @@
                                     // if deleteting first page  then scroll all into first page
                                     index=1
                                 } 
-                                loadPageAjax(index)                                                               //console.log('Empy page.. load page behind this current page', index)
-                                //$(".a_page_nav:eq(" +  index  +")").trigger('click');
-                                //dynamically created element trigger
-                               // $(document).on('click', ".a_page_nav:eq(" +  index  +")", onClick);
+                                loadPageAjax(index)
                             }
 
                         }

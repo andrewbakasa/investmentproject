@@ -71,20 +71,21 @@
                                          
                                     <td class="modelData" name="date_created" >{{item.date_created }}</td>
                                     <td class="text-right modelAction modelData" name="action">
+                                        
+                                        <a href="{% url 'investor-details' item.id investment.id  %}"
+                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='View Investor Info'><i class="fa fa-eye"></i>
+                                        </a>
                                         <a href="#"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                             title='Chat'><i class="fa fa-file-audio"></i>
                                         </a>
                                   
-<!--                                      
-                                         
-                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                        <!--<a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                           data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
                                           data-delete-url="#"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                                           title='Decline Investor' > <i class="fa fa-trash "></i> 
-                                        </a>
-
-                                        -->
+                                        </a>-->
                                       </td>
                                    
                                 </tr>

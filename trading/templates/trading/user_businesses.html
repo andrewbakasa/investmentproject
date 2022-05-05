@@ -18,122 +18,126 @@
 
 {% block content %} 
 <main id="main">
-  <!-- ======= Breadcrumbs ======= -->
-  <div class="breadcrumbs">
-  </div>
-  <!-- End Breadcrumbs -->
-  <!---Removed padding from 70px-- 0px-->
-<section style= 'padding: 5px 0;' id="projects" class="projects">  
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+    <!-- End Breadcrumbs -->
+    <!---Removed padding from 70px-- 0px-->
+    <section style= 'padding: 5px 0;' id="projects" class="projects">  
     <div class="container" data-aos="fade-up">
-       <!-- ======= Breadcrumbs ======= -->
-        <div class="row">
-            <ol class="breadcrumb" >
-                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
-                <li class="breadcrumb-item active">
-                    <a href="#"   style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
-                      title='Add New Business'><i style="color:red"  class="fas fa-plus"></i>
-                    </a>
-                </li> 
-                <li class="breadcrumb-item" >
-                    <label id="total_projects_searched">Personal Businesses</label>
-                </li>  
-            </ol>
+        <!-- ======= Breadcrumbs ======= -->
+            <div class="row">
+                <ol class="breadcrumb" >
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
+                    <li class="breadcrumb-item active">
+                        <a href="#"   style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
+                        title='Add New Business'><i style="color:red"  class="fas fa-plus"></i>
+                        </a>
+                    </li> 
+                    <li class="breadcrumb-item" >
+                        <label id="total_projects_searched">Personal Businesses [{{total}}]</label>
+                    </li>  
+                </ol>        
+            </div> 
+        
+            <!-- Table Section -->
+            <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+                <div class="col-md-12">
+                    <div class="box">
+                        <div class="box-body">
+                            {%if first_page %}
+                            <h4 style="text-align:center;">My Businesses</h4>
+                            <hr>
+                            <div class="table-responsive">
+                                <table id="userBusinessTable" class="table table-striped">
+                                    <thead class="thead-dark">
+                                    <th style="width: 1%" >#</th>    
+                                    <th style="width: 9%" >Name</th>
+                                    <th style="width: 25%" >description</th>
+                                    <th style="width: 10%" >category</th>
+                                    <th style="width: 8%" >Value</th>
+                                    <th style="width: 8%" >Current</th>
+                                    <th style="width: 8%" >Investors</th>
+                                    <th style="width: 17%" >Date Created</th>
+                                    <th style="width: 7%" class="text-right">Actions</th>
+                                    </thead>
+                                    <tbody id="userbusiness-table-tbody">
+                                    {% for item in first_page  %}
+                                    <tr id="item-{{item.id}}" >
+                                        <td>{{forloop.counter}}</td>
+                                        <td class="modelData" name="name" >{{item.name}}</td>
+                                        <td class="modelData" name="description" >{{item.description}}</td>
+                                        <td class="modelData" name="category" >{{item.category}}</td>
+                                        <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
+                                        <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
+                                        <td class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
+                                    
+                                            
+                                        <td class="modelData" name="date_created" >{{item.date_created }}</td>
+                                        <td class="text-right modelAction modelData" name="action">
+                                            <a href="{% url 'edit-investment' item.id %}"
+                                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Manage Business'><i class="fa fa-eye"></i>
+                                            </a>
+                                    
+                                            <!-- EDIT MODEL -->
+                                            <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
+                                                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Edit Model'><i  class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                            data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
+                                            data-delete-url="{% url 'delete_investment_ajax' item.id 1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Delete' > <i class="fa fa-trash "></i> 
+                                            </a>
 
-      
-        </div> 
-   
-      
-     
-
-        <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
-            <div class="col-md-12">
-                <div class="box">
-                    <div class="box-body">
-                        {%if models %}
-                        <h4 style="text-align:center;">My Businesses: [{{total}}]</h4>
-                        <hr>
-                        <div class="table-responsive">
-                            <table id="userBusinessTable" class="table table-striped">
-                                <thead class="thead-dark">
-                                <th style="width: 1%" >#</th>    
-                                <th style="width: 9%" >Name</th>
-                                <th style="width: 25%" >description</th>
-                                <th style="width: 10%" >category</th>
-                                <th style="width: 8%" >Value</th>
-                                <th style="width: 8%" >Current</th>
-                                <th style="width: 8%" >Investors</th>
-                                <th style="width: 17%" >Date Created</th>
-                                <th style="width: 7%" class="text-right">Actions</th>
-                                </thead>
-                                <tbody id="userbusiness-table-tbody">
-                                {% for item in models  %}
-                                <tr id="item-{{item.id}}" >
-                                    <td>{{forloop.counter}}</td>
-                                    <td class="modelData" name="name" >{{item.name}}</td>
-                                    <td class="modelData" name="description" >{{item.description}}</td>
-                                    <td class="modelData" name="category" >{{item.category}}</td>
-                                    <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
-                                    <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
-                                    <td class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
-                                 
                                         
-                                    <td class="modelData" name="date_created" >{{item.date_created }}</td>
-                                    <td class="text-right modelAction modelData" name="action">
-                                        <a href="{% url 'edit-investment' item.id %}"
-                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Manage Business'><i class="fa fa-eye"></i>
-                                        </a>
-                                  
-                                         <!-- EDIT MODEL -->
-                                        <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
-                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Edit Model'><i  class="fas fa-edit"></i>
-                                        </a>
-                                         
-                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                          data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
-                                          data-delete-url="{% url 'delete_investment_ajax' item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Delete' > <i class="fa fa-trash "></i> 
-                                        </a>
+                                        </td>
+                                    
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            
+                            </div>
 
-                                       
-                                      </td>
-                                   
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                           
+                            {%else%}
+
+                            <h3>No businesses available</h3>
+
+                            {%endif%}
+
                         </div>
 
-                        {%else%}
-
-                        <h3>No businesses available</h3>
-
-                        {%endif%}
-
                     </div>
-
                 </div>
             </div>
-        </div>
-          
-          
-    
-  
-      </div>
-    
-    
-  
+
+
+            <!--Pagination  -->
+            <div id= "page_section" class="pagination">
+                <ul class="pagination newpagination">
+                    {% if current_page.has_previous %}
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                        
+                    {% endif %}
+            
+                    <span class="current"  style="margin-left:5px">
+                    Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+                    </span>
+            
+                    {% if current_page.has_next %}
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+                    
+                    {% endif %}
+                </ul>
+            </div>
     </div>
-   
-  </section><!-- End User Section -->
-  
-
- 
-
- 
+    </section><!-- End User Section -->
   
 </main><!-- End #main -->
 
@@ -200,6 +204,24 @@
 
 {% block scripts %}
 <script>
+    function getToken(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+    var csrftoken = getToken('csrftoken');
+    var display_business_ajax_url= "{% url 'display_business_ajax' %}" 
+    
     $(document).ready(function (){ 
         $("#investments a:first").addClass( "active") 
         $("#enterprenuer a:first").addClass( "active") 
@@ -235,6 +257,28 @@
                         //remove the row deleted
                         $(this).remove();
                         // if deleted page make the page disappear, point to prev page
+                        //page-1
+                        if (data.data.total_pages < data.data.deleted_page){                     
+                            var index= parseInt(data.data.total_pages)-1
+                            window.setTimeout(function() {
+                                $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                            }, 1000);
+                        }else{
+                            // if item on the current page get to zero
+                            // point to page-1
+                            var total = $('#userbusiness-table-tbody').children().length
+                            if (total == 0){
+                                //refresh the current pages
+                                var index= parseInt(data.data.deleted_page)-1
+                                if (index<1){
+                                    // if deleteting first page  then scroll all into first page
+                                    index=1
+                                } 
+                                
+                                loadPageAjax(index)
+                            }
+
+                        }
                         
                        
                     });
@@ -481,6 +525,105 @@
               return false;
           })
        
-    
+      
+        $('body').on('click', '.a_page_nav', function (event) {
+            // preventing default actions
+            event.preventDefault();
+            var page_no = $(this).attr('href');
+            // ajax call
+            loadPageAjax(page_no)
+        });
+        function updatePaging2(data){
+            var has_previous=''
+            console.log(data)
+            if (data.has_previous){
+                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+            
+            }       
+            var has_next= ''          
+            if (data.has_next){
+                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                    `; 
+            }       
+            a_html=`
+            <div id= "page_section" class="pagination">
+                <ul class="pagination newpagination">
+                    ${has_previous}            
+                    <span class="current" style="margin-left:5px" >
+                        Page ${ data.current_page } of ${ data.last }.
+                    </span>                   
+                    ${has_next}
+                </ul>
+                </div>`
+                $("#page_section").html(a_html)
+          }
+
+        function append_html(counter,val,page_no){
+            var js_date_created = new Date(val.date_created)
+           
+            a_html=`
+            <tr id="item-${val.id}">
+                <td>${counter}</td>
+                <td class="modelData" name="name" >${val.name}</td>
+                <td class="modelData" name="description" >${val.description}</td>
+                <td class="modelData" name="category" >${val.category}</td>
+                <td class="modelData" name="total_value" >${val.total_value}</td>
+                <td class="modelData" name="current_investment" >${val.current_investment}</td>
+                <td class="modelData" name="investors_count" >${val.investors_count}</td>                        
+                <td class="modelData" name="date_created" >${js_date_created}</td>
+                <td class="text-right modelAction modelData" name="action">
+                    <a href="/trading/edit-investment/${val.id}"
+                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='Manage Business'><i class="fa fa-eye"></i>
+                    </a>
+                    <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${val.id}/" 
+                        data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='Edit Model'><i  class="fas fa-edit"></i>
+                    </a>
+                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                        data-object-name="${val.name}"  data-item-id="${val.id}" 
+                        data-delete-url="/trading/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        title='Delete'> <i class="fa fa-trash "></i> 
+                    </a>
+                    </td>
+            </tr>` ;
+            return a_html
+        }
+        function loadPageAjax(page_no){
+            $.ajax({
+                    type: "POST",
+                    // define url name
+                    url: display_business_ajax_url, 
+                    data : {    
+                        page_no : page_no, 
+                        csrfmiddlewaretoken: csrftoken,
+                    },
+                    // handle a successful response
+                    success: function (response) {
+                        $('#userbusiness-table-tbody').html('')
+                        updatePaging2(response.data)
+                        if (response.data.per_table){
+                            per_table=response.data.per_table
+                        }
+                        var base_counter =(parseInt(page_no)-1)*per_table
+                        var counter=base_counter
+                        $.each(response.data.results, function(i, val) {
+                            counter=  counter +1
+                            a_html=append_html(counter,val,page_no)                           
+                            // add each model on every line
+                            $('#userbusiness-table-tbody').append(a_html)
+                        });
+                        },
+                        error: function () {
+                            alert('Error Occured');
+                        }
+                        
+                });
+                //add_model_class()
+          }
+      
+     
 </script>
 {% endblock %}

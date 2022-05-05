@@ -27,18 +27,13 @@
                       <span class="help-block">{{ error }}</span>
                       {% endfor %}
                   </div>
-                <!-- <div class="col-sm-2">
-                    <div class="col-sm-4 checkbox">
-                      <label>
-                        {{ form.g2 }}
-                        {{ form.g2.label }}
-                      </label>
-                    </div>
-                  
-                    {% for error in form.g2.errors %}
-                    <span class="help-block">{{ error }}</span>
-                    {% endfor %}
-                </div> -->
+                  <label class="col-sm-2 control-label" for="{{ form.pertable.id_for_label }}">{{ form.pertable.label }}</label>
+                  <div class="col-sm-4  {% if form.pertable.errors %} has-error{% endif %}">
+                      {{ form.pertable|add_class:"form-control" }}
+                      {% for error in form.pertable.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>
               </div>
         </div>
       </br>

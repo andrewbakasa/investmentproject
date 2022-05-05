@@ -2,7 +2,7 @@
 from django.shortcuts import get_object_or_404, render
 from common.decorators import admin_only
 
-from investments_appraisal.models import ModelCategory, UserModel, UserPreference
+from investments_appraisal.models import ModelCategory, UserModel, UserPreference, UserProfile
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 
@@ -18,18 +18,43 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt
 
+
+
 @login_required(login_url="account_login")
 def get_user_businesses(request):
-    queryset = Investment.objects.filter(creater=request.user)#.order_by("current_investment")
+    queryset = Investment.objects.filter(creater=request.user)
     form = UserInvestmentForm(initial={'creater': request.user})
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    else:
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(queryset, pertable)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
+
     context = {
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+        'current_page':current_page,
+        'page_range':page_range,
+        "user": request.user,
         "models": queryset,
         "total": queryset.count(),
         "user": request.user,
         'form': form,
     }
-
     return render(request, 'trading/user_businesses.html', context)
+ 
 
 @login_required(login_url="account_login")
 def view_investors(request, id):
@@ -52,18 +77,39 @@ def view_investors(request, id):
 def get_user_investments(request):
     queryset = Investor.objects.filter(user=request.user).first()  
     df=queryset.trading_df
-    #df['id']= df['id'].astype()
     df['id'] = pd.to_numeric(df.id)
    
     sum_total = df['myinvest'].sum()
     aver_val = df['myinvest'].mean()
-    # print(df)
+
     dict_,colms= dataframe_to_list_dict(df,True)
-    # print(dict_)
-    # print(colms)
+
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    else:
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
     
+    obj_paginator = Paginator(dict_, pertable)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
+
     context = {
-        "models": dict_,
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+        'current_page':current_page,
+        'page_range':page_range,
+        "user": request.user,
+        "models": first_page,
         "total": len(dict_),
         'total_sum':sum_total,
         'average':aver_val
@@ -273,6 +319,29 @@ def investment_details(request,id):
     }
     return render(request, 'trading/investment-details.html', context)
 
+
+@login_required
+def investor_details(request,id, investment_id):
+    investor_obj = get_object_or_404(Investor,pk=id)
+    investment_obj = get_object_or_404(Investment,pk=investment_id)
+    userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
+    
+    # user = models.OneToOneField(User, on_delete= models.CASCADE)
+    # last_modified = models.DateTimeField(auto_now=True)
+    # age = models.IntegerField(default=18)
+    # country = models.CharField(max_length=200, blank=True, null=True)
+    # sex = models.CharField(max_length=200, blank=True, null=True)
+    # profession = models.CharField(max_length=200, blank=True, null=True) 
+    # aboutyou = models.TextField(blank=True, null=True, verbose_name='About Me') 
+    print(userprofile_obj)
+  
+    context = {
+        'model':investor_obj,
+        'investment':investment_obj,
+        'userprofile':userprofile_obj,
+     
+    }
+    return render(request, 'trading/investor-details.html', context)
 
        
 @login_required
@@ -584,7 +653,7 @@ def dataframe_to_list_dict(df, isDataFrame):
 
 
 @login_required(login_url="account_login")
-def delete_investor_ajax(request, id, *args, **kwargs):
+def delete_investor_ajax(request, id, page_no, *args, **kwargs):
 	if request.method == 'POST':
 		#print(request.POST)
 		if request.is_ajax():
@@ -594,10 +663,10 @@ def delete_investor_ajax(request, id, *args, **kwargs):
 			model_.delete()
 			item_object = model_to_dict(model_)
 
-			#total_pages= get_total_pages(request)
+			total_pages= get_total_pages_dict(request)
 			data= {}
-			#data['total_pages']=total_pages
-			#data['deleted_page']=page_no
+			data['total_pages']=total_pages
+			data['deleted_page']=page_no
 			
 			data['model']=item_object
 			
@@ -614,7 +683,7 @@ def delete_investor_ajax(request, id, *args, **kwargs):
 		return JsonResponse(error, content_type="application/json")
 
 @login_required(login_url="account_login")
-def delete_investment_ajax(request, id, *args, **kwargs):
+def delete_investment_ajax(request, id,page_no, *args, **kwargs):
 	if request.method == 'POST':
 		#print(request.POST)
 		if request.is_ajax():
@@ -622,14 +691,14 @@ def delete_investment_ajax(request, id, *args, **kwargs):
 			model_ = get_object_or_404(Investment, pk=id)
 
 			model_.delete()
-			prices_item_object = model_to_dict(model_)
+			item_object = model_to_dict(model_)
 
-			#total_pages= get_total_pages(request)
+			total_pages= get_total_pages(request)
 			data= {}
-			#data['total_pages']=total_pages
-			#data['deleted_page']=page_no
+			data['total_pages']=total_pages
+			data['deleted_page']=page_no
 			
-			data['model']=prices_item_object
+			data['model']=item_object
 			
 			#messages.success(request, "Successfully deleted  model")
 			
@@ -642,6 +711,43 @@ def delete_investment_ajax(request, id, *args, **kwargs):
 			'message': 'Error, must be an Ajax call.'
 		}
 		return JsonResponse(error, content_type="application/json")
+
+
+def get_total_pages(request):
+	if not ('pertable' in request.session):
+		obj= UserPreference.objects.filter(user=request.user).first()
+		if obj:
+			request.session['pertable']=obj.pertable
+		else:# nothing in db
+			request.session['pertable']= 3
+	pertable=request.session['pertable']
+	#per_page=request.session['pertable']
+	recordcount= Investment.objects.filter(creater=request.user).count()
+	#avoide error
+	if pertable==0:
+		pertable=10
+	return math.ceil(recordcount/pertable)
+
+def get_total_pages_dict(request):
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
+
+    queryset = Investor.objects.filter(user=request.user).first()  
+    df=queryset.trading_df
+    df['id'] = pd.to_numeric(df.id)
+
+    dict_, _= dataframe_to_list_dict(df,True)
+
+    recordcount= len(dict_)
+    #avoide error
+    if pertable==0:
+        pertable=10
+    return math.ceil(recordcount/pertable)
 
 login_required(login_url="account_login")
 def update_investment_ajax(request,pk):
@@ -773,3 +879,134 @@ def add_model_investment_paragraph_ajax(request, id, *args, **kwargs):
             'message': 'Error, must be an Ajax call.'
         }
         return JsonResponse(error, content_type="application/json")
+
+
+def display_business_ajax(request):
+
+    userdata= Investment.objects.filter(creater=request.user)
+
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 3
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(userdata, pertable)
+    first_page = obj_paginator.page(1).object_list
+    page_range = obj_paginator.page_range
+    if request.method == 'POST':
+        #getting page number
+        page_no = request.POST.get('page_no', None)
+        #print('page:', page_no) 
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)   
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        print('num_of_pages:', num_of_pages) 
+        data["totalrecords"]=totalrecords
+        
+        #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+
+                                                
+        results=[] 												 
+        for i in obj_paginator.page(page_no).object_list:
+
+            # name 
+            # description
+            cdate= i.date_created.ctime()
+            item_object = model_to_dict(i)
+            item_object['category']=i.category.name
+            item_object['date_created']=f'{i.date_created.ctime()}'
+            item_object['current_investment']=i.current_investment
+            item_object['current_investment_percent']=i.current_investment_percent            
+            item_object['investors_count']=i.investors_count                
+            item_object['total_value']=i.total_value
+                
+            results.append(item_object)
+		
+        data["results"]=results
+        return JsonResponse({"data":data})
+
+
+
+def display_myinvestment_ajax(request):    
+    queryset = Investor.objects.filter(user=request.user).first()  
+    df=queryset.trading_df
+    df['id'] = pd.to_numeric(df.id)
+    userdata, _= dataframe_to_list_dict(df,True)
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 3
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(userdata, pertable)
+    if request.method == 'POST':
+        page_no = request.POST.get('page_no', None)
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)   
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        #print('num_of_pages:', num_of_pages) 
+        data["totalrecords"]=totalrecords
+        
+      
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+
+                                                
+        results=[] 												 
+        for i in obj_paginator.page(page_no).object_list:
+            item_object = {}
+            item_object['summary']=i['summary']
+            item_object['total_value']=i['total_value']
+            item_object['myinvest']=i['myinvest']
+            item_object['cat_name']=i['cat_name']
+            item_object['email']=i['email']
+            item_object['inv_name']=i['inv_name']
+            item_object['id']=i['id']
+            item_object['iid']=i['iid']
+            results.append(item_object)
+
+        print(results)
+        data["results"]=results
+        return JsonResponse({"data":data})
+

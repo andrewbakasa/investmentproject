@@ -15,7 +15,7 @@ class InvestorFormUpdate(forms.ModelForm):
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
             'cols'          : "30", #size
-            'rows'          : "3", #size
+            'rows'          : "5", #size
             'placeholder'   : 'description', 
             'style'         : 'resize : none' 
             }), required=False) 
@@ -34,7 +34,7 @@ class InvestorForm(forms.ModelForm):
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
             'cols'          : "30", #size
-            'rows'          : "3", #size
+            'rows'          : "5", #size
             'placeholder'   : 'description', 
             'style'         : 'resize : none' 
             }), required=False)   

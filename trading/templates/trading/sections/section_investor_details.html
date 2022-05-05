@@ -1,0 +1,67 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+<section style= 'padding: 5px 0;' id="project-details" class="project-details">
+  <div class="container" data-aos="fade-up">
+     <!-- ======= Breadcrumbs ======= -->
+     <div class="row">
+      <ol class="breadcrumb" >
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'view-investors' investment.id %}" %}">{% trans 'Back to Investors' %}</a></li>
+      
+        <li class="breadcrumb-item" >
+          <label id="total_projects_searched"></label>
+        </li>  
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">     
+        <h3>Investor Category:</h3>
+        <p>
+          {{model.name}}
+        </p>
+        
+        <!-- Summary -->
+        <h3>Investment Summary:</h3>
+        <p>
+          My total pledge is $<i><b>{{model.value}}</b></i> </br>
+          {{model.description}}
+        </p>
+
+        <!-- Details -->
+        <h3>Investor Details</h3>
+        <p>
+          {% if model.user.last_name %}
+            My name is <b>{{model.user.get_full_name}}.</b>
+          {% endif %} 
+          {% if model.user.email  %}
+            My email is <b>{{model.user.email}}.</b>
+          {% endif %} 
+          {% if userprofile.profession  %}
+              My profession is <b>{{userprofile.profession}}.</b> 
+          {% endif %} 
+          {% if userprofile.country  %}
+              and I am from   <b>{{userprofile.country}}.</b></br>
+          {% endif %} 
+          
+        </p>
+        <p>
+          <i>{{userprofile.aboutyou}}</i>
+       
+        </p>
+        
+       
+
+        <div class="text-center">
+          <a href="{% url 'view-investors' investment.id %}" class="more-btn">Back<i class="bx bx-chevron-right"></i></a>
+        </div>
+      </div>
+    
+    </div>
+
+  </div>
+</section><!-- End Investor Details Section -->
+
+

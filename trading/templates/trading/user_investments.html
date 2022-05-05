@@ -30,23 +30,21 @@
             <ol class="breadcrumb" >
                 <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Models' %}</a></li>
-               
+                <li class="breadcrumb-item"><a href="{% url 'trading_home' %}">{% trans 'Investments' %}</a></li>
                 <li class="breadcrumb-item" >
-                    <label id="total_projects_searched">Personal Investments</label>
+                    <label id="total_projects_searched">Personal Investments [{{total}}]</label>
                 </li>  
-            </ol>
-
-      
+            </ol>      
         </div> 
    
       
-
+        <!-- Table Section -->
         <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
             <div class="col-md-12">
                 <div class="box">
                     <div class="box-body">
-                        {%if models %}
-                        <h4 style="text-align:center;">My Investments: [{{total}}]  Total:${{total_sum|intcomma}} Aver:$ {{average| floatformat:1 | intcomma}}</h4>
+                        {%if first_page %}
+                        <h4 style="text-align:center;"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:1 | intcomma}}</h4>
                         <hr>
                         <div class="table-responsive">
                             <table id="usersTable" class="table table-striped">
@@ -60,17 +58,17 @@
                                 <th style="width: 10%" >Owner</th>
                                 <th style="width: 7%" class="text-right">Actions</th>
                                 </thead>
-                                <tbody id="users-table-tbody">
-                                {% for item in models  %}
-                                <tr id="comment-{{item.id}}" >
+                                <tbody id="userinvestment-table-tbody">
+                                {% for item in first_page  %}
+                                <tr id="item-{{item.id}}" >
                                     <td>{{forloop.counter}}</td>
                                     <td class="modelData" name="name" >{{item.inv_name}}</td>
                                     <td class="modelData" name="description" >{{item.summary}}</td>
                                     <td class="modelData" name="category" >{{item.total_value| intcomma}}</td>
-                                    <td class="modelData" name="total_value" >${{item.myinvest| intcomma}}</td>
-                                    <td class="modelData" name="current_investment" >{{item.cat_name}}</td>
+                                    <td class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
+                                    <td class="modelData" name="category" >{{item.cat_name}}</td>
                                     
-                                    <td class="modelData" name="date_created" >{{item.email }}</td>
+                                    <td class="modelData" name="email" >{{item.email }}</td>
                                     <td class="text-right modelAction modelData" name="action">
                                         <a href="{% url 'investment-details' item.iid %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -78,8 +76,8 @@
                                         </a>
                                          
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                          data-object-name="{{ item.inv_name }}"  data-comment-id="{{item.id}}" 
-                                          data-delete-url="{% url 'delete_investor_ajax' item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                          data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
+                                          data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                                           title='Delete' > <i class="fa fa-trash "></i> 
                                         </a>
                                       </td>
@@ -102,16 +100,29 @@
                 </div>
             </div>
         </div>
-          
-          
-    
-  
-      </div>
-    
-    
+
+          <!--Pagination  -->
+          <div id= "page_section" class="pagination">
+            <ul class="pagination newpagination">
+                {% if current_page.has_previous %}
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                    
+                {% endif %}
+        
+                <span class="current"  style="margin-left:5px">
+                Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+                </span>
+        
+                {% if current_page.has_next %}
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+                
+                {% endif %}
+            </ul>
+        </div>
   
     </div>
-   
   </section><!-- End User Section -->
   
 
@@ -142,7 +153,7 @@
                     <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
 
                     <input type="button" class="delete-button  btn btn-danger" id="delete-button"
-                            name="delete-button" value="Yes" data-url="" tr-id="" comment-id="">
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
                 </div>
             </div>
         </div>
@@ -154,6 +165,25 @@
 
 {% block scripts %}
 <script>
+    function getToken(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+  
+    var csrftoken = getToken('csrftoken');
+    var display_myinvestement_ajax_url= "{% url 'display_myinvestment_ajax' %}" 
+    
     $(document).ready(function (){ 
         $("#investments a:first").addClass( "active") 
         $("#investors a:first").addClass( "active") 
@@ -162,17 +192,17 @@
      $('#confirmdelete').on('show.bs.modal', function(e) {
         var name = $(e.relatedTarget).data('object-name');
         var url = $(e.relatedTarget).data('delete-url');
-        var comment_id = $(e.relatedTarget).data('comment-id');
+        var item_id = $(e.relatedTarget).data('item-id');
         $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
         $('#confirmdelete .modal-footer input').attr('data-url', url);
-        $('#confirmdelete .modal-footer input').attr('comment-id', comment_id);
+        $('#confirmdelete .modal-footer input').attr('item-id', item_id);
     });
 
   
     $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
-            var tr_id =$('#delete-button').attr('comment-id')
-            row = $('#comment-'+ tr_id.trim());
+            var tr_id =$('#delete-button').attr('item-id')
+            row = $('#item-'+ tr_id.trim());
             var formData = {
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             };
@@ -190,6 +220,28 @@
                         //remove the row deleted
                         $(this).remove();
                         // if deleted page make the page disappear, point to prev page
+                        //page-1
+                        if (data.data.total_pages < data.data.deleted_page){                     
+                            var index= parseInt(data.data.total_pages)-1
+                            window.setTimeout(function() {
+                                $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                            }, 1000);
+                        }else{
+                            // if item on the current page get to zero
+                            // point to page-1
+                            var total = $('#userinvestment-table-tbody').children().length
+                            if (total == 0){
+                                //refresh the current pages
+                                var index= parseInt(data.data.deleted_page)-1
+                                if (index<1){
+                                    // if deleteting first page  then scroll all into first page
+                                    index=1
+                                } 
+                                
+                                loadPageAjax(index)
+                            }
+
+                        }
                         
                        
                     });
@@ -202,7 +254,98 @@
             });
         });
           
-        
+    
+        $('body').on('click', '.a_page_nav', function (event) {
+            // preventing default actions
+            event.preventDefault();
+            var page_no = $(this).attr('href');
+            // ajax call
+            loadPageAjax(page_no)
+        });
+        function updatePaging2(data){
+            var has_previous=''
+            console.log(data)
+            if (data.has_previous){
+                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+            
+            }       
+            var has_next= ''          
+            if (data.has_next){
+                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                    `; 
+            }       
+            a_html=`
+            <div id= "page_section" class="pagination">
+                <ul class="pagination newpagination">
+                    ${has_previous}            
+                    <span class="current" style="margin-left:5px" >
+                        Page ${ data.current_page } of ${ data.last }.
+                    </span>                   
+                    ${has_next}
+                </ul>
+                </div>`
+                $("#page_section").html(a_html)
+          }
+
+        function append_html(counter,val,page_no){
+            a_html=`
+                <tr id="item-${val.id}" >
+                    <td>${counter}</td>
+                    <td class="modelData" name="name" >${val.inv_name}</td>
+                    <td class="modelData" name="description" >${val.summary}</td>
+                    <td class="modelData" name="category" >${val.total_value}</td>
+                    <td class="modelData" name="myinvest" >${val.myinvest}</td>
+                    <td class="modelData" name="category" >${val.cat_name}</td>
+                    <td class="modelData" name="email" >${val.email}</td>
+                    <td class="text-right modelAction modelData" name="action">
+                        <a href="/trading/investment-details/${val.iid}/"
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='View Investment'><i class="fa fa-eye"></i>
+                        </a>
+                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                            data-object-name="${val.inv_name}"  data-item-id="${val.id}" 
+                            data-delete-url="/trading/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            title='Delete' > <i class="fa fa-trash "></i> 
+                        </a>
+                        </td>
+                </tr>` ;
+            return a_html
+        }
+        function loadPageAjax(page_no){
+            $.ajax({
+                    type: "POST",
+                    // define url name
+                    url: display_myinvestement_ajax_url, 
+                    data : {    
+                        page_no : page_no, 
+                        csrfmiddlewaretoken: csrftoken,
+                    },
+                    // handle a successful response
+                    success: function (response) {
+                        $('#userinvestment-table-tbody').html('')
+                        updatePaging2(response.data)
+                        if (response.data.per_table){
+                            per_table=response.data.per_table
+                        }
+                        var base_counter =(parseInt(page_no)-1)*per_table
+                        var counter=base_counter
+                        $.each(response.data.results, function(i, val) {
+                            counter=  counter +1
+                            a_html=append_html(counter,val,page_no)                           
+                            // add each model on every line
+                            $('#userinvestment-table-tbody').append(a_html)
+                        });
+                        },
+                        error: function () {
+                            alert('Error Occured');
+                        }
+                        
+                });
+                //add_model_class()
+          }
+          
     
 </script>
 {% endblock %}

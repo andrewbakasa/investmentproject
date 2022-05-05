@@ -370,6 +370,7 @@ class UserPreference(models.Model):
     user = models.OneToOneField(User, on_delete= models.CASCADE)
     last_modified = models.DateTimeField(auto_now=True)
     perpage = models.IntegerField(default=6, verbose_name='Records per page')
+    pertable = models.IntegerField(default=10, verbose_name='Records per table')
     g2 = models.BooleanField(default=True, verbose_name='G2: another')
   
     def __str__(self):

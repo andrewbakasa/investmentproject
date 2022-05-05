@@ -276,8 +276,18 @@ class MacroeconomicParametersForm(forms.ModelForm):
 class UserPreferenceForm(forms.ModelForm):
     class Meta:
         model = UserPreference
-        fields = ['perpage', 'g2']
+        fields = ['perpage', 'pertable']
   
+    def clean_pertable(self):
+        pertable = self.cleaned_data['pertable']
+        max_val=50
+        min_val=3
+        if pertable>max_val:
+            raise ValidationError(_(f'{pertable} is greather than max allowed of {max_val}'))
+        elif pertable <min_val:
+            raise ValidationError(_(f'{pertable} is less than min allowed of {min_val}'))
+        return pertable
+
     def clean_perpage(self):
         perpage = self.cleaned_data['perpage']
         max_val=50
@@ -287,7 +297,6 @@ class UserPreferenceForm(forms.ModelForm):
         elif perpage <min_val:
             raise ValidationError(_(f'{perpage} is less than min allowed of {min_val}'))
         return perpage
-
 
 class UserProfileForm(forms.ModelForm):
     aboutyou = forms.CharField(
