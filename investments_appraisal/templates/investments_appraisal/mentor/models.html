@@ -474,7 +474,7 @@
                 //console.log(this)
                 var attr = $(this).attr("name");
                 if (attr == "link") {
-                    $(this).find('a').text(item.name);
+                    $(this).find('a').text(truncChar(item.name,15));
                     $(this).find('p').text(item.currency);
                     
                 } else if (attr == "description") {
