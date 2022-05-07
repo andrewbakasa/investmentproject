@@ -14,7 +14,7 @@
         <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
         <li class="breadcrumb-item" ><a href="{% url 'models' %}">{% trans 'User Models' %}</a></li>
         {% if usermodel %}
-            <li class="breadcrumb-item"><a href="{{ model.get_absolute_url }}">{{ usermodel }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ model.get_absolute_url }}">{{usermodel.name | truncatechars:15}}</a></li>
             <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-update"   href="#" data-url="{% url 'get_beef_model_spreadsheets' usermodel.id %}" 
                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                 title='Download Excel'><i class="fas fa-download"></i>

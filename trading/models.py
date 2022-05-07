@@ -32,6 +32,12 @@ class InvestmentCategory(models.Model):
     def __str__(self):
         return str(self.name)
     
+class Tag(models.Model):
+    name = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name
+
    
 class Investment(models.Model):
     name = models.CharField(max_length=60)
@@ -40,7 +46,8 @@ class Investment(models.Model):
     category = models.ForeignKey('InvestmentCategory', on_delete=models.SET_NULL, null=True,verbose_name="Category")
     likes = models.IntegerField(default=0)
     hits = models.IntegerField(default=0)# downloads
-    total_value = models.IntegerField(default=100)
+    total_value = models.IntegerField(default=0)
+    tags = models.ManyToManyField(Tag, null=True, blank =True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     class Meta:
         ordering = ['-likes']

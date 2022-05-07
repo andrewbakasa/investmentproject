@@ -46,7 +46,7 @@
                           <div {% if model.design_complete %} ready  {% endif %} class="project-content">
                             
                               <div class="d-flex justify-content-between align-items-center mb-3" name="link">
-                                <h3><a href="{% url 'select_model_mentor' model.id %}">{{model.name}}</a></h3>
+                                <h3><a href="{% url 'select_model_mentor' model.id %}">{{model.name|truncatechars:15}}</a></h3>
                                 <p class="price">{{model.currency.symbol}}</p>
                               </div> 
                             

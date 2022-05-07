@@ -1,4 +1,10 @@
-
+function truncChar(str,length){
+    var myTruncatedString = str.substring(0,length);              
+    if (str.length > myTruncatedString.length){
+      return myTruncatedString + "..."
+    }
+    return myTruncatedString
+}
 function addfeedlotdesignparametersTable(data){
     console.log('addfeedlotdesignparametersTable')
     $("#feedlotdesignparameters_section").children(".view-section").each(function() {
@@ -43,7 +49,7 @@ function addfeedlotdesignparametersTable(data){
             console.log('model_id', data['data'].model_id)
             url=`/edit_model_feedlotdesignparameters_ajax/${data['data'].id}/`
             $("#form-feedlotdesignparameters").attr( "data-url",  url)
-            $("#feedlotdesignparameters_label").html(`Edit feedlotdesignparameters Parameters: ${data['data'].model_name}`)
+            $("#feedlotdesignparameters_label").html(`Edit feedlotdesignparameters Parameters: ${truncChar(['data'].model_name,15)}`)
             
             
         

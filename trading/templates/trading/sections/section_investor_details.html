@@ -17,14 +17,20 @@
     </div>
 
     <div class="row">
-      <div class="col-lg-12">     
+      <div class="col-lg-12">
+          <!-- Summary -->
+        <h3>Interprenuer perspective</h3>
+        <p>
+         {{investment.description}}</br>
+          investment value of ${{investment.total_value|intcomma}}
+        </p>    
         <h3>Investor Category:</h3>
         <p>
           {{model.name}}
         </p>
         
         <!-- Summary -->
-        <h3>Investment Summary:</h3>
+        <h3>Investor Summary:</h3>
         <p>
           My total pledge is $<i><b>{{model.value}}</b></i> </br>
           {{model.description}}

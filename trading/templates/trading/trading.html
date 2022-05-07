@@ -51,9 +51,20 @@
       <script>
          //first timme
           var display_investment_ajax_url= "{% url 'display_investment_ajax' %}" 
+          var search_tags= '{{search_tags}}'
+          var slug= '{{slug}}'
+          
+          if (search_tags){            
+              display_investment_ajax_url = `{% url 'investment_search_tag_ajax' 12345 %}`.replace(/12345/, slug.toString()); 
+            
+          }
+
+        
           function updatePaging2(data){
             var has_previous=''
             console.log(data)
+            //<li><a class='a_page_nav' {% if search_tags  %} search_tags="{{search_tags}}" {% endif %} style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+             
             if (data.has_previous){
                 has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
                     <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
@@ -178,6 +189,8 @@
               display_investment_ajax_url = `{% url 'investment_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
           
             }
+            
+         
              // click first page
             page_no=1
 
@@ -251,76 +264,75 @@
             }
           var csrftoken = getToken('csrftoken');
           $(document).ready(function (){ 
-            
-         
-          $('body').on('click', '.a_page_nav', function (event) {
-                // preventing default actions
-                console.log($(this).attr('href'))
-                event.preventDefault();
-                var page_no = $(this).attr('href');
-                var objthis = $(this)
-                // ajax call
-                $.ajax({
-                    type: "POST",
-                    // define url name
-                    url: display_investment_ajax_url, 
-                    data : {    
-                        page_no : page_no, 
-                        csrfmiddlewaretoken: csrftoken,
-                    },
-                    // handle a successful response
-                    success: function (response) {
-                      updatePaging2(response.data)
-                        //removeClass(objthis)
-                        $('#project_div').html('')
-                        if (response.data.per_page){
-                            per_page=response.data.per_page
-                        }
-                        var base_counter =(parseInt(page_no)-1)*per_page
-                        var counter=base_counter
-                        $.each(response.data.results, function(i, val) {
-                            a_html=append_html(counter,val)
-                            // add each model on every line
-                            $('#project_div').append(a_html)
-                            
-                        });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
-                }); 
-            });
-          
-          
-         
-          $('body').on("click",".model-likes",function(e){
-                event.preventDefault();
-                e.stopPropagation()
-                var url = $(this).attr('data-url');
-                // ajax call
-                $.ajax({
-                  type: "POST",
-                  url: url, 
-                  data : {  
-                    csrfmiddlewaretoken: csrftoken,
-                  },
-                  success: function(response){
-                      if(response.error == false){
-                          const ref="#div-" + response.data.id
-                          val= $(ref).children().find('.trainer').find('a')
-                        
-                          htmal_a= `<a class="model-likes" href="#" data-url="/trading/update_investment_likes/${response.data.id}/" 
-                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
-                          $(val).html(htmal_a)
-                      }
-                  //END SUCCESS
+                     
+            $('body').on('click', '.a_page_nav', function (event) {
+                  // preventing default actions
+                  if (search_tags){
+                    console.log('000:search_tags:', search_tags)
                   }
-              // END AJAX
-              })
-              return false;
-          })
+                  event.preventDefault();
+                  var page_no = $(this).attr('href');
+                  var objthis = $(this)
+                  // ajax call
+                  $.ajax({
+                      type: "POST",
+                      // define url name
+                      url: display_investment_ajax_url, 
+                      data : {    
+                          page_no : page_no, 
+                          csrfmiddlewaretoken: csrftoken,
+                      },
+                      // handle a successful response
+                      success: function (response) {
+                        updatePaging2(response.data)
+                          //removeClass(objthis)
+                          $('#project_div').html('')
+                          if (response.data.per_page){
+                              per_page=response.data.per_page
+                          }
+                          var base_counter =(parseInt(page_no)-1)*per_page
+                          var counter=base_counter
+                          $.each(response.data.results, function(i, val) {
+                              a_html=append_html(counter,val)
+                              // add each model on every line
+                              $('#project_div').append(a_html)
+                              
+                          });
+                          },
+                          error: function () {
+                              alert('Error Occured');
+                          }
+                  }); 
+              });
           
+            $('body').on("click",".model-likes",function(e){
+                  event.preventDefault();
+                  e.stopPropagation()
+                  var url = $(this).attr('data-url');
+                  // ajax call
+                  $.ajax({
+                    type: "POST",
+                    url: url, 
+                    data : {  
+                      csrfmiddlewaretoken: csrftoken,
+                    },
+                    success: function(response){
+                        if(response.error == false){
+                            const ref="#div-" + response.data.id
+                            val= $(ref).children().find('.trainer').find('a')
+                          
+                            htmal_a= `<a class="model-likes" href="#" data-url="/trading/update_investment_likes/${response.data.id}/" 
+                              style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                              title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
+                            $(val).html(htmal_a)
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
+            
           })
       </script>
 

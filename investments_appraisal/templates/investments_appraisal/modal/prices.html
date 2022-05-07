@@ -4,7 +4,7 @@
                         <div class="modal-content">
                             <!--Header-->
                             <div class="modal-header">
-                                <h4 class="modal-title" id="prices_label"> {% if price_record %} Edit {% else %}  Add {% endif %} Prices: {{usermodel.name}} </h4>
+                                <h4 class="modal-title" id="prices_label"> {% if price_record %} Edit {% else %}  Add {% endif %} Prices: {{usermodel.name | truncatechars:15}} </h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>

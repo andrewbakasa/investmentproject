@@ -96,8 +96,14 @@
        <script src="{% static 'mentor/assets/js/search.js' %}"></script>
        
       <script>
-        
-          function getToken(name) {
+            function truncChar(str,length){
+                var myTruncatedString = str.substring(0,length);              
+                if (str.length > myTruncatedString.length){
+                return myTruncatedString + "..."
+                }
+                return myTruncatedString
+            }
+            function getToken(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
                     const cookies = document.cookie.split(';');
@@ -204,7 +210,7 @@
                                 
                                     <div ${ready_attr} class="project-content ${model_class_added}">
                                         <div class="d-flex justify-content-between align-items-center mb-3"  name="link">
-                                            <h3><a href="/select_model_mentor/${val.id}/">${val.name}</a></h3>
+                                            <h3><a href="/select_model_mentor/${val.id}/">${truncChar(val.name,15)}</a></h3>
                                  
                                             <p class="price">${val.currency}</p>
                                         </div> 

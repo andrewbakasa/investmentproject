@@ -53,11 +53,12 @@
                                 <table id="userBusinessTable" class="table table-striped">
                                     <thead class="thead-dark">
                                     <th style="width: 1%" >#</th>    
-                                    <th style="width: 9%" >Name</th>
-                                    <th style="width: 25%" >description</th>
-                                    <th style="width: 10%" >category</th>
-                                    <th style="width: 8%" >Value</th>
-                                    <th style="width: 8%" >Current</th>
+                                    <th style="width: 12%" >Name</th>
+                                    <th style="width: 18%" >description</th>
+                                    <th style="width: 8%" >category</th>
+                                    <th style="width: 7%" >Value</th>
+                                    <th style="width: 7%" >Current</th>
+                                    <th style="width: 3%" >%</th>
                                     <th style="width: 8%" >Investors</th>
                                     <th style="width: 17%" >Date Created</th>
                                     <th style="width: 7%" class="text-right">Actions</th>
@@ -65,16 +66,18 @@
                                     <tbody id="userbusiness-table-tbody">
                                     {% for item in first_page  %}
                                     <tr id="item-{{item.id}}" >
-                                        <td>{{forloop.counter}}</td>
-                                        <td class="modelData" name="name" >{{item.name}}</td>
-                                        <td class="modelData" name="description" >{{item.description}}</td>
+                                        <td class="modelData" name="counter">{{forloop.counter}}</td>
+                                        <td class="modelData" name="name" >{{item.name|truncatechars:12}}</td>
+                                        <td class="modelData" name="description" >{{item.description|truncatechars:20}}</td>
                                         <td class="modelData" name="category" >{{item.category}}</td>
                                         <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
                                         <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
+                                        <td class="modelData" name="current_investment_percent" >{{item.current_investment_percent| floatformat:-1| intcomma}}%</td>
+                                      
                                         <td class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
                                     
                                             
-                                        <td class="modelData" name="date_created" >{{item.date_created }}</td>
+                                        <td class="modelData" name="date_created" >{{item.date_created}}</td>
                                         <td class="text-right modelAction modelData" name="action">
                                             <a href="{% url 'edit-investment' item.id %}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -204,6 +207,18 @@
 
 {% block scripts %}
 <script>
+    function truncChar(str,length){
+        var myTruncatedString = str.substring(0,length);              
+        if (str.length > myTruncatedString.length){
+        return myTruncatedString + "..."
+        }
+        return myTruncatedString
+    }
+    function numberWithCommas(x) {
+                var parts = x.toString().split(".");
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return parts.join(".");
+            }
     function getToken(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
@@ -236,7 +251,7 @@
         $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
     });
 
-    $('body').on('click', '.delete-button', function (e) {
+        $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
             var tr_id =$('#delete-button').attr('item-id')
             row = $('#item-'+ tr_id.trim());
@@ -328,16 +343,12 @@
                   success: function(data){ 
                       //console.log('added data' ,data.model)
                       if(data.model){
-                          console.log(data.model)
+                          //console.log(data.model)
                           appendTable(data.model)
                           $('.close-modal').click()
-                          //update paging
                           if (data.total_pages){
                               updatePaging(data.total_pages)
                           }
-                         
-                      
-
                       } else {
                           // ADDITION NOT SUCCESSFUL
                           $('#public_toggle_form-errors').html('');
@@ -386,17 +397,24 @@
               return false;
           })
         function appendTable(item){  
-            console.log(item) 
+            //console.log(item) 
             var js_date_created = new Date(item.date_created) 
+            var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
+            var current_investment=numberWithCommas(item.current_investment)
+            var name_trunc =truncChar(item.name,12)
+            var description_trunc =truncChar(item.description,20)
             a_html =`
                 <tr id="item-${item.id}" >
-                    <td><i class="fa fa-edit"></i></td>
-                    <td class="modelData" name="name" >${item.name}</td>
-                    <td class="modelData" name="description" >${item.description}</td>
+                    <td  class="modelData" name="counter"><i class="fa fa-edit"></i></td>
+                    <td class="modelData" name="name" >${name_trunc}</td>
+                    <td class="modelData" name="description" >${description_trunc}</td>
                     <td class="modelData" name="category" >${item.category}</td>
-                    <td class="modelData" name="total_value" >${item.total_value}</td>
-                    <td class="modelData" name="current_investment" >${item.current_investment}</td>
-                    <td class="modelData" name="investors_count" >${item.investors_count}</td>
+                    <td class="modelData" name="total_value" >${numberWithCommas(item.total_value)}</td>
+                    <td class="modelData" name="current_investment" >${current_investment}</td>
+                    <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
+                    
+                    
+                    <td class="modelData" name="investors_count" >${numberWithCommas(item.investors_count)}</td>
                     
                         
                     <td class="modelData" name="date_created" >${js_date_created}</td>
@@ -431,18 +449,28 @@
             $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
                 console.log(item.name)
                 var attr = $(this).attr("name");
+                var name_trunc =truncChar(item.name,12)
+                var description_trunc =truncChar(item.description,20)
                 if (attr == "description") {
-                    $(this).text(item.description);
+
+                    $(this).text(description_trunc);
                 } else if (attr == "category") {
                     $(this).text(item.category);
                 } else if (attr == "name") {
-                    $(this).text(item.name);   
+                    $(this).text(name_trunc);   
                 } else if (attr == "total_value") {
-                    $(this).text(item.total_value);
+                    $(this).text('$'+ numberWithCommas(item.total_value));
                 } else if (attr == "current_investment") {
-                    $(this).text(item.current_investment);
+                    $(this).text('$'+ numberWithCommas(item.current_investment));
+                } else if (attr == "current_investment_percent") {
+                    $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
                 
-                } 
+                } else if (attr == "counter") {
+                    var a_html= `<td  class="modelData" name="counter"><i class="fa fa-edit"></i></td>`
+                    $(this).html(a_html);
+                
+                }  
+                
             });
         }  
         $('body').on("submit",".model-form-edit",function(e){
@@ -460,19 +488,20 @@
                   processData:false,
                   contentType: false,
                   success: function(data){
+                      //console.log('its mot get here', data)
                       if(data.model){
                           console.log(data.model)
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           updateTable(data.model);
                           if (data.model.current_investment){
-                            $('#current_investment').html(`${data.model.current_investment}`);
+                            $('#current_investment').html(`${numberWithCommas(data.model.current_investment)}`);
                           }
-                          if (data.model.current_investment){
-                              $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
+                          if (data.model.current_investment_percent){
+                              $('#current_investment_percent').html(`${parseFloat(data.model.current_investment_percent)}%`);
                           }
                           if (data.model.investors_count){
-                            $('#investors_count').html(`${data.model.investors_count}`);
+                            $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
                           }
                         
 
@@ -561,17 +590,22 @@
           }
 
         function append_html(counter,val,page_no){
+            //loading the page #
             var js_date_created = new Date(val.date_created)
-           
+
+            var name_trunc =truncChar(val.name,12)
+            var description_trunc =truncChar(val.description,20)
+
             a_html=`
             <tr id="item-${val.id}">
-                <td>${counter}</td>
-                <td class="modelData" name="name" >${val.name}</td>
-                <td class="modelData" name="description" >${val.description}</td>
+                <td class="modelData" name="counter">${counter}</td>
+                <td class="modelData" name="name" >${name_trunc}</td>
+                <td class="modelData" name="description" >${description_trunc}</td>
                 <td class="modelData" name="category" >${val.category}</td>
-                <td class="modelData" name="total_value" >${val.total_value}</td>
-                <td class="modelData" name="current_investment" >${val.current_investment}</td>
-                <td class="modelData" name="investors_count" >${val.investors_count}</td>                        
+                <td class="modelData" name="total_value" >${numberWithCommas(val.total_value)}</td>
+                <td class="modelData" name="current_investment" >${numberWithCommas(val.current_investment)}</td>
+                <td class="modelData" name="current_investment_percent" >${parseFloat(val.current_investment_percent).toFixed(1)}%</td>  
+                <td class="modelData" name="investors_count" >${numberWithCommas(val.investors_count)}</td>                      
                 <td class="modelData" name="date_created" >${js_date_created}</td>
                 <td class="text-right modelAction modelData" name="action">
                     <a href="/trading/edit-investment/${val.id}"

@@ -12,7 +12,12 @@
           <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}">{% trans 'Investments' %}</a></li>
         
           <li class="breadcrumb-item" >
-            <label id="total_projects_searched"></label>
+            {%if search_tags %}
+              <a href="{% url 'trading_home' %}" style="color:inherit" 
+                data-toggle="tooltip" data-placement="bottom" 
+                title='Remove Tag'><i>[{{tag_name}}]</i> <span aria-hidden="true">×</span>
+             </a>             
+            {% endif %}
           </li>  
         </ol>
       </div>
@@ -53,7 +58,7 @@
 
     </div>
 
-   
+    
     <div id= "page_section" class="pagination">
       <ul class="pagination newpagination">
           {% if current_page.has_previous %}

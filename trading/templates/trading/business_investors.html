@@ -46,8 +46,8 @@
                 <div class="box">
                     <div class="box-body">
                         {%if models %}
-                        <h4 style="text-align:center;"> Investors for <i>{{investment.name|truncatechars:60}}</i>: [{{total}}]</h4>
-                        <h5>{{investment.description |truncatechars:150}}</h5>
+                        <h4 style="text-align:center;"> <b>Investors</b> pledges for: <i>{{investment.name|truncatechars:50}}</i> [{{total}}]</h4>
+                        <h5>{{investment.description |truncatechars:150}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
                         <hr>
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-striped">
@@ -63,7 +63,7 @@
                                 <tbody id="userbusiness-table-tbody">
                                 {% for item in models  %}
                                 <tr id="item-{{item.id}}" >
-                                    <td>{{forloop.counter}}</td>
+                                    <td class="modelData" name="counter" >{{forloop.counter}}</td>
                                     <td class="modelData" name="name" >{{item.user.email}}</td>
                                     <td class="modelData" name="name" >{{item.name}}</td>
                                     <td class="modelData" name="description" >{{item.description|truncatechars:45}}</td>
@@ -97,7 +97,7 @@
 
                         {%else%}
 
-                        <h3>No businesses available</h3>
+                        <h3>No Investor Available</h3>
 
                         {%endif%}
 

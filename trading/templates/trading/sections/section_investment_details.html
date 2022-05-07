@@ -35,10 +35,16 @@
     <div class="row">
       <div class="col-lg-8">     
          <img src ="{% static 'mentor/assets/img/projects/'|add:model.category.uniqueid|add:'.jpg' %}" class="img-fluid"alt="">
-        <h3>{{model.details.motto}}</h3>
+        <h3>{{model.name|truncatechars:50}}</h3>
         <p>
-          {{model.description}}
+          {{model.description|truncatechars:200}}
         </p>
+        <p>
+          Tags:
+          {% for tag in model.tags.all %}
+              <a href="{% url 'investment_load_tags' tag.id %}">{{tag.name}}</a>
+          {% endfor %}
+      </p>
       </div>
       <div class="col-lg-4">
 

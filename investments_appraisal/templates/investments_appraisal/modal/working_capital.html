@@ -4,7 +4,7 @@
                         <div class="modal-content">
                             <!--Header-->
                             <div class="modal-header">
-                                <h4 class="modal-title" id="workingcapital_label"> {% if workingcapital_record %} Edit {% else %}  Add {% endif %} workingcapital: {{usermodel.name}} </h4>
+                                <h4 class="modal-title" id="workingcapital_label"> {% if workingcapital_record %} Edit {% else %}  Add {% endif %} workingcapital: {{usermodel.name | truncatechars:15}} </h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>

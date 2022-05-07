@@ -134,11 +134,14 @@ def update_investment_likes_ajax(request,  id, *args, **kwargs):
 	else:
 		return JsonResponse({'error': True, 'data': "Request not ajax"})
 
-def investment_search_ajax(request,slug, *args, **kwargs):
+def investment_search_ajax(request,slug, search_type,*args, **kwargs):
     #
     if request.method == 'POST':
         #description= request.POST['description']
-        modelsdata= Investment.objects.filter(description__icontains=slug)
+        if search_type=='tags':
+            modelsdata= Investment.objects.filter(tags__in=slug)
+        else:
+            modelsdata= Investment.objects.filter(description__icontains=slug)
 
         if not ('perpage' in request.session):
             if request.user.is_authenticated:
@@ -200,6 +203,10 @@ def investment_search_ajax(request,slug, *args, **kwargs):
                 item_object['date_created']=f'{i.date_created.ctime()}'
                 item_object['uniqueid']=i.category.uniqueid
                 item_object['userIsInvestor']=i.userIsInvestor(request.user)
+                taglist = []
+                for j in i.tags.all():
+                    taglist.append(j.name)
+                item_object['tags']= taglist
                 results.append(item_object)
                 
             data["results"]=results
@@ -267,6 +274,10 @@ def display_investment_ajax(request):
             item_object['uniqueid']=i.category.uniqueid
             item_object['userIsInvestor']=i.userIsInvestor(request.user)
             #print(item_object)
+            taglist = []
+            for j in i.tags.all():
+                taglist.append(j.name)
+            item_object['tags']= taglist
             results.append(item_object)
         
         data["results"]=results
@@ -414,6 +425,28 @@ def home(request):
 	
 	return render(request, 'trading/trading.html', context)
 
+@login_required
+def investment_load_tags(request, slug):
+    # replicate
+    models= Investment.objects.filter(tags__in=slug)
+    tag= get_object_or_404(Tag,pk=slug)
+    per_page=3
+    obj_paginator = Paginator(models, per_page)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
+
+    context = {
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,        
+        'current_page':current_page,
+        'page_range':page_range,
+        'search_tags':True,
+        'slug':slug,
+        'tag_name':tag.name
+    }
+
+    return render(request, 'trading/trading.html', context)
 def project_details(request,id):
 	#model= ModelCategory.objects.filter(pk=id)
 	model = get_object_or_404(Investment,pk=id)
@@ -551,6 +584,10 @@ def create_all_user_business(request,form,template_name):
             item_object['investors_count']= record.investors_count
             item_object['total_value']=record.total_value
             item_object['date_created']= record.date_created.ctime()
+            taglist = []
+            for i in record.tags.all():
+                   taglist.append(i.name)
+            item_object['tags']= taglist
             data['model'] = item_object
         else:
             data['form_is_valid'] = False
@@ -771,18 +808,30 @@ def save_all_user_investment(request,form,template_name):
     if request.method == 'POST':
         # retrieve product
         pk = form.instance.id
-        item_instance = get_object_or_404(Investment,pk=pk)
+       
         #eject errors for modal form display
         errors=form.errors
         if form.is_valid():			
             form.save()
             pk = form.instance.id
+           
             item_instance = get_object_or_404(Investment,pk=pk)
             data['form_is_valid'] = True
             item_object = model_to_dict(item_instance)
             item_object['category']=item_instance.category.name
             item_object['creater']=item_instance.creater.username
-            print(item_object)
+            cdate= item_instance.date_created.ctime()
+            
+            item_object['date_created']=cdate
+            item_object['current_investment']=item_instance.current_investment
+            item_object['current_investment_percent']=item_instance.current_investment_percent            
+            item_object['investors_count']=item_instance.investors_count                
+            item_object['total_value']=item_instance.total_value
+            taglist = []
+            for i in item_instance.tags.all():
+                   taglist.append(i.name)
+            item_object['tags']= taglist
+            #print(item_object)
             data['model'] = item_object
         else:
         
@@ -941,6 +990,10 @@ def display_business_ajax(request):
             item_object['current_investment_percent']=i.current_investment_percent            
             item_object['investors_count']=i.investors_count                
             item_object['total_value']=i.total_value
+            taglist = []
+            for j in i.tags.all():
+                   taglist.append(j.name)
+            item_object['tags']= taglist
                 
             results.append(item_object)
 		

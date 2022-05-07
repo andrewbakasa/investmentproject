@@ -22,8 +22,10 @@ urlpatterns = [
     path('display_business_ajax/', views.display_business_ajax, name="display_business_ajax"),
      path('display_myinvestment_ajax/', views.display_myinvestment_ajax, name="display_myinvestment_ajax"),
 
-    path('investment_search/<str:slug>/', views.investment_search_ajax,  name='investment_search_ajax'), 
+    path('investment_search/<str:slug>/', views.investment_search_ajax, {'search_type': ''}, name='investment_search_ajax'), 
+    path('investment_search/<str:slug>/tags/', views.investment_search_ajax,{'search_type': 'tags'}, name='investment_search_tag_ajax'), 
 
+    path('t/<str:slug>/', views.investment_load_tags, name='investment_load_tags'), 
     path('update_investment_likes/<int:id>/',views.update_investment_likes_ajax,  name='update_investment_likes'),
     path('u/i/', views.get_user_investments, name="user_investments"),
     path('u/b/', views.get_user_businesses, name="user_businesses"),
