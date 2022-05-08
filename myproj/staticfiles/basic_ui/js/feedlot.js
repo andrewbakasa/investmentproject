@@ -46,10 +46,10 @@ function addfeedlotdesignparametersTable(data){
             a_html =html_lead + html_body + html_trail
             $(this).html(a_html)
             //prepare for updating
-            console.log('model_id', data['data'].model_id)
+            
             url=`/edit_model_feedlotdesignparameters_ajax/${data['data'].id}/`
             $("#form-feedlotdesignparameters").attr( "data-url",  url)
-            $("#feedlotdesignparameters_label").html(`Edit feedlotdesignparameters Parameters: ${truncChar(['data'].model_name,15)}`)
+            $("#feedlotdesignparameters_label").html(`Edit feedlotdesignparameters Parameters: ${truncChar(data['data'].model_name,15)}`)
             
             
         

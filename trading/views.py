@@ -119,20 +119,24 @@ def get_user_investments(request):
 
 
 def update_investment_likes_ajax(request,  id, *args, **kwargs):
-	#obj = get_object_or_404(ModelCategory,id=id)
-	obj = Investment.objects.filter(pk=id)
-	if request.method == 'POST':
-		if request.is_ajax():
-			obj.update(likes=F('likes') + 1)		
-			#obj.save()
-		else:
-			return JsonResponse({'error': True, 'data': 'errors'})  
-			
-		record = Investment.objects.get(pk=id)
-		item_object = model_to_dict(record)
-		return JsonResponse({'error': False, 'data': item_object})
-	else:
-		return JsonResponse({'error': True, 'data': "Request not ajax"})
+    #obj = get_object_or_404(ModelCategory,id=id)
+    obj = Investment.objects.filter(pk=id)
+    if request.method == 'POST':
+        if request.is_ajax():
+            obj.update(likes=F('likes') + 1)		
+            #obj.save()
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+            
+        record = Investment.objects.get(pk=id)
+        item_object = model_to_dict(record)
+        taglist=[]
+        for j in record.tags.all():
+            taglist.append(j.name)
+        item_object['tags']= taglist
+        return JsonResponse({'error': False, 'data': item_object})
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
 
 def investment_search_ajax(request,slug, search_type,*args, **kwargs):
     #
@@ -470,30 +474,34 @@ def create_userinvestment_ajax(request):
 login_required(login_url="account_login")
 def create_all_useinvestment(request,form,template_name):
 
-	data = dict()
-	errors= None
-	if request.method == 'POST':
-		errors=form.errors
-		
-		if form.is_valid():
-			form.save()
-			#total_pages= get_total_pages(request)
-			data['form_is_valid'] = True
-			latest = Investment.objects.latest('id').id
-			record = Investment.objects.get(pk=latest)
-			item_object = model_to_dict(record)
-			data['model'] = item_object
-			#data['total_pages']=total_pages
-		else:
-			data['form_is_valid'] = False
-			# print('nofield errors: ',form.non_field_errors)
-			# print('errors:::',form.errors)
-	context = {
-		'form':form
-	}
-	data['html_form'] = render_to_string(template_name,context,request=request)
-	data['error']=errors
-	return JsonResponse(data)
+    data = dict()
+    errors= None
+    if request.method == 'POST':
+        errors=form.errors
+        
+        if form.is_valid():
+            form.save()
+            #total_pages= get_total_pages(request)
+            data['form_is_valid'] = True
+            latest = Investment.objects.latest('id').id
+            record = Investment.objects.get(pk=latest)
+            item_object = model_to_dict(record)
+            taglist=[]
+            for j in record.tags.all():
+                taglist.append(j.name)
+            item_object['tags'] =taglist
+            data['model'] = item_object
+            #data['total_pages']=total_pages
+        else:
+            data['form_is_valid'] = False
+            # print('nofield errors: ',form.non_field_errors)
+            # print('errors:::',form.errors)
+    context = {
+        'form':form
+    }
+    data['html_form'] = render_to_string(template_name,context,request=request)
+    data['error']=errors
+    return JsonResponse(data)
 
 
 login_required(login_url="account_login")
@@ -536,6 +544,7 @@ def save_all_user_investor_update(request,form,template_name):
                     
                 item_object['investor_id']=pk
                 item_object['total_value']=parent_invest.total_value
+
                 
                 data['model'] = item_object
         else:
@@ -721,33 +730,38 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
 
 @login_required(login_url="account_login")
 def delete_investment_ajax(request, id,page_no, *args, **kwargs):
-	if request.method == 'POST':
-		#print(request.POST)
-		if request.is_ajax():
-			
-			model_ = get_object_or_404(Investment, pk=id)
+    if request.method == 'POST':
+        #print(request.POST)
+        if request.is_ajax():
+            
+            model_ = get_object_or_404(Investment, pk=id)
 
-			model_.delete()
-			item_object = model_to_dict(model_)
+            model_.delete()
+            item_object = model_to_dict(model_)
 
-			total_pages= get_total_pages(request)
-			data= {}
-			data['total_pages']=total_pages
-			data['deleted_page']=page_no
-			
-			data['model']=item_object
-			
-			#messages.success(request, "Successfully deleted  model")
-			
-			return JsonResponse({'error': False, 'data': data})
-			
-		else:
-			return JsonResponse({'error': True, 'data': "errors encontered"})
-	else:
-		error = {
-			'message': 'Error, must be an Ajax call.'
-		}
-		return JsonResponse(error, content_type="application/json")
+            total_pages= get_total_pages(request)
+            data= {}
+            data['total_pages']=total_pages
+            data['deleted_page']=page_no
+            taglist=[]
+            # for j in model_.tags.all():
+            #     taglist.append(j.name)
+            # aaaa
+            item_object['tags'] =[]#taglist 
+            data['model']=item_object
+
+            
+            #messages.success(request, "Successfully deleted  model")
+            
+            return JsonResponse({'error': False, 'data': data})
+            
+        else:
+            return JsonResponse({'error': True, 'data': "errors encontered"})
+    else:
+        error = {
+            'message': 'Error, must be an Ajax call.'
+        }
+        return JsonResponse(error, content_type="application/json")
 
 
 def get_total_pages(request):

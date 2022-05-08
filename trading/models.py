@@ -133,6 +133,10 @@ class Investor(models.Model):
         return self.name 
     
     @property
+    def deleted_df(self):
+        pass
+        #get all that has null investments
+    @property
     def trading_df(self):
         investments_df = pd.DataFrame(Investment.objects.all().values())	
         investors_df = pd.DataFrame(Investor.objects.filter(user=self.user).values())

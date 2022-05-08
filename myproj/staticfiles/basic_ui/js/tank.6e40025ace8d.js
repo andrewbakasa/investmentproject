@@ -1,12 +1,9 @@
  
-    function truncChar(str,length){
-        var myTruncatedString = str.substring(0,length);              
-        if (str.length > myTruncatedString.length){
-          return myTruncatedString + "..."
-        }
-        return myTruncatedString
-    }   
+
+   
     $(document).ready(function(){        
+        
+       
         //FishTank Design
         $('body').on("submit",".model-tankdesignparameters-edit",function(e){
             e.preventDefault();
@@ -199,7 +196,7 @@
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_tankdesignparameters_ajax/${data['data'].id}/`
                     $("#form-tankdesignparameters").attr( "data-url",  url)
-                    $("#tankdesignparameters_label").html(`Edit tankdesignparameters Parameters: ${truncChars(data['data'].model_name,15)}`)
+                    $("#tankdesignparameters_label").html(`Edit tankdesignparameters Parameters: ${truncChar(data['data'].model_name,15)}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-8">
                     <i class="bi bi-check-circle"></i>Tank Design</a>`;
@@ -242,3 +239,11 @@
                     });
                 });            
         }
+
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length);              
+            if (str.length > myTruncatedString.length){
+              return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        } 

@@ -1668,6 +1668,8 @@ def create_all_usermodel(request,form,template_name):
 			item_object = model_to_dict(record)
 			data['model'] = item_object
 			data['total_pages']=total_pages
+			print(data)
+			print(data['model'])
 		else:
 			data['form_is_valid'] = False
 			# print('nofield errors: ',form.non_field_errors)
