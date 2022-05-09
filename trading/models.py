@@ -121,7 +121,7 @@ class InvestmentDetails(models.Model):
 class Investor(models.Model):
     investment = models.ForeignKey(Investment, on_delete=models.SET_NULL, null=True) 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=60, verbose_name='Title')
+    name = models.CharField(max_length=200, verbose_name='Keywords')
     description = models.TextField(verbose_name='Investment Proposal')
     value= models.IntegerField(default= 0, verbose_name='Funds Pledge')
     date_created = models.DateTimeField(auto_now_add=True, null=True)

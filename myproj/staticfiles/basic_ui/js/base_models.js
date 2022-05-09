@@ -394,7 +394,15 @@
                         alert('Error Occured');
                     }
             }); 
-        });    
+        });
+        
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length);              
+            if (str.length > myTruncatedString.length){
+              return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        } 
   
 
      });

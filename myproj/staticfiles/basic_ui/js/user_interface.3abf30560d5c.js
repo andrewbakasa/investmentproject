@@ -308,7 +308,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_prices_ajax/${data['data'].model_id}/${data['data'].id}/`
                     $("#form-prices").attr( "data-url",  url)
-                    $("#prices_label").html(`Edit Prices: ${data['data'].model_name}`)
+                    $("#prices_label").html(`Edit Prices: ${truncChar(data['data'].model_name,15)}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-2">
                     <i class="bi bi-check-circle"></i> Prices Details</a>`;
@@ -530,7 +530,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_timing_assumptions_ajax/${data['data'].model_id}/${data['data'].id}/`
                     $("#form-timing-assumptions").attr( "data-url",  url)
-                    $("#timing_assumptions_label").html(`Edit Timing Assumptions: ${data['data'].model_name}`)
+                    $("#timing_assumptions_label").html(`Edit Timing Assumptions: ${truncChar(data['data'].model_name,15)}`)
                     
                    
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">
@@ -680,7 +680,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_depreciation_ajax/${data['data'].model_id}/${data['data'].id}/`
                     $("#form-depreciation").attr( "data-url",  url)
-                    $("#depreciation_label").html(`Edit depreciation Assumptions: ${data['data'].model_name}`)
+                    $("#depreciation_label").html(`Edit depreciation Assumptions: ${truncChar(data['data'].model_name,15)}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-4">
                     <i class="bi bi-check-circle"></i> Depreciation Details</a>`;
@@ -821,7 +821,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_taxes_ajax/${data['data'].model_id}/${data['data'].id}/`
                     $("#form-taxes").attr( "data-url",  url)
-                    $("#taxes_label").html(`Edit taxes Assumptions: ${data['data'].model_name}`)
+                    $("#taxes_label").html(`Edit taxes Assumptions: ${truncChar(data['data'].model_name,15)}`)
                     // change destination ajax form class
                     $("#form-taxes").attr( "class",  "model-taxes-edit")
                     
@@ -963,7 +963,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_financing_ajax/${data['data'].id}/`
                     $("#form-financing").attr( "data-url",  url)
-                    $("#financing_label").html(`Edit Financing Parameters: ${data['data'].model_name}`)
+                    $("#financing_label").html(`Edit Financing Parameters: ${truncChar(data['data'].model_name,15)}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-3">
                     <i class="bi bi-check-circle"></i> Financing Details</a>`;
@@ -1106,7 +1106,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_workingcapital_ajax/${data['data'].id}/`
                     $("#form-workingcapital").attr( "data-url",  url)
-                    $("#workingcapital_label").html(`Edit workingcapital Parameters: ${data['data'].model_name}`)
+                    $("#workingcapital_label").html(`Edit workingcapital Parameters: ${truncChar(data['data'].model_name,15)}`)
                     // change destination ajax form class
                     $("#form-workingcapital").attr( "class",  "model-workingcapital-edit")
                     
@@ -1249,7 +1249,7 @@ $(document).ready(function(){
                     console.log('model_id', data['data'].model_id)
                     url=`/edit_model_macroeconomicparameters_ajax/${data['data'].id}/`
                     $("#form-macroeconomicparameters").attr( "data-url",  url)
-                    $("#macroeconomicparameters_label").html(`Edit macroeconomicparameters Parameters: ${data['data'].model_name}`)
+                    $("#macroeconomicparameters_label").html(`Edit macroeconomicparameters Parameters: ${truncChar(data['data'].model_name,15)}`)
                     
                     html_add_check= `<a class="nav-link active show" data-bs-toggle="tab" href="#tab-7">
                     <i class="bi bi-check-circle"></i> Macro Economic Parameters</a>`;
@@ -1290,6 +1290,14 @@ $(document).ready(function(){
                     });
                 });            
         }
+
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length);              
+            if (str.length > myTruncatedString.length){
+              return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        } 
       
        
         
