@@ -44,7 +44,7 @@
                 <div class="box">
                     <div class="box-body">
                         {%if first_page %}
-                        <h4 style="text-align:center;"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:1 | intcomma}}</h4>
+                        <h4 style="text-align:center;"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
                         <hr>
                         <div class="table-responsive">
                             <table id="usersTable" class="table table-striped">

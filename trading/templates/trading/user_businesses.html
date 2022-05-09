@@ -151,7 +151,12 @@
 {% block modal_divs %}
     <!-- EDIT DISPLAY HOLDER -->
     <div class="modal fade" id="modal-usermodel">
-        <div class="modal-dialog">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog modal-lg">
             <div class="modal-content"></div>
         </div>
     </div>
@@ -182,7 +187,12 @@
     <!-- Modal: modalAdd New Investment -->
     <div class="modal fade" id="modal_add_new_business" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true" style="overflow-y: auto !important">
-        <div class="modal-dialog" role="document">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog  modal-lg" role="document">
             <div class="modal-content">
                 <!--Header-->
                 <div class="modal-header">
@@ -409,8 +419,8 @@
                     <td class="modelData" name="name" >${name_trunc}</td>
                     <td class="modelData" name="description" >${description_trunc}</td>
                     <td class="modelData" name="category" >${item.category}</td>
-                    <td class="modelData" name="total_value" >${numberWithCommas(item.total_value)}</td>
-                    <td class="modelData" name="current_investment" >${current_investment}</td>
+                    <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
+                    <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
                     <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
                     
                     
@@ -431,7 +441,7 @@
                         </a>
                             
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                            data-object-name="${ item.name }"  data-item-id="${item.id}" 
+                            data-object-name="${item.name }"  data-item-id="${item.id}" 
                             data-delete-url="/trading/delete_investment_ajax/${item.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                             title='Delete' > <i class="fa fa-trash "></i> 
                         </a>

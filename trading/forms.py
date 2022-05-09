@@ -67,7 +67,7 @@ class UserInvestmentForm(forms.ModelForm):
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
             'cols'          : "30", #size
-            'rows'          : "7", #size
+            'rows'          : "4", #size
             'placeholder'   : 'description', 
             'style'         : 'resize : none' 
             }), required=False)  
