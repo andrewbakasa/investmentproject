@@ -1,6 +1,6 @@
 from django import forms
 
-from django.forms import ModelForm
+from django.forms import CheckboxSelectMultiple, ModelForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
@@ -61,8 +61,21 @@ class InvestorForm(forms.ModelForm):
         return transaction
 
 
+
+from django.forms.widgets import CheckboxSelectMultiple
+from django.forms.models import ModelMultipleChoiceField
+
+class CustomSelectMultiple(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return "%s" %(obj.name)
+
 class UserInvestmentForm(forms.ModelForm):
-   
+    tags = forms.ModelMultipleChoiceField(
+            queryset=Tag.objects.all(), widget=forms.CheckboxSelectMultiple(
+            # attrs= {'class':'column-checkbox'}
+            ),)
+    
+  
     description = forms.CharField(
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
@@ -82,12 +95,13 @@ class UserInvestmentForm(forms.ModelForm):
         if initial_arguments:
             if initial_arguments.creater:
                 self.fields['creater']=initial_arguments.creater
-        
+   
     
     class Meta:
         model = Investment
         fields = ['name','description','category', 'total_value','creater', 'tags' ]
-    
+       
+   
     def save(self, commit=True):
         transaction = super().save(commit)
         
@@ -96,6 +110,11 @@ class UserInvestmentForm(forms.ModelForm):
 
 
 class UserInvestmentFormUpdate(forms.ModelForm):
+    tags = forms.ModelMultipleChoiceField(
+            queryset=Tag.objects.all(), widget=forms.CheckboxSelectMultiple(
+                # attrs= {'class':'column-checkbox'} 
+            ),)
+    
     description = forms.CharField(
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
