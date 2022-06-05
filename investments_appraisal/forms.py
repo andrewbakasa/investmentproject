@@ -43,7 +43,15 @@ class InvestmentOptionsModelForm(forms.ModelForm):
     
 
 class UserBusinessModelForm(forms.ModelForm):
-   
+    description = forms.CharField(
+            help_text=" Describe the description",#text to help
+            widget=forms.Textarea( attrs={
+            'cols'          : "30", #size
+            'rows'          : "6", #size
+            'placeholder'   : 'write your model description', 
+            'style'         : 'resize : none' 
+            }), required=False)
+
     
     def __init__(self, user=None, *args, **kwargs):
         self.request = kwargs.pop('request', None)
@@ -61,7 +69,7 @@ class UserBusinessModelForm(forms.ModelForm):
     
     class Meta:
         model = UserModel
-        fields = ['model_type','name','user', 'currency']
+        fields = ['model_type','name','description','user', 'currency']
     
     def save(self, commit=True):
         transaction = super().save(commit)
@@ -80,21 +88,31 @@ class UserBusinessModelForm(forms.ModelForm):
 
 
 
-class UserModelFormUpdate(forms.ModelForm): 
+class UserModelFormUpdate(forms.ModelForm):
+    description = forms.CharField(
+            help_text=" Describe the description",#text to help
+            widget=forms.Textarea( attrs={
+            'cols'          : "30", #size
+            'rows'          : "4", #size
+            'placeholder'   : 'write your model description', 
+            'style'         : 'resize : none' 
+            }), required=False)
+ 
      
     def __init__(self, *args, **kwargs):
         super(UserModelFormUpdate,self).__init__(*args, **kwargs)
        
        
         #self.fields['user'].widget.attrs['readonly']=True   
-        print(self.fields['user'])    
+        #print(self.fields['user'])    
         # self.fields['user'].disabled=True
         # if not self.check_if_premium_user():
         #     self.fields['simulation_run'].widget.attrs['readonly']=True
 
     class Meta:
         model = UserModel
-        fields = ['name','model_type', 'currency','simulation_iterations',  'user', 'simulation_run', 'npv_bin_size']
+        fields = ['name','description', 'model_type', 'currency', 
+                 'simulation_iterations',  'user', 'simulation_run', 'npv_bin_size', 'total_params']
     
     def clean_simulation_iterations(self):
         simulation_iterations = self.cleaned_data['simulation_iterations']
@@ -149,12 +167,12 @@ class UserModelFormUpdate(forms.ModelForm):
 class TimingAssumptionForm(forms.ModelForm):
  
     
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(TimingAssumptionForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
-        #self.fields['usermodel'].disabled=True   
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(TimingAssumptionForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
+    #     #self.fields['usermodel'].disabled=True   
     class Meta:
         model = TimingAssumption
         fields = ['usermodel','base_period','construction_start_year','construction_len',
@@ -162,20 +180,14 @@ class TimingAssumptionForm(forms.ModelForm):
         'operation_end','number_of_months_in_a_year']
 
 
-
-    def save(self, commit=True):
-        transaction = super().save(commit)
-        
-        return transaction
-    
    
 class TimingAssumptionFormUpdate(forms.ModelForm):
    
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(TimingAssumptionFormUpdate,self).__init__(*args, **kwargs)
-        if user:
-            pass
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(TimingAssumptionFormUpdate,self).__init__(*args, **kwargs)
+    #     if user:
+    #         pass
     
     class Meta:
         model = TimingAssumption
@@ -185,20 +197,15 @@ class TimingAssumptionFormUpdate(forms.ModelForm):
   
   
   
-    def save(self, commit=True):
-        transaction = super().save(commit)
-        
-        return transaction
-   
 
 
 class PricesForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(PricesForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(PricesForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
         #self.fields['usermodel'].disabled=True    
     class Meta:
         model = Prices
@@ -206,12 +213,12 @@ class PricesForm(forms.ModelForm):
 
 class DepreciationForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(DepreciationForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
-        #self.fields['usermodel'].disabled=True    
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(DepreciationForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
+    #     #self.fields['usermodel'].disabled=True    
     class Meta:
         model = Depreciation
         fields = ['usermodel','economic_life_of_machinery',
@@ -222,39 +229,39 @@ class DepreciationForm(forms.ModelForm):
 
 class TaxesForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(TaxesForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
-        #self.fields['usermodel'].disabled=True    
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(TaxesForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
+    #     #self.fields['usermodel'].disabled=True    
     class Meta:
         model = Taxes
         fields = ['usermodel','import_duty',
         'sales_tax','corporate_income_tax']
 class FinancingForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(FinancingForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
-        #self.fields['usermodel'].disabled=True    
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(FinancingForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
+    #     #self.fields['usermodel'].disabled=True    
     class Meta:
         model = Financing
         fields = ['usermodel','real_interest_rate', 'risk_premium',
-                  'num_of_installments','grace_period',  'repayment_starts','equity','senior_debt']
+                  'num_of_installments','grace_period',  'equity','senior_debt']
 
 
 
 class WorkingCapitalForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(WorkingCapitalForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
-        #self.fields['usermodel'].disabled=True    
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(WorkingCapitalForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
+    #     #self.fields['usermodel'].disabled=True    
     class Meta:
         model = WorkingCapital
         fields = ['usermodel','accounts_receivable', 'accounts_payable', 'cash_balance']
@@ -262,12 +269,12 @@ class WorkingCapitalForm(forms.ModelForm):
 
 class MacroeconomicParametersForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super(MacroeconomicParametersForm,self).__init__(*args, **kwargs)
-         # # in case no initial arumenr
-        self.fields['usermodel'].widget.attrs['readonly']=True
-        #self.fields['usermodel'].disabled=True    
+    # def __init__(self, user=None, *args, **kwargs):
+    #     self.request = kwargs.pop('request', None)
+    #     super(MacroeconomicParametersForm,self).__init__(*args, **kwargs)
+    #      # # in case no initial arumenr
+    #     self.fields['usermodel'].widget.attrs['readonly']=True
+    #     #self.fields['usermodel'].disabled=True    
     class Meta:
         model = MacroeconomicParameters
         fields = ['usermodel','discount_rate_equity', 'domestic_inflation_rate', 'us_inflation_rate',

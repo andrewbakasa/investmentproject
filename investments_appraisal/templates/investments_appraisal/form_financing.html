@@ -1,15 +1,5 @@
 {% load widget_tweaks %}
 
-<!-- <div class="form-row">
-  <div class="form-group col-md-6">
-    <label for="inputEmail4">Email</label>
-    <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
-  </div>
-  <div class="form-group col-md-6">
-    <label for="inputPassword4">Password</label>
-    <input type="password" class="form-control" id="inputPassword4" placeholder="Password">
-  </div>
-</div> -->
 
 <div class="form-group row">
     <div class="col-sm-5  {% if financing_form.usermodel.errors %} has-error{% endif %}" style="display:none">
@@ -23,7 +13,7 @@
 <div class="form-group row"> 
     <label class="col-sm-7 col-form-label" for="{{ financing_form.real_interest_rate.id_for_label }}">{{ financing_form.real_interest_rate.label }}</label>
     <div class="col-sm-5  {% if financing_form.real_interest_rate.errors %} has-error{% endif %}">
-      {{ financing_form.real_interest_rate|add_class:"form-control" }}
+      {{ financing_form.real_interest_rate|add_class:"form-control change-financing" }}
       {% for error in financing_form.real_interest_rate.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -33,7 +23,7 @@
 <div class="form-group row">
     <label class="col-sm-7 col-form-label" for="{{ financing_form.risk_premium.id_for_label }}">{{ financing_form.risk_premium.label }}</label>
     <div class="col-sm-5  {% if financing_form.risk_premium.errors %} has-error{% endif %}">
-      {{ financing_form.risk_premium|add_class:"form-control" }}
+      {{ financing_form.risk_premium|add_class:"form-control change-financing" }}
       {% for error in financing_form.risk_premium.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -43,7 +33,7 @@
 <div class="form-group row">
     <label class="col-sm-7 col-form-label" for="{{ financing_form.num_of_installments.id_for_label }}">{{ financing_form.num_of_installments.label }}</label>
     <div class="col-sm-5  {% if financing_form.num_of_installments.errors %} has-error{% endif %}">
-      {{ financing_form.num_of_installments|add_class:"form-control" }}
+      {{ financing_form.num_of_installments|add_class:"form-control change-financing" }}
       {% for error in financing_form.num_of_installments.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -53,7 +43,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ financing_form.grace_period.id_for_label }}">{{ financing_form.grace_period.label }}</label>
   <div class="col-sm-5  {% if financing_form.grace_period.errors %} has-error{% endif %}">
-    {{ financing_form.grace_period|add_class:"form-control" }}
+    {{ financing_form.grace_period|add_class:"form-control change-financing" }}
     {% for error in financing_form.grace_period.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -61,21 +51,12 @@
 </div>
 
 
-<div class="form-group row">
-  <label class="col-sm-7 col-form-label" for="{{ financing_form.repayment_starts.id_for_label }}">{{ financing_form.repayment_starts.label }}</label>
-  <div class="col-sm-5  {% if financing_form.repayment_starts.errors %} has-error{% endif %}">
-    {{ financing_form.repayment_starts|add_class:"form-control" }}
-    {% for error in financing_form.repayment_starts.errors %}
-    <span class="help-block">{{ error }}</span>
-    {% endfor %}
-  </div>
-</div>
 
 
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ financing_form.equity.id_for_label }}">{{ financing_form.equity.label }}</label>
   <div class="col-sm-5  {% if financing_form.equity.errors %} has-error{% endif %}">
-    {{ financing_form.equity|add_class:"form-control" }}
+    {{ financing_form.equity|add_class:"form-control change-financing" }}
     {% for error in financing_form.equity.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -85,7 +66,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ financing_form.senior_debt.id_for_label }}">{{ financing_form.senior_debt.label }}</label>
   <div class="col-sm-5  {% if financing_form.senior_debt.errors %} has-error{% endif %}">
-    {{ financing_form.senior_debt|add_class:"form-control" }}
+    {{ financing_form.senior_debt|add_class:"form-control change-financing" }}
     {% for error in financing_form.senior_debt.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}

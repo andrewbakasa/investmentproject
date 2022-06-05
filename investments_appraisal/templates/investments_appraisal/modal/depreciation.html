@@ -1,38 +1,42 @@
- <!-- modal Add modal_add_model_depreciation -->
- <div class="modal fade" id="modal_add_model_depreciation" tabindex="-1" role="dialog"
- aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
- <div class="modal-dialog" role="document">
-         <div class="modal-content">
-             <!--Header-->
-             <div class="modal-header">
-                 <h4 class="modal-title" id="depreciation_label"> {% if depreciation_record %} Edit {% else %}  Add {% endif %} depreciation: {{usermodel.name | truncatechars:15}} </h4>
-                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <span aria-hidden="true">×</span>
-                 </button>
-             </div>
-             <!--Body-->
-             <div class="modal-body">
-
-                         
-                <form method="POST" id='form-depreciation'
-                    {% if depreciation_record %} class="model-depreciation-edit form-horizontal" data-url="{% url 'edit_model_depreciation_ajax' usermodel.id depreciation_record.id %}" 
-                    {% else %}  class="model-depreciation-add form-horizontal"   data-url="{% url 'add_model_depreciation_ajax' usermodel.id %}" 
-                
-                    {% endif %} > 
-                    {% csrf_token %}
-
-                    {% include 'investments_appraisal/form_depreciation.html' %}
-
-             </div> 
-            <!--Footer-->
-            <div class="modal-footer">
-                <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
-                    type="reset">Close
-                </button>  
-                <button class="btn btn-danger" type="submit" id ="submit_depreciation">Save</button>
-            
-            </div>
-            </form>
+ 
+ 
+  
+       {% load i18n %}
+       {% load static %}
+       {% load tags %}
+       {% load humanize %}
+       {% load widget_tweaks %}
+       
+       
+       <div class="modal-header">
+           <h4 class="modal-title myModalLabel">Add Depreciation [{{usermodel| truncatechars:15}}]</h4>
+           <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+             <span aria-hidden="true">×</span>
+           </button>       
+       </div>
+       
+       <div class="modal-body">
+           <form id='depreciation' class="model-form-edit model-depreciation-add form-horizontal" 
+             enctype="multipart/form-data" method="post" data-url="{% url 'add_model_depreciation_ajax2' usermodel.id %}">
+             {% csrf_token %}
+             
+               <div class="modal-body">
+       
+       
+                   {% include 'investments_appraisal/form_depreciation.html' %}      
+                   <div class="form-error2 public_toggle_form-errors" style='display:none'>
+                   </div>
+               </div>
+       
+         <!--Footer-->
+         <div class="modal-footer">
+           <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+               type="reset">Close
+           </button>
+           <button class="btn btn-danger" type="submit">Save</button>
+       
+           
          </div>
- </div>
-</div>
+       </form>
+           
+  

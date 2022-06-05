@@ -1,3 +1,9 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
 <div class="box box-profile">
     <div class="box-body" id='timing_assumptions_section'>
         <h4 class="box-title" style="color:blue">Timing Assumptions Details</h4>
@@ -47,12 +53,19 @@
                     </table>
                 </div>
 
-                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                data-target="#modal_add_model_timing_assumptions"> <i class="fa fa-edit"></i></a>
+                 <!-- EDIT MODEL -->
+                <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model_timing_assumptions_ajax' ta_record.id %}" 
+                  data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                  title='Edit Timing Assumptions'><i  class="fas fa-edit"></i>
+                </a>
+
+                       
             {% else %}
-                <!-- Add For First Time -->
-                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                data-target="#modal_add_model_timing_assumptions"> <i class="fa fa-plus"></i></a>
+               
+                <a class="model-edit show-form-update" href="#" data-url="{% url 'add_model_timing_assumptions_ajax2' usermodel.id %}" 
+                    data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                    title='Add Timing Assumptions'><i  class="fas fa-plus"></i>
+                </a>
             {% endif%}
         </div>
     </div>

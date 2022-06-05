@@ -40,7 +40,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.exchange_rate.id_for_label }}">{{ macroeconomicparameters_form.exchange_rate.label }}</label>
   <div class="col-sm-4 {% if macroeconomicparameters_form.exchange_rate.errors %} has-error{% endif %}">
-    {{ macroeconomicparameters_form.exchange_rate|add_class:"form-control" }}
+    {{ macroeconomicparameters_form.exchange_rate|add_class:"form-control change-positivenumber" }}
     {% for error in macroeconomicparameters_form.exchange_rate.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -50,7 +50,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.dividend_payout_ratio.id_for_label }}">{{ macroeconomicparameters_form.dividend_payout_ratio.label }}</label>
   <div class="col-sm-4 {% if macroeconomicparameters_form.dividend_payout_ratio.errors %} has-error{% endif %}">
-    {{ macroeconomicparameters_form.dividend_payout_ratio|add_class:"form-control" }}
+    {{ macroeconomicparameters_form.dividend_payout_ratio|add_class:"form-control change-percent" }}
     {% for error in macroeconomicparameters_form.dividend_payout_ratio.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -59,7 +59,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.num_of_shares.id_for_label }}">{{ macroeconomicparameters_form.num_of_shares.label }}</label>
   <div class="col-sm-4 {% if macroeconomicparameters_form.num_of_shares.errors %} has-error{% endif %}">
-    {{ macroeconomicparameters_form.num_of_shares|add_class:"form-control" }}
+    {{ macroeconomicparameters_form.num_of_shares|add_class:"form-control change-positiveinteger" }}
     {% for error in macroeconomicparameters_form.num_of_shares.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -69,7 +69,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ macroeconomicparameters_form.investment_costs_over_run_factor.id_for_label }}">{{ macroeconomicparameters_form.investment_costs_over_run_factor.label }}</label>
   <div class="col-sm-4 {% if macroeconomicparameters_form.investment_costs_over_run_factor.errors %} has-error{% endif %}">
-    {{ macroeconomicparameters_form.investment_costs_over_run_factor|add_class:"form-control" }}
+    {{ macroeconomicparameters_form.investment_costs_over_run_factor|add_class:"form-control change-positivenumber" }}
     {% for error in macroeconomicparameters_form.investment_costs_over_run_factor.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}

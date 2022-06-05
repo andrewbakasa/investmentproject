@@ -99,7 +99,7 @@ class UserInvestmentForm(forms.ModelForm):
     
     class Meta:
         model = Investment
-        fields = ['name','description','category', 'total_value','creater', 'tags' ]
+        fields = ['name','description','category', 'total_value','creater', 'tags', 'public' ]
        
    
     def save(self, commit=True):
@@ -131,7 +131,7 @@ class UserInvestmentFormUpdate(forms.ModelForm):
 
     class Meta:
         model = Investment
-        fields = ['name','description','category', 'total_value', 'tags']
+        fields = ['name','description','category', 'total_value', 'tags', 'public']
   
 
 

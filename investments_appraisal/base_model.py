@@ -22,15 +22,6 @@ import numpy as np
 import numpy_financial as npf
 
 class BaseModel():
-    #_get_number_formats_= {'PERCENT':'0%', 'NUMBER':'GENERAL','YEARS':'GENERAL','YEAR':'GENERAL', 'BLANK': 'GENERAL'}
-    # Track all input for cell formulae refrences
-    
-    # Model specifications Removed
-
-  
-    # TIMING ASSUMPTIONS
-    #timing_assumptions  removed
-    
   
    #Flags
     flags = {
@@ -44,8 +35,6 @@ class BaseModel():
     }
     
     myworboook = None
-    #Costs (Real)					
-    
     
 
     def update(self, param_dict):
@@ -78,7 +67,9 @@ class BaseModel():
 
         if description_font2 is not None:
             self.description_font2= description_font2
-        
+        #add i think this will work
+        self.financing['repayment_starts']['value']=self.timing_assumptions['base_period']['value'] + self.financing['grace_period']['value']
+     
         #initial calculate this values
         #self._cal_metrix()--- removed to be implemented inside derived class
     def __str__(self):
@@ -174,13 +165,18 @@ class BaseModel():
        
         return list_, index_of_base_value,index_npv_zero
     def _get_loan_principal_repayment_bounds(self,):
+        # -    1   1   1   1  1   -   -   -
+        #     
         found_lb= False
         lbound= None
         ubound= None
         
         base_period= int(self.timing_assumptions['base_period']['value'])
-        vara =   int(self.financing['repayment_starts']['value'])
-        varb =  int(self.financing['repayment_starts']['value']) + int(self.financing['num_of_installments']['value'])  - int(self.financing['grace_period']['value'])-1
+        #vara =   int(self.financing['repayment_starts']['value'])
+        repayment_starts=self.timing_assumptions['base_period']['value'] + self.financing['grace_period']['value']
+        vara =   int(repayment_starts)
+      
+        varb =  int(repayment_starts) + int(self.financing['num_of_installments']['value'])  -1
         operation_end= int(self.timing_assumptions['operation_end']['value'])
         
         list_ =[]
@@ -231,16 +227,19 @@ class BaseModel():
       
       
     def _metric_workingCapital(self):
+        #problematic.......
        
 
         #Accounts receivable [% of Gross Sales]
         arogs_list= [x*self.accounts_receivable for x in self.gsr_list]
         setattr(self, 'arogs_list', self.clean_inf_array(arogs_list))
+        #print('arogs_list',arogs_list)
      
         #Acccounts payable (% of total input cost)
         apotic_list= [x*self.accounts_payable for x in self.tic_n_list]
         setattr(self, 'apotic_list', self.clean_inf_array(apotic_list))
-     
+        #print('apotic_list',apotic_list)
+
         #Cash balance  (% of gross sales)
         cbogs_list= [x*self.cash_balance for x in self.gsr_list]
         setattr(self, 'cbogs_list', self.clean_inf_array(cbogs_list))
@@ -252,7 +251,7 @@ class BaseModel():
         #Change in A/P
         ciap_list= list(self._accumulate_change_in(self.apotic_list))
         setattr(self, 'ciap_list', self.clean_inf_array(ciap_list))
-        
+        #print('ciap_list',ciap_list)
         #Change in cash balance
         cicb_list= list(self._accumulate_change_in_CB(self.cbogs_list))
         setattr(self, 'cicb_list', self.clean_inf_array(cicb_list))
@@ -274,10 +273,19 @@ class BaseModel():
                                     self.discount_rate_equity))
         setattr(self, 'nominal_interest_rate_lc_list', self.clean_inf_array(nominal_interest_rate_lc_list))
 
-        upper_bound= (self.repayment_starts + self.num_of_installments - self.grace_period-1)
+        #upper_bound= (self.repayment_starts + self.num_of_installments - self.grace_period-1)
+        upper_bound= (self.repayment_starts + self.num_of_installments -1)
         #upper bound questionable effect of grace period..........
 
-        loan_principal_repayment_flag_list=[0 if x < self.start_year or x > upper_bound else 1 for x in self.tp_list]#dynamic later
+        # print('self.repayment_starts',self.repayment_starts)
+        # print('upper_bound',upper_bound)
+        # print(f'range allowed : {self.start_year} <====> {upper_bound}')
+        #ERROR SOLVED????? 22 May 2022 1805HR: Raining and cold, programming in blanked @ 08 Mopani Road morningside Mutare
+        # relaced start year with repayment_starts
+        loan_principal_repayment_flag_list=[0 if x < self.repayment_starts or x > upper_bound else 1 for x in self.tp_list]#dynamic later
+        # print('time period',self.tp_list)
+        # print('loan repayment',loan_principal_repayment_flag_list)
+
         setattr(self, 'loan_principal_repayment_flag_list', loan_principal_repayment_flag_list)
         
         construction_period_flag_list=[0 if x > self.construction_year_end  else 1 for x in self.tp_list]#dynamic later
@@ -343,6 +351,8 @@ class BaseModel():
 		# 	Total Loan Repayment as an outflow in Local Currency
         total_loan_repayment_ouflow_lc_list=[x for x in self.total_loan_repayment_list]
         setattr(self, 'total_loan_repayment_ouflow_lc_list', total_loan_repayment_ouflow_lc_list)
+        #print('total_loan_repayment_ouflow_lc_list',total_loan_repayment_ouflow_lc_list)
+        
         # 	Construction period flag
 		# 	Operating period
 		# 	Interest during Construction, Capitalized for Tax Purposes
@@ -496,14 +506,26 @@ class BaseModel():
         and expected future cashflows. In this case, the value of the initial cashflow 
         is zero and the initial investment is later added to the future cashflows net present value:
         """
+       
         cashflows= cashflows_in.copy()
-        initial_cashflow = cashflows[0]
+        #cashflows=[round(i,1)  for i in  cashflows]
+        initial_cashflow = cashflows[0]#.copy()
         cashflows[0] = 0
-        npv_ =np.round(npf.npv(rate_, cashflows) + initial_cashflow, 5)
+        # if abs(rate_-.12) <.001:
+        #     print('-------------------------rateCF----------------------------')
+        #     print(rate_,initial_cashflow, cashflows)
+        npv_ =np.round(npf.npv(rate_, cashflows) + initial_cashflow, 1)
         return npv_
     def _get_loan_period_bounds(self):
+        # loan bounds has flout with error from wtong user input correct here
+        # or make sure user inputs correct values
+        #print('reapymet: ' , self.loan_principal_repayment_flag_list)
+        # get the first 1 index:
         i= self.loan_principal_repayment_flag_list.index(1)
+        #after first pint 
+        #----0 0 0 0 1 1 1 1 1 0 0 0 0
         j= self.loan_principal_repayment_flag_list.index(0,i)
+
         return i, j-1
                  
    
@@ -539,6 +561,18 @@ class BaseModel():
         for p in range (i,j):
             sum_ += list_[p]
         return sum_
+    
+   
+    def _accumulate_harvesting(self,list_, operations_list):
+        next_value =0
+        for i in range(len(list_)):
+            item = list_[i]
+            next_value= self.clean_inf_array(next_value) + self.clean_inf_array(item)
+            #if opertion has strted calcultea
+            if sum(operations_list[:i+1])>0:
+                yield next_value
+            else:
+                yield 0
 
     def _accumulate_addition(self,list_):
         next_value =0

@@ -11,7 +11,7 @@
 <div class="form-group row"> 
     <label class="col-sm-7 col-form-label" for="{{ prices_form.title.id_for_label }}">{{ prices_form.title.label }}</label>
     <div class="col-sm-4 {% if prices_form.title.errors %} has-error{% endif %}">
-      {{ prices_form.title|add_class:"form-control" }}
+      {{ prices_form.title|add_class:"form-control change-price" }}
       {% for error in prices_form.title.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -21,7 +21,7 @@
 <div class="form-group row">
     <label class=" col-sm-7 col-form-label" for="{{ prices_form.base_price.id_for_label }}">{{ prices_form.base_price.label }}</label>
     <div class="col-sm-4 {% if prices_form.base_price.errors %} has-error{% endif %}">
-      {{ prices_form.base_price|add_class:"form-control" }}
+      {{ prices_form.base_price|add_class:"form-control change-price" }}
       {% for error in prices_form.base_price.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -31,7 +31,7 @@
 <div class="form-group row">
     <label class="col-sm-7 col-form-label" for="{{ prices_form.change_in_price.id_for_label }}">{{ prices_form.change_in_price.label }}</label>
     <div class="col-sm-4 {% if prices_form.change_in_price.errors %} has-error{% endif %}">
-      {{ prices_form.change_in_price|add_class:"form-control" }}
+      {{ prices_form.change_in_price|add_class:"form-control change-price" }}
       {% for error in prices_form.change_in_price.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}

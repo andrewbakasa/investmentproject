@@ -17,6 +17,7 @@ class BeefBusinessReport(BaseModel):
     
     myworboook = None
     project_title = 'BEEF FARMING OUTPUTS'
+    description= 'BEEF FARMING OUTPUTS'
     #no input from this : to keep value ONLY
     #keep database table of these paramere
     investment_parameter_options ={
@@ -53,7 +54,8 @@ class BeefBusinessReport(BaseModel):
         self.investment_parameter_options = investment_parameter_options
         
         #create sister model that also refer back to this model
-        self.excel_obj = BeefExcelReport(self)	
+        self.excel_obj = BeefExcelReport(self)
+        #setattr(self.excel_obj,'description' ,self.description)	
 
          
         for i in self.cattle_business_options.keys():
@@ -62,7 +64,11 @@ class BeefBusinessReport(BaseModel):
         #initial calculate this values
         self._cal_metrix()
      
-        
+    def _set_model_description(self,user_model_decription):
+         #addition
+        setattr(self.excel_obj,'user_model_decription' ,user_model_decription)
+
+    
     def _set_parameters_simulation(self,num_reps = 10):
         from numpy.random import default_rng
         rg = default_rng(4470)
@@ -72,7 +78,9 @@ class BeefBusinessReport(BaseModel):
 
     
         base_scenario_inputs = {
-            'initial_pens_employed':np.array([50]),
+            """     remove this""" 
+            # 'initial_pens_employed':np.array([50]),
+
             'dressed_weight_at_selling': rg.uniform(0.8*self.dressed_weight_at_selling, get_alternative_sd(self.dressed_weight_at_selling,.3,30), num_reps),
             'cattle_price_per_unit': stats.triang.rvs(loc=.4*self.cattle_price_per_unit,scale= get_alternative_sd(self.cattle_price_per_unit,.9, 20),c=.5,size= num_reps),
             'cattle_survival_rate': stats.triang.rvs(loc=1.-.1,scale=.1,c=1, size= num_reps),# step function with prob
@@ -100,7 +108,7 @@ class BeefBusinessReport(BaseModel):
             'annual_increase_salaries_workers':  rg.uniform(self.annual_increase_salaries_workers, get_alternative_sd(self.annual_increase_salaries_workers,.4,.2), num_reps),
             'annual_increase_salaries_supervisors_technicians':  rg.uniform(self.annual_increase_salaries_supervisors_technicians, get_alternative_sd(self.annual_increase_salaries_supervisors_technicians,.4,.2), num_reps),
             
-            'num_workers_per_supervisor': np.array([5]),      
+            #'num_workers_per_supervisor': np.array([5]),      
         }
         setattr(self, 'base_scenario_inputs', base_scenario_inputs)
 
@@ -165,6 +173,7 @@ class BeefBusinessReport(BaseModel):
 
         #Cattle parameters
         num_feedlots=self.investment_parameter_options['initial_pens_employed'][0] 
+        #print(f'num_feedlots: {num_feedlots}')
         setattr(self, 'initial_pens_employed', num_feedlots)
         fedlot_length_m= self.investment_parameter_options['pen_length'][0]
         setattr(self, 'pen_length', fedlot_length_m)
@@ -197,7 +206,9 @@ class BeefBusinessReport(BaseModel):
         setattr(self, 'risk_premium', risk_premium)
         num_of_installments=self.financing['num_of_installments']['value']
         setattr(self, 'num_of_installments', num_of_installments)
-        repayment_starts=self.financing['repayment_starts']['value']
+
+        #repayment_starts=self.financing['repayment_starts']['value']
+        repayment_starts=self.timing_assumptions['base_period']['value'] + self.financing['grace_period']['value']
         setattr(self, 'repayment_starts', repayment_starts)
         
         grace_period=self.financing['grace_period']['value']
@@ -623,7 +634,10 @@ class BeefBusinessReport(BaseModel):
             #Cattle parameters
             num_feedlots=self.investment_parameter_options['initial_pens_employed'][0] 
             setattr(self, 'initial_pens_employed', num_feedlots)
-            
+            #print(f'num_feedlots: {num_feedlots}')
+        else:
+            num_feedlots=self.investment_parameter_options['initial_pens_employed'][0] 
+            #print(f'2..... num_feedlots: {num_feedlots}')   
         if not hasattr(self, 'pen_length'):    
             fedlot_length_m= self.investment_parameter_options['pen_length'][0]
             setattr(self, 'pen_length', fedlot_length_m)
@@ -670,7 +684,9 @@ class BeefBusinessReport(BaseModel):
             setattr(self, 'num_of_installments', num_of_installments)
 
         if not hasattr(self, 'repayment_starts'):   
-            repayment_starts=self.financing['repayment_starts']['value']
+            #repayment_starts=self.financing['repayment_starts']['value']
+            repayment_starts=self.timing_assumptions['base_period']['value'] + self.financing['grace_period']['value']
+    
             setattr(self, 'repayment_starts', repayment_starts)
             
         if not hasattr(self, 'grace_period'):   
@@ -1057,7 +1073,11 @@ class BeefBusinessReport(BaseModel):
         
      
         #4.a.2 Cumulative pens under Cattle
-        cum_feedlots_list= list(self._accumulate_addition(self.initial_pens_constructed_list))
+        #cum_feedlots_list= list(self._accumulate_addition(self.initial_pens_constructed_list))
+        cum_feedlots_list= list(self._accumulate_harvesting(self.initial_pens_constructed_list, self.op_list))
+        #print('cum_feedlots_list' , cum_feedlots_list)
+        
+
         setattr(self, 'cum_feedlots_list', cum_feedlots_list)
         #print('cum_feedlots_list', cum_feedlots_list)
         
@@ -1083,7 +1103,7 @@ class BeefBusinessReport(BaseModel):
         #4.b. Sales Qnty  
         sales_qnty_list= list(self._accumulate_sales_qnty(self.ci_list, self.prod_qnty_list))
         setattr(self, 'sales_qnty_list', self.clean_inf_array(sales_qnty_list))
-
+        # print('sales_qnty_list', sales_qnty_list)
        
         
         #Real Price of Beef per ton        
@@ -1222,7 +1242,7 @@ class BeefBusinessReport(BaseModel):
         #13 Cash Flow
         self._metric_cashFlow()
   
-    def  _generate_data(self,output):
+    def  _generate_data(self,output,request):
         # Create a workbook
         wb = Workbook()
         self.myworboook = wb
@@ -1231,7 +1251,7 @@ class BeefBusinessReport(BaseModel):
         
         self.excel_obj._write_input_sheet(wb,)
         #correct formating here---------
-        self.excel_obj._write_output_sheet(wb, )
+        self.excel_obj._write_output_sheet(wb, request)
         self.excel_obj._write_sens_sheet(wb, )
        
         self.excel_obj._write_calculation_sheet(wb, )
@@ -1384,10 +1404,20 @@ class BeefBusinessReport(BaseModel):
         for i in params_list:
            if hasattr(self, i ):
                 dict_of_para[i]=getattr(self,i) 
-
+        """  
+        print('....................  input_list  ........................')
+        print(input_list)
+        print('....................  dict_of_para  ........................')
+        print(dict_of_para) 
+        
+        """
         sens_dict = get_data_table_sensitivity_in_parrallel(model_clone,input_list,dict_of_para)
         
-
+        """ 
+        print('....................  sens_dict  ........................')
+        print(sens_dict)
+        
+        """
         setattr(self, 'sens_dict', sens_dict) 
         self.write_sens_data()  
         sens_grad =get_sensitivity_gradient(model_clone,input_list)
@@ -1402,15 +1432,13 @@ class BeefBusinessReport(BaseModel):
         
         return sens_dict
  
-    def spreadsheet(self) :
+    def spreadsheet(self, request) :
         
         if not hasattr(self, 'para_list_by_grad'):
             self._sens_sensitivity_parrallel_generator()
         # Return an excel spreadsheet
         output = BytesIO()
-        self._generate_data(
-            output
-        )
+        self._generate_data(output,request)
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             content=output.getvalue(),
@@ -1707,7 +1735,7 @@ class BeefBusinessReport(BaseModel):
         net_cash_after_tax_after_financing= self.clean_inf_array(net_cash_after_tax_before_financing)+ \
                                             debt_cash_inflow_lc - \
                                             total_loan_repayment_lc
-        # print('net_cash_after_tax_after_financing',net_cash_after_tax_after_financing)
+        #print('net_cash_after_tax_after_financing',net_cash_after_tax_after_financing)
         #----------------------------------------------------------------------------------
 
         #PV Annual Net Cash Flows (NCF)

@@ -38,6 +38,16 @@
 
 {%endblock content%}
 
+{% block modal_divs %}
+    <!-- EDIT DISPLAY HOLDER -->
+    <div class="modal fade" id="modal-usermodel">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+    </div> 
+    
+{% endblock %} 
+
 
 
  <!-- ======= Footer ======= --> 
@@ -52,6 +62,8 @@
     $(document).ready(function (){ 
       // $("#index").removeClass( "active")
       $("#models a").addClass( "active") 
+     /*  if it has this class do somthing....
+      $ ("#models a").hasClass( "active").css("","")*/ 
       console.log('added models active')             
     })
     </script>
@@ -78,10 +90,14 @@
     </style>
     
     <script>
-        var check_url_ajax= "{% url 'check_model_beef' usermodel.id %}"  
+        var check_url_ajax= "{% url 'check_model_beef' usermodel.id %}" 
+        
+         
       </script>
+    <script src="{% static 'basic_ui/js/input-range.js' %}"></script>  
     <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
     <script src="{% static 'basic_ui/js/feedlot.js' %}"></script>
+
 {% endblock %}
 
 

@@ -42,32 +42,54 @@ urlpatterns = [
     #Timing Assumptions
     path('add_model_timing_assumptions_ajax/<int:model_id>/', views.general_page.add_model_timing_assumptions_ajax, name="add_model_timing_assumptions_ajax"),
     path('edit_model_timing_assumptions_ajax/<int:model_id>/<int:ta_id>/', views.general_page.edit_model_timing_assumptions_ajax, name="edit_model_timing_assumptions_ajax"),
+    
+    path('add_model_timing_assumptions_ajax2/<int:model_id>/', views.general_page.add_model_timing_assumptions_ajax2, name="add_model_timing_assumptions_ajax2"),
+
+    path('update_model_timing_assumptions_ajax/<int:ta_id>/', views.general_page.update_model_timing_assumptions_ajax, name="update_model_timing_assumptions_ajax"),
+ 
    
 
    #Model Prices
     path('add_model_prices_ajax/<int:model_id>/', views.general_page.add_model_prices_ajax, name="add_model_prices_ajax"),
     path('edit_model_prices_ajax/<int:model_id>/<int:price_id>/', views.general_page.edit_model_prices_ajax, name="edit_model_prices_ajax"),
-   
+    path('add_model_prices_ajax2/<int:model_id>/', views.general_page.add_model_prices_ajax2, name="add_model_prices_ajax2"),
+    path('update_model_prices_ajax/<int:id>/', views.general_page.update_model_prices_ajax, name="update_model_prices_ajax"),
+
    #Model Depreciation
     path('add_model_depreciation_ajax/<int:model_id>/', views.general_page.add_model_depreciation_ajax, name="add_model_depreciation_ajax"),
     path('edit_model_depreciation_ajax/<int:model_id>/<int:depr_id>/', views.general_page.edit_model_depreciation_ajax, name="edit_model_depreciation_ajax"),
-   
+    path('add_model_depreciation_ajax2/<int:model_id>/', views.general_page.add_model_depreciation_ajax2, name="add_model_depreciation_ajax2"),
+    path('update_model_depreciation_ajax/<int:id>/', views.general_page.update_model_depreciation_ajax, name="update_model_depreciation_ajax"),
+
     #Model Taxes
     path('add_model_taxes_ajax/<int:model_id>/', views.general_page.add_model_taxes_ajax, name="add_model_taxes_ajax"),
     path('edit_model_taxes_ajax/<int:model_id>/<int:taxes_id>/', views.general_page.edit_model_taxes_ajax, name="edit_model_taxes_ajax"),
-   
+    path('add_model_taxes_ajax2/<int:model_id>/', views.general_page.add_model_taxes_ajax2, name="add_model_taxes_ajax2"),
+    path('update_model_taxes_ajax/<int:id>/', views.general_page.update_model_taxes_ajax, name="update_model_taxes_ajax"),
+
+
     #Model Financing
     path('add_model_financing_ajax/', views.general_page.add_model_financing_ajax, name="add_model_financing_ajax"),
     path('edit_model_financing_ajax/<int:id>/', views.general_page.edit_model_financing_ajax, name="edit_model_financing_ajax"),
-   
+    path('add_model_financing_ajax2/<int:model_id>/', views.general_page.add_model_financing_ajax2, name="add_model_financing_ajax2"),
+    path('update_model_financing_ajax/<int:id>/', views.general_page.update_model_financing_ajax, name="update_model_financing_ajax"),
+ 
+
+
     #Model WorkingCapital
     path('add_model_workingcapital_ajax/', views.general_page.add_model_workingcapital_ajax, name="add_model_workingcapital_ajax"),
     path('edit_model_workingcapital_ajax/<int:id>/', views.general_page.edit_model_workingcapital_ajax, name="edit_model_workingcapital_ajax"),
-   
+    path('add_model_working_capital_ajax2/<int:model_id>/', views.general_page.add_model_working_capital_ajax2, name="add_model_working_capital_ajax2"),
+    path('update_model_working_capital_ajax/<int:id>/', views.general_page.update_model_working_capital_ajax, name="update_model_working_capital_ajax"),
+
+
+
     #Model MacroEconomicParameters
     path('add_model_macroeconomicparameters_ajax/', views.general_page.add_model_macroeconomicparameters_ajax, name="add_model_macroeconomicparameters_ajax"),
     path('edit_model_macroeconomicparameters_ajax/<int:id>/', views.general_page.edit_model_macroeconomicparameters_ajax, name="edit_model_macroeconomicparameters_ajax"),
-   
+    path('add_model_macro_economic_parameters_ajax2/<int:model_id>/', views.general_page.add_model_macro_economic_parameters_ajax2, name="add_model_macro_economic_parameters_ajax2"),
+    path('update_model_macro_economic_parameters_ajax/<int:id>/', views.general_page.update_model_macro_economic_parameters_ajax, name="update_model_macro_economic_parameters_ajax"),
+
   
    path('delete_bussiness_model_ajax/<int:model_id>/<int:page_no>/', views.general_page.delete_bussiness_model_ajax, name="delete_bussiness_model"),
    path('delete_comment_ajax/<int:id>/', views.general_page.delete_comment_ajax, name="delete_comment_ajax"),

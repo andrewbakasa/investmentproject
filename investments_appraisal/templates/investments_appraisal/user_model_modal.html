@@ -22,6 +22,17 @@
                 </div>
                 
                 </br>
+
+                <div class="form-group row">
+                  <label class="col-sm-3 col-form-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                  <div class="col-sm-9 {% if form.description.errors %} has-error{% endif %}">
+                    {{ form.description|add_class:"form-control" }}
+                    {% for error in form.description.errors %}
+                    <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+              </br>
                 <div class="form-group row">  
                     <label class="col-sm-3 col-form-label" for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
                     <div class="col-sm-9 {% if form.currency.errors %} has-error{% endif %}">
@@ -69,7 +80,7 @@
                   
                </div>
 
-               <div id="public_toggle_form-errors" class="form-error2 form-group" style='display:none'>
+               <div class="form-error2 public_toggle_form-errors form-group" style='display:none'>
               </div>
             </form>
            

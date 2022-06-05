@@ -18,18 +18,23 @@
                                 <td class="taxesAction taxesData"  name="sales_tax">{{taxes_record.sales_tax}}</td>                                                    
                             </tr>
                             <tr id="taxes-corporate_income_tax" >
-                                <th scope="row">Corporate incometax</th>
+                                <th scope="row">Corporate income tax</th>
                                 <td class="taxesAction taxesData"  name="corporate_income_tax">{{taxes_record.corporate_income_tax}}</td>                                                    
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                  data-target="#modal_add_model_taxes"> <i class="fa fa-edit"></i></a>
+                   <!-- EDIT MODEL -->
+                   <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model_taxes_ajax' taxes_record.id %}" 
+                   data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                   title='Edit Taxes'><i  class="fas fa-edit"></i>
+               </a>
             {% else %}
                 <!-- Add For First Time -->
-                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                data-target="#modal_add_model_taxes"> <i class="fa fa-plus"></i></a>
+                <a class="model-edit show-form-update" href="#" data-url="{% url 'add_model_taxes_ajax2' usermodel.id %}" 
+                        data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                        title='Add Taxes'><i  class="fas fa-plus"></i>
+                    </a>
             {% endif%}
         </div>
     </div>

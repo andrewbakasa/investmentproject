@@ -6,7 +6,7 @@
 
 
 <div class="modal-header">
-    <h4 class="modal-title" id="myModalLabel">Edit Investment [{{usermodel | truncatechars:15}}]</h4>
+    <h4 class="modal-title myModalLabel">Edit Investment [{{usermodel | truncatechars:15}}]</h4>
     <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
       <span aria-hidden="true">×</span>
     </button>       
@@ -67,12 +67,28 @@
                       <span class="help-block">{{ error }}</span>
                       {% endfor %}
                 </div>
-            </div>  
+            </div>
+            
+            <div class="form-group row" >
+              <div class="col-sm-12 ">
+                  <div class="checkbox">
+                    <label class="col-sm-2 col-form-label" for="{{ form.public.id_for_label }}">
+                      {{ form.public.label }}
+                      {{ form.public }}
+                    </label>
+                  </div>
+                
+                  {% for error in form.public.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+              </div>
+            </div>
         </div>
             </br>
          
-      <div id="public_toggle_form-errors" class="form-error2" style='display:none'>
+      <div class="form-error2 public_toggle_form-errors" style='display:none'>
       </div>
+      <label id="investment_contrib" style="color:inherit;"></label>
       </div>
 
   <!--Footer-->

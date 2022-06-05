@@ -45,7 +45,7 @@
   
   <div class="row marl">
     <div class="col-lg-12 text-right">
-      <span class="d-inline"><a class="primary_btn" href="{% url 'common:create_doc' %}"><i class="fa fa-plus"></i> Add
+      <span class="d-inline"><a class="primary_btn" href="{% url 'common:create_doc' %}"><i class="fas fa-plus"></i> Add
           New Document</a></span>
     </div>
   </div>
@@ -188,7 +188,7 @@
                       <div class="actions">
                         {% if request.user == document.created_by or request.user.role == 'ADMIN' or request.user.has_sales_access%}
                         <a href="{% url 'common:view_doc' document.id %}" class="view_icon" title="View"><i
-                            class="fas fa-eye edit_delete_options"></i></a>
+                            class="fas fa-eye" edit_delete_options"></i></a>
                         <a href="{% url 'common:edit_doc' document.id %}" class="edit_icon" title="Edit" ><i
                             class="fas fa-pencil-alt edit_delete_options"></i></a>
                         <a href="{% url 'common:remove_doc' document.id %}" class="delete_icon remove_document" title="Delete" ><i

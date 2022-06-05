@@ -12,7 +12,7 @@ from openpyxl.formula.translate import Translator
 
 from openpyxl.utils import cell
 import math
-from investments_appraisal.base_report import BaseBusinessReport
+#from investments_appraisal.base_report import BaseBusinessReport
 
 
 
@@ -164,7 +164,7 @@ class BeefExcelReport(ExcelReport):
         'dressed_weight_at_selling': {'title': 'Dressed Weight @ selling','value': 211.7 , 'units': 'KG'},
         'num_of_feedlot_targeted_for_construction': {'title': 'No. of feedlot(pens) targeted for construction','value': None, 'units': 'NUMBER'},
         'cum_pens_under_cattle': {'title': 'Cumulative pens under Cattle','value': None , 'units': 'NUMBER'}, 
-        'cum_pens_under_harvesting': {'title': 'Cumulative pens under harvesting','value': None, 'units': 'YEARS'},
+        'cum_pens_under_harvesting': {'title': 'Cumulative pens under harvesting','value': None, 'units': 'NUMBER'},
         'production_quantity': {'title': 'Production Quantity','value': None, 'units': 'TONS'},
         'closing_inventory': {'title': 'Closing Inventory','value': None, 'units': 'TONS'},
         'investment_roll_out_flag': {'title': 'Investment Roll out Flag','value': None, 'units': 'NUMBER'},
@@ -175,10 +175,14 @@ class BeefExcelReport(ExcelReport):
         self.sister_model =modelx
 
     def _add_feedlotDesignParameters_section(self, w_sheet, row_index,total_wsheet_cols):
+
+        #upate user model decription
+        self.sister_model.cattle_business_options['my_option']['description']=self.user_model_decription
+        
         #overide all add tis to class
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Pen/Feedlot Design Parameters' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Pen/Feedlot Design Parameters' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -222,9 +226,11 @@ class BeefExcelReport(ExcelReport):
         #----leave blank for now: update later in Outputs
         self.track_inputs['cattle_business_options']['header']['row'] = row_index
         row_index +=1
+        #------------
+        #update here ..........................
         #-----------------------------------------------------------
         for item in self.sister_model.cattle_business_options.keys():
-            w_sheet.cell('%s%s'%(colHeader, row_index)).value = self.sister_model.cattle_business_options[item]['description']
+            w_sheet['%s%s'%(colHeader, row_index)].value = self.sister_model.cattle_business_options[item]['description']
             w_sheet['%s%s'%(colHeader, row_index)].font = self.description_font
             self.track_inputs['cattle_business_options'][item]['row'] = row_index
             self.track_inputs['cattle_business_options'][item]['heading'] = self.sister_model.cattle_business_options[item]['heading'] 
@@ -239,24 +245,24 @@ class BeefExcelReport(ExcelReport):
        
         return row_index
 
-    def _write_output_sheet(self, wb):
+    def _write_output_sheet(self, wb,request):
         total_wsheet_cols = 17
         #---------------------------Worksheet 1---------------------------
         output_sheet = wb['Outputs']	
         col = get_column_letter(2)
 
         row_index = 2
-        output_sheet.cell('%s%s'%(col, row_index)).value = self.project_title# 'PERI-URBAN CATTLE FARMING OUTPUTS'# dynamic heading
+        output_sheet['%s%s'%(col, row_index)].value = self.project_title# 'PERI-URBAN CATTLE FARMING OUTPUTS'# dynamic heading
         output_sheet['%s%s'%(col, row_index)].style= 'Heading1'
           
         self._set_thick_bottom_border_range( output_sheet,  row_index, 1, total_wsheet_cols)
         
         row_index += 2
-        output_sheet.cell('%s%s'%(col, row_index)).value = 'Scenario Analysis '
+        output_sheet['%s%s'%(col, row_index)].value = 'Scenario Analysis '
         output_sheet['%s%s'%(col, row_index)].style= 'Heading1'
         
         col = get_column_letter(6)
-        output_sheet.cell('%s%s'%(col, row_index)).value = 'Active Scenario'
+        output_sheet['%s%s'%(col, row_index)].value = 'Active Scenario'
         output_sheet['%s%s'%(col, row_index)].alignment = Alignment(horizontal='left', vertical='top',)
         output_sheet['%s%s'%(col, row_index)].font = Font(name='Calibri',bold=False, italic=True, sz=10.0, color='FF0070C0', scheme='minor')
         
@@ -266,8 +272,8 @@ class BeefExcelReport(ExcelReport):
         cell_display_formuale=""
         if self.modelspec_cell_ref:
             cell_display_formuale = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
-        output_sheet.cell('%s%s'%(col, row_index)).value = cell_display_formuale
-        output_sheet.cell('%s%s'%(col, row_index)).style= 'Explanatory Text'
+        output_sheet['%s%s'%(col, row_index)].value = cell_display_formuale
+        output_sheet['%s%s'%(col, row_index)].style= 'Explanatory Text'
 
        
         self._set_thick_bottom_border_range( output_sheet,  row_index, 1, total_wsheet_cols)
@@ -275,6 +281,7 @@ class BeefExcelReport(ExcelReport):
         row_index+=2
         
         #-------------------Data Validation---------------------------
+       
         i=0
         values_ =''
         for item in self.sister_model.cattle_business_options.keys():
@@ -285,8 +292,9 @@ class BeefExcelReport(ExcelReport):
             i+=1
         dv = DataValidation(type="list", formula1='"'+ values_ + '"', allow_blank=True)
         
+        user_name=request.user
         # Optionally set a custom prompt message
-        dv.prompt = 'Please select from the list'
+        dv.prompt = f'{user_name} Please select from the list'
         dv.promptTitle = 'List Selection'
         
         # Add the data-validation object to the worksheet
@@ -311,11 +319,11 @@ class BeefExcelReport(ExcelReport):
 
        
         col = get_column_letter(3)
-        output_sheet.cell('%s%s'%(col, row_index)).value = 'A.'
+        output_sheet['%s%s'%(col, row_index)].value = 'A.'
         output_sheet['%s%s'%(col, row_index)].style= 'Heading3'
 
         col = get_column_letter(4)
-        output_sheet.cell('%s%s'%(col, row_index)).value = 'Alternative Investment Scenario'
+        output_sheet['%s%s'%(col, row_index)].value = 'Alternative Investment Scenario'
         output_sheet['%s%s'%(col, row_index)].style= 'Heading3'
 
         col = get_column_letter(7)
@@ -324,8 +332,8 @@ class BeefExcelReport(ExcelReport):
         cell_display_formuale=""
         if self.modelspec_cell_ref:
             cell_display_formuale = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
-        output_sheet.cell('%s%s'%(col, row_index)).value = cell_display_formuale
-        output_sheet.cell('%s%s'%(col, row_index)).style= 'Explanatory Text'
+        output_sheet['%s%s'%(col, row_index)].value = cell_display_formuale
+        output_sheet['%s%s'%(col, row_index)].style= 'Explanatory Text'
        #------------------
 
         #####################333update input------------------------
@@ -349,7 +357,7 @@ class BeefExcelReport(ExcelReport):
             i+=1
         #---------------------------------------------------------------
          
-        wb["Inputs"].cell('%s%s'%(colHeader, input_row_index)).value = select_val
+        wb["Inputs"]['%s%s'%(colHeader, input_row_index)].value = select_val
         wb["Inputs"]['%s%s'%(colHeader, row_index)].font = self.description_font
         ##########################################3
 
@@ -384,7 +392,7 @@ class BeefExcelReport(ExcelReport):
         #--------User View of Selected Project Option-------------------------------------------------------
         start_row= row_index
         source_row_ =self.track_inputs['cattle_business_options']['header']['row']
-        wb['Outputs'].cell('%s%s'%("I", start_row)).value = '=Inputs!$E$'+ str(source_row_)
+        wb['Outputs']['%s%s'%("I", start_row)].value = '=Inputs!$E$'+ str(source_row_)
         col2_ =column_index_from_string("I")
         wb['Outputs']['I' + str(start_row)].alignment = Alignment(wrap_text=True,vertical='top')
         wb['Outputs']['I' + str(start_row)].font = Font(name='Bookman Old Style',bold=False, sz=20.0, color='FF0070C0', scheme='minor')
@@ -416,6 +424,188 @@ class BeefExcelReport(ExcelReport):
         output_sheet.sheet_view.showGridLines = False
         output_sheet.sheet_view.showRowColHeaders = False
  
+
+    def _write_output_sheet_orginal(self, wb, request):
+        total_wsheet_cols = 17
+        #---------------------------Worksheet 1---------------------------
+        output_sheet = wb['Outputs']	
+        col = get_column_letter(2)
+
+        row_index = 2
+        output_sheet['%s%s'%(col, row_index)].value = self.project_title# 'PERI-URBAN CATTLE FARMING OUTPUTS'# dynamic heading
+        output_sheet['%s%s'%(col, row_index)].style= 'Heading1'
+          
+        self._set_thick_bottom_border_range( output_sheet,  row_index, 1, total_wsheet_cols)
+        
+        row_index += 2
+        output_sheet['%s%s'%(col, row_index)].value = 'Scenario Analysis '
+        output_sheet['%s%s'%(col, row_index)].style= 'Heading1'
+        
+        col = get_column_letter(6)
+        output_sheet['%s%s'%(col, row_index)].value = 'Active Scenario'
+        output_sheet['%s%s'%(col, row_index)].alignment = Alignment(horizontal='left', vertical='top',)
+        output_sheet['%s%s'%(col, row_index)].font = Font(name='Calibri',bold=False, italic=True, sz=10.0, color='FF0070C0', scheme='minor')
+        
+        col = get_column_letter(7)
+        _unit= "NOTE"
+
+        cell_display_formuale=""
+        if self.modelspec_cell_ref:
+            cell_display_formuale = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
+        output_sheet['%s%s'%(col, row_index)].value = cell_display_formuale
+        output_sheet['%s%s'%(col, row_index)].style= 'Explanatory Text'
+
+       
+        self._set_thick_bottom_border_range( output_sheet,  row_index, 1, total_wsheet_cols)
+        col = get_column_letter(1)
+        row_index+=2
+        
+        #-------------------Data Validation---------------------------
+        i=0
+        values_ =''
+        for item in self.sister_model.cattle_business_options.keys():
+            if i ==len(self.sister_model.cattle_business_options.keys())-1:
+                values_ += self.sister_model.cattle_business_options[item]['heading'] 
+            else:
+               values_ += self.sister_model.cattle_business_options[item]['heading'] + ','     
+            i+=1
+        dv = DataValidation(type="list", formula1='"'+ values_ + '"', allow_blank=True)
+        
+        user_name=request.user
+        # Optionally set a custom prompt message
+        dv.prompt = f'{user_name} Please select from the list'
+        dv.promptTitle = 'List Selection'
+        
+        # Add the data-validation object to the worksheet
+        output_sheet.add_data_validation(dv)
+        # Create some cells, and add them to the data-validation object
+        model_sel_row= row_index
+        model_sel_col= "F"
+        model_sel_cell= "$" + model_sel_col + "$" + str(model_sel_row)
+        model_cell = output_sheet[model_sel_cell]
+        self.track_inputs['outputs']['model_selection']['row']= model_sel_row 
+        self.track_inputs['outputs']['model_selection']['col']= model_sel_col
+        self.track_inputs['outputs']['model_selection']['cell']= model_sel_cell
+
+        model_cell.value = values_.split(",")[0]
+        model_cell.fill = PatternFill(fill_type="solid", fgColor="70c4f4")
+        model_cell.font = Font(name='Calibri',bold=True,  scheme='minor', sz=11.0)
+        model_cell.alignment = Alignment(horizontal='left', vertical='top',)
+        dv.add(model_cell)
+        
+       
+       #----switch
+
+       
+        col = get_column_letter(3)
+        output_sheet['%s%s'%(col, row_index)].value = 'A.'
+        output_sheet['%s%s'%(col, row_index)].style= 'Heading3'
+
+        col = get_column_letter(4)
+        output_sheet['%s%s'%(col, row_index)].value = 'Alternative Investment Scenario'
+        output_sheet['%s%s'%(col, row_index)].style= 'Heading3'
+
+        col = get_column_letter(7)
+        _unit= "SWITCH"
+
+        cell_display_formuale=""
+        if self.modelspec_cell_ref:
+            cell_display_formuale = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
+        output_sheet['%s%s'%(col, row_index)].value = cell_display_formuale
+        output_sheet['%s%s'%(col, row_index)].style= 'Explanatory Text'
+       #------------------
+
+        #####################333update input------------------------
+        colHeader = get_column_letter(5)
+        select_val ="="
+        list_= self.sister_model.cattle_business_options.keys()
+        #print(list_)
+        closin_brackets=''
+        for  i in range(len(list_)-1):
+            closin_brackets+=')'
+
+        i = 0
+        input_row_index= self.track_inputs['cattle_business_options']['header']['row']
+        for item in list_:
+            #item =list_[i]
+            if i ==len(list_)-1:
+                select_val += colHeader + str(input_row_index +i+1) + closin_brackets
+            else:
+                cell_x= model_sel_cell
+                select_val += 'IF(Outputs!' + cell_x + '="'+ self.sister_model.cattle_business_options[item]['heading'] +'",' + colHeader + str(input_row_index +i+1) + ','
+            i+=1
+        #---------------------------------------------------------------
+         
+        wb["Inputs"]['%s%s'%(colHeader, row_index)].value = select_val
+        wb["Inputs"]['%s%s'%(colHeader, row_index)].font = self.description_font
+        ##########################################3
+
+
+      
+        row_index+=2
+
+        self._hide_empty_cells( output_sheet)
+        #--set dim---
+        rangelist= []
+        rangelist.append({'start':1, 'end': total_wsheet_cols, 'dim':10})
+        rangelist.append({'start':1, 'end': 2 , 'dim':5})
+        rangelist.append({'start':2, 'end': 5, 'dim':2})
+        #rangelist.append({'start':2, 'end': 3, 'dim':5})
+
+        indexlist= []
+        #indexlist.append({'index':margin_offset+1, 'dim':5})
+        indexlist.append({'index':5, 'dim':55})
+        indexlist.append({'index':6, 'dim':30})
+        indexlist.append({'index':7, 'dim':15})
+
+        #set dims----
+        self._set_column_dim(output_sheet,rangelist,indexlist)
+        #------------------------------------
+        start_row = row_index
+        #end_row = start_row +10
+        
+        # ------------Financial Section------------------ 
+        end_row =self._add_output_financial(output_sheet, row_index)
+        self._output_bordered_section(output_sheet,"B","H",start_row, end_row,'Financial Analysis Output',)
+        
+        #--------User View of Selected Project Option-------------------------------------------------------
+        start_row= row_index
+        source_row_ =self.track_inputs['cattle_business_options']['header']['row']
+        wb['Outputs']['%s%s'%("I", start_row)].value = '=Inputs!$E$'+ str(source_row_)
+        col2_ =column_index_from_string("I")
+        wb['Outputs']['I' + str(start_row)].alignment = Alignment(wrap_text=True,vertical='top')
+        wb['Outputs']['I' + str(start_row)].font = Font(name='Bookman Old Style',bold=False, sz=20.0, color='FF0070C0', scheme='minor')
+        
+
+        #description of selected project
+        wb['Outputs'].merge_cells(start_row=start_row, start_column=col2_, end_row=end_row, end_column=col2_ + 6)
+        #----------------------------------------------------------------- 
+       
+              
+        start_row = end_row + 2
+        #end_row = start_row +4
+        row_index = start_row
+        # ------------Funding Section------------------ 
+        end_row =self._add_output_funding(output_sheet, row_index)
+        self._output_bordered_section(output_sheet,"B","H",start_row,end_row,'Funding','Heading1','Accent1')
+        # ------------------------------Write cell------------------ 
+
+        start_row = end_row + 2
+        #end_row = start_row +4
+        row_index = start_row
+        # ------------General Section------------------ 
+        end_row =self._add_output_general(output_sheet, row_index)
+        self._output_bordered_section(output_sheet,"B","H",start_row,end_row,'General','Heading1','Accent1')
+        # ------------------------------Write cell------------------ 
+
+        #self._remove_borders(output_sheet)
+        # remove gridlines
+        output_sheet.sheet_view.showGridLines = False
+        output_sheet.sheet_view.showRowColHeaders = False
+ 
+
+
+
     def _get_investment_paramater_formulae(self, input_row_index):
 
         # retrive model values
@@ -504,7 +694,7 @@ class BeefExcelReport(ExcelReport):
         user='Andrew'
         # Writing the first row of the csv	
         col = get_column_letter(1)
-        input_sheet.cell('%s%s'%(col, 1)).value = 'Input Sheet ' #% (user)
+        input_sheet['%s%s'%(col, 1)].value = 'Input Sheet ' #% (user)
         input_sheet['%s%s'%(col, 1)].style= 'Heading1'
     
 
@@ -644,7 +834,7 @@ class BeefExcelReport(ExcelReport):
                {'title':"Senior Debt",               "track_input_item": "sens_senior_debt",           'base_val':self.sister_model.senior_debt,            'number_format':"PERCENT"},
                {'title':"Cattle Survival rate",      "track_input_item": "sens_cattle_survival_rate" , 'base_val':self.sister_model.cattle_survival_rate,   'number_format':"PERCENT"},
                
-               {'title':"Cattle Feed Price per kg",      "track_input_item": "sens_cattle_feed_price_per_kg" , 'base_val':self.sister_model.cattle_feed_price_per_kg,   'number_format':"NUMBER"},
+               {'title':"Cattle Feed Price per kg",      "track_input_item": "sens_cattle_feed_price_per_kg" , 'base_val':self.sister_model.cattle_feed_price_per_kg,   'number_format':"SMALL_NUMBER"},
                
                {'title':"Us Inflation rate",         "track_input_item": "sens_us_inflation_rate",     'base_val':self.sister_model.us_inflation_rate,      'number_format':"PERCENT"},
 
@@ -661,12 +851,12 @@ class BeefExcelReport(ExcelReport):
                {'title':"Annual Change in price of Imported inputs", "track_input_item":  "sens_annual_change_in_price_of_imported_inputs", 'base_val':self.sister_model.annual_change_in_price_of_imported_inputs, 'number_format':"PERCENT"},
           
        
-               {'title':"Monthly wage per worker",                    "track_input_item":  "sens_monthly_wage_per_worker",            'base_val':self.sister_model.monthly_wage_per_worker,            'number_format':"NUMBER"},
-               {'title':"Monthly wage per supervisor",                "track_input_item":    "sens_monthly_wage_per_supervisor",               'base_val':self.sister_model.monthly_wage_per_supervisor,               'number_format':"NUMBER"},
+               {'title':"Monthly wage per worker",                    "track_input_item":  "sens_monthly_wage_per_worker",            'base_val':self.sister_model.monthly_wage_per_worker,            'number_format':"SMALL_NUMBER"},
+               {'title':"Monthly wage per supervisor",                "track_input_item":    "sens_monthly_wage_per_supervisor",               'base_val':self.sister_model.monthly_wage_per_supervisor,               'number_format':"SMALL_NUMBER"},
                {'title':"Annual increase salaries workers",             "track_input_item":  "sens_annual_increase_salaries_workers",                   'base_val':self.sister_model.annual_increase_salaries_workers,                   'number_format':"PERCENT"},
                {'title':"Annual increase salaries Supervisors and Technicians", "track_input_item":  "sens_annual_increase_salaries_supervisors_technicians", 'base_val':self.sister_model.annual_increase_salaries_supervisors_technicians, 'number_format':"PERCENT"},
                {'title':"Number of workers per Supervisor", "track_input_item":  "sens_num_workers_per_supervisor", 'base_val':self.sister_model.num_workers_per_supervisor, 'number_format':"INTEGER"},
-               {'title':"Investments Cost Overun", "track_input_item":  "sens_inv_cost_over_run", 'base_val':self.sister_model.inv_cost_over_run, 'number_format':"NUMBER"},
+               {'title':"Investments Cost Overun", "track_input_item":  "sens_inv_cost_over_run", 'base_val':self.sister_model.inv_cost_over_run, 'number_format':"SMALL_NUMBER"},
            
             
             ] 
@@ -704,7 +894,12 @@ class BeefExcelReport(ExcelReport):
                     number_format ='0.0%'
                 elif item['number_format']=="NUMBER":
                     #decimal
+
                     number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                elif item['number_format']=="SMALL_NUMBER":
+                    #decimal
+                    
+                    number_format ='_(* #,##0.0##_);_(* \(#,##0.0##\);_(* "-"??_);_(@_)'
                 elif item['number_format']=="INTEGER":
                     #integer---
                     number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
@@ -718,40 +913,63 @@ class BeefExcelReport(ExcelReport):
                                      header_title,  item['track_input_item'],list_,indexof_base, indexof_npv_zero, number_format)
   
     def _populate_productionInventory_section(self, w_sheet, item ):
-
+                 
         if item=='num_of_feedlot_targeted_for_construction':
             r_index, c_index, found_state= self._retrieve_cell_row_colm('production_inventory','num_of_feedlot_targeted_for_construction')
             if found_state:
                 span_ =self._get_span()
-                start_col_index = 9
-                first_slice_point = get_column_letter(start_col_index +1) + str(r_index)# skipp first col
-                second_slice_point = get_column_letter(start_col_index + int(span_)) + str(r_index) # D39
-                
-
                 if 'sens' in self.track_inputs:
                     if 'initial_pens_employed' in self.track_inputs['sens']:
                         _row = self.track_inputs['sens']['initial_pens_employed']['row'] 
                         _col = self.track_inputs['sens']['initial_pens_employed']['col']
                         col = get_column_letter(_col)
-                        w_sheet.cell('%s%s'%(get_column_letter(start_col_index), r_index)).value = "=Sens!$" + col + "$" + str(_row)
-                        w_sheet.cell('%s%s'%(get_column_letter(start_col_index), r_index)).style = 'Linkedcell'
+                        sens_val= "Sens!$" + col + "$" + str(_row)
+                #bbbbbbbbbbb          
+                r_index2, _, found_state2= self._retrieve_cell_row_colm('flags','OP')
+                if found_state2:
+                    #start at one less writing columns
+                    startpoint = '$'+ get_column_letter(8) + '$'+ str(r_index2)# D07
+                 
+                    start_col_index = 9
+                    first_slice_point = get_column_letter(start_col_index+1) + str(r_index)
+                    second_slice_point = get_column_letter(start_col_index +1 + int(span_)) + str(r_index) # D39
+
+                    #--------------------------------
+                    w_sheet['%s%s'%(get_column_letter(start_col_index), r_index)].value ='=' + sens_val  
+                    w_sheet['%s%s'%(get_column_letter(start_col_index), r_index)].style = 'Linkedcell'
+                    w_sheet['%s%s'%(get_column_letter(start_col_index), r_index)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)' 
+
+                    #---------------------------------
                     
-            #loop each cell of this row D15:G15
-            #----------->
-            for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
-                for cell in cellObj:
-                    #get column
-                    new_column_letter = cell.column # J
-                    prev_col=column_index_from_string(new_column_letter)-1
-                    prev_letter= get_column_letter(prev_col)
-                    prev_cell = prev_letter + str(cell.row)
-                   
-                   
-                    w_sheet['%s%s'%(new_column_letter, cell.row)] =  0
-                    w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Linkedcell'
-                    #w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General'
-            
+                    #loop each cell of this row D15:G15
+                    for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
+                        for cell in cellObj:
+                            new_column_letter = cell.column # J
+                            prev_col=column_index_from_string(new_column_letter)-1
+                            prev_letter= get_column_letter(prev_col)
+                            prev_targeted_cell = prev_letter + str(r_index2)
+                            current_targeted_cell = new_column_letter + str(r_index2)                        
+                            w_sheet['%s%s'%(new_column_letter, cell.row)].value ='=0'   #'=IF(AND(SUM(' + startpoint + ':' + prev_targeted_cell +')=0,' + current_targeted_cell +'>0),'+ sens_val + ',0)' 
+                            w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Linkedcell'
+                            w_sheet['%s%s'%(new_column_letter, cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)' 
+                    
+       
         if item=='cum_pens_under_cattle':
+            r_feedlot_constr, c_index, found_state= self._retrieve_cell_row_colm('production_inventory','num_of_feedlot_targeted_for_construction')
+            startpoint_feedlot_const_row = '$'+ get_column_letter(9) + '$'+ str(r_feedlot_constr)
+         
+            r_op, _, found_state2= self._retrieve_cell_row_colm('flags','OP')
+            if found_state2:
+                #start at one less writing columns
+                startpoint = '$'+ get_column_letter(9) + '$'+ str(r_op)# D07
+
+            if 'sens' in self.track_inputs:
+                if 'initial_pens_employed' in self.track_inputs['sens']:
+                    _row = self.track_inputs['sens']['initial_pens_employed']['row'] 
+                    _col = self.track_inputs['sens']['initial_pens_employed']['col']
+                    col = get_column_letter(_col)
+                    sens_val= "Sens!$" + col + "$" + str(_row)
+
             r_index, c_index, found_state= self._retrieve_cell_row_colm('production_inventory','cum_pens_under_cattle')
             if found_state:
                 span_ =self._get_span()
@@ -761,19 +979,18 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        
+                       
                         new_column_letter = cell.column # J
                         prev_col=column_index_from_string(new_column_letter)-1
                         prev_letter= get_column_letter(prev_col)
-                        cum_time_minus_one_cell = prev_letter + str(cell.row)
+                        prev_row = cell.row-1
 
-                        prev_row = cell.row-1 
-                        current_constr_cell = new_column_letter + str(prev_row)
-                    
-                    
-                        w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=' + cum_time_minus_one_cell + '+' + current_constr_cell
+                        endpoint_feedlot_const_row = '$'+ new_column_letter + '$'+ str(r_feedlot_constr)
+                        current_op_cell = new_column_letter + str(r_op)  
+                        answ = '=IF((SUM(' + startpoint + ':' + current_op_cell +')>0),SUM(' + startpoint_feedlot_const_row + ':' + endpoint_feedlot_const_row +'),0)'
+                        w_sheet['%s%s'%(new_column_letter, cell.row)] = answ 
                         w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Output2'
-                        #w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General
+                        
         if item=='cum_pens_under_harvesting':
             r_index, c_index, found_state= self._retrieve_cell_row_colm('production_inventory','cum_pens_under_harvesting')
             if found_state:
@@ -820,8 +1037,8 @@ class BeefExcelReport(ExcelReport):
                 if found_state2: 
                     first_slice_point = get_column_letter(9) + str(r_index2)# D07
                     second_slice_point = get_column_letter(9 + int(span_)) + str(r_index2) # D39
-                    w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).value = "=Sum(" + first_slice_point + ":" + second_slice_point +")"
-                w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(c_index), r_index)].value = "=Sum(" + first_slice_point + ":" + second_slice_point +")"
+                w_sheet['%s%s'%(get_column_letter(c_index), r_index)].style = 'Calculation'
         
         if item=='investment_roll_out_flag':
             r_index, c_index, found_state= self._retrieve_cell_row_colm('production_inventory','investment_roll_out_flag')
@@ -935,9 +1152,9 @@ class BeefExcelReport(ExcelReport):
                 if found_state2: 
                     first_slice_point = get_column_letter(9) + str(r_index2)# D07
                     second_slice_point = get_column_letter(9 + int(span_)) + str(r_index2) # D39
-                    w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).value = "=AVERAGE(" + first_slice_point + ":" + second_slice_point +")"
-                w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).style = 'Calculation'
-                w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(c_index), r_index)].value = "=AVERAGE(" + first_slice_point + ":" + second_slice_point +")"
+                w_sheet['%s%s'%(get_column_letter(c_index), r_index)].style = 'Calculation'
+                w_sheet['%s%s'%(get_column_letter(c_index), r_index)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
               
         
         if item=='average_num_of_supervisors':
@@ -949,14 +1166,14 @@ class BeefExcelReport(ExcelReport):
                 if found_state2: 
                     first_slice_point = get_column_letter(9) + str(r_index2)# D07
                     second_slice_point = get_column_letter(9 + int(span_)) + str(r_index2) # D39
-                    w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).value = "=AVERAGE(" + first_slice_point + ":" + second_slice_point +")"
-                w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).style = 'Calculation'
-                w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(c_index), r_index)].value = "=AVERAGE(" + first_slice_point + ":" + second_slice_point +")"
+                w_sheet['%s%s'%(get_column_letter(c_index), r_index)].style = 'Calculation'
+                w_sheet['%s%s'%(get_column_letter(c_index), r_index)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
   
     def _add_investmentCost_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Investment Cost (Real)' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Investment Cost (Real)' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
         
         #keep track : to insert datatimeline:---> 2021, 2022....2040 
@@ -1014,6 +1231,7 @@ class BeefExcelReport(ExcelReport):
 
          #-----------------------------------------------------------------
         r_index, _, found_state= self._retrieve_cell_row_colm('investment_cost','total_land_for_pens')
+
         if found_state:
             headers=[]
             for item in self.sister_model.cattle_business_options.keys():
@@ -1082,16 +1300,16 @@ class BeefExcelReport(ExcelReport):
             if found_state2: 
                 first_slice_point = get_column_letter(9) + str(r_index2)# D07
                 second_slice_point = get_column_letter(9 + int(span_)) + str(r_index2) # D39
-                w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).value ="=SUM(" + first_slice_point + ":" + second_slice_point +")"
-            w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).style = 'Calculation'
-            w_sheet.cell('%s%s'%(get_column_letter(c_index), r_index)).number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                w_sheet['%s%s'%(get_column_letter(c_index), r_index)].value ="=SUM(" + first_slice_point + ":" + second_slice_point +")"
+            w_sheet['%s%s'%(get_column_letter(c_index), r_index)].style = 'Calculation'
+            w_sheet['%s%s'%(get_column_letter(c_index), r_index)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
                  
 
     
     def _add_prodInventory_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Production and Inventory' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Production and Inventory' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if 'header' in self.track_inputs['production_inventory']:
@@ -1266,7 +1484,7 @@ class BeefExcelReport(ExcelReport):
       
         # Writing the first row of the csv	
         col = get_column_letter(1)
-        sens_sheet.cell('%s%s'%(col, 1)).value = 'Sensitivity Analysis sheet'
+        sens_sheet['%s%s'%(col, 1)].value = 'Sensitivity Analysis sheet'
         sens_sheet['%s%s'%(col, 1)].style= 'Heading1'
     
         span_ = 6 
@@ -1341,7 +1559,7 @@ class BeefExcelReport(ExcelReport):
         r_index, c_index, found_state= self._retrieve_cell_row_colm('feedlot_design_parameters','sqm_per_cattle')
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + pen_area_cell + '/' + cattle_per_cycle
+            w_sheet['%s%s'%(c, r_index)].value ='=' + pen_area_cell + '/' + cattle_per_cycle
             w_sheet['%s%s'%(c, r_index)].fill = PatternFill(fgColor='FFF2F2F2', patternType='solid', fill_type='solid')  
         
         
@@ -1395,7 +1613,7 @@ class BeefExcelReport(ExcelReport):
     def _add_sensitivity_section(self, wb, w_sheet, row_index,total_wsheet_cols):
          #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Sensitivity Parameters' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Sensitivity Parameters' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -1463,11 +1681,11 @@ class BeefExcelReport(ExcelReport):
                             _row = self.track_inputs[item_instance][item]['row'] 
                             _col = self.track_inputs[item_instance][item]['col']
                             col = get_column_letter(_col)
-                            wb["Inputs"].cell('%s%s'%(col, _row)).value = "=Sens!$" + colValue + "$" + str(row_index)
+                            wb["Inputs"]['%s%s'%(col, _row)].value = "=Sens!$" + colValue + "$" + str(row_index)
                             #print(col, _row,"=Sens!$" + colValue + "$" + str(row_index))
                             #if not set change to linkedcell type
-                            wb["Inputs"].cell('%s%s'%(col, _row)).style = 'Linkedcell'
-                            wb["Inputs"].cell('%s%s'%(col, _row)).number_format= self._get_number_formats(_unit)
+                            wb["Inputs"]['%s%s'%(col, _row)].style = 'Linkedcell'
+                            wb["Inputs"]['%s%s'%(col, _row)].number_format= self._get_number_formats(_unit)
 
             #iter for writing the sens only {not related to how many instance are found per iteration}
             row_index +=1
@@ -1635,7 +1853,7 @@ class BeefExcelReport(ExcelReport):
     def _add_costs_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Costs (Real)' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Costs (Real)' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -1749,7 +1967,7 @@ class BeefExcelReport(ExcelReport):
         live_weight_gain_cell = get_column_letter(c_index) + str(r_index ) if found_state else None
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + daily_weight_gain_cell + '*' + days_in_feed_lot_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + daily_weight_gain_cell + '*' + days_in_feed_lot_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
         
@@ -1764,7 +1982,7 @@ class BeefExcelReport(ExcelReport):
         live_weight_at_selling_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + weight_at_purchase_cell + '+' + live_weight_gain_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + weight_at_purchase_cell + '+' + live_weight_gain_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
         
@@ -1781,7 +1999,7 @@ class BeefExcelReport(ExcelReport):
         qnty_of_feed_per_cattle_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + food_conversion_ratio_cell + '*' + daily_weight_gain_cell + '*' + days_in_feed_lot_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + food_conversion_ratio_cell + '*' + daily_weight_gain_cell + '*' + days_in_feed_lot_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
        
@@ -1790,7 +2008,7 @@ class BeefExcelReport(ExcelReport):
         commercial_feed_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_per_pen_per_year_cell + '*' + qnty_of_feed_per_cattle_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_per_pen_per_year_cell + '*' + qnty_of_feed_per_cattle_cell
             #w_sheet['%s%s'%(c, r_index)].fill = PatternFill(fgColor='FFF2F2F2', patternType='solid', fill_type='solid')
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)' 
@@ -1802,7 +2020,7 @@ class BeefExcelReport(ExcelReport):
         dressed_weight_at_selling_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + dressed_weight_percent_cell + '*' + live_weight_at_selling_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + dressed_weight_percent_cell + '*' + live_weight_at_selling_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
         
@@ -1815,7 +2033,7 @@ class BeefExcelReport(ExcelReport):
         cost_of_cattle_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_per_pen_per_year_cell + '*' + cattle_price_per_unit_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_per_pen_per_year_cell + '*' + cattle_price_per_unit_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
         
@@ -1824,7 +2042,7 @@ class BeefExcelReport(ExcelReport):
         cost_of_cattle_feed_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_feed_price_per_kg_cell + '*' + commercial_feed_per_pen_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_feed_price_per_kg_cell + '*' + commercial_feed_per_pen_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
 
@@ -1833,7 +2051,7 @@ class BeefExcelReport(ExcelReport):
         total_input_costs_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cost_of_cattle_per_pen_cell + '+' + cost_of_cattle_feed_per_pen_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cost_of_cattle_per_pen_cell + '+' + cost_of_cattle_feed_per_pen_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
 
@@ -1842,7 +2060,7 @@ class BeefExcelReport(ExcelReport):
         tonnes_produced_per_pen_per_year_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_per_pen_per_year_cell + \
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_per_pen_per_year_cell + \
                                                         '*' + dressed_weight_at_selling_cell + \
                                                         '*' +  cattle_survival_rate + '/1000' 
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
@@ -1853,7 +2071,7 @@ class BeefExcelReport(ExcelReport):
         r_index, c_index, found_state= self._retrieve_cell_row_colm('cost_real','cost_of_domestic_inputs_per_ton_of_beef_produced')
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + total_input_costs_per_pen_cell + \
+            w_sheet['%s%s'%(c, r_index)].value ='=' + total_input_costs_per_pen_cell + \
                                                         '/' + tonnes_produced_per_pen_per_year_cell 
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
@@ -1909,7 +2127,7 @@ class BeefExcelReport(ExcelReport):
         live_weight_gain_cell = get_column_letter(c_index) + str(r_index ) if found_state else None
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + daily_weight_gain_cell + '*' + days_in_feed_lot_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + daily_weight_gain_cell + '*' + days_in_feed_lot_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
         
@@ -1924,7 +2142,7 @@ class BeefExcelReport(ExcelReport):
         live_weight_at_selling_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + weight_at_purchase_cell + '+' + live_weight_gain_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + weight_at_purchase_cell + '+' + live_weight_gain_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
         
@@ -1935,7 +2153,7 @@ class BeefExcelReport(ExcelReport):
         commercial_feed_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_per_pen_per_year_cell + '*' + qnty_of_feed_per_cattle_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_per_pen_per_year_cell + '*' + qnty_of_feed_per_cattle_cell
             #w_sheet['%s%s'%(c, r_index)].fill = PatternFill(fgColor='FFF2F2F2', patternType='solid', fill_type='solid')
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)' 
@@ -1947,7 +2165,7 @@ class BeefExcelReport(ExcelReport):
         dressed_weight_at_selling_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + dressed_weight_percent_cell + '*' + live_weight_at_selling_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + dressed_weight_percent_cell + '*' + live_weight_at_selling_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)' 
         
@@ -1957,7 +2175,7 @@ class BeefExcelReport(ExcelReport):
         cost_of_cattle_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_per_pen_per_year_cell + '*' + cattle_price_per_unit_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_per_pen_per_year_cell + '*' + cattle_price_per_unit_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
         
@@ -1966,7 +2184,7 @@ class BeefExcelReport(ExcelReport):
         cost_of_cattle_feed_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_feed_price_per_kg_cell + '*' + commercial_feed_per_pen_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_feed_price_per_kg_cell + '*' + commercial_feed_per_pen_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
 
@@ -1975,7 +2193,7 @@ class BeefExcelReport(ExcelReport):
         total_input_costs_per_pen_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cost_of_cattle_per_pen_cell + '+' + cost_of_cattle_feed_per_pen_cell
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cost_of_cattle_per_pen_cell + '+' + cost_of_cattle_feed_per_pen_cell
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
 
@@ -1984,7 +2202,7 @@ class BeefExcelReport(ExcelReport):
         tonnes_produced_per_pen_per_year_cell = get_column_letter(c_index) + str(r_index ) if found_state else '0'
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + cattle_per_pen_per_year_cell + \
+            w_sheet['%s%s'%(c, r_index)].value ='=' + cattle_per_pen_per_year_cell + \
                                                         '*' + dressed_weight_at_selling_cell + \
                                                         '*' +  cattle_survival_rate + '/1000' 
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
@@ -1995,7 +2213,7 @@ class BeefExcelReport(ExcelReport):
         r_index, c_index, found_state= self._retrieve_cell_row_colm('cost_real','cost_of_domestic_inputs_per_ton_of_beef_produced')
         if found_state:
             c= get_column_letter(c_index)
-            w_sheet.cell('%s%s'%(c, r_index)).value ='=' + total_input_costs_per_pen_cell + \
+            w_sheet['%s%s'%(c, r_index)].value ='=' + total_input_costs_per_pen_cell + \
                                                         '/' + tonnes_produced_per_pen_per_year_cell 
             w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             w_sheet['%s%s'%(c, r_index)].number_format ='_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)'
@@ -2007,7 +2225,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_purchases_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'PURCHASES (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'PURCHASES (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
 
@@ -2496,7 +2714,7 @@ class BeefExcelReport(ExcelReport):
 
         # Writing the first row of the csv	
         col = get_column_letter(1)
-        calculation_sheet.cell('%s%s'%(col, 1)).value = 'Calculation Sheet ' #% (user)
+        calculation_sheet['%s%s'%(col, 1)].value = 'Calculation Sheet ' #% (user)
         calculation_sheet['%s%s'%(col, 1)].style= 'Heading1'
     
 
@@ -2619,7 +2837,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_production_sales_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'PRODUCTION AND SALES (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'PRODUCTION AND SALES (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
 
@@ -2708,7 +2926,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_unit_of_production_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'UNIT COST OF PRODUCTION'
+        w_sheet['%s%s'%(col, row_index)].value = 'UNIT COST OF PRODUCTION'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_unit_of_production' in self.track_inputs:
@@ -3086,7 +3304,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_investment_cost_real_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'INVESTMENT COST (Real)'
+        w_sheet['%s%s'%(col, row_index)].value = 'INVESTMENT COST (Real)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
 
@@ -3232,7 +3450,7 @@ class BeefExcelReport(ExcelReport):
 
         # Writing the first row of the csv	
         col = get_column_letter(1)
-        cashflow_sheet.cell('%s%s'%(col, 1)).value = 'Cash Flow Sheet ' #% (user)
+        cashflow_sheet['%s%s'%(col, 1)].value = 'Cash Flow Sheet ' #% (user)
         cashflow_sheet['%s%s'%(col, 1)].style= 'Heading1'
     
 
@@ -3532,7 +3750,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cf_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'CASH FLOW (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'CASH FLOW (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cf_nominal' in self.track_inputs:
@@ -3980,7 +4198,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_investment_cost_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'INVESTMENT COST (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'INVESTMENT COST (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
 
@@ -4116,7 +4334,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_residual_values_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'RESIDUAL VALUES (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'RESIDUAL VALUES (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_residual_values' in self.track_inputs:
@@ -4575,7 +4793,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cf_real_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'CASH FLOW  (Real)'
+        w_sheet['%s%s'%(col, row_index)].value = 'CASH FLOW  (Real)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cf_real' in self.track_inputs:
@@ -4930,7 +5148,7 @@ class BeefExcelReport(ExcelReport):
     def _add_cal_labour_cost_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'LABOUR COSTS AND OTHER INDIRECT COSTS (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'LABOUR COSTS AND OTHER INDIRECT COSTS (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_labour_cost_nominal' in self.track_inputs:

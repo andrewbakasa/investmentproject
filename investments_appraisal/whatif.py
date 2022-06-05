@@ -986,13 +986,23 @@ def get_data_table(model):
 
 
    
-def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10, total_runs=10000, selected_inputs_dict=None,):
+def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10, 
+                  total_runs=10000, selected_inputs_dict=None,total_params=None):
+    # print('............selected_inputs_dict..............................')
+    # print(selected_inputs_dict)
+    """
+    1. selected_inputs_dict:
+    Has a list, in order of decraesing grad, of all parameter with a gradient (sensitive)
 
+    2. base_scenario_inputs:
+    Brings in item defined with probability of occurence
     
+    3. Calcultate interference: [1 INTERSECTION 2]
+    """
     if hasattr(model,'base_scenario_inputs'):
         base_scenario_inputs=model.base_scenario_inputs
     else:
-        #run
+        #if not yet set , set it now
         model._set_parameters_simulation(num_reps)
         base_scenario_inputs=model.base_scenario_inputs
 
@@ -1004,10 +1014,19 @@ def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10, total_runs=10000,
  
     #-----input with highest gradient selected first
     scenario_inputs={}
+
     if not selected_inputs_dict==None:
         scenario_inputs={}
-        for item in selected_inputs_dict:
+        limit_vars = 0
+        #---limit to 5 variables
+        if total_params ==None:
+            limit_vars= len(selected_inputs_dict)
+        else:
+            limit_vars = total_params
+        
+        for item in selected_inputs_dict[:limit_vars]:
             if  item in base_scenario_inputs.keys():
+                #already defined.... stats
                 scenario_inputs[item]=base_scenario_inputs[item]
             else:
                 
@@ -1073,8 +1092,9 @@ def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10, total_runs=10000,
         max_values += f"  {i['name']} : @ {i['val']}, "
     max_values+='}'
     #print('Min NPV:', npv_series.min(),'Max NPV:', npv_series.max(),  min_values, max_values)
-   
-    return  cumfreq(model2_results_df,npv_bin_size), np.sort(np.array(npv_series.tolist()))
+    # print('Used Inputs...........')
+    # print(scenario_inputs.keys())
+    return  cumfreq(model2_results_df,npv_bin_size), np.sort(np.array(npv_series.tolist())), scenario_inputs
 
 
 
@@ -1087,10 +1107,26 @@ def cumfreq(df,bins=100):
     cdf =[round(stats.percentileofscore(df['npv'], y) / 100.0,3) for y in range(lower_,upper_+step, step)]
     y =[round(probability_npv(df,y-step,y),3) for y in range(lower_,upper_+step, step)]
     #y =list(_accumulate_pos_difference(cdf))
-    x = lower_ + np.linspace(0, bins * step,
-                                 step)
+    x = lower_ + np.linspace(0, bins * step,  step)
     x =[y  for y in range(lower_,upper_+step, step)]
-    return {'x':x, 'y':y,'cdf':cdf}#,bins,lower_, upper_
+
+    prob_npv_zero= probability_atleast(df, 0)
+    mean= stats.describe(df['npv']).mean
+    variance= stats.describe(df['npv']).variance
+    # print('older mu:', mean)
+    # print('older variance:', variance)
+    
+    _, mean= _get_variance(df['npv'].tolist())
+
+    return {'x':x, 'y':y,'cdf':cdf ,'prob_npv_zero':prob_npv_zero, 
+            'mean' : mean, 'variance' : variance }#,bins,lower_, upper_
+  
+def probability_upto(df, x):
+    return probability_npv(df, None, x)
+
+def probability_atleast(df, x):
+    return probability_npv(df,x)
+
 
 def probability_npv(df, x=None, y=None):
     # Probability profit is between x-----y
@@ -1107,7 +1143,19 @@ def probability_npv(df, x=None, y=None):
         val=(stats.percentileofscore(df['npv'], y) - stats.percentileofscore(df['npv'], x)) / 100.0
    
     return val
+def _get_variance(list_):
+    arr= np.array(list_)
+    mu= np.mean(arr)
+    _ = None
+    #print('mu', mu)
+    #print(arr)
+    # diff1= arr-mu
+    # diff2= arr-mu
+    # var=diff1*diff2/len(list_-1)
+    # print('var', var)
+    return _ ,mu
 
+  
 def _accumulate_pos_difference(list_):
     next_value =0
     for item in list_:

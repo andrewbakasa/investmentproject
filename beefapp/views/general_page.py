@@ -520,9 +520,10 @@ def check_run_requirements_ajax(request, model_id, *args, **kwargs):
 			if progress_count<8:
 				return JsonResponse({'error': False, 'data': False, 'status': f'{progress_count} of 8 Complete'})
 			else:
-				#update database
-				usermodel.design_complete= True
-				usermodel.save()
+				if usermodel.design_complete== False:
+					#update database
+					usermodel.design_complete= True
+					usermodel.save()
 				return JsonResponse({'error': False, 'data': True, 'status': f'{progress_count} of 8 Complete'})
 			
 			
@@ -535,5 +536,99 @@ def check_run_requirements_ajax(request, model_id, *args, **kwargs):
 		}
 		return JsonResponse(error, content_type="application/json")
 
+
+
+
+login_required(login_url="account_login")
+def update_model_feedlotdesignparameters_ajax(request, id, *args, **kwargs):
+	
+	obj_instance = get_object_or_404(FeedlotDesignParameters, pk=id)
+	if request.method == 'POST':
+		form = FeedlotDesignParametersForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call
+		form = FeedlotDesignParametersForm( instance=obj_instance)
+	return save_update_model_feedlotdesignparameters(request,form,'beefapp/modal/feedlot_design_edit.html')
+
+def save_update_model_feedlotdesignparameters(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(FeedlotDesignParameters,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(FeedlotDesignParameters,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		print('errors:', errors)
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(FeedlotDesignParameters,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'feedlotdesignparameters_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def add_model_feedlotdesignparameters_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	
+	if request.method == 'POST':
+		form = FeedlotDesignParametersForm(request.POST or None)
+ 								
+	else:
+		#first time call 
+		form = FeedlotDesignParametersForm(initial={'usermodel': model_instance})
+	return save_add_model_feedlotdesignparameters(request,form,model_instance,'beefapp/modal/feedlot_design.html')
+
+def save_add_model_feedlotdesignparameters(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(FeedlotDesignParameters,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'feedlotdesignparameters_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
 
 

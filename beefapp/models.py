@@ -9,12 +9,19 @@ class FeedlotDesignParameters(models.Model):
     num_of_feedlots =  models.IntegerField(default=1)
     length =  models.DecimalField(decimal_places=2, max_digits=10 , default=7.5)
     width =  models.DecimalField(decimal_places=2, max_digits=10, default=7.5)
-    sqm =  models.DecimalField(decimal_places=2, max_digits=10 ,default=2500)
-    pen_area =  models.DecimalField(decimal_places=2, max_digits=10, default=2500)
+    #sqm =  models.DecimalField(decimal_places=2, max_digits=10 ,default=2500)
+    #pen_area =  models.DecimalField(decimal_places=2, max_digits=10, default=2500)
     sqm_per_cattle =  models.DecimalField(decimal_places=2, max_digits=10, default=10)
     total_cattle_per_pen_per_cycle =  models.IntegerField(default=20)
     num_of_months_per_cycle =  models.IntegerField(default=3)
-    cattle_per_pen_per_year =  models.IntegerField(default=80)
+    #cattle_per_pen_per_year =  models.IntegerField(default=80)
+
+
+    construction_cost_per_pen =  models.DecimalField(decimal_places=2, max_digits=15, default=1000)
+    machinery_cost_per_pen =  models.DecimalField(decimal_places=2,max_digits=15, default=1200)
+    building_cost_per_sqm =  models.DecimalField(decimal_places=2, max_digits=15,default=10)
+    total_land_sqm =  models.DecimalField(decimal_places=2, max_digits=15,default=1000)
+    cost_of_land_per_sqm =  models.DecimalField(decimal_places=2, max_digits=15,default=1)
 
 
 

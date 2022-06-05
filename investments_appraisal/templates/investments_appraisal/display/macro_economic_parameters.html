@@ -45,12 +45,18 @@
                         </tbody>
                     </table>
                 </div>
-                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                  data-target="#modal_add_model_macroeconomicparameters"> <i class="fa fa-edit"></i></a>
+              
+                     <!-- EDIT MODEL -->
+                     <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model_macro_economic_parameters_ajax' macroeconomicparameters_record.id %}" 
+                        data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                        title='Edit Macro Economic Parameter'><i  class="fas fa-edit"></i>
+                    </a>
             {% else %}
                 <!-- Add For First Time -->
-                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                data-target="#modal_add_model_macroeconomicparameters"> <i class="fa fa-plus"></i></a>
+                <a class="model-edit show-form-update" href="#" data-url="{% url 'add_model_macro_economic_parameters_ajax2' usermodel.id %}" 
+                    data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                    title='Add Macro Economic Parameter'><i  class="fas fa-plus"></i>
+                </a>
             {% endif%}
         </div>
     </div>

@@ -27,11 +27,11 @@ depreciation_fish = {
 
 investment_cost_fish = {
     'total_land_for_tanks': {'title': 'Total Land For Tanks','value': 0, 'units': 'NUMBER'}, 
-    'cost_of_land_per_sqm': {'title': 'Cost of Land per SQM','value': 0, 'units': 'NUMBER'},  
-    'cost_of_machinery_per_tank': {'title': 'Cost of Machinery (Per Tank)','value': 100, 'units': 'NUMBER'}, 
-    'cost_of_building_per_sqm': {'title': 'Cost of building per SQM','value': 0, 'units': 'NUMBER'},   
+    'cost_of_land_per_sqm': {'title': 'Cost of Land per SQM','value': 0, 'units': 'LC'},  
+    'cost_of_machinery_per_tank': {'title': 'Cost of Machinery (Per Tank)','value': 100, 'units': 'LC'}, 
+    'cost_of_building_per_sqm': {'title': 'Cost of building per SQM','value': 0, 'units': 'LC'},   
     'total_tanks': {'title': 'Total Tanks','value': 10, 'units': 'NUMBER'},
-    'cost_of_unit_tank': {'title': 'Cost of Unit Tank','value': 700, 'units': 'NUMBER'},
+    'cost_of_unit_tank': {'title': 'Cost of Unit Tank','value': 700, 'units': 'LC'},
         #for sensitivity analysis: linked sens page which then links Financing Section
     'senior_debt_dynamic_parameter': {'title': 'Senior Debt','value': 0, 'units': 'PERCENT'}, 
 
@@ -44,7 +44,7 @@ investment_cost_fish = {
     'total_land_required': {'title': 'Total Land Required (hectares)','value': 0, 'units': 'NUMBER'}, 
     #'cost_of_tanks': {'title': 'Cost of Tanks','value':None, 'units': 'T_LC'},
     'cost_of_tanks_constructed': {'title': 'Cost of Tanks constructed','value':None, 'units': 'T_LC'},
-    'cost_of_land': {'title': 'Cost of Land','value': None, 'units': 'NUMBER'},
+    'cost_of_land': {'title': 'Cost of Land','value': None, 'units': 'T_LC'},
     'investment_cost_of_land': {'title': 'Investment cost of land','value':None, 'units': 'T_LC'}, 
     'cif_cost_of_machinery': {'title': 'CIF cost of Machinery','value': None, 'units': 'T_USD'},
     'investment_cost_of_buildings': {'title': 'Investment cost of buildings','value':None, 'units': 'T_LC'}, 

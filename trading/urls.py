@@ -22,10 +22,14 @@ urlpatterns = [
     path('display_business_ajax/', views.display_business_ajax, name="display_business_ajax"),
      path('display_myinvestment_ajax/', views.display_myinvestment_ajax, name="display_myinvestment_ajax"),
 
-    path('investment_search/<str:slug>/', views.investment_search_ajax, {'search_type': ''}, name='investment_search_ajax'), 
-    path('investment_search/<str:slug>/tags/', views.investment_search_ajax,{'search_type': 'tags'}, name='investment_search_tag_ajax'), 
+    path('investment_search/<str:tag_id_or_slug>/', views.investment_search_ajax, {'search_type': ''}, name='investment_search_ajax'), 
+    path('investment_search/<str:tag_id_or_slug>/tags/', views.investment_search_ajax,{'search_type': 'tags'}, name='investment_search_tag_ajax'), 
+    path('investment_search/<str:tag_id>/<str:slug>/search/tags/', views.investment_search_and_tags_ajax,{'search_type': 1}, name='investment_search_and_tags_ajax'), 
+    path('investment_search/<str:tag_id>/tags/', views.investment_search_and_tags_ajax,{'search_type': 0}, name='investment_tags_ajax'), 
 
-    path('t/<str:slug>/', views.investment_load_tags, name='investment_load_tags'), 
+    path('t/<str:tag_id>/', views.investment_load_tags, name='investment_load_tags'), 
+    path('t/search/<str:tagname>/<str:search_str>/', views.investment_load_tags_search_string, name='investment_load_tags_search_string'),
+    
     path('update_investment_likes/<int:id>/',views.update_investment_likes_ajax,  name='update_investment_likes'),
     path('u/i/', views.get_user_investments, name="user_investments"),
     path('u/b/', views.get_user_businesses, name="user_businesses"),

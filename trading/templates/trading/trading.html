@@ -52,19 +52,16 @@
          //first timme
           var display_investment_ajax_url= "{% url 'display_investment_ajax' %}" 
           var search_tags= '{{search_tags}}'
-          var slug= '{{slug}}'
+          var tag_id= '{{tag_id}}'
           
           if (search_tags){            
-              display_investment_ajax_url = `{% url 'investment_search_tag_ajax' 12345 %}`.replace(/12345/, slug.toString()); 
+              display_investment_ajax_url = `{% url 'investment_search_tag_ajax' 12345 %}`.replace(/12345/, tag_id.toString()); 
             
           }
 
         
           function updatePaging2(data){
             var has_previous=''
-            console.log(data)
-            //<li><a class='a_page_nav' {% if search_tags  %} search_tags="{{search_tags}}" {% endif %} style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
-             
             if (data.has_previous){
                 has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
                     <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
@@ -124,6 +121,17 @@
                   eye_style='style="color:inherit"'
               }
 
+              if (val.userIsOwner) {
+                  myportifolio= `<a href="/trading/edit-investment/${val.id}/" 
+                      data-toggle="tooltip" data-placement="bottom"  
+                      title='Manage Investment'>
+                      <span class="advanced">My Portifolio</span>
+                    </a>`
+                  
+              }else{                  
+                  myportifolio=''
+              }
+
               var design_complete_checked=''
               if (val.design_complete) {
                   design_complete_checked='checked'
@@ -142,12 +150,13 @@
               <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
                 <div ${ready_attr} class="project-item umodel-item ${model_class_added}" ${inlinestyle}>
                   <img src="${imgval}" class="img-fluid" alt="...">
+                  ${myportifolio}              
                   <div class="project-content">
                     <h3><a href="/trading/investment-details/${val.id}/">${name_trunc}</a></h3>
                     <p>${descript_trunc}</p>
                     <div class="trainer d-flex justify-content-between align-items-center">
                       <div class="trainer-rank d-flex align-items-center">
-                        <i class="bx bx-download"></i>&nbsp;${val.hits}
+                        <i class="bx bx-download"></i>&nbsp;${val.views}
                       </div>
                       <div class="trainer-rank d-flex align-items-center">
                           <a class="model-likes" href="#" data-url="/trading/update_investment_likes/${val.id}/" 
@@ -164,13 +173,35 @@
   return a_html
 }
 
+          function set_my_portifolio(){
+              $('.myspan[myportifolio]').each( function (){
+                  $(this).addClass('advanced')                   
+              })
+               // display:none and remove ele
+              $('.myspan[portifolio_na]').each( function (){
+                  $(this).css(
+                     { "display":"none",
+                        // "title":"", 
+                      }
+                  ).remove()          
+              })
+          }
           function set_model_complete(){
             $('.project-item[myinvestment]').each( function (){
                     $(this).addClass('model-complete')
                     $(this).css("background-color","beige")
+                   /*  //css prop chaining....
+                    $(this).css(
+                      { "background-color":"beige",
+                        "background-color":"beige", 
+                        "background-color":"beige",  
+                      }
+                    ) 
+                    */
               })
           }
           $(document).ready(function (){ 
+              set_my_portifolio()
               $("#investments a:first").addClass( "active") 
               $("#investors a:first").addClass( "active") 
               $("#iamaninvestor a:first").addClass( "active")
@@ -179,15 +210,32 @@
           })
           $("body").on("keyup", "#search", function(){
             var search_val = $(this).val().toLowerCase();
+            var tag_name ="{{tag_name}}"
+            var tag_id ="{{tag_id}}"
             search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
-            if (search_val.length == 0){
-                //change here
-                display_investment_ajax_url = "{% url 'display_investment_ajax' %}"
+            if (search_val.length == 0 ){
+                if (tag_name.length  == 0){
+                  //console.log('searching only display :0')
+                  display_investment_ajax_url = "{% url 'display_investment_ajax' %}"
+                }else{
+                  // console.log('tag only display :1')
+                  //tag
+                  display_investment_ajax_url = `{% url 'investment_tags_ajax' 12345 %}`.replace(/12345/, tag_id.toString()); 
           
-            }else{
-              //change here
-              display_investment_ajax_url = `{% url 'investment_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
+                }
           
+            } else{
+               if (tag_name.length  == 0){
+                  // console.log('searching only display :3')
+                  //search
+                  display_investment_ajax_url = `{% url 'investment_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
+          
+                }else{
+                  // console.log('tag and search display :4')
+                  // tag and search
+                  display_investment_ajax_url = `{% url 'investment_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, tag_id.toString()).replace(/6789/, search_val.toString()); 
+                 
+                }
             }
             
          
@@ -266,10 +314,7 @@
           $(document).ready(function (){ 
                      
             $('body').on('click', '.a_page_nav', function (event) {
-                  // preventing default actions
-                  if (search_tags){
-                    console.log('000:search_tags:', search_tags)
-                  }
+                 
                   event.preventDefault();
                   var page_no = $(this).attr('href');
                   var objthis = $(this)

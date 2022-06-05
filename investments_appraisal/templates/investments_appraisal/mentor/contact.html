@@ -77,21 +77,21 @@
                      
                       if(data.error == false){
                         clearPage()
-                        $('#public_toggle_form-errors').html('');
+                        $('.public_toggle_form-errors').html('');
                         a_html = 	`</br><div class='alert alert-success alert dismissable'>
                                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span></button> Your message has been sent. Thank you!!!
                                   </div> ` ;
-                        $('#public_toggle_form-errors').append(a_html)
-                        $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                        $('.public_toggle_form-errors').append(a_html)
+                        $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                               }, 4000);
                       } else {
                           //console.log('Error data...', data.data)
-                          $('#public_toggle_form-errors').html('</br>');
+                          $('.public_toggle_form-errors').html('</br>');
                           if (data.error == true) {
                               //console.log('Error', data.error)
                               var form_vars=['__all__','subject','message', 'email', 'name']//,
@@ -103,30 +103,30 @@
                                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span></button> ${data['data'][name_var][0]}
                                   </div> ` ;
-                                  $('#public_toggle_form-errors').append(a_html)
+                                  $('.public_toggle_form-errors').append(a_html)
                                   
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                               }, 4000);
                           //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button> ${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                           } 

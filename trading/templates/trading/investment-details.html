@@ -79,7 +79,7 @@
             <div class="modal-content">
                 <!--Header-->
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Add Your Investment Pledge</h4>
+                    <h4 class="modal-title myModalLabel" >Add Your Investment Pledge</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -103,8 +103,16 @@
   <div id="preloader"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+
   {% block scripts %}
-  <script>
+    <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
+    <script>
+        var user_is_owner = '{{is_user_record_owner}}'
+        var first_entry = '{{first_entry}}'
+        var is_user_investor ='{{is_user_investor}}'
+        var investment_capital = '{{model.total_value}}'
+        var curr_pledge = 0
+       
         $(document).ready(function (){ 
             $("#investments a:first").addClass( "active") 
             $("#investors a:first").addClass( "active") 
@@ -122,6 +130,12 @@
                   $('#modal-usermodel').modal('show');
               },
               success: function(data){
+                  //validate user
+                  user_is_owner= data.user_is_owner 
+                  is_user_investor= data.is_user_investor_bool 
+                  investment_capital=data.total_value
+                  curr_pledge=data.value   
+                  console.log('checkkkkkkk..', data)                
                   $('#modal-usermodel .modal-content').html(data.html_form);
               }
               });
@@ -150,6 +164,8 @@
                   success: function(data){ 
                       //console.log('added data' ,data.model)
                       if(data.model){
+
+                          
                           $('.close-modal').click()
                           //update paging
                           if (data.total_pages){
@@ -161,15 +177,27 @@
                           if (data.model.current_investment){
                               $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
                           }
-                          
+
+                          if (data.model.user_investor){
+                              $('#user_investor').html(`${data.model.user_investor}`);
+                          }
+
+
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
-                         
 
+                          if (data.model.user_stake){
+                              $('#user_stake').html(`${data.model.user_stake.toFixed(1)}%`);
+                          }
+                         
+                          var pledge_title ="Edit Investment Pledge"
+                          if (data.model.user_investor==true){
+                            pledge_title ="Edit Equity"
+                          }
                           a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                    title='Edit Investment Pledge'><i  style="color:green"  class="fas fa-edit"></i>
+                                    title='${pledge_title}'><i  style="color:green"  class="fas fa-edit"></i>
                                 </a>`
 
                            $('#breadcrumb_changeto_edit').html(a_html)
@@ -177,7 +205,7 @@
 
                       } else {
                           // ADDITION NOT SUCCESSFUL
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (data['error']) {
                               var form_vars=['__all__','investment','user','name', 'description','value']
                               for (let p=0; p < form_vars.length; p++ ){
@@ -187,29 +215,29 @@
                                           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                           <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
                                       </div> ` ;
-                                      $('#public_toggle_form-errors').append(a_html)
+                                      $('.public_toggle_form-errors').append(a_html)
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                               //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
 
@@ -252,11 +280,19 @@
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
+
+                          if (data.model.user_stake){
+                              $('#user_stake').html(`${data.model.user_stake.toFixed(1)}%`);
+                          }
+
+                          if (data.model.user_investor){
+                              $('#user_investor').html(`${data.model.user_investor}`);
+                          }
                         
 
                           
                       } else {
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (data.error) {
                               var form_vars=['__all__','investment','user','name', 'description','value']//,
                       
@@ -267,30 +303,30 @@
                                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
                                   </div> ` ;
-                                  $('#public_toggle_form-errors').append(a_html)
+                                  $('.public_toggle_form-errors').append(a_html)
                                   
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                               }, 4000);
                           //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                           } 
@@ -332,7 +368,7 @@
 
                       } else {
                           // ADDITION NOT SUCCESSFUL
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (response.data['error']) {
                               var form_vars=['__all__','investment','strategy','summary', 'roi','shareholding']
                               for (let p=0; p < form_vars.length; p++ ){
@@ -342,29 +378,29 @@
                                           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                           <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
                                       </div> ` ;
-                                      $('#public_toggle_form-errors').append(a_html)
+                                      $('.public_toggle_form-errors').append(a_html)
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                               //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
 
@@ -393,13 +429,13 @@
                   processData:false,
                   contentType: false,
                   success: function(response){
-                    console.log('Entry', response.data)
+                    //console.log('Entry', response.data)
                       if(response.data.model){
                           //updateTable(data.model);
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                       } else {
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (response.data.error) {
                               var form_vars=['__all__','investment','strategy','summary', 'roi','shareholding']//,
                       
@@ -410,30 +446,30 @@
                                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
                                   </div> ` ;
-                                  $('#public_toggle_form-errors').append(a_html)
+                                  $('.public_toggle_form-errors').append(a_html)
                                   
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                               }, 4000);
                           //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                           } 
@@ -445,7 +481,105 @@
               })
               return false;
           })
+         
+
+          $('body').on("click",".model-likes",function(e){
+                  event.preventDefault();
+                  e.stopPropagation()
+                  var url = $(this).attr('data-url');
+                  // ajax call
+                  $.ajax({
+                    type: "POST",
+                    url: url, 
+                    data : {  
+                      csrfmiddlewaretoken: csrftoken,
+                    },
+                    success: function(response){
+                        if(response.error == false){
+                            
+                            //val= $('.trainer-rank').find('a')
+                            val= $('.model-likes')
+                            htmal_a= `<a class="model-likes" href="#" data-url="/trading/update_investment_likes/${response.data.id}/" 
+                              style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                              title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
+                            //$(val).html(htmal_a)
+                            $(val).html(`<i class="bx bx-heart"></i>&nbsp;${response.data.likes}`)
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
         
+
+           
+            
+            $(document).on('shown.bs.modal','.modal',function(e){  
+               
+                
+                if (user_is_owner ==true) {
+                    if (is_user_investor ==true ){
+                        $('.myModalLabel').html('Edit Investment Equity')
+                    }else if (is_user_investor ==false )  {
+                        $('.myModalLabel').html('Add Investment Equity')
+                    }   
+                }
+                // console.log('user_is_owner',user_is_owner)
+                // console.log('is_user_investor',is_user_investor)
+            
+            })
+            
+            $('body').on("change","#id_value",function(e){
+                var item=$(this).val() 
+                get_investment(item)  
+                    
+            })
+
+            // $('body').on("keypress","#id_value",function(e){
+            //     //var item_id=$(this).attr('id') 
+                
+            //     //console.log('keypress')
+                    
+            // })
+
+            $('body').on("keyup","#id_value",function(e){
+                var item=$(this).val() 
+                get_investment(item)                    
+            })
+            function get_investment (dynamic_val){
+
+                //console.log(dynamic_val)
+                var curr_percent= roundTo(parseFloat(curr_pledge* 100/investment_capital),3)
+                var dynamic_percent= roundTo(parseFloat(dynamic_val*100/investment_capital),3)
+                var direction_verb
+                var percentage_change= Math.abs(roundTo(parseFloat(dynamic_percent-curr_percent),3))
+
+                if (curr_pledge == dynamic_val){
+                    direction_verb= "<i>remain the same</i> @ "
+                    direction_from= ""
+                    direction_to= ""
+                }else if (curr_pledge < dynamic_val) {
+                    direction_verb= `<i>increase</i> ${percentage_change}%`
+                    direction_from= "<i>from</i>"
+                    direction_to= "<i>upto</i>"
+                }else {
+                    direction_verb= `<i>decrease</i> ${percentage_change}%`
+                    direction_from= "<i>from</i>"
+                    direction_to= "<i>downto</i>"
+                }
+                var htmltxt= `Your pledge will ${direction_verb} ${direction_from} <b> 
+                          ${numberWithCommas(curr_percent)}%</b> ${direction_to}  <b>
+                          ${numberWithCommas(dynamic_percent)}%</b> of $<b>
+                          ${numberWithCommas(investment_capital)}</b>`
+                if  (direction_to.length ==0){
+                    htmltxt= `Your pledge will ${direction_verb} <b> 
+                          ${numberWithCommas(dynamic_percent)}%</b> of $<b>
+                          ${numberWithCommas(investment_capital)}</b>`
+                }               
+                $('#investment_contrib').html(htmltxt)
+            }
+
         })
 
     </script>

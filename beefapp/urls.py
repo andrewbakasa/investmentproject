@@ -18,7 +18,10 @@ urlpatterns = [
     #Model FeedLotDesignparameters
     path('add_model_feedlotdesignparameters_ajax/', views.general_page.add_model_feedlotdesignparameters_ajax, name="add_model_feedlotdesignparameters_ajax"),
     path('edit_model_feedlotdesignparameters_ajax/<int:id>/', views.general_page.edit_model_feedlotdesignparameters_ajax, name="edit_model_feedlotdesignparameters_ajax"),
-   
+    
+    path('add_model_feedlotdesignparameters_ajax2/<int:model_id>/', views.general_page.add_model_feedlotdesignparameters_ajax2, name="add_model_feedlotdesignparameters_ajax2"),
+    path('update_model_feedlotdesignparameters_ajax/<int:id>/', views.general_page.update_model_feedlotdesignparameters_ajax, name="update_model_feedlotdesignparameters_ajax"),
+
       
     #get selected model spreadsheet
     path('get_beef_model_spreadsheets/<int:model_id>/', views.usermodels.get_model_spreadsheets, name="get_beef_model_spreadsheets"),

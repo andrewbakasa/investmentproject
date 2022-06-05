@@ -1,3 +1,4 @@
+from ast import Pass
 import copy
 from django.utils import translation
 from django.utils.decorators import method_decorator
@@ -16,14 +17,13 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.utils import get_column_letter,column_index_from_string
 from openpyxl.styles import Font, Color, Alignment, Border, Side, colors, NamedStyle,PatternFill
-from openpyxl.chart import BarChart, Reference
+from openpyxl.chart import BarChart, Reference, Series, LineChart, BubbleChart
 from openpyxl.styles import NamedStyle
 from openpyxl.formula.translate import Translator
 
 from openpyxl.utils import cell
-
 import math
-from investments_appraisal.base_report import BaseBusinessReport
+#from investments_appraisal.base_report import BaseBusinessReport
 
 
 
@@ -84,7 +84,7 @@ class ExcelReport():
             elif x.upper()=='NUMBER':
                 return '_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)' 
             elif x.upper()=='SMALL_NUMBER':
-                return '_(* #,##0.000_);_(* \(#,##0.000\);_(* "-"??_);_(@_)'
+                return '_(* #,##0.0##_);_(* \(#,##0.0##\);_(* "-"??_);_(@_)'
             else:
                 return 'General' 
         else:
@@ -352,8 +352,11 @@ class ExcelReport():
         return latest_row
 
     
-    def _hide_empty_cells(self, wkSheet):
+    def _hide_empty_cells(self, wkSheet,extra_cols=None):
         max_column =wkSheet.max_column
+
+        if extra_cols != None:
+            max_column +=extra_cols
         max_row =wkSheet.max_row
 
         last_column = cell.column_index_from_string('XFD')+1
@@ -567,8 +570,8 @@ class ExcelReport():
     def _output_bordered_section(self, w_sheet, col_letter_start, col_letter_end, 
                 start_row, end_row, title_, heading_style='Heading1', accent_style='Accent1'):
 
-        w_sheet.cell('%s%s'%(col_letter_start, start_row)).value = title_
-        w_sheet.cell('%s%s'%(col_letter_start, start_row)).style = heading_style
+        w_sheet['%s%s'%(col_letter_start, start_row)].value = title_
+        w_sheet['%s%s'%(col_letter_start, start_row)].style = heading_style
         w_sheet[col_letter_start + str(start_row)].alignment = Alignment(wrap_text=False,vertical='top')
 
         col_s =column_index_from_string(col_letter_start)
@@ -585,7 +588,7 @@ class ExcelReport():
     def _add_legend_section(self, w_sheet, row_index,total_wsheet_cols, unit_start_col=7):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Legend' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Legend' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -593,23 +596,23 @@ class ExcelReport():
         
         row_index +=2
         col = get_column_letter(unit_start_col)    
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Unit'
+        w_sheet['%s%s'%(col, row_index)].value = 'Unit'
         w_sheet['%s%s'%(col, row_index)].style= 'Explanatory Text'
 
         col = get_column_letter(unit_start_col+2)    
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Input'
+        w_sheet['%s%s'%(col, row_index)].value = 'Input'
         w_sheet['%s%s'%(col, row_index)].style= 'Input'
 
         col = get_column_letter(unit_start_col+3)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Calculation' 
+        w_sheet['%s%s'%(col, row_index)].value = 'Calculation' 
         w_sheet['%s%s'%(col, row_index)].style= 'Calculation'
 
         col = get_column_letter(unit_start_col+4)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Output'
+        w_sheet['%s%s'%(col, row_index)].value = 'Output'
         w_sheet['%s%s'%(col, row_index)].style= 'Output'
 
         col = get_column_letter(unit_start_col+5)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Linked Cell'
+        w_sheet['%s%s'%(col, row_index)].value = 'Linked Cell'
         w_sheet['%s%s'%(col, row_index)].style= 'Linkedcell'
 
         return row_index 
@@ -617,7 +620,7 @@ class ExcelReport():
     def _add_modelspecification_section(self,modelx, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Model specification' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Model specification' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -634,10 +637,10 @@ class ExcelReport():
         for model_item in self.sister_model.model_specifications:
             #print('model_item-->', model_item)
 
-            w_sheet.cell('%s%s'%(colHeader, row_index)).value = model_item['title']
+            w_sheet['%s%s'%(colHeader, row_index)].value = model_item['title']
             w_sheet['%s%s'%(colHeader, row_index)].font = self.description_font
 
-            w_sheet.cell('%s%s'%(colValue, row_index)).value = model_item['units']
+            w_sheet['%s%s'%(colValue, row_index)].value = model_item['units']
             w_sheet['%s%s'%(colValue, row_index)].style= 'Input'
             w_sheet['%s%s'%(colValue, row_index)].font = self.description_font2
             
@@ -661,10 +664,10 @@ class ExcelReport():
         row_index, header_title,value, val_number_format= 'General'):
 
         #----Tis function write eader and value as excel row wit formatin
-        w_sheet.cell('%s%s'%(write_colHeader, row_index)).value = header_title
+        w_sheet['%s%s'%(write_colHeader, row_index)].value = header_title
         w_sheet['%s%s'%(write_colHeader, row_index)].font = self.description_font
 
-        w_sheet.cell('%s%s'%(write_colValue, row_index)).value = value
+        w_sheet['%s%s'%(write_colValue, row_index)].value = value
         w_sheet['%s%s'%(write_colValue, row_index)].style= 'Input'
         w_sheet['%s%s'%(write_colValue, row_index)].number_format= val_number_format
         w_sheet['%s%s'%(write_colValue, row_index)].font = self.description_font2
@@ -672,7 +675,7 @@ class ExcelReport():
     def _add_timingassumptions_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Timing Assumptions' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Timing Assumptions' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -758,7 +761,7 @@ class ExcelReport():
     def _add_prices_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Prices' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Prices' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -767,7 +770,7 @@ class ExcelReport():
 
         #eadin 2
         col = get_column_letter(2)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Net Sales Price: %s' % (commodity_title)
+        w_sheet['%s%s'%(col, row_index)].value = 'Net Sales Price: %s' % (commodity_title)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading2'
         row_index +=1
 
@@ -778,9 +781,9 @@ class ExcelReport():
         row_index +=1
         
         # Base price of beef ROW:
-        w_sheet.cell('%s%s'%(colHeader, row_index)).value = 'Base price of %s in %s per ton' % (commodity_title ,self.sister_model.timing_assumptions['base_period']['value'])
+        w_sheet['%s%s'%(colHeader, row_index)].value = 'Base price of %s in %s per ton' % (commodity_title ,self.sister_model.timing_assumptions['base_period']['value'])
         w_sheet['%s%s'%(colHeader, row_index)].font = self.description_font
-        w_sheet.cell('%s%s'%(colValue, row_index)).value = self.sister_model.prices['base_price']
+        w_sheet['%s%s'%(colValue, row_index)].value = self.sister_model.prices['base_price']
         w_sheet['%s%s'%(colValue, row_index)].style= 'Input'
         if 'base_price' in self.track_inputs['prices']:
             self.track_inputs['prices']['base_price']['row'] = row_index
@@ -790,14 +793,14 @@ class ExcelReport():
             self.track_inputs['prices']['base_price']['value'] = self.sister_model.prices['base_price']
          
        
-        w_sheet.cell('%s%s'%(colUnits, row_index)).value  =self.modelspec_cell_ref['LC'] if  'LC' in self.modelspec_cell_ref else ''
+        w_sheet['%s%s'%(colUnits, row_index)].value  =self.modelspec_cell_ref['LC'] if  'LC' in self.modelspec_cell_ref else ''
         w_sheet['%s%s'%(colUnits, row_index)].style= 'Explanatory Text'  
         row_index +=1
 
         # Change in Price of Beef ROW:
-        w_sheet.cell('%s%s'%(colHeader, row_index)).value = 'Change in Price of %s'  % (commodity_title)
+        w_sheet['%s%s'%(colHeader, row_index)].value = 'Change in Price of %s'  % (commodity_title)
         w_sheet['%s%s'%(colHeader, row_index)].font = self.description_font
-        w_sheet.cell('%s%s'%(colValue, row_index)).value = self.sister_model.prices['change_in_price']
+        w_sheet['%s%s'%(colValue, row_index)].value = self.sister_model.prices['change_in_price']
 
         w_sheet['%s%s'%(colValue, row_index)].style= 'Linkedcell'
         w_sheet['%s%s'%(colValue, row_index)].number_format ='0%'
@@ -811,7 +814,7 @@ class ExcelReport():
          
         
 
-        w_sheet.cell('%s%s'%(colUnits, row_index)).value = self.modelspec_cell_ref['PERCENT'] if  'PERCENT' in self.modelspec_cell_ref else ''
+        w_sheet['%s%s'%(colUnits, row_index)].value = self.modelspec_cell_ref['PERCENT'] if  'PERCENT' in self.modelspec_cell_ref else ''
         w_sheet['%s%s'%(colUnits, row_index)].style= 'Explanatory Text'
 
         row_index +=1
@@ -819,7 +822,20 @@ class ExcelReport():
         return row_index 
 
     def _get_span(self):
-        span_ = self.sister_model.timing_assumptions['operation_duration']['value'] if 'operation_duration' in self.sister_model.timing_assumptions else 0
+        start=None
+        end= None
+        if 'base_period' in self.sister_model.timing_assumptions:
+            start=self.sister_model.timing_assumptions['base_period']['value'] 
+        
+        if 'operation_end' in self.sister_model.timing_assumptions:
+            end=self.sister_model.timing_assumptions['operation_end']['value'] 
+
+        if start and end:
+            span_ = end - start
+            #print(f' span_ = end - start: {span_} = {end} - {start}')
+
+        else:
+            span_ = self.sister_model.timing_assumptions['operation_duration']['value'] if 'operation_duration' in self.sister_model.timing_assumptions else 0
                 
            
         """ 
@@ -840,7 +856,7 @@ class ExcelReport():
   
     
     def _populate_investment_parameters_in_excelrow(self, w_sheet, options_arraylist, row_index, item):
-
+   
         total_len = len(options_arraylist)-1
         first_slice_point = get_column_letter(9) + str(row_index)# D09
         second_slice_point = get_column_letter(9 + int(total_len)) + str(row_index) # D16
@@ -863,7 +879,7 @@ class ExcelReport():
     def _add_depreciation_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Depreciation' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Depreciation' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -878,7 +894,7 @@ class ExcelReport():
        
         #==========Sub-heading=========================
         # col = get_column_letter(2)
-        # w_sheet.cell('%s%s'%(col, row_index)).value = 'Economic service life' 
+        # w_sheet['%s%s'%(col, row_index)].value = 'Economic service life' 
         # w_sheet['%s%s'%(col, row_index)].style= 'Heading2'
         self._add_sub_heading(w_sheet,'Economic service life',row_index)
         row_index +=1
@@ -903,7 +919,7 @@ class ExcelReport():
         row_index +=1 
         #==========Sub-heading=========================
         col = get_column_letter(2)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Recovery period for income tax' 
+        w_sheet['%s%s'%(col, row_index)].value = 'Recovery period for income tax' 
         w_sheet['%s%s'%(col, row_index)].style= 'Heading2'
         row_index +=1
         #----------------------------------- 
@@ -926,23 +942,23 @@ class ExcelReport():
         return row_index  
     def _add_sub_heading3(self, w_sheet, title, row_index):
         col = get_column_letter(4)
-        w_sheet.cell('%s%s'%(col, row_index)).value = title 
+        w_sheet['%s%s'%(col, row_index)].value = title 
         w_sheet['%s%s'%(col, row_index)].style= 'Heading4'
       
     def _add_sub_heading2(self, w_sheet, title, row_index):
         col = get_column_letter(3)
-        w_sheet.cell('%s%s'%(col, row_index)).value = title 
+        w_sheet['%s%s'%(col, row_index)].value = title 
         w_sheet['%s%s'%(col, row_index)].style= 'Heading3'
       
     def _add_sub_heading(self, w_sheet, title, row_index):
         col = get_column_letter(2)
-        w_sheet.cell('%s%s'%(col, row_index)).value = title 
+        w_sheet['%s%s'%(col, row_index)].value = title 
         w_sheet['%s%s'%(col, row_index)].style= 'Heading2'
         
     def _add_workingCapital_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Working Capital' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Working Capital' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -981,17 +997,17 @@ class ExcelReport():
                                     blank_UNITS =False,  valfield_style='Explanatory Text'):
 
         #----Tis function write eader and value as excel row wit formatin
-        w_sheet.cell('%s%s'%(write_colHeader, row_index)).value = header_title
+        w_sheet['%s%s'%(write_colHeader, row_index)].value = header_title
         w_sheet['%s%s'%(write_colHeader, row_index)].font = self.description_font
         # if None skip
         if input_value != None:
-            w_sheet.cell('%s%s'%(write_colValue, row_index)).value = input_value
+            w_sheet['%s%s'%(write_colValue, row_index)].value = input_value
             w_sheet['%s%s'%(write_colValue, row_index)].style= 'Input'
         w_sheet['%s%s'%(write_colValue, row_index)].number_format= val_number_format
         w_sheet['%s%s'%(write_colValue, row_index)].font = self.description_font2
        
         if blank_UNITS==False:
-            w_sheet.cell('%s%s'%(write_colUnits, row_index)).value = ref_formular_unit
+            w_sheet['%s%s'%(write_colUnits, row_index)].value = ref_formular_unit
             w_sheet['%s%s'%(write_colUnits, row_index)].style= valfield_style
         
     def _write_row_title_and_value4(self, 
@@ -1003,18 +1019,18 @@ class ExcelReport():
         
       
         #----Tis function write eader and value as excel row wit formatin
-        w_sheet.cell('%s%s'%(write_colHeader, row_index)).value = header_title
+        w_sheet['%s%s'%(write_colHeader, row_index)].value = header_title
         w_sheet['%s%s'%(write_colHeader, row_index)].font = self.description_font
         # if None skip
         if input_value != None:
-            w_sheet.cell('%s%s'%(write_colValue, row_index)).value = input_value
+            w_sheet['%s%s'%(write_colValue, row_index)].value = input_value
         w_sheet['%s%s'%(write_colValue, row_index)].style= 'Output2'
         
         w_sheet['%s%s'%(write_colValue, row_index)].number_format= val_number_format
         w_sheet['%s%s'%(write_colValue, row_index)].font = self.description_font2
        
         if blank_UNITS == False:
-            w_sheet.cell('%s%s'%(write_colUnits, row_index)).value = ref_formular_unit
+            w_sheet['%s%s'%(write_colUnits, row_index)].value = ref_formular_unit
             w_sheet['%s%s'%(write_colUnits, row_index)].style= valfield_style
        
         return [w_sheet,write_colHeader, write_colValue, write_colUnits,row_index, header_title ,  
@@ -1024,7 +1040,7 @@ class ExcelReport():
     def _add_financing_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Financing' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Financing' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -1041,7 +1057,7 @@ class ExcelReport():
         itemlist =['real_interest_rate','risk_premium','num_of_installments','grace_period','repayment_starts']
         #==========Sub-heading=========================
         col = get_column_letter(2)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Suppliers credit' 
+        w_sheet['%s%s'%(col, row_index)].value = 'Suppliers credit' 
         w_sheet['%s%s'%(col, row_index)].style= 'Heading2'
         row_index +=1
         #-----------------------
@@ -1063,7 +1079,7 @@ class ExcelReport():
         
         #==========Sub-heading=========================
         col = get_column_letter(2)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Financing as a  % of Investment Costs' 
+        w_sheet['%s%s'%(col, row_index)].value = 'Financing as a  % of Investment Costs' 
         w_sheet['%s%s'%(col, row_index)].style= 'Heading2'
         row_index +=1
         #-----------------------
@@ -1082,7 +1098,7 @@ class ExcelReport():
                 self.track_inputs['financing'][item]['value'] = self.sister_model.financing[item]['value']  
 
                 if item=='equity':
-                    w_sheet.cell('%s%s'%(colValue, row_index)).value ='=1-'+ colValue + str(row_index +1)
+                    w_sheet['%s%s'%(colValue, row_index)].value ='=1-'+ colValue + str(row_index +1)
                     w_sheet['%s%s'%(colValue, row_index)].fill = PatternFill(fgColor='FFF2F2F2', patternType='solid', fill_type='solid')  
                     
                 #self._populate_flags_section(w_sheet, row_index, item, cell_ref_timing)
@@ -1101,10 +1117,10 @@ class ExcelReport():
         row_index, header_title,value, val_number_format= 'General', valfield_style='Explanatory Text'):
 
         #----Tis function write eader and value as excel row wit formatin
-        w_sheet.cell('%s%s'%(write_colHeader, row_index)).value = header_title
+        w_sheet['%s%s'%(write_colHeader, row_index)].value = header_title
         w_sheet['%s%s'%(write_colHeader, row_index)].font = self.description_font
 
-        w_sheet.cell('%s%s'%(write_colValue, row_index)).value = value
+        w_sheet['%s%s'%(write_colValue, row_index)].value = value
         w_sheet['%s%s'%(write_colValue, row_index)].style= valfield_style
         #w_sheet['%s%s'%(write_colValue, row_index)].number_format= val_number_format
         #w_sheet['%s%s'%(write_colValue, row_index)].font = self.description_font2
@@ -1217,7 +1233,7 @@ class ExcelReport():
                     years_cell = cell.column + str(flags_years_row)
                     w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=IF(OR(' + years_cell + '<' + cell_ref_timing['repayment_starts'] + \
                                                                   ',' + years_cell +'>('+ cell_ref_timing['repayment_starts'] + \
-                                                                  '+' + cell_ref_timing['num_of_installments'] + '-' + cell_ref_timing['grace_period'] + '-1)),0,1)'
+                                                                  '+' + cell_ref_timing['num_of_installments'] + '-1)),0,1)'
                     w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Output2'
                     #w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General'
 		
@@ -1264,7 +1280,7 @@ class ExcelReport():
     def _add_flags_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Flags' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Flags' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -1337,7 +1353,7 @@ class ExcelReport():
     def _add_taxes_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Taxes' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Taxes' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -1371,7 +1387,7 @@ class ExcelReport():
     def _add_macroeconomicParameters_section(self, w_sheet, row_index,total_wsheet_cols):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Macroeconomic Parameters' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Macroeconomic Parameters' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -1410,16 +1426,16 @@ class ExcelReport():
         if found_state:
             c= get_column_letter(c_index)
             if val != None:
-                w_sheet.cell('%s%s'%(c, r_index)).value ='=' +   val
+                w_sheet['%s%s'%(c, r_index)].value ='=' +   val
             if  linked_Style =='Linkedcell':
                 #linked  
-                w_sheet.cell('%s%s'%(c, r_index)).style = linked_Style
+                w_sheet['%s%s'%(c, r_index)].style = linked_Style
             else:
                 #calculated
                 w_sheet['%s%s'%(c, r_index)].style = 'Calculation'
             
             if format_style != "":
-                w_sheet.cell('%s%s'%(c, r_index)).number_format= self._get_number_formats(format_style) 
+                w_sheet['%s%s'%(c, r_index)].number_format= self._get_number_formats(format_style) 
         
   
     def _hide_rows(self, wkSheet, start, end):
@@ -1461,7 +1477,7 @@ class ExcelReport():
                 _col_index = self.track_inputs[header_par][sub_header]['col']
                 found_state=True
                 col_Letter = get_column_letter(_col_index)
-                return  w_sheet.cell('%s%s'%(col_Letter, _row_index)).value, found_state 
+                return  w_sheet['%s%s'%(col_Letter, _row_index)].value, found_state 
         return  _,  found_state
 
     def _retrieve_cell_formuale(self, w_sheet, header_par, sub_header):
@@ -1489,7 +1505,7 @@ class ExcelReport():
                                          first_col_num_format='General'):
          #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = header_title
+        w_sheet['%s%s'%(col, row_index)].value = header_title
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not track_input_item in self.track_inputs:
@@ -1794,7 +1810,7 @@ class ExcelReport():
     def _add_cal_finished_product_inventory_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'FINISHED PRODUCT INVENTORY VALUATION USING FIFO METHOD (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'FINISHED PRODUCT INVENTORY VALUATION USING FIFO METHOD (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_finished_product_inventory' in self.track_inputs:
@@ -1912,7 +1928,7 @@ class ExcelReport():
     def _add_cal_loan_schedule_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'LOAN SCHEDULE (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'LOAN SCHEDULE (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_loan_schedule' in self.track_inputs:
@@ -2043,7 +2059,7 @@ class ExcelReport():
     def _add_cal_depreciation_for_tax_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'DEPRECIATION FOR TAX PURPOSES (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'DEPRECIATION FOR TAX PURPOSES (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_depreciation_for_tax' in self.track_inputs:
@@ -2151,7 +2167,7 @@ class ExcelReport():
     def _add_cal_income_tax_statement_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'INCOME TAX STATEMENT (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'INCOME TAX STATEMENT (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
         if not 'cal_income_tax_statement' in self.track_inputs:
@@ -3035,7 +3051,7 @@ class ExcelReport():
     def _add_cal_working_capital_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'WORKING CAPITAL (Nominal)'
+        w_sheet['%s%s'%(col, row_index)].value = 'WORKING CAPITAL (Nominal)'
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
 
@@ -3984,7 +4000,7 @@ class ExcelReport():
     def _add_cal_inflation_price_indices_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'INFLATION, EXCHANGE RATE AND PRICE INDICES' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'INFLATION, EXCHANGE RATE AND PRICE INDICES' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
 
 
@@ -4253,7 +4269,7 @@ class ExcelReport():
       
         # Writing the first row of the csv	
         col = get_column_letter(1)
-        analytics_sheet.cell('%s%s'%(col, 1)).value = 'Analytic sheet'
+        analytics_sheet['%s%s'%(col, 1)].value = 'Analytic sheet'
         analytics_sheet['%s%s'%(col, 1)].style= 'Heading1'
     
         span_ = 6 
@@ -4266,33 +4282,59 @@ class ExcelReport():
         #==========Model Specification Section =========================
         row_index +=2
         row_index = self._add_analytics_gradient_section(wb, analytics_sheet, row_index,total_wsheet_cols)
-
-       
-
+        
+        #add three row
+        row_index += 3
        
         # hide---------------
-        self._hide_empty_cells(analytics_sheet)
+        self._hide_empty_cells(analytics_sheet,2)
 
          #--set dim---
         rangelist= []
-        rangelist.append({'start':14, 'end': 16, 'dim':2})
-        rangelist.append({'start':3, 'end': 13, 'dim':10})
+        rangelist.append({'start':14+2, 'end': 16+2, 'dim':2})
+        rangelist.append({'start':3, 'end': 13+2, 'dim':10})
 
         indexlist= []
         #indexlist.append({'index':margin_offset+1, 'dim':5})
         indexlist.append({'index':1, 'dim':2})
         indexlist.append({'index':2, 'dim':40})
         
-        #skipp one row
-        analytics_sheet.append([])
+        
+        
+       
+      
         if hasattr(self.sister_model,'npv_distribution'):
+            for i in self.sister_model.employed_scenario_inputs.keys():
+                Pass
+            #skipp thre row
+            analytics_sheet.append([])
+            analytics_sheet.append(["","","","","",""])
+            analytics_sheet.append(["","","","","",""])   
+      
+
+            col = get_column_letter(2)    
+            analytics_sheet['%s%s'%(col, row_index)].value = 'MonteCarlo Simulation Graphs' #% (user)
+            analytics_sheet['%s%s'%(col, row_index)].style= 'Heading1'
+
             npv_y= list(self.sister_model.npv_distribution['y'])
-            npv_x= list(self.sister_model.npv_distribution['x'])
+            npv_x_thousand = np.array(list(self.sister_model.npv_distribution['x']))/1000
+            npv_x= list(np.round(npv_x_thousand,1))
             npv_cdf= list(self.sister_model.npv_distribution['cdf'])
+            prob_npv_zero=self.sister_model.npv_distribution['prob_npv_zero']
+             
+            
+            mean= round(self.sister_model.npv_distribution['mean']/1000,1)
+            sd=round(math.sqrt(self.sister_model.npv_distribution['variance']/1000000),1)
+           
+            #-------Title plus blank
             npv_y.insert(0,'PDF')
             npv_y.insert(0,'')
+
+            #-------Title plus blank
             npv_x.insert(0,'NPV')
             npv_x.insert(0,'')
+
+            #-------Title plus blank
             npv_cdf.insert(0,'CDF')
             npv_cdf.insert(0,'')
             data = [
@@ -4300,30 +4342,149 @@ class ExcelReport():
                 npv_y,
                 npv_cdf,
             ]      
-        
+            #print(data)
             # write content of each row in 1st and 2nd
             # column of the active sheet respectively .
             for row in data:
                 analytics_sheet.append(row)
-    
-            latest_row= row_index + 2 +1
-            last_col = 3 + len(data[0])-3# three empty space subtract
+            
+            #last row for NPV-ZERO
+            npvz= []
+            npvz.append('')
+            npvz.append('Prob. NPV >= Zero')
+            for i in range(max(len(data[0])-1-1,0)):
+                npvz.append(prob_npv_zero) 
+            analytics_sheet.append(npvz)
+            
+            npvless= []
+            npvless.append('')
+            npvless.append('Prob. NPV less Zero')
+            for i in range(max(len(data[0])-1-1,0)):
+                npvless.append(1-prob_npv_zero) 
+            analytics_sheet.append(npvless)
+            
+            #------------------------------------
+            stride= max(len(data[0])-1-1,0)
+            #set border
+            self._set_chart_data_border(analytics_sheet, row_index, stride)
+            
+          
+            
+            latest_row= row_index  + 2  
+            last_col = 3 + len(data[0])-3 # three empty space subtract
             first_col =3
-            heading_row_index=latest_row-1
-            #6.-----------------------Draw Chart------------------------------
-            self.drawChart(analytics_sheet,latest_row, latest_row,
-                first_col, last_col,	latest_row +3, 
-                heading_row_index, heading_row_index,
-                "PDF","NPV")
-            #-------------------------------------------------
+            heading_row_index= row_index +1
 
+            prob_npv_zero=round(prob_npv_zero*100)
+
+            prob_npv_zero_stat= f'Prob NPV > 0 is {prob_npv_zero} %'
+            #6.-----------------------Draw Chart------------------------------
+            self.drawChart2(analytics_sheet, latest_row, latest_row,
+                first_col, last_col,	latest_row + 4 + 5, 
+                heading_row_index, heading_row_index,
+                f"PDF {prob_npv_zero_stat}",f"NPV (000)  u:{mean}  sd: {sd} ")
+            #-------------------------------------------------
+            added_rows=6
+            self._cal_mean_variance(analytics_sheet, row_index, added_rows, stride)
+
+          
         #set dims----
         self._set_column_dim(analytics_sheet,rangelist,indexlist)
-    
+
+    def _cal_mean_variance(self ,w_sheet, base_index, added_rows, stride):
+        row_index= base_index + added_rows
+        row_i = row_index +1
+        number_format ='_(* #,##0.0##_);_(* \(#,##0.0##\);_(* "-"??_);_(@_)'
+
+        first_slice_point = get_column_letter(3) + str(row_i )# skip heeder and first row 
+        second_slice_point = get_column_letter(3 + int(stride-1)) + str(row_i+2) # D39
+
+        # last cell
+        header_column = get_column_letter(2) 
+        last_column = get_column_letter(3 + int(stride-1+1)) 
+        last_column_less_one = get_column_letter(3 + int(stride-1))
+        
+        #Average Sum
+        first_row_first_point = get_column_letter(3) + str(row_i )
+        first_row_last_point = last_column_less_one + str(row_i )
+        range_ = first_row_first_point + ':' + first_row_last_point
+        denominator_ ='COUNTA(' + range_ + ')'
+        w_sheet['%s%s'%(last_column, row_i)]= '=Sum('+ range_ + ')/' + denominator_ 
+        w_sheet['%s%s'%(header_column, row_i)]= 'Mean' 
+        w_sheet['%s%s'%(last_column, row_i)].number_format = number_format
+        w_sheet['%s%s'%(last_column, row_i)].font = Font(name='Arial',bold=True, 
+                                                     sz=11.0, color='FF0070C0', scheme='minor')     
+      
+        #Sum Of Difference ((COUNTA(C47:N47)-1))
+        third_row_first_point = get_column_letter(3) + str(row_i+2 )
+        third_row_last_point = last_column_less_one + str(row_i+2 )
+        range_ = third_row_first_point + ':' + third_row_last_point
+        denominator_ ='COUNTA(' + range_ + ')-1'
+        w_sheet['%s%s'%(last_column, row_i + 2)]= '=Sum('+ range_ + ')/(' + denominator_ + ')'
+        w_sheet['%s%s'%(header_column, row_i + 2)]= 'Variance'
+        w_sheet['%s%s'%(last_column, row_i + 2)].number_format = number_format
+        w_sheet['%s%s'%(last_column, row_i + 2)].font = Font(name='Arial',bold=True, 
+                                                     sz=11.0, color='FF0070C0', scheme='minor')  
+
+        for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
+            for cell in cellObj:
+                #w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'  
+
+                if  cell.row == row_i : #dict_['1']:  
+                    npv_cell = cell.column + str(row_i -added_rows)  
+                    pdf_cell = cell.column + str(row_i - added_rows +1)    
+                    w_sheet['%s%s'%(cell.column, cell.row)]= '='+ npv_cell + '*' + pdf_cell
+                elif (cell.row == row_i + 1):
+                    #Diff
+                    npv_cell = cell.column + str(cell.row-1)  
+                    average_cell = last_column + str(cell.row-1 )    
+                    w_sheet['%s%s'%(cell.column, cell.row)]= '='+ npv_cell + '-' + average_cell
+
+                elif (cell.row == row_i + 2):
+                    #summm sqr
+                    prev_cell = cell.column + str(cell.row-1)     
+                    w_sheet['%s%s'%(cell.column, cell.row)]= '='+ prev_cell + '^2' 
+
+                w_sheet['%s%s'%(cell.column, cell.row)].number_format = number_format   
+
+        #---------List Parameters used in Simulation::::::
+        scenario_var =self.sister_model.employed_scenario_inputs
+        next_toheader_column = get_column_letter(3) 
+        list_of_paras= ''
+        for i in scenario_var.keys():
+            if len(list_of_paras)>0:
+                list_of_paras += ', ' + i
+            else:
+                #first ele
+                list_of_paras =  i
+        #Write it 25 lines below
+        w_sheet['%s%s'%(header_column, row_i + 2 + 17 )]= f'{len(scenario_var)} Parameters Employed'
+        w_sheet['%s%s'%(next_toheader_column, row_i + 2 + 17 )]= list_of_paras
+
+            
+    def _set_chart_data_border(self ,w_sheet, row_index, stride):
+        row_i= row_index+1
+        # format table
+        number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+        number_format_2 ='_(* #,##0.0###_);_(* \(#,##0.0###\);_(* "-"??_);_(@_)'
+        first_slice_point = get_column_letter(3) + str(row_i )# skip heeder and first row 
+        second_slice_point = get_column_letter(3 + int(stride-1)) + str(row_i  + 4) # D39
+        for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
+            for cell in cellObj:
+                w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'  
+
+                if  cell.row > row_i:        
+                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = number_format_2
+                else:
+                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = number_format
+                w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
+                                                sz=11.0, color='FF0070C0', scheme='minor')  
+
+               
     def _add_analytics_gradient_section(self,wb, w_sheet, row_index,total_wsheet_cols):
          #==========Lengend=========================
         col = get_column_letter(1)
-        w_sheet.cell('%s%s'%(col, row_index)).value = 'Parameters Gradients' #% (user)
+        w_sheet['%s%s'%(col, row_index)].value = 'Parameters Gradients' #% (user)
         w_sheet['%s%s'%(col, row_index)].style= 'Heading1'
       
         self._set_thick_bottom_border_range( w_sheet,  row_index, 1, total_wsheet_cols)
@@ -4478,7 +4639,7 @@ class ExcelReport():
       
         # Writing the first row of the csv	
         col = get_column_letter(1)
-        sens_sheet.cell('%s%s'%(col, 1)).value = 'Sensitivity analysis sheet'
+        sens_sheet['%s%s'%(col, 1)].value = 'Sensitivity analysis sheet'
         sens_sheet['%s%s'%(col, 1)].style= 'Heading1'
     
         span_ = 6 
@@ -4553,21 +4714,66 @@ class ExcelReport():
         chart.style = 24
         wkSheet.add_chart(chart, chart_draw_cell)
 
-        """ 
-        # create data for plotting
-        from openpyxl.chart import BubbleChart, Reference, Series
-        xvalues = Reference(wkSheet, min_col = 1, min_row = 2, max_row = 5)
-        yvalues = Reference(wkSheet, min_col = 2, min_row = 2, max_row = 5)
-        size = Reference(wkSheet, min_col = 3, min_row = 2, max_row = 5)
-        # create a 1st series of data
-        series = Series(values = yvalues, xvalues = xvalues, zvalues = size, title ="2013")
-        # add series data to the chart object
-        chart.series.append(series)
-        # add chart to the sheet the top-left corner of a chart
-        # is anchored to cell E2
-        sheet.add_chart(chart, "E2")   
-        """
        
+         
+       
+    def drawChart2(self, wkSheet,
+                min_row,max_row,
+                min_col,max_col,
+                chart_row_index_pos, 
+                cat_min_row, cat_max_row, 
+                chart_title, x_axis_title):
+        #-----------------------Draw Charts
+        #chart2 = BarChart()
+
+       
+       
+        col_first = get_column_letter(min_col)# max [0,first_col]
+        chart_draw_cell = col_first + str(chart_row_index_pos)# "F3"
+     
+     
+        # setup the chart
+        chart = LineChart()
+        #chart.drawing.name = 'This is my chart'
+
+        # setup and append the first series
+        values1 = Reference(wkSheet, min_col = min_col, max_col=max_col, min_row = min_row, max_row = max_row)
+        series1 = Series(values1, title="PDF")
+        chart.append(series1)
+
+        # setup and append the second series
+        values2 = Reference(wkSheet, min_col = min_col, max_col=max_col, min_row = min_row+1, max_row = max_row+1)
+        series2 = Series(values2, title="CDF")
+        chart.append(series2)
+
+         # setup and append the third series
+        values3 = Reference(wkSheet, min_col = min_col, max_col=max_col, min_row = min_row+2, max_row = max_row+2)
+        series3 = Series(values3, title="NPV +")
+        chart.append(series3)
+
+
+          # setup and append the third series
+        values4 = Reference(wkSheet, min_col = min_col, max_col=max_col, min_row = min_row+3, max_row = max_row+3)
+        series4 = Series(values4, title="NPV -")
+        #print(f'type of values4 4: {type(values4)}')
+        chart.append(series4)
+
+        cats = Reference(worksheet=wkSheet,
+                        min_row=cat_min_row,
+                        max_row=cat_max_row,
+                        min_col=min_col,
+                        max_col=max_col,
+                        )
+        chart.set_categories(cats)
+
+        chart.x_axis.title = x_axis_title
+        chart.y_axis.title = chart_title
+
+        wkSheet.add_chart(chart, chart_draw_cell)
+        #wkSheet.add_chart(chart2, chart_draw_cell)
+        
+       
+          
     #----------------Check Additiona Methods---------------------------------------------
             
     def _get_out_values_as_dict(self,wb):

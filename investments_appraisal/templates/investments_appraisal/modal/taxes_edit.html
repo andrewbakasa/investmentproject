@@ -1,0 +1,45 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+<div class="modal-header">
+    <h4 class="modal-title myModalLabel">Edit Taxes [{{usermodel| truncatechars:15}}]</h4>
+    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>       
+</div>
+
+<div class="modal-body">
+    <form id='form-taxes' class="model-form-edit model-taxes-edit form-horizontal" 
+      enctype="multipart/form-data" method="post" data-url="{% url 'update_model_taxes_ajax' taxes_form.instance.id %}">
+      {% csrf_token %}
+      
+        <div class="modal-body">
+
+
+            {% include 'investments_appraisal/form_taxes.html' %}      
+            <div class="form-error2 public_toggle_form-errors" style='display:none'>
+            </div>
+        </div>
+
+  <!--Footer-->
+  <div class="modal-footer">
+    <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+        type="reset">Close
+    </button>
+    <button class="btn btn-danger" type="submit">Save</button>
+
+    
+  </div>
+</form>
+
+
+
+
+
+
+
+

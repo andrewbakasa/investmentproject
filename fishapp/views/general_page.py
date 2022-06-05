@@ -176,14 +176,7 @@ def add_model_specs_page_mentor(request, model_id):
 	else:
 		macroeconomicparameters_form = MacroeconomicParametersForm(initial={'usermodel': usermodel})
 		
-    # #8. Model FeedlotDesignParametersForm
-	# model_feedlotdesignparameters = FeedlotDesignParameters.objects.filter(usermodel=usermodel).first()
-	# if model_feedlotdesignparameters :
-
-	# 	feedlotdesignparameters_form = FeedlotDesignParametersForm(instance=model_feedlotdesignparameters)
-	# else:
-	# 	feedlotdesignparameters_form = FeedlotDesignParametersForm(initial={'usermodel': usermodel})
-	
+  
     #9. Model TankDesignParameterForm
 	model_tankdesignparameters = TankDesignParameters.objects.filter(usermodel=usermodel).first()
 	if model_tankdesignparameters :	
@@ -536,9 +529,11 @@ def check_run_requirements_ajax(request, model_id, *args, **kwargs):
 			if progress_count<8:
 				return JsonResponse({'error': False, 'data': False, 'status': f'{progress_count} of 8 Complete'})
 			else:
-				#update database
-				usermodel.design_complete= True
-				usermodel.save()
+
+				if usermodel.design_complete== False:
+					#update database
+					usermodel.design_complete= True
+					usermodel.save()
 				return JsonResponse({'error': False, 'data': True, 'status': f'{progress_count} of 8 Complete'})
 			
 		
@@ -549,3 +544,98 @@ def check_run_requirements_ajax(request, model_id, *args, **kwargs):
 			'message': 'Error, must be an Ajax call.'
 		}
 		return JsonResponse(error, content_type="application/json")
+
+
+login_required(login_url="account_login")
+def update_model_tankdesignparameters_ajax(request, id, *args, **kwargs):
+	
+	obj_instance = get_object_or_404(TankDesignParameters, pk=id)
+	if request.method == 'POST':
+		form = TankDesignParametersForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call
+		form = TankDesignParametersForm( instance=obj_instance)
+	return save_update_model_tankdesignparameters(request,form,'fishapp/modal/tank_design_edit.html')
+
+def save_update_model_tankdesignparameters(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(TankDesignParameters,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(TankDesignParameters,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(TankDesignParameters,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'tankdesignparameters_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def add_model_tankdesignparameters_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	
+	if request.method == 'POST':
+		form = TankDesignParametersForm(request.POST or None)
+ 								
+	else:
+		#first time call 
+		form = TankDesignParametersForm(initial={'usermodel': model_instance})
+	return save_add_model_tankdesignparameters(request,form,model_instance,'fishapp/modal/tank_design.html')
+
+def save_add_model_tankdesignparameters(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(TankDesignParameters,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'tankdesignparameters_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+

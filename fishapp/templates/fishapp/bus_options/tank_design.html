@@ -1,3 +1,7 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
 <div class="box box-profile">
     <div class="box-body" id='tankdesignparameters_section'>
         <h4 class="box-title" style="color:blue">Tank Design Parameters</h4>
@@ -12,53 +16,88 @@
                         <tbody id="tankdesignparameters-table-tbody">
                             <tr id="tankdesignparameters-tank_length" >
                                 <th scope="row">Length</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData" name="tank_length" >{{tankdesignparameters_record.tank_length}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData" name="tank_length" >{{tankdesignparameters_record.tank_length| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                    
                             <tr id="tankdesignparameters-tank_width" >
                                 <th scope="row">Width</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="tank_width">{{tankdesignparameters_record.tank_width}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="tank_width">{{tankdesignparameters_record.tank_width| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                             <tr id="tankdesignparameters-depth" >
                                 <th scope="row">Depth</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="depth">{{tankdesignparameters_record.depth}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="depth">{{tankdesignparameters_record.depth| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                             <tr id="tankdesignparameters-volume_of_water" >
                                 <th scope="row">Volume of water</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData" name="volume_of_water" >{{tankdesignparameters_record.volume_of_water}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData" name="volume_of_water" >{{tankdesignparameters_record.volume_of_water| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                             <tr id="tankdesignparameters-density_per_cubic_metre" >
                                 <th scope="row">Density per cubic metre</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="density_per_cubic_metre">{{tankdesignparameters_record.density_per_cubic_metre}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="density_per_cubic_metre">{{tankdesignparameters_record.density_per_cubic_metre| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                             <tr id="tankdesignparameters-total_fish_per_tank_per_cycle" >
                                 <th scope="row">Total fish per tank per cycle</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="total_fish_per_tank_per_cycle">{{tankdesignparameters_record.total_fish_per_tank_per_cycle}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="total_fish_per_tank_per_cycle">{{tankdesignparameters_record.total_fish_per_tank_per_cycle| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
 
                             <tr id="tankdesignparameters-tank_num_of_months_per_cycle" >
                                 <th scope="row"># of months per cycle</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="tank_num_of_months_per_cycle">{{tankdesignparameters_record.tank_num_of_months_per_cycle}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="tank_num_of_months_per_cycle">{{tankdesignparameters_record.tank_num_of_months_per_cycle| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                             <tr id="tankdesignparameters-fish_per_tank_per_year" >
                                 <th scope="row">Annual Fish per tank per year</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="fish_per_tank_per_year">{{tankdesignparameters_record.fish_per_tank_per_year}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="fish_per_tank_per_year">{{tankdesignparameters_record.fish_per_tank_per_year| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
                             <tr id="tankdesignparameters-num_of_tanks" >
                                 <th scope="row"># of Tanks</th>
-                                <td class="tankdesignparametersAction tankdesignparametersData"  name="num_of_tanks">{{tankdesignparameters_record.num_of_tanks}}</td>                                                    
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="num_of_tanks">{{tankdesignparameters_record.num_of_tanks| floatformat:-1 |intcomma}}</td>                                                    
                             </tr>
+                            
+                            <tr id="tankdesignparameters-purchase_price_tank" >
+                                <th scope="row">Unit Tank Price</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="purchase_price_tank">{{tankdesignparameters_record.purchase_price_tank| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+
+                            <tr id="tankdesignparameters-machinery_cost_per_tank" >
+                                <th scope="row">Machinery Price Per Tank</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="machinery_cost_per_tank">{{tankdesignparameters_record.machinery_cost_per_tank| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+                            <tr id="tankdesignparameters-building_cost_per_sqm" >
+                                <th scope="row">Building cost per sqm (of Total Land)</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="building_cost_per_sqm">{{tankdesignparameters_record.building_cost_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+
+                            <tr id="tankdesignparameters-total_land_sqm" >
+                                <th scope="row">Total land (sqm)</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="total_land_sqm">{{tankdesignparameters_record.total_land_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+                            <tr id="tankdesignparameters-cost_of_land_per_sqm" >
+                                <th scope="row">Land cost per sqm</th>
+                                <td class="tankdesignparametersAction tankdesignparametersData"  name="cost_of_land_per_sqm">{{tankdesignparameters_record.cost_of_land_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
 
                            
                         </tbody>
                     </table>
                 </div>
-                <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                data-target="#modal_add_model_tankdesignparameters"> <i class="fa fa-edit"></i></a>
-            {% else %}
+                   
+                <!-- EDIT MODEL -->
+                <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model_tankdesignparameters_ajax' tankdesignparameters_record.id %}" 
+                    data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                    title='Edit Tank Parameters'><i  class="fas fa-edit"></i>
+                </a>
+         {% else %}
+          
                 <!-- Add For First Time -->
-                <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                data-target="#modal_add_model_tankdesignparameters"> <i class="fa fa-plus"></i></a>
+                <a class="model-edit show-form-update" href="#" data-url="{% url 'add_model_tankdesignparameters_ajax2' usermodel.id %}" 
+                    data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+                    title='Add Tank Parameters'><i  class="fas fa-plus"></i>
+                </a>
             {% endif%}
         </div>
     </div>

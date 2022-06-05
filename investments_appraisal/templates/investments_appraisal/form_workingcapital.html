@@ -11,7 +11,7 @@
 <div class="form-group row"> 
     <label class="col-sm-7 col-form-label" for="{{ workingcapital_form.accounts_receivable.id_for_label }}">{{ workingcapital_form.accounts_receivable.label }}</label>
     <div class="col-sm-4 {% if workingcapital_form.accounts_receivable.errors %} has-error{% endif %}">
-      {{ workingcapital_form.accounts_receivable|add_class:"form-control" }}
+      {{ workingcapital_form.accounts_receivable|add_class:"form-control change-percent" }}
       {% for error in workingcapital_form.accounts_receivable.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -21,7 +21,7 @@
 <div class="form-group row">
     <label class=" col-sm-7 col-form-label" for="{{ workingcapital_form.accounts_payable.id_for_label }}">{{ workingcapital_form.accounts_payable.label }}</label>
     <div class="col-sm-4 {% if workingcapital_form.accounts_payable.errors %} has-error{% endif %}">
-      {{ workingcapital_form.accounts_payable|add_class:"form-control" }}
+      {{ workingcapital_form.accounts_payable|add_class:"form-control change-percent" }}
       {% for error in workingcapital_form.accounts_payable.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -31,7 +31,7 @@
 <div class="form-group row">
     <label class="col-sm-7 col-form-label" for="{{ workingcapital_form.cash_balance.id_for_label }}">{{ workingcapital_form.cash_balance.label }}</label>
     <div class="col-sm-4 {% if workingcapital_form.cash_balance.errors %} has-error{% endif %}">
-      {{ workingcapital_form.cash_balance|add_class:"form-control" }}
+      {{ workingcapital_form.cash_balance|add_class:"form-control change-percent" }}
       {% for error in workingcapital_form.cash_balance.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}

@@ -44,41 +44,44 @@
                 <div class="box">
                     <div class="box-body">
                         {%if first_page %}
-                        <h4 style="text-align:center;"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
+                        <h4 style="text-align:center;" id="personal_totals"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
                         <hr>
                         <div class="table-responsive">
                             <table id="usersTable" class="table table-striped">
                                 <thead class="thead-dark">
                                 <th style="width: 1%" >#</th>    
-                                <th style="width: 9%" >Investment Title</th>
-                                <th style="width: 158%" >Investment Summary</th>
+                                <th style="width: 15%" >Investment Title</th>
+                                <th style="width: 35%" >Investment Summary</th>
                                 <th style="width: 10%" >Total value</th>
                                 <th style="width: 10%" >My Contr</th>
                                 <th style="width: 10%" >Category</th>
                                 <th style="width: 10%" >Owner</th>
+                                <th style="width: 10%" >Application Status</th>
                                 <th style="width: 7%" class="text-right">Actions</th>
                                 </thead>
                                 <tbody id="userinvestment-table-tbody">
                                 {% for item in first_page  %}
                                 <tr id="item-{{item.id}}" >
                                     <td>{{forloop.counter}}</td>
-                                    <td class="modelData" name="name" >{{item.inv_name}}</td>
-                                    <td class="modelData" name="description" >{{item.summary}}</td>
+                                  
+                                    <td class="modelData" name="name" >{{item.inv_name |truncatechars:15}}</td>
+                                    <td class="modelData" name="description" >{{item.summary|truncatechars:40}}</td>
                                     <td class="modelData" name="category" >${{item.total_value| intcomma}}</td>
                                     <td class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
                                     <td class="modelData" name="category" >{{item.cat_name}}</td>
                                     
                                     <td class="modelData" name="email" >{{item.email }}</td>
+                                    <td class="modelData" name="application_status" >{{ item.application_status }}</td>
                                     <td class="text-right modelAction modelData" name="action">
                                         <a href="{% url 'investment-details' item.iid %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='View Investment'><i class="fa fa-eye"></i>
+                                            title='View Investment'><i class="fas fa-eye"></i>
                                         </a>
                                          
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                           data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
                                           data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Withdraw Investment' > <i class="fa fa-trash "></i> 
+                                          title='Withdraw Investment' > <i class="fas fa-trash"></i> 
                                         </a>
                                       </td>
                                    
@@ -165,6 +168,18 @@
 
 {% block scripts %}
 <script>
+     function truncChar(str,length){
+        var myTruncatedString = str.substring(0,length);              
+        if (str.length > myTruncatedString.length){
+        return myTruncatedString + "..."
+        }
+        return myTruncatedString
+    }
+     function numberWithCommas(x) {
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    }
     function getToken(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
@@ -193,7 +208,9 @@
         var name = $(e.relatedTarget).data('object-name');
         var url = $(e.relatedTarget).data('delete-url');
         var item_id = $(e.relatedTarget).data('item-id');
-        $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
+        //console.log(item_id)
+        var name =truncChar(name,25)
+        $('#confirmdelete .modal-body').html("Are you sure you want to <b>withdraw</b> your <b>investment</b> in <i>[" + name + "]</i>?");
         $('#confirmdelete .modal-footer input').attr('data-url', url);
         $('#confirmdelete .modal-footer input').attr('item-id', item_id);
     });
@@ -214,15 +231,21 @@
                 crossDomain: false,
                 dataType: 'json',
                 data: formData,     // our data object
-                success: function (data) {
-                    $('.close-modal').click()               
+                success: function (response) {
+                    $('.close-modal').click()
+                    //console.log('rrr',response)
+                    
+                    ahtml= `<h4 style="text-align:center;" id="personal_totals"> 
+                        <b>Value</b>:$${numberWithCommas(response.data.model.total_sum)} 
+                        <b>Aver</b>:$${numberWithCommas(response.data.model.average)}</h4>`
+                    $('#personal_totals').html(ahtml)  
                     row.fadeOut(1000, function () {
                         //remove the row deleted
                         $(this).remove();
                         // if deleted page make the page disappear, point to prev page
                         //page-1
-                        if (data.data.total_pages < data.data.deleted_page){                     
-                            var index= parseInt(data.data.total_pages)-1
+                        if (response.data.total_pages < response.data.deleted_page){                     
+                            var index= parseInt(response.data.total_pages)-1
                             window.setTimeout(function() {
                                 $(".a_page_nav:eq(" +  index  +")").trigger('click');
                             }, 1000);
@@ -232,7 +255,7 @@
                             var total = $('#userinvestment-table-tbody').children().length
                             if (total == 0){
                                 //refresh the current pages
-                                var index= parseInt(data.data.deleted_page)-1
+                                var index= parseInt(response.data.deleted_page)-1
                                 if (index<1){
                                     // if deleteting first page  then scroll all into first page
                                     index=1
@@ -264,7 +287,7 @@
         });
         function updatePaging2(data){
             var has_previous=''
-            console.log(data)
+            //console.log(data)
             if (data.has_previous){
                 has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
                     <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
@@ -295,19 +318,19 @@
                     <td>${counter}</td>
                     <td class="modelData" name="name" >${val.inv_name}</td>
                     <td class="modelData" name="description" >${val.summary}</td>
-                    <td class="modelData" name="category" >${val.total_value}</td>
-                    <td class="modelData" name="myinvest" >${val.myinvest}</td>
+                    <td class="modelData" name="category" >$${numberWithCommas(val.total_value)}</td>
+                    <td class="modelData" name="myinvest" >$${numberWithCommas(val.myinvest)}</td>
                     <td class="modelData" name="category" >${val.cat_name}</td>
                     <td class="modelData" name="email" >${val.email}</td>
                     <td class="text-right modelAction modelData" name="action">
                         <a href="/trading/investment-details/${val.iid}/"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='View Investment'><i class="fa fa-eye"></i>
+                            title='View Investment'><i class="fas fa-eye"></i>
                         </a>
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                             data-object-name="${val.inv_name}"  data-item-id="${val.id}" 
                             data-delete-url="/trading/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                            title='Delete' > <i class="fa fa-trash "></i> 
+                            title='Delete' > <i class="class="fas fa-trash"></i> 
                         </a>
                         </td>
                 </tr>` ;

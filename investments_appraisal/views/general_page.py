@@ -197,10 +197,12 @@ def display_models(request):
 	return render(request, 'investments_appraisal/pagenation.html',context)
 
 def display_projects_ajax(request):
-	models= ModelCategory.objects.all()#.order_by('-date')
-
+	models= ModelCategory.objects.all()#.order_by('-date')	
+	#get user settings
+	get_user_perpage(request)
 	
-	per_page=3
+	
+	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
 	obj_paginator = Paginator(models, per_page)
@@ -663,10 +665,39 @@ def buy(request,type):
 		}
 
 	return render(request, 'investments_appraisal/mentor/buy.html', context)
+
+
+def get_user_perpage(request,perpage=3):
+
+	if not ('perpage' in request.session):
+		#print('session[perpage] on set')
+		if request.user.is_authenticated:
+			obj= UserPreference.objects.filter(user=request.user).first()
+			if obj:
+				#print('userpref found')
+				request.session['perpage']=obj.perpage
+			else:# nothing in db
+				request.session['perpage']= perpage
+		else:
+				request.session['perpage']= perpage
+	else:
+		if request.user.is_authenticated:
+			obj= UserPreference.objects.filter(user=request.user).first()
+			if obj:
+				#print('2.userpref found')
+				request.session['perpage']=obj.perpage
+			else:# nothing in db
+				request.session['perpage']= perpage
+		else:
+			request.session['perpage']= perpage
+	
 def projects(request):
 	models= ModelCategory.objects.all()
 	
-	per_page=3
+	#get user settings
+	get_user_perpage(request)
+	
+	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
 	obj_paginator = Paginator(models, per_page)
@@ -694,23 +725,8 @@ def models(request):
 	form = UserBusinessModelForm(initial={'user': request.user})
 	# articles per page
 	
-	if not ('perpage' in request.session):
-		#print('session[perpage] on set')
-		obj= UserPreference.objects.filter(user=request.user).first()
-		if obj:
-			#print('userpref found')
-			request.session['perpage']=obj.perpage
-		else:# nothing in db
-			request.session['perpage']= 3
-	else:
-		#print('2. session[perpage] is...')
-		obj= UserPreference.objects.filter(user=request.user).first()
-		if obj:
-			#print('2.userpref found')
-			request.session['perpage']=obj.perpage
-		else:# nothing in db
-			request.session['perpage']= 3
-		#print('2. session[perpage] =', request.session['perpage'])
+	#get user settings
+	get_user_perpage(request)
 	
 
 	per_page=request.session['perpage']
@@ -981,6 +997,674 @@ def edit_model_timing_assumptions_ajax(request,  model_id, ta_id,  *args, **kwar
 		}
 		return JsonResponse(error, content_type="application/json")
 
+
+
+login_required(login_url="account_login")
+def add_model_timing_assumptions_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	print(model_instance)
+	print('id', model_instance.id)
+	if request.method == 'POST':
+		form = TimingAssumptionForm(request.POST or None)
+ 								
+	else:
+		#first time call from loco failure list
+		form = TimingAssumptionForm(initial={'usermodel': model_instance})
+	return save_add_model_timing_assumptions(request,form,model_instance,'investments_appraisal/modal/timing_assumption.html')
+
+
+
+
+login_required(login_url="account_login")
+def add_model_prices_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	print(model_instance)
+	print('id', model_instance.id)
+	if request.method == 'POST':
+		form = PricesForm(request.POST or None)
+ 								
+	else:
+		#first time call from loco failure list
+		form = PricesForm(initial={'usermodel': model_instance})
+	return save_add_model_prices(request,form,model_instance,'investments_appraisal/modal/prices.html')
+
+def save_add_model_prices(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(Prices,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'prices_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def add_model_depreciation_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	
+	if request.method == 'POST':
+		form = DepreciationForm(request.POST or None)
+ 								
+	else:
+		#first time call 
+		form = DepreciationForm(initial={'usermodel': model_instance})
+	return save_add_model_depreciation(request,form,model_instance,'investments_appraisal/modal/depreciation.html')
+
+def save_add_model_depreciation(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(Depreciation,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'depreciation_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+login_required(login_url="account_login")
+def add_model_taxes_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	
+	if request.method == 'POST':
+		form = TaxesForm(request.POST or None)
+ 								
+	else:
+		#first time call 
+		form = TaxesForm(initial={'usermodel': model_instance})
+	return save_add_model_taxes(request,form,model_instance,'investments_appraisal/modal/taxes.html')
+
+def save_add_model_taxes(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(Taxes,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'taxes_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def add_model_working_capital_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	
+	if request.method == 'POST':
+		form = WorkingCapitalForm(request.POST or None)
+ 								
+	else:
+		#first time call 
+		form = WorkingCapitalForm(initial={'usermodel': model_instance})
+	return save_add_model_working_capital(request,form,model_instance,'investments_appraisal/modal/working_capital.html')
+
+def save_add_model_working_capital(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(WorkingCapital,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'workingcapital_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def add_model_macro_economic_parameters_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	
+	if request.method == 'POST':
+		form = MacroeconomicParametersForm(request.POST or None)
+ 								
+	else:
+		#first time call 
+		form = MacroeconomicParametersForm(initial={'usermodel': model_instance})
+	return save_add_model_macro_economic_parameters(request,form,model_instance,'investments_appraisal/modal/macro_economic_parameters.html')
+
+def save_add_model_macro_economic_parameters(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(MacroeconomicParameters,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'macroeconomicparameters_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+login_required(login_url="account_login")
+def add_model_financing_ajax2(request, model_id, *args, **kwargs):
+	
+	model_instance = get_object_or_404(UserModel, pk=model_id)
+	# print(model_instance)
+	# print('id', model_instance.id)
+	if request.method == 'POST':
+		form = FinancingForm(request.POST or None)
+ 								
+	else:
+		#first time call from loco failure list
+		form = FinancingForm(initial={'usermodel': model_instance})
+	return save_add_model_financing(request,form,model_instance,'investments_appraisal/modal/financing.html')
+
+def save_add_model_financing(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(Financing,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'financing_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+login_required(login_url="account_login")
+def update_model_timing_assumptions_ajax(request, ta_id, *args, **kwargs):
+	
+	ta_instance = get_object_or_404(TimingAssumption, pk=ta_id)
+	#print(ta_instance)
+	if request.method == 'POST':
+		form = TimingAssumptionFormUpdate(request.POST or None, 
+										instance=ta_instance)
+	else:
+		#first time call from loco failure list
+		form = TimingAssumptionFormUpdate( instance=ta_instance)
+	return save_update_model_timing_assumptions(request,form,'investments_appraisal/modal/timing_assumption_edit.html')
+
+
+
+def save_update_model_timing_assumptions(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(TimingAssumption,pk=pk)
+	#print('instances:' ,item_instance)
+	# for i in item_instance:
+	# 	print(i)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(TimingAssumption,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		#print('Hello erorrs:', errors)
+		#form.save()
+		if form.is_valid():	
+			form.save()
+			#print('saved...............')
+			pk = form.instance.id
+			item_instance = get_object_or_404(TimingAssumption,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'timing_assumptions_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+
+login_required(login_url="account_login")
+def update_model_prices_ajax(request, id, *args, **kwargs):
+	
+	ta_instance = get_object_or_404(Prices, pk=id)
+	#print(ta_instance)
+	if request.method == 'POST':
+		form = PricesForm(request.POST or None, 
+										instance=ta_instance)
+	else:
+		#first time call from loco failure list
+		form = PricesForm( instance=ta_instance)
+	return save_update_model_prices(request,form,'investments_appraisal/modal/prices_edit.html')
+
+def save_update_model_prices(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(Prices,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(Prices,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			#print('saved...............')
+			pk = form.instance.id
+			item_instance = get_object_or_404(Prices,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'prices_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+
+login_required(login_url="account_login")
+def update_model_depreciation_ajax(request, id, *args, **kwargs):
+	
+	obj_instance = get_object_or_404(Depreciation, pk=id)
+	if request.method == 'POST':
+		form = DepreciationForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call
+		form = DepreciationForm( instance=obj_instance)
+	return save_update_model_depreciation(request,form,'investments_appraisal/modal/depreciation_edit.html')
+
+def save_update_model_depreciation(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(Depreciation,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(Depreciation,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(Depreciation,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'depreciation_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def update_model_taxes_ajax(request, id, *args, **kwargs):
+	
+	obj_instance = get_object_or_404(Taxes, pk=id)
+	if request.method == 'POST':
+		form = TaxesForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call
+		form = TaxesForm( instance=obj_instance)
+	return save_update_model_taxes(request,form,'investments_appraisal/modal/taxes_edit.html')
+
+def save_update_model_taxes(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(Taxes,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(Taxes,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(Taxes,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'taxes_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+login_required(login_url="account_login")
+def update_model_working_capital_ajax(request, id, *args, **kwargs):
+	
+	obj_instance = get_object_or_404(WorkingCapital, pk=id)
+	if request.method == 'POST':
+		form = WorkingCapitalForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call
+		form = WorkingCapitalForm( instance=obj_instance)
+	return save_update_model_working_capital(request,form,'investments_appraisal/modal/working_capital_edit.html')
+
+def save_update_model_working_capital(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(WorkingCapital,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(WorkingCapital,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(WorkingCapital,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'workingcapital_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+
+login_required(login_url="account_login")
+def update_model_macro_economic_parameters_ajax(request, id, *args, **kwargs):
+	
+	obj_instance = get_object_or_404(MacroeconomicParameters, pk=id)
+	if request.method == 'POST':
+		form = MacroeconomicParametersForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call
+		form = MacroeconomicParametersForm( instance=obj_instance)
+	return save_update_model_macro_economic_parameters(request,form,'investments_appraisal/modal/macro_economic_parameters_edit.html')
+
+def save_update_model_macro_economic_parameters(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(MacroeconomicParameters,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(MacroeconomicParameters,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(MacroeconomicParameters,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'macroeconomicparameters_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
+login_required(login_url="account_login")
+def update_model_financing_ajax(request, id, *args, **kwargs):
+	print('id', id)
+	obj_instance = get_object_or_404(Financing, pk=id)
+	print(obj_instance)
+	if request.method == 'POST':
+		form = FinancingForm(request.POST or None, 
+										instance=obj_instance)
+	else:
+		#first time call from loco failure list
+		form = FinancingForm( instance=obj_instance)
+	return save_update_model_financing(request,form,'investments_appraisal/modal/financing_edit.html')
+
+
+
+def save_update_model_financing(request,form,template_name):
+
+	data = dict()
+	errors= None
+	# retrieve product
+	pk = form.instance.id
+	item_instance = get_object_or_404(Financing,pk=pk)
+	if request.method == 'POST':
+		# retrieve product
+		pk = form.instance.id
+		item_instance = get_object_or_404(Financing,pk=pk)
+		#eject errors for modal form display
+		errors=form.errors
+		if form.is_valid():	
+			form.save()
+			#print('saved...............')
+			pk = form.instance.id
+			item_instance = get_object_or_404(Financing,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'financing_form':form,
+		'usermodel':item_instance.usermodel,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+def save_add_model_timing_assumptions(request,form,model_instance,template_name):
+
+	data = dict()
+	errors= None
+	
+	if request.method == 'POST':		
+		if form.is_valid():	
+			form.save()
+			pk = form.instance.id
+			item_instance = get_object_or_404(TimingAssumption,pk=pk)
+			data['form_is_valid'] = True
+			item_object = model_to_dict(item_instance)
+			item_object['model_id']=model_instance.id
+			item_object['model_name']=model_instance.name
+			data['model'] = item_object
+		else:
+		
+			data['form_is_valid'] = False
+
+	context = {
+		'timing_assumptions_form':form,
+		'usermodel':model_instance,
+	}
+	#print(form)
+
+	data['html_form'] = render_to_string(template_name,context,request=request)
+	data['error']= errors
+	return JsonResponse(data)
+
+
 @login_required(login_url="account_login")
 def add_model_timing_assumptions_ajax(request, model_id,  *args, **kwargs):
 	if request.method == 'POST':
@@ -1206,7 +1890,6 @@ def edit_model_financing_ajax(request, id, *args, **kwargs):
 			risk_premium = request.POST['risk_premium']
 			num_of_installments = request.POST['num_of_installments']
 			grace_period = request.POST['grace_period']
-			repayment_starts = request.POST['repayment_starts']
 			equity = request.POST['equity']
 			senior_debt = request.POST['senior_debt']
 
@@ -1242,7 +1925,6 @@ def edit_model_financing_ajax(request, id, *args, **kwargs):
 				_instance.num_of_installments =num_of_installments
 
 				_instance.grace_period =grace_period
-				_instance.repayment_starts =repayment_starts
 				_instance.equity =equity
 				_instance.senior_debt =senior_debt
 
@@ -1277,7 +1959,7 @@ def add_model_financing_ajax(request,  *args, **kwargs):
 			risk_premium = request.POST['risk_premium']
 			num_of_installments = request.POST['num_of_installments']
 			grace_period = request.POST['grace_period']
-			repayment_starts = request.POST['repayment_starts']
+		
 			equity = request.POST['equity']
 			senior_debt = request.POST['senior_debt']
 
@@ -1307,7 +1989,7 @@ def add_model_financing_ajax(request,  *args, **kwargs):
 		
 			i = Financing.objects.create(usermodel=usermodel, real_interest_rate=real_interest_rate,
 					risk_premium=risk_premium, num_of_installments=num_of_installments,
-					grace_period=grace_period, repayment_starts=repayment_starts,
+					grace_period=grace_period, 
 					equity=equity, senior_debt=senior_debt,)
 			i.save()
 			
@@ -1637,12 +2319,8 @@ def create_usermodel_ajax(request):
 	return create_all_usermodel(request,form,'investments_appraisal/user_model_modal.html')
 
 def get_total_pages(request):
-	if not ('perpage' in request.session):
-		obj= UserPreference.objects.filter(user=request.user).first()
-		if obj:
-			request.session['perpage']=obj.perpage
-		else:# nothing in db
-			request.session['perpage']= 3
+	#get user settings
+	get_user_perpage(request)
 	per_page=request.session['perpage']
 	#per_page=request.session['perpage']
 	recordcount= UserModel.objects.filter(user=request.user).count()
@@ -1790,17 +2468,9 @@ def project_search_ajax(request,slug, *args, **kwargs):
 	if request.method == 'POST':
 		#description= request.POST['description']
 		modelsdata= ModelCategory.objects.filter(description__icontains=slug)
-	
-		if not ('perpage' in request.session):
-			if request.user.is_authenticated:
-				obj= UserPreference.objects.filter(user=request.user).first()
-			    # anonymous user is not iterable
-				if obj:
-					request.session['perpage']=obj.perpage
-				else:# nothing in db
-					request.session['perpage']= 3
-			else:
-				request.session['perpage']= 3
+
+		#get user settings
+		get_user_perpage(request)
 
 		per_page=request.session['perpage']
 

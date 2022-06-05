@@ -33,9 +33,14 @@ def get_model_spreadsheets(request, model_id):
     request.session['total_runs'] =100000
     request.session.save()
     usermodel = get_object_or_404(UserModel,pk=model_id)
-    simulation_iterations=usermodel.simulation_iterations 
+    simulation_iterations=usermodel.simulation_iterations
+    total_params=usermodel.total_params
+
     simulation_run=usermodel.simulation_run 
     npv_bin_size=usermodel.npv_bin_size
+
+    #change to description
+    user_model_decription =usermodel.description
 
 
     # if usermodel.model_type==1:#
@@ -98,7 +103,7 @@ def get_model_spreadsheets(request, model_id):
             'risk_premium': {'title': 'Risk premium','value': float(model_financing.risk_premium), 'units': 'PERCENT'}, 
             'num_of_installments': {'title': 'No. of installments','value': int(model_financing.num_of_installments), 'units': 'NUMBER'},  
             'grace_period': {'title': 'Grace period (years)','value':int(model_financing.grace_period), 'units': 'YEARS'}, 
-            'repayment_starts': {'title': 'Repayment starts year','value':int(model_financing.repayment_starts), 'units': 'YEAR'}, 
+            'repayment_starts': {'title': 'Repayment starts year','value':0, 'units': 'YEAR'}, #calculated
             'equity': {'title': 'Equity (% of Investment Costs)','value': float(model_financing.equity), 'units': 'PERCENT'}, 
             'senior_debt': {'title': 'Senior Debt (% of Investment Costs)','value': float(model_financing.senior_debt), 'units': 'PERCENT'},  
         }
@@ -134,36 +139,60 @@ def get_model_spreadsheets(request, model_id):
     # FeedlotDesignParameters--------------
     model_feedlot_design_parameters = FeedlotDesignParameters.objects.filter(usermodel=usermodel).first()
     if model_feedlot_design_parameters:
-       
+        pen_area =float(model_feedlot_design_parameters.length)* float(model_feedlot_design_parameters.width)
+        cattle_per_pen_per_year=0
+        if (model_feedlot_design_parameters.num_of_months_per_cycle)!= 0:
+            cattle_per_pen_per_year=12 * float(model_feedlot_design_parameters.total_cattle_per_pen_per_cycle)/float(model_feedlot_design_parameters.num_of_months_per_cycle)
+        
         feedlot_design_parameters = {
             'num_of_feedlots': {'title': 'N# Of FeedLot','value': float(model_feedlot_design_parameters.num_of_feedlots), 'units': 'NUMBER'}, 
             'length': {'title': 'Length in meters','value': float(model_feedlot_design_parameters.length), 'units': 'NUMBER'}, 
             'width': {'title': 'Width in meters','value': float(model_feedlot_design_parameters.width), 'units': 'NUMBER'},
-            'sqm': {'title': 'SQM covered','value': float(model_feedlot_design_parameters.sqm), 'units': 'NUMBER'},  
-            'pen_area': {'title': 'Pen-Area','value': float(model_feedlot_design_parameters.pen_area), 'units': 'NUMBER'}, 
+            'sqm': {'title': 'SQM covered','value': pen_area, 'units': 'NUMBER'},  
+            'pen_area': {'title': 'Pen-Area','value':pen_area, 'units': 'NUMBER'}, 
             'sqm_per_cattle': {'title': 'SQM per cattle','value':None, 'units': 'NUMBER'},#calculated 
             'total_cattle_per_pen_per_cycle': {'title': 'Total Cattle in one pen per cycle','value': float(model_feedlot_design_parameters.total_cattle_per_pen_per_cycle), 'units': 'NUMBER'}, 
             'num_of_months_per_cycle': {'title': 'N# of months per cycle','value': float(model_feedlot_design_parameters.num_of_months_per_cycle), 'units': 'NUMBER'},
-            'cattle_per_pen_per_year': {'title': 'Total Cattle per pen per year','value': float(model_feedlot_design_parameters.cattle_per_pen_per_year), 'units': 'NUMBER'},
+            'cattle_per_pen_per_year': {'title': 'Total Cattle per pen per year','value': float(cattle_per_pen_per_year), 'units': 'NUMBER'},
         }
+
+        ip_options={} 
+        for i in investment_parameter_options_beef.keys():
+            ip_options[i] =investment_parameter_options_beef[i].copy()
+
         for i in feedlot_design_parameters.keys():
             if 'num_of_feedlots'==i:
-                investment_parameter_options_beef['initial_pens_employed'].insert(0,float(model_feedlot_design_parameters.num_of_feedlots))
+                ip_options['initial_pens_employed'].insert(0,float(model_feedlot_design_parameters.num_of_feedlots))
             elif 'length'==i:
-                investment_parameter_options_beef['pen_length'].insert(0,float(model_feedlot_design_parameters.length))
+                ip_options['pen_length'].insert(0,float(model_feedlot_design_parameters.length))
             elif 'width'==i:
-                investment_parameter_options_beef['pen_width'].insert(0,float(model_feedlot_design_parameters.width))
+                ip_options['pen_width'].insert(0,float(model_feedlot_design_parameters.width))
             elif 'total_cattle_per_pen_per_cycle'==i:
-                investment_parameter_options_beef['pen_cattle_density'].insert(0,float(model_feedlot_design_parameters.total_cattle_per_pen_per_cycle))
+                ip_options['pen_cattle_density'].insert(0,float(model_feedlot_design_parameters.total_cattle_per_pen_per_cycle))
            
-        
-        
+           #Additionals
+        #    'construction_cost_per_pen','machinery_cost_per_pen', 
+        #     'building_cost_per_sqm','total_land_sqm'
         for i in ['cost_of_land_per_sqm','cost_of_machinery_per_pen',
-                         'cost_of_building_per_sqm','cost_of_pen_construction', 'total_land_required',  'pen_height']:
-            first_ =investment_parameter_options_beef[i][0]
-            investment_parameter_options_beef[i].insert(0,first_)
+                         'cost_of_building_per_sqm','cost_of_pen_construction', 'total_land_required']:
+            
+            if 'cost_of_land_per_sqm'==i:
+                ip_options['cost_of_land_per_sqm'].insert(0,float(model_feedlot_design_parameters.cost_of_land_per_sqm))
+            elif 'cost_of_machinery_per_pen'==i:
+                    ip_options['cost_of_machinery_per_pen'].insert(0,float(model_feedlot_design_parameters.machinery_cost_per_pen))
+            elif 'cost_of_building_per_sqm'==i:
+                    ip_options['cost_of_building_per_sqm'].insert(0,float(model_feedlot_design_parameters.building_cost_per_sqm))
+            elif 'cost_of_pen_construction'==i:
+                    ip_options['cost_of_pen_construction'].insert(0,float(model_feedlot_design_parameters.construction_cost_per_pen))
+            
+            elif 'total_land_required'==i:
+                ip_options['total_land_required'].insert(0,float(model_feedlot_design_parameters.total_land_sqm))
+
+        for i in ['pen_height']:
+            first_ =ip_options[i][0]
+            ip_options[i].insert(0,first_)
         # senoir debt
-        investment_parameter_options_beef['senior_debt_dynamic_parameter'].insert(0,para_senior_debt)
+        ip_options['senior_debt_dynamic_parameter'].insert(0,para_senior_debt)
    
     
     breport= None
@@ -172,12 +201,12 @@ def get_model_spreadsheets(request, model_id):
                                 working_capital=working_capital, taxes=taxes, macroeconomic_parameters =macroeconomic_parameters, 
                                 feedlot_design_parameters =feedlot_design_parameters, investment_cost= investment_cost_beef
                                 , cattle_business_options= cattle_business_options, cost_real=cost_real_beef, 
-                                investment_parameter_options=investment_parameter_options_beef)
+                                investment_parameter_options=ip_options)
 
   
+    #set descripton
+    breport._set_model_description(user_model_decription)
 
-   
-   
     if not hasattr(breport, 'para_list_by_grad'):
         breport._sens_sensitivity_parrallel_generator()
         if hasattr(breport, 'para_list_by_grad'):
@@ -200,16 +229,19 @@ def get_model_spreadsheets(request, model_id):
             request.session.save()
             setattr(breport,'sim_count',0)
 
-            breport._set_parameters_simulation(25)            
-            graph_, ar= monteCarlo_sim(request,breport, npv_bin_size, 25, simulation_iterations, input_vars)
+            breport._set_parameters_simulation(25)
+            #limit params
+            if  total_params <=0:
+                total_params=None           
+            graph_, ar, employed_scenario_inputs= monteCarlo_sim(request,breport, npv_bin_size, 25, simulation_iterations, input_vars, total_params)
             setattr(breport,'npv_distribution' ,graph_)
-    
+            setattr(breport,'employed_scenario_inputs' ,employed_scenario_inputs)
     #get_sensitivity_gradient(breport,input_x)
    
     #add counter downloads
     create_downloads_instance(request, 'beef')
     #get the spread sheet
-    spread_Sht= breport.spreadsheet()
+    spread_Sht= breport.spreadsheet(request)
 
     #print(breport.__str__())
     return spread_Sht

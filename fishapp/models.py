@@ -16,3 +16,12 @@ class TankDesignParameters(models.Model):
     total_fish_per_tank_per_cycle =  models.IntegerField(default=3000)
     tank_num_of_months_per_cycle =  models.IntegerField(default=6)
     fish_per_tank_per_year =  models.IntegerField(default=7000)
+
+    purchase_price_tank =  models.DecimalField(decimal_places=2, max_digits=15, default=700)
+    machinery_cost_per_tank =  models.DecimalField(decimal_places=2,max_digits=15, default=100)
+    # no bulding cost backyard
+    building_cost_per_sqm =  models.DecimalField(decimal_places=2, max_digits=15,default=0)
+    #backyard
+    total_land_sqm =  models.DecimalField(decimal_places=2, max_digits=15,default=0)
+    #backyard cost is zero
+    cost_of_land_per_sqm =  models.DecimalField(decimal_places=2, max_digits=15,default=0)

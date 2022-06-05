@@ -37,18 +37,18 @@
                   <!-- SHOW MODEL -->
                   <a href="{% url 'select_model' model.id %}"
                     style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                    title='View Model'><i class="fa fa-eye"></i>
+                    title='View Model'><i class="fas fa-eye"></i>
                   </a>
                   <!-- EDIT MODEL -->
                   <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model' model.id %}" 
                     data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                    title='Edit Model'><i class="fa fa-edit"></i>
+                    title='Edit Model'><i class="fas fa-edit"></i>
                   </a>
                   <!-- DELETE MODEL -->
                  <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                     data-object-name="{{ model.name }}"  data-model-id="{{model.id}}" 
                     data-delete-url="{% url 'delete_bussiness_model' model.id 1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                    title='Delete' > <i class="fa fa-trash "></i> 
+                    title='Delete' > <i class="fas fa-trash"></i> 
                     </a>
               </td>
             </tr>

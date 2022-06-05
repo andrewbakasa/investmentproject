@@ -63,7 +63,10 @@ class FishBusinessReport(BaseModel):
         #for testing only: do it onces
         self.save_test_df()
          
-          
+    def _set_model_description(self,user_model_decription):
+         #addition
+        setattr(self.excel_obj,'user_model_decription' ,user_model_decription)
+      
     def _set_parameters_simulation(self,num_reps = 10):
         from numpy.random import default_rng
         rg = default_rng(4470)
@@ -73,7 +76,9 @@ class FishBusinessReport(BaseModel):
 
     
         base_scenario_inputs = {
-            'initial_tanks_employed':np.array([10]),
+             """     remove this""" 
+            #'initial_tanks_employed':np.array([10]),
+
             'fish_weight_at_selling': rg.uniform(0.8*self.fish_weight_at_selling, get_alternative_sd(self.fish_weight_at_selling,.3,30), num_reps),
             'fingerlings_price_per_1000_units': stats.triang.rvs(loc=.4*self.fingerlings_price_per_1000_units,scale= get_alternative_sd(self.fingerlings_price_per_1000_units,.9, 20),c=.5,size= num_reps),
             'fingerlings_survival_rate': stats.triang.rvs(loc=1.-.3,scale=.1,c=1, size= num_reps),# step function with prob
@@ -100,7 +105,7 @@ class FishBusinessReport(BaseModel):
             'annual_increase_salaries_workers':  rg.uniform(self.annual_increase_salaries_workers, get_alternative_sd(self.annual_increase_salaries_workers,.4,.2), num_reps),
             'annual_increase_salaries_supervisors_technicians':  rg.uniform(self.annual_increase_salaries_supervisors_technicians, get_alternative_sd(self.annual_increase_salaries_supervisors_technicians,.4,.2), num_reps),
             
-            'num_workers_per_supervisor': np.array([5]),      
+            #'num_workers_per_supervisor': np.array([5]),      
         }
         setattr(self, 'base_scenario_inputs', base_scenario_inputs)
     
@@ -201,7 +206,9 @@ class FishBusinessReport(BaseModel):
         setattr(self, 'risk_premium', risk_premium)
         num_of_installments=self.financing['num_of_installments']['value']
         setattr(self, 'num_of_installments', num_of_installments)
-        repayment_starts=self.financing['repayment_starts']['value']
+        #repayment_starts=self.financing['repayment_starts']['value']
+        repayment_starts=self.timing_assumptions['base_period']['value'] + self.financing['grace_period']['value']
+      
         setattr(self, 'repayment_starts', repayment_starts)
         
         grace_period=self.financing['grace_period']['value']
@@ -674,7 +681,9 @@ class FishBusinessReport(BaseModel):
             setattr(self, 'num_of_installments', num_of_installments)
 
         if not hasattr(self, 'repayment_starts'):   
-            repayment_starts=self.financing['repayment_starts']['value']
+            #repayment_starts=self.financing['repayment_starts']['value']
+            repayment_starts=self.timing_assumptions['base_period']['value'] + self.financing['grace_period']['value']
+      
             setattr(self, 'repayment_starts', repayment_starts)
             
         if not hasattr(self, 'grace_period'):   
@@ -1054,7 +1063,10 @@ class FishBusinessReport(BaseModel):
         
      
         #4.a.2 Cumulative tanks under Fish
-        cum_tanks_list= list(self._accumulate_addition(self.initial_tanks_list))
+        #cum_tanks_list= list(self._accumulate_addition(self.initial_tanks_list))
+        cum_tanks_list= list(self._accumulate_harvesting(self.initial_tanks_list, self.op_list))
+        #print('cum_feedlots_list' , cum_tanks_list)
+
         setattr(self, 'cum_tanks_list', cum_tanks_list)
         #print('cum_tanks_list', cum_tanks_list)
         
@@ -1220,7 +1232,7 @@ class FishBusinessReport(BaseModel):
         #13 Cash Flow
         self._metric_cashFlow()
   
-    def  _generate_data(self,output):
+    def  _generate_data(self,output,request):
         # Create a workbook
         wb = Workbook()
         self.myworboook = wb
@@ -1229,7 +1241,7 @@ class FishBusinessReport(BaseModel):
         
         self.excel_obj._write_input_sheet(wb,)
         #correct formating here---------
-        self.excel_obj._write_output_sheet(wb, )
+        self.excel_obj._write_output_sheet(wb,request )
         self.excel_obj._write_sens_sheet(wb, )
        
         self.excel_obj._write_calculation_sheet(wb, )
@@ -1405,15 +1417,13 @@ class FishBusinessReport(BaseModel):
         
         return sens_dict
  
-    def spreadsheet(self) :
+    def spreadsheet(self,request) :
         
         if not hasattr(self, 'para_list_by_grad'):
             self._sens_sensitivity_parrallel_generator()
         # Return an excel spreadsheet
         output = BytesIO()
-        self._generate_data(
-            output
-        )
+        self._generate_data( output, request )
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             content=output.getvalue(),

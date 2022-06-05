@@ -1,0 +1,41 @@
+
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+
+<div class="modal-header">
+    <h4 class="modal-title myModalLabel">Edit Tankdesignparameters [{{usermodel| truncatechars:15}}]</h4>
+    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>       
+</div>
+
+<div class="modal-body">
+    <form id='form-tankdesignparameters' class="model-form-edit model-tankdesignparameters-edit form-horizontal" 
+      enctype="multipart/form-data" method="post" data-url="{% url 'update_model_tankdesignparameters_ajax' tankdesignparameters_form.instance.id %}">
+      {% csrf_token %}
+      
+        <div class="modal-body">
+
+
+            {% include 'fishapp/form_tankdesignparameters.html' %}      
+            <div class="form-error2 public_toggle_form-errors" style='display:none'>
+            </div>
+        </div>
+
+  <!--Footer-->
+  <div class="modal-footer">
+    <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+        type="reset">Close
+    </button>
+    <button class="btn btn-danger" type="submit">Save</button>
+
+    
+  </div>
+</form>
+
+

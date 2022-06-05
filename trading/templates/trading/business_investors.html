@@ -45,10 +45,12 @@
             <div class="col-md-12">
                 <div class="box">
                     <div class="box-body">
-                        {%if models %}
+                        {% if models %}
                         <h4 style="text-align:center;"> <b>Investors</b> pledges for: <i>{{investment.name|truncatechars:50}}</i> [{{total}}]</h4>
                         <h5>{{investment.description |truncatechars:150}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
                         <hr>
+                        <a href="#">Analytics</a>
+                        <a href="#">Rank Your Investors</a>
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-striped">
                                 <thead class="thead-dark">
@@ -58,6 +60,7 @@
                                 <th style="width: 25%" >description</th>
                                 <th style="width: 8%" >Value</th>
                                 <th style="width: 17%" >Date Created</th>
+                                <th style="width: 10%" >Application Stage</th>
                                 <th style="width: 7%" class="text-right">Actions</th>
                                 </thead>
                                 <tbody id="userbusiness-table-tbody">
@@ -69,12 +72,13 @@
                                     <td class="modelData" name="description" >{{item.description|truncatechars:45}}</td>
                                     <td class="modelData" name="total_value" >${{item.value| intcomma}}</td>
                                          
-                                    <td class="modelData" name="date_created" >{{item.date_created }}</td>
+                                    <td class="modelData" name="date_created" >{{ item.date_created }}</td>
+                                    <td class="modelData" name="application_status" >{{ item.application_status }}</td>
                                     <td class="text-right modelAction modelData" name="action">
                                         
                                         <a href="{% url 'investor-details' item.id investment.id  %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='View Investor Info'><i class="fa fa-eye"></i>
+                                            title='View Investor Info'><i class="fas fa-eye"></i>
                                         </a>
                                         <a href="#"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -84,7 +88,7 @@
                                         <!--<a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                           data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
                                           data-delete-url="#"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Decline Investor' > <i class="fa fa-trash "></i> 
+                                          title='Decline Investor' > <i class="fastrash "></i> 
                                         </a>-->
                                       </td>
                                    
@@ -167,7 +171,7 @@
             <div class="modal-content">
                 <!--Header-->
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Add Your Business</h4>
+                    <h4 class="modal-title myModalLabel">Add Your Business</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -272,7 +276,7 @@
                   success: function(data){ 
                       //console.log('added data' ,data.model)
                       if(data.model){
-                          console.log(data.model)
+                          //console.log(data.model)
                           appendTable(data.model)
                           $('.close-modal').click()
                           //update paging
@@ -284,7 +288,7 @@
 
                       } else {
                           // ADDITION NOT SUCCESSFUL
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (data['error']) {
                               var form_vars=['__all__','name','description','category', 'total_value','creater']
                               for (let p=0; p < form_vars.length; p++ ){
@@ -294,29 +298,29 @@
                                           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                           <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
                                       </div> ` ;
-                                      $('#public_toggle_form-errors').append(a_html)
+                                      $('.public_toggle_form-errors').append(a_html)
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                               //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
 
@@ -330,11 +334,11 @@
               return false;
           })
         function appendTable(item){  
-            console.log(item) 
+            //console.log(item) 
             var js_date_created = new Date(item.date_created) 
             a_html =`
                 <tr id="item-${item.id}" >
-                    <td><i class="fa fa-edit"></i></td>
+                    <td><i class="fasedit"></i></td>
                     <td class="modelData" name="name" >${item.name}</td>
                     <td class="modelData" name="description" >${item.description}</td>
                     <td class="modelData" name="category" >${item.category}</td>
@@ -359,7 +363,7 @@
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                             data-object-name="${ item.name }"  data-item-id="${item.id}" 
                             data-delete-url="/trading/delete_investment_ajax/${item.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                            title='Delete' > <i class="fa fa-trash "></i> 
+                            title='Delete' > <i class="fas fa-trash"></i> 
                         </a>
 
                         
@@ -373,7 +377,7 @@
         function updateTable(item){
             //after edit update the table
             $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
-                console.log(item.name)
+                //console.log(item.name)
                 var attr = $(this).attr("name");
                 if (attr == "description") {
                     $(this).text(item.description);
@@ -405,7 +409,7 @@
                   contentType: false,
                   success: function(data){
                       if(data.model){
-                          console.log(data.model)
+                          //console.log(data.model)
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           updateTable(data.model);
@@ -415,6 +419,10 @@
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
                           }
+                          if (data.model.user_stake){
+                              $('#user_stake').html(`${data.model.user_stake}%`);
+                          }
+                          
                           if (data.model.investors_count){
                             $('#investors_count').html(`${data.model.investors_count}`);
                           }
@@ -422,7 +430,7 @@
 
                           
                       } else {
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (data.error) {
                               var form_vars=['__all__','investment','user','name', 'description','value']//,
                       
@@ -433,30 +441,30 @@
                                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
                                   </div> ` ;
-                                  $('#public_toggle_form-errors').append(a_html)
+                                  $('.public_toggle_form-errors').append(a_html)
                                   
                                   }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                               }, 4000);
                           //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                           } 

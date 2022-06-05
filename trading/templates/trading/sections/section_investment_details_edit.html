@@ -14,13 +14,13 @@
             
               <a id="breadcrumb_changeto_edit" class="model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
               data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                title='Edit EQUITY'><i  style="color:green"  class="fas fa-edit"></i>
+                title='Edit Equity'><i  style="color:green"  class="fas fa-edit"></i>
             </a>
           </li>         
         {%else %}
           <li  class="breadcrumb-item active">
               <a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
-                title='Add EQUITY'><i style="color:red"  class="fas fa-plus"></i>
+                title='Add Equity'><i style="color:red"  class="fas fa-plus"></i>
               </a>
           </li> 
         {% endif%}
@@ -32,11 +32,29 @@
 
     <div class="row">
       <div class="col-lg-8">     
-         <img src ="{% static 'mentor/assets/img/projects/'|add:model.category.uniqueid|add:'.jpg' %}" class="img-fluid"alt="">
-        <h3>{{model.name|truncatechars:50}}</h3>
-        <p>
-          {{model.description|truncatechars:200}}
-        </p>
+          <img src ="{% static 'mentor/assets/img/projects/'|add:model.category.uniqueid|add:'.jpg' %}" class="img-fluid"alt="">
+          <h3>{{model.name|truncatechars:25}} valued @ ${{model.total_value| intcomma}} </h3>
+          <p>
+            {{model.description|truncatechars:200}}
+          </p>
+          
+          <div class="row">
+            <div class="col-lg-8">
+                Tags:
+                {% for tag in model.tags.all %}
+                    <a href="#">{{tag.name}}</a>
+                {% endfor %}
+            </div>
+
+            <div class="col-lg-2">
+                Views: {{model.views}}
+            </div>
+
+            <div class="col-lg-2">
+              Public {% if model.public %}<i style='color:blue;' class="bi bi-check-circle"></i>
+              {% else %} <i class="bi-square"></i>{% endif %}
+            </div>
+          </div>       
       </div>
       <div class="col-lg-4">
 
@@ -64,6 +82,12 @@
           <h5>Current Investment</h5>
           <p id="current_investment_value">${{model.current_investment|intcomma}} of ${{model.total_value|  floatformat:-1 | intcomma}}</p>
         </div>
+
+        <div class="project-info d-flex justify-content-between align-items-center">
+          <h5>of which My Stake</h5>
+          <p id="user_stake">{% UserIsInvestorStake model request.user %} %</p>
+        </div>
+        
         <div class="project-info d-flex justify-content-between align-items-center">
           <h5>As Percentage</h5>
           <p id="current_investment">{{model.current_investment_percent | floatformat:-1 | intcomma}} %</p>

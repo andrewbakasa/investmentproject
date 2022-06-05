@@ -6,7 +6,7 @@
 
 
 <div class="modal-header">
-    <h4 class="modal-title" id="myModalLabel">Edit Investment Pledge [{{usermodel.name | truncatechars:15}}] </h4>
+    <h4 class="modal-title myModalLabel">Edit Investment Pledge [{{usermodel.name | truncatechars:15}}] </h4>
     <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
       <span aria-hidden="true">×</span>
     </button>       
@@ -75,8 +75,9 @@
           
         
         </br>
-      <div id="public_toggle_form-errors" class="form-error2" style='display:none'>
+      <div class="form-error2 public_toggle_form-errors" style='display:none'>
       </div>
+      <label id="investment_contrib" style="color:inherit;"></label>
 </div>
 
   <!--Footer-->

@@ -27,19 +27,20 @@
               <div class="col-lg-8 details order-2 order-lg-1">
                 <h3>Business Strategy</h3>
                 <p class="fst-italic">
-                  Strategy</p>
-                <p>
+                  Strategy
+                </p>
+                <p id="model-strategy">
                   {{model.details.strategy}}
                   
                   {% if model.details.strategy and is_user_record_owner %}
                     </br>
                     <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                    data-target="#modal_add_investment_strategy"> <i class="fa fa-edit"></i></a>
+                    data-target="#modal_add_investment_strategy"> <i class="fas fa-edit"></i></a>
 
                   {% elif is_user_record_owner %}
                     <!-- Add For First Time -->
                     <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                    data-target="#modal_add_investment_strategy"> <i class="fa fa-plus"></i></a>
+                    data-target="#modal_add_investment_strategy"> <i class="fas fa-plus"></i></a>
                    
                   {% endif%}
                 </p>
@@ -50,24 +51,23 @@
           <div class="tab-pane" id="tab-2">
             <div class="row">
               <div class="col-lg-8 details order-2 order-lg-1">
-                <h3>Summary</h3>
-                <p class="fst-italic">
-                  Summary:</p>
-                    {{model.details.summary}}
-                 
-                    {% if model.details.summary and is_user_record_owner %}
-                        </br>
-                        <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                        data-target="#modal_add_investment_summary"> <i class="fa fa-edit"></i></a>
-                       
-                    {% elif is_user_record_owner %}
-                        <!-- Add For First Time -->
-                        <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                        data-target="#modal_add_investment_summary"> <i class="fa fa-plus"></i></a>
-                         
-                    {% endif%}
-
-                 
+                  <h3>Summary</h3>
+                  <p class="fst-italic">
+                    Summary:
+                  </p>
+                  <p id="model-summary">
+                      {{model.details.summary}}
+                    
+                      {% if model.details.summary and is_user_record_owner %}
+                          </br>
+                          <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                          data-target="#modal_add_investment_summary"> <i class="fas fa-edit"></i></a>
+                          
+                      {% elif is_user_record_owner %}
+                          <!-- Add For First Time -->
+                          <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                          data-target="#modal_add_investment_summary"> <i class="fas fa-plus"></i></a>
+                      {% endif%}
                   </p>
               </div>
              
@@ -76,25 +76,25 @@
           <div class="tab-pane" id="tab-3">
             <div class="row">
               <div class="col-lg-8 details order-2 order-lg-1">
-                <h3>The profit margin</h3>
-                <p class="fst-italic">ROI.
-                </p>
-                
-                <p>
-                  {{model.details.roi}}
-                
-                  {% if model.details.roi and is_user_record_owner %}
-                      </br>
-                      <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                      data-target="#modal_add_investment_roi"> <i class="fa fa-edit"></i></a>
-                       
-                  {% elif is_user_record_owner %}
-                      <!-- Add For First Time -->
-                      <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                      data-target="#modal_add_investment_roi"> <i class="fa fa-plus"></i></a>
-                      
-                  {% endif%}
-                </p>
+                  <h3>The profit margin</h3>
+                  <p class="fst-italic">ROI.
+                  </p>
+                  
+                  <p id="model-roi">
+                    {{model.details.roi}}
+                  
+                    {% if model.details.roi and is_user_record_owner %}
+                        </br>
+                        <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                        data-target="#modal_add_investment_roi"> <i class="fas fa-edit"></i></a>
+                        
+                    {% elif is_user_record_owner %}
+                        <!-- Add For First Time -->
+                        <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                        data-target="#modal_add_investment_roi"> <i class="fas fa-plus"></i></a>
+                        
+                    {% endif%}
+                  </p>
                
               </div>
               
@@ -103,24 +103,24 @@
           <div class="tab-pane" id="tab-4">
             <div class="row">
               <div class="col-lg-8 details order-2 order-lg-1">
-                <h3> Shareholding</h3>
-                <p class="fst-italic">
-                  Shareholding Strategy
-                </p>
-                <p>
-                  {{model.details.shareholding}}
-                
-                  {% if model.details.shareholding and is_user_record_owner %}
-                </br>
-                  <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                  data-target="#modal_add_investment_shareholding"> <i class="fa fa-edit"></i></a>
-                  {% elif is_user_record_owner %}
-                    <!-- Add For First Time -->
-                    <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                    data-target="#modal_add_investment_shareholding"> <i class="fa fa-plus"></i></a>
-                  {% endif%}
+                  <h3> Shareholding</h3>
+                  <p class="fst-italic">
+                    Shareholding Strategy
+                  </p>
+                  <p id="model-shareholding">
+                      {{model.details.shareholding}}
+                    
+                      {% if model.details.shareholding and is_user_record_owner %}
+                      </br>
+                      <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
+                      data-target="#modal_add_investment_shareholding"> <i class="fas fa-edit"></i></a>
+                      {% elif is_user_record_owner %}
+                        <!-- Add For First Time -->
+                        <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
+                        data-target="#modal_add_investment_shareholding"> <i class="fas fa-plus"></i></a>
+                      {% endif%}
 
-                </p>
+                  </p>
               </div>
              
             </div>

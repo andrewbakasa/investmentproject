@@ -102,11 +102,11 @@ macroeconomic_parameters = {
 
 investment_cost_beef = {
     'total_land_for_pens': {'title': 'Total Land For Pens','value': 750, 'units': 'NUMBER'}, 
-    'cost_of_land_per_sqm': {'title': 'Cost of Land per SQM','value': 2, 'units': 'NUMBER'},  
-    'cost_of_machinery_per_pen': {'title': 'Cost of Machinery (Per Pen)','value': 2500, 'units': 'NUMBER'}, 
-    'cost_of_building_per_sqm': {'title': 'Cost of building per SQM','value': 10, 'units': 'NUMBER'},   
+    'cost_of_land_per_sqm': {'title': 'Cost of Land per SQM','value': 2, 'units': 'LC'},  
+    'cost_of_machinery_per_pen': {'title': 'Cost of Machinery (Per Pen)','value': 2500, 'units': 'LC'}, 
+    'cost_of_building_per_sqm': {'title': 'Cost of building per SQM','value': 10, 'units': 'LC'},   
     'total_pens': {'title': 'Total pens','value': 5, 'units': 'NUMBER'},
-    'cost_of_pen_construction': {'title': 'Cost of Unit Pen Construction','value': 1200, 'units': 'NUMBER'},
+    'cost_of_pen_construction': {'title': 'Cost of Unit Pen Construction','value': 1200, 'units': 'LC'},
         #for sensitivity analysis: linked sens page which then links Financing Section
     'senior_debt_dynamic_parameter': {'title': 'Senior Debt','value': .70, 'units': 'PERCENT'}, 
 
@@ -118,7 +118,7 @@ investment_cost_beef = {
 
     'total_land_required': {'title': 'Total Land Required (hectares)','value': 1500, 'units': 'NUMBER'}, 
     'cost_of_pens_constructed': {'title': 'Cost of pens constructed','value':None, 'units': 'T_LC'}, 
-    'cost_of_land': {'title': 'Cost of Land','value': None, 'units': 'NUMBER'},
+    'cost_of_land': {'title': 'Cost of Land','value': None, 'units': 'T_LC'},
     'investment_cost_of_land': {'title': 'Investment cost of land','value':None, 'units': 'T_LC'}, 
     'cif_cost_of_machinery': {'title': 'CIF cost of Machinery','value': None, 'units': 'T_USD'},
     'investment_cost_of_buildings': {'title': 'Investment cost of buildings','value':None, 'units': 'T_LC'}, 

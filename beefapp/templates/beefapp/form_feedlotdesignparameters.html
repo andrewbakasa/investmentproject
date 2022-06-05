@@ -11,7 +11,7 @@
 <div class="form-group row"> 
     <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.length.id_for_label }}">{{ feedlotdesignparameters_form.length.label }}</label>
     <div class="col-sm-5  {% if feedlotdesignparameters_form.length.errors %} has-error{% endif %}">
-      {{ feedlotdesignparameters_form.length|add_class:"form-control" }}
+      {{ feedlotdesignparameters_form.length|add_class:"form-control change-positivenumber" }}
       {% for error in feedlotdesignparameters_form.length.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
@@ -21,37 +21,20 @@
 <div class="form-group row">
     <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.width.id_for_label }}">{{ feedlotdesignparameters_form.width.label }}</label>
     <div class="col-sm-5  {% if feedlotdesignparameters_form.width.errors %} has-error{% endif %}">
-      {{ feedlotdesignparameters_form.width|add_class:"form-control" }}
+      {{ feedlotdesignparameters_form.width|add_class:"form-control change-positivenumber" }}
       {% for error in feedlotdesignparameters_form.width.errors %}
       <span class="help-block">{{ error }}</span>
       {% endfor %}
     </div>
  </div>
 
-<div class="form-group row">
-    <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.sqm.id_for_label }}">{{ feedlotdesignparameters_form.sqm.label }}</label>
-    <div class="col-sm-5  {% if feedlotdesignparameters_form.sqm.errors %} has-error{% endif %}">
-      {{ feedlotdesignparameters_form.sqm|add_class:"form-control" }}
-      {% for error in feedlotdesignparameters_form.sqm.errors %}
-      <span class="help-block">{{ error }}</span>
-      {% endfor %}
-    </div>
-</div>
 
-<div class="form-group row">
-  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.pen_area.id_for_label }}">{{ feedlotdesignparameters_form.pen_area.label }}</label>
-  <div class="col-sm-5  {% if feedlotdesignparameters_form.pen_area.errors %} has-error{% endif %}">
-    {{ feedlotdesignparameters_form.pen_area|add_class:"form-control" }}
-    {% for error in feedlotdesignparameters_form.pen_area.errors %}
-    <span class="help-block">{{ error }}</span>
-    {% endfor %}
-  </div>
-</div>
+
 
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.sqm_per_cattle.id_for_label }}">{{ feedlotdesignparameters_form.sqm_per_cattle.label }}</label>
   <div class="col-sm-5  {% if feedlotdesignparameters_form.sqm_per_cattle.errors %} has-error{% endif %}">
-    {{ feedlotdesignparameters_form.sqm_per_cattle|add_class:"form-control" }}
+    {{ feedlotdesignparameters_form.sqm_per_cattle|add_class:"form-control change-positivenumber" }}
     {% for error in feedlotdesignparameters_form.sqm_per_cattle.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -60,7 +43,7 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.total_cattle_per_pen_per_cycle.id_for_label }}">{{ feedlotdesignparameters_form.total_cattle_per_pen_per_cycle.label }}</label>
   <div class="col-sm-5  {% if feedlotdesignparameters_form.total_cattle_per_pen_per_cycle.errors %} has-error{% endif %}">
-    {{ feedlotdesignparameters_form.total_cattle_per_pen_per_cycle|add_class:"form-control" }}
+    {{ feedlotdesignparameters_form.total_cattle_per_pen_per_cycle|add_class:"form-control  change-positiveinteger" }}
     {% for error in feedlotdesignparameters_form.total_cattle_per_pen_per_cycle.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
@@ -69,31 +52,74 @@
 <div class="form-group row">
   <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.num_of_months_per_cycle.id_for_label }}">{{ feedlotdesignparameters_form.num_of_months_per_cycle.label }}</label>
   <div class="col-sm-5  {% if feedlotdesignparameters_form.num_of_months_per_cycle.errors %} has-error{% endif %}">
-    {{ feedlotdesignparameters_form.num_of_months_per_cycle|add_class:"form-control" }}
+    {{ feedlotdesignparameters_form.num_of_months_per_cycle|add_class:"form-control  change-positiveinteger" }}
     {% for error in feedlotdesignparameters_form.num_of_months_per_cycle.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
   </div>
 </div>
 
+
+
 <div class="form-group row">
-  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.cattle_per_pen_per_year.id_for_label }}">{{ feedlotdesignparameters_form.cattle_per_pen_per_year.label }}</label>
-  <div class="col-sm-5  {% if feedlotdesignparameters_form.cattle_per_pen_per_year.errors %} has-error{% endif %}">
-    {{ feedlotdesignparameters_form.cattle_per_pen_per_year|add_class:"form-control" }}
-    {% for error in feedlotdesignparameters_form.cattle_per_pen_per_year.errors %}
+  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.num_of_feedlots.id_for_label }}">{{ feedlotdesignparameters_form.num_of_feedlots.label }}</label>
+  <div class="col-sm-5  {% if feedlotdesignparameters_form.num_of_feedlots.errors %} has-error{% endif %}">
+    {{ feedlotdesignparameters_form.num_of_feedlots|add_class:"form-control  change-positiveinteger" }}
+    {% for error in feedlotdesignparameters_form.num_of_feedlots.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
   </div>
 </div>
 
 <div class="form-group row">
-  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.num_of_feedlots.id_for_label }}">{{ feedlotdesignparameters_form.num_of_feedlots.label }}</label>
-  <div class="col-sm-5  {% if feedlotdesignparameters_form.num_of_feedlots.errors %} has-error{% endif %}">
-    {{ feedlotdesignparameters_form.num_of_feedlots|add_class:"form-control" }}
-    {% for error in feedlotdesignparameters_form.num_of_feedlots.errors %}
+  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.construction_cost_per_pen.id_for_label }}">{{ feedlotdesignparameters_form.construction_cost_per_pen.label }}</label>
+  <div class="col-sm-5  {% if feedlotdesignparameters_form.construction_cost_per_pen.errors %} has-error{% endif %}">
+    {{ feedlotdesignparameters_form.construction_cost_per_pen|add_class:"form-control  change-positivenumber" }}
+    {% for error in feedlotdesignparameters_form.construction_cost_per_pen.errors %}
     <span class="help-block">{{ error }}</span>
     {% endfor %}
   </div>
 </div>
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.machinery_cost_per_pen.id_for_label }}">{{ feedlotdesignparameters_form.machinery_cost_per_pen.label }}</label>
+  <div class="col-sm-5  {% if feedlotdesignparameters_form.machinery_cost_per_pen.errors %} has-error{% endif %}">
+    {{ feedlotdesignparameters_form.machinery_cost_per_pen|add_class:"form-control  change-positivenumber" }}
+    {% for error in feedlotdesignparameters_form.machinery_cost_per_pen.errors %}
+    <span class="help-block">{{ error }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.building_cost_per_sqm.id_for_label }}">{{ feedlotdesignparameters_form.building_cost_per_sqm.label }}</label>
+  <div class="col-sm-5  {% if feedlotdesignparameters_form.building_cost_per_sqm.errors %} has-error{% endif %}">
+    {{ feedlotdesignparameters_form.building_cost_per_sqm|add_class:"form-control  change-positivenumber" }}
+    {% for error in feedlotdesignparameters_form.building_cost_per_sqm.errors %}
+    <span class="help-block">{{ error }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.total_land_sqm.id_for_label }}">{{ feedlotdesignparameters_form.total_land_sqm.label }}</label>
+  <div class="col-sm-5  {% if feedlotdesignparameters_form.total_land_sqm.errors %} has-error{% endif %}">
+    {{ feedlotdesignparameters_form.total_land_sqm|add_class:"form-control  change-positivenumber" }}
+    {% for error in feedlotdesignparameters_form.total_land_sqm.errors %}
+    <span class="help-block">{{ error }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="form-group row">
+  <label class="col-sm-7 col-form-label" for="{{ feedlotdesignparameters_form.cost_of_land_per_sqm.id_for_label }}">{{ feedlotdesignparameters_form.cost_of_land_per_sqm.label }}</label>
+  <div class="col-sm-5  {% if feedlotdesignparameters_form.cost_of_land_per_sqm.errors %} has-error{% endif %}">
+    {{ feedlotdesignparameters_form.cost_of_land_per_sqm|add_class:"form-control  change-positivenumber" }}
+    {% for error in feedlotdesignparameters_form.cost_of_land_per_sqm.errors %}
+    <span class="help-block">{{ error }}</span>
+    {% endfor %}
+  </div>
+</div>
+
 
 

@@ -1,3 +1,7 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
 <div class="accordion-item" id='feedlotdesignparameters_accordion'>
 
     <h4 class="accordion-header" id="feedlotdesignparameters_header" >
@@ -28,14 +32,8 @@
                                 <th scope="row">Width</th>
                                 <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="width">{{feedlotdesignparameters_record.width}}</td>                                                    
                             </tr>
-                            <tr id="feedlotdesignparameters-sqm" >
-                                <th scope="row">SQM</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="sqm">{{feedlotdesignparameters_record.sqm}}</td>                                                    
-                            </tr>
-                            <tr id="feedlotdesignparameters-pen_area" >
-                                <th scope="row">Pen area</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData" name="pen_area" >{{feedlotdesignparameters_record.pen_area}}</td>                                                    
-                            </tr>
+                           
+                          
                             <tr id="feedlotdesignparameters-sqm_per_cattle" >
                                 <th scope="row">SQM per each cattle</th>
                                 <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="sqm_per_cattle">{{feedlotdesignparameters_record.sqm_per_cattle}}</td>                                                    
@@ -49,24 +47,49 @@
                                 <th scope="row"># of months per cycle</th>
                                 <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="num_of_months_per_cycle">{{feedlotdesignparameters_record.num_of_months_per_cycle}}</td>                                                    
                             </tr>
-                            <tr id="feedlotdesignparameters-cattle_per_pen_per_year" >
-                                <th scope="row">Annual Cattle Output per pen </th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="cattle_per_pen_per_year">{{feedlotdesignparameters_record.cattle_per_pen_per_year}}</td>                                                    
-                            </tr>
+                           
                             <tr id="feedlotdesignparameters-num_of_feedlots" >
                                 <th scope="row"># of feedlots</th>
                                 <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="num_of_feedlots">{{feedlotdesignparameters_record.num_of_feedlots}}</td>                                                    
                             </tr>
+
+                            <tr id="feedlotdesignparameters-construction_cost_per_pen" >
+                                <th scope="row"># Unit Pen Construction Cost</th>
+                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="construction_cost_per_pen">{{feedlotdesignparameters_record.construction_cost_per_pen| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+
+                            <tr id="feedlotdesignparameters-machinery_cost_per_pen" >
+                                <th scope="row"># Unit Pen Machinery Cost</th>
+                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="machinery_cost_per_pen">{{feedlotdesignparameters_record.machinery_cost_per_pen| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+                            <tr id="feedlotdesignparameters-building_cost_per_sqm" >
+                                <th scope="row">Building cost per sqm (of Total Land)</th>
+                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="building_cost_per_sqm">{{feedlotdesignparameters_record.building_cost_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+
+                            <tr id="feedlotdesignparameters-total_land_sqm" >
+                                <th scope="row">Total land (sqm)</th>
+                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="total_land_sqm">{{feedlotdesignparameters_record.total_land_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
+                            <tr id="feedlotdesignparameters-cost_of_land_per_sqm" >
+                                <th scope="row">Land cost per sqm</th>
+                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="cost_of_land_per_sqm">{{feedlotdesignparameters_record.cost_of_land_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                            </tr>
+
                             
                         </tbody>
                     </table>
                 </div>
                 <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                data-target="#modal_add_model_feedlotdesignparameters"> <i class="fa fa-edit"></i></a>
+                data-target="#modal_add_model_feedlotdesignparameters"> <i class="fas fa-edit"></i></a>
             {% else %}
                 <!-- Add For First Time -->
                 <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                data-target="#modal_add_model_feedlotdesignparameters"> <i class="fa fa-plus"></i></a>
+                data-target="#modal_add_model_feedlotdesignparameters"> <i class="fas fa-plus"></i></a>
             {% endif%}
         </div>
       </div>

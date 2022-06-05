@@ -3,6 +3,7 @@
 # Create your views here.
 import copy
 import math
+from tkinter.messagebox import NO
 import numpy as np
 import pandas as pd
 from common.data_utils import create_downloads_instance
@@ -35,9 +36,13 @@ def get_model_spreadsheets(request, model_id):
     request.session['total_runs'] =100000
     request.session.save()
     usermodel = get_object_or_404(UserModel,pk=model_id)
-    simulation_iterations=usermodel.simulation_iterations 
+    simulation_iterations=usermodel.simulation_iterations
+    total_params=usermodel.total_params 
     simulation_run=usermodel.simulation_run 
     npv_bin_size=usermodel.npv_bin_size
+    
+    #change to description
+    user_model_decription =usermodel.description
 
     run_check_counter=0
     #1. Model Timing Assumptions        
@@ -104,7 +109,7 @@ def get_model_spreadsheets(request, model_id):
             'risk_premium': {'title': 'Risk premium','value': float(model_financing.risk_premium), 'units': 'PERCENT'}, 
             'num_of_installments': {'title': 'No. of installments','value': int(model_financing.num_of_installments), 'units': 'NUMBER'},  
             'grace_period': {'title': 'Grace period (years)','value':int(model_financing.grace_period), 'units': 'YEARS'}, 
-            'repayment_starts': {'title': 'Repayment starts year','value':int(model_financing.repayment_starts), 'units': 'YEAR'}, 
+            'repayment_starts': {'title': 'Repayment starts year','value':0, 'units': 'YEAR'}, #recalculated
             'equity': {'title': 'Equity (% of Investment Costs)','value': float(model_financing.equity), 'units': 'PERCENT'}, 
             'senior_debt': {'title': 'Senior Debt (% of Investment Costs)','value': float(model_financing.senior_debt), 'units': 'PERCENT'},  
         }
@@ -158,28 +163,45 @@ def get_model_spreadsheets(request, model_id):
             'num_of_months_per_cycle': {'title': 'N# of months per cycle','value': float(model_tank_design_parameters.tank_num_of_months_per_cycle), 'units': 'NUMBER'},
             'fish_per_tank_per_year': {'title': 'Total fish per tank per year','value': float(model_tank_design_parameters.fish_per_tank_per_year), 'units': 'NUMBER'},
         }
+        ip_options={} 
+        for i in investment_parameter_options_fish.keys():
+            ip_options[i] =investment_parameter_options_fish[i].copy()
 
         for i in tank_design_parameters.keys():
             if 'num_of_tanks'==i:
-                investment_parameter_options_fish['initial_tanks_employed'].insert(0,float(model_tank_design_parameters.num_of_tanks))
+                ip_options['initial_tanks_employed'].insert(0,float(model_tank_design_parameters.num_of_tanks))
             elif 'length'==i:
-                investment_parameter_options_fish['tank_length'].insert(0,float(model_tank_design_parameters.tank_length))
+                ip_options['tank_length'].insert(0,float(model_tank_design_parameters.tank_length))
             elif 'width'==i:
-                investment_parameter_options_fish['tank_width'].insert(0,float(model_tank_design_parameters.tank_width))
+                ip_options['tank_width'].insert(0,float(model_tank_design_parameters.tank_width))
             elif 'depth'==i:
-                investment_parameter_options_fish['tank_depth'].insert(0,float(model_tank_design_parameters.depth))
+                ip_options['tank_depth'].insert(0,float(model_tank_design_parameters.depth))
            
             elif 'total_fish_per_tank_per_cycle'==i:
-                investment_parameter_options_fish['fish_density'].insert(0,float(model_tank_design_parameters.total_fish_per_tank_per_cycle))
+                ip_options['fish_density'].insert(0,float(model_tank_design_parameters.total_fish_per_tank_per_cycle))
           
         
-        for i in ['cost_of_land_per_sqm','cost_of_machinery', 'cost_of_building_per_sqm',
-                  'cost_of_unit_tank', 'total_land_required',  'cost_of_machinery_per_tank']:
-            first_ =investment_parameter_options_fish[i][0]
-            investment_parameter_options_fish[i].insert(0,first_)
+        for i in ['cost_of_land_per_sqm','cost_of_machinery_per_tank',
+                         'cost_of_building_per_sqm','cost_of_unit_tank', 'total_land_required']:
+          
+            if 'cost_of_land_per_sqm'==i:
+                ip_options['cost_of_land_per_sqm'].insert(0,float(model_tank_design_parameters.cost_of_land_per_sqm))
+            elif 'cost_of_machinery_per_tank'==i:
+                    ip_options['cost_of_machinery_per_tank'].insert(0,float(model_tank_design_parameters.machinery_cost_per_tank))
+            elif 'cost_of_building_per_sqm'==i:
+                    ip_options['cost_of_building_per_sqm'].insert(0,float(model_tank_design_parameters.building_cost_per_sqm))
+            elif 'cost_of_unit_tank'==i:
+                    ip_options['cost_of_unit_tank'].insert(0,float(model_tank_design_parameters.purchase_price_tank))
+            
+            elif 'total_land_required'==i:
+                ip_options['total_land_required'].insert(0,float(model_tank_design_parameters.total_land_sqm))
+
+        for i in ['cost_of_machinery']:
+            first_ =ip_options[i][0]
+            ip_options[i].insert(0,first_)
         # senoir debt
-        investment_parameter_options_fish['senior_debt_dynamic_parameter'].insert(0,para_senior_debt)
-        #print(investment_parameter_options_fish)
+        ip_options['senior_debt_dynamic_parameter'].insert(0,para_senior_debt)
+        #print(ip_options)
 
   
 
@@ -193,10 +215,11 @@ def get_model_spreadsheets(request, model_id):
                         working_capital=working_capital, taxes=taxes, macroeconomic_parameters =macroeconomic_parameters, 
                         tank_design_parameters =tank_design_parameters, investment_cost= investment_cost_fish
                         ,fish_business_options= fish_business_options, cost_real=cost_real_fish, 
-                        investment_parameter_options=investment_parameter_options_fish)
+                        investment_parameter_options=ip_options)
    
 
-   
+     #set descripton
+    breport._set_model_description(user_model_decription)
    
     if not hasattr(breport, 'para_list_by_grad'):
         breport._sens_sensitivity_parrallel_generator()
@@ -222,15 +245,20 @@ def get_model_spreadsheets(request, model_id):
             request.session.save()
             setattr(breport,'sim_count',0)
 
-            breport._set_parameters_simulation(25)            
-            graph_, ar= monteCarlo_sim(request,breport, npv_bin_size, 25, simulation_iterations, input_vars)
+            breport._set_parameters_simulation(25)  
+             #limit params
+            if  total_params <=0:
+                total_params=None 
+                       
+            graph_, ar ,employed_scenario_inputs = monteCarlo_sim(request,breport, npv_bin_size, 25, simulation_iterations, input_vars, total_params)
             setattr(breport,'npv_distribution' ,graph_)
+            setattr(breport,'employed_scenario_inputs' ,employed_scenario_inputs)
     
     #add counter downloads
     create_downloads_instance(request, 'fish')
     
     #get the spread sheet
-    spread_Sht= breport.spreadsheet()
+    spread_Sht= breport.spreadsheet(request)
 
     #print(breport.__str__())
     return spread_Sht

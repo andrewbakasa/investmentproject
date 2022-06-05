@@ -16,7 +16,7 @@
         <li class="breadcrumb-item" ><a href="{% url 'models' %}">{% trans 'User Models' %}</a></li>
         {% if usermodel %}
             <li class="breadcrumb-item"><a href="{{ model.get_absolute_url }}">{{usermodel.name | truncatechars:15}}</a></li>
-            <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-update"   href="#" data-url="{% url 'get_fish_model_spreadsheets' usermodel.id %}" 
+            <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-download"   href="#" data-url="{% url 'get_fish_model_spreadsheets' usermodel.id %}" 
                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                 title='Download Excel'><i class="fas fa-download"></i>
                 </a></li> 
@@ -103,34 +103,4 @@
 
   </div>
 </section><!-- End Cource Details Tabs Section -->
- <!-- *****************MODAL POPUP FORMS *************************** -->
-            <!-------------------------FORM TIMING ASSUMPTIONS SECTION ----------------------------------->
-            <!-- modal Add modal_add_model_timing -->
-            {% include 'investments_appraisal/modal/timing_assumption.html' %}    
-            <!-------------------------FORM PRICES SECTION ----------------------------->
-            <!-- modal Add modal_add_model_prices -->
-            {% include 'investments_appraisal/modal/prices.html' %}
-            <!-------------------------FORM DEPRECIATION SECTION ------------------------>            
-            {% include 'investments_appraisal/modal/depreciation.html' %}
-            <!-------------------------FORM TAXES SECTION ----------------------------------->
-            <!-- modal Add modal_add_model_taxes -->
-            {% include 'investments_appraisal/modal/taxes.html' %}
-            
-            <!--------------FORM FINANCING SECTION ------------------------------------>
-            <!-- modal Add modal_add_model_fiancing -->
-            {% include 'investments_appraisal/modal/financing.html' %}
-          
-            <!---------------FORM MACROECONOMICPARAMETER SECTION ---------------------->
-            <!-- modal Add modal_add_model_macroeconomicparameters -->
-            {% include 'investments_appraisal/modal/macro_economic_parameters.html' %}
-      
-           
-            <!------------------FORM TANKDESIGNPARAMETER SECTION ------------->
-            <!-- modal Add modal_add_model_tankdesignparameters -->
-            {% include 'fishapp/modal/tank_design.html' %}
-           
-            <!----------------------FORM WORKINGCAPITAL SECTION --------------->
-            <!-- modal Add modal_add_model_macroeconomicparameters -->
-            {% include 'investments_appraisal/modal/working_capital.html' %}
-          
-
+ 

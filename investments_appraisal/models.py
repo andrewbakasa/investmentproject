@@ -22,7 +22,7 @@ class SimulationParameters(models.Model):
         ordering = ['-date_created']
 
     def __str__(self):
-        return self.date_created 
+        return str(self.date_created)
 class NewsSubscribe(models.Model):
     email = models.CharField(max_length=200, unique=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -196,7 +196,7 @@ class ModelCategory(models.Model):
     hits = models.IntegerField(default=0)# downloads
     	
     class Meta:
-        ordering = ['name']
+        ordering = ['-hits']
 
     def __str__(self):
         return str(self.name)
@@ -233,7 +233,8 @@ class UserModel(models.Model):
    
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Model Owner")
     model_type = models.ForeignKey(ModelCategory, on_delete=models.SET_NULL, null=True,verbose_name="Category")
-    name = models.CharField(verbose_name=_("model_name"), max_length=200, null=False )	
+    name = models.CharField(verbose_name=_("Model Title"), max_length=200, null=False )
+    description = models.TextField(default='My own model')	
     status = models.CharField(max_length=20, default='WIP')
     currency = models.ForeignKey(Currency, on_delete= models.SET_NULL, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -243,6 +244,7 @@ class UserModel(models.Model):
     simulation_run =models.BooleanField(default=False)
     npv_bin_size= models.IntegerField(default=10)
     design_complete =models.BooleanField(default=False)
+    total_params= models.IntegerField(default=0, verbose_name="Simulation Params")
 
     class Meta:
         ordering = ['-last_modified','-date_created']
@@ -301,7 +303,9 @@ class TimingAssumption(models.Model):
     class Meta:
         ordering = ['usermodel']
         #unique_together = (('product', 'invoice'),)
-
+    
+    def __str__(self):
+        return str(self.usermodel)
 class Prices(models.Model):
     usermodel = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, default ='Base_Price')
@@ -331,7 +335,7 @@ class Financing(models.Model):
     risk_premium =  models.DecimalField(default =.01, decimal_places=2, max_digits=10)
     num_of_installments =  models.IntegerField(default =6)
     grace_period =  models.IntegerField(default =1)
-    repayment_starts =  models.IntegerField(default = get_curr_year()+1)
+    #repayment_starts =  models.IntegerField(default = get_curr_year()+1)
     equity =  models.DecimalField(default =.3, decimal_places=2, max_digits=10)
     senior_debt =  models.DecimalField(default =.7,decimal_places=2, max_digits=10)
     
@@ -369,8 +373,8 @@ class MacroeconomicParameters(models.Model):
 class UserPreference(models.Model):
     user = models.OneToOneField(User, on_delete= models.CASCADE)
     last_modified = models.DateTimeField(auto_now=True)
-    perpage = models.IntegerField(default=6, verbose_name='Records per page')
-    pertable = models.IntegerField(default=10, verbose_name='Records per table')
+    perpage = models.IntegerField(default=6, verbose_name='Page Records')
+    pertable = models.IntegerField(default=10, verbose_name='Table Records')
     g2 = models.BooleanField(default=True, verbose_name='G2: another')
   
     def __str__(self):

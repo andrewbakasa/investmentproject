@@ -17,7 +17,7 @@ import pandas as pd
 from django.contrib.sessions.models import Session
 from common.get_current_user import get_username
 from investments_appraisal.middlewares import get_request
-
+from django.db.models import Q
 class InvestmentCategory(models.Model):
     name = models.CharField(max_length=60, unique=True)
     description = models.TextField()
@@ -45,12 +45,13 @@ class Investment(models.Model):
     creater = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey('InvestmentCategory', on_delete=models.SET_NULL, null=True,verbose_name="Category")
     likes = models.IntegerField(default=0)
-    hits = models.IntegerField(default=0)# downloads
+    views = models.IntegerField(default=0, verbose_name='Views')# downloads
     total_value = models.IntegerField(default=0)
     tags = models.ManyToManyField(Tag, null=True, blank =True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
+    public= models.BooleanField(default=True)
     class Meta:
-        ordering = ['-likes']
+        ordering = ['-views']
 
     def __str__(self):
         return self.name 
@@ -97,13 +98,43 @@ class Investment(models.Model):
 
         return False
     
+
+    def userIsOwnerAttr(self, user):  
+        if self.creater == user :
+            return 'myportifolio'
+
+        return 'portifolio_na'
+
+    def userIsOwner(self, user):    
+        if self.creater == user :
+            return True
+
+        return False
+    def userIsInvestorStatement(self, user):       
+        qs = self.investor_set.filter(user=user).first()
+        if qs:
+            return 'I am an Investor'
+
+        return 'I am NOT an Investor'
+
     def userIsInvestorAttr(self, user):       
         qs = self.investor_set.filter(user=user).first()
         if qs:
             return 'myinvestment'
 
         return ''
-   
+    
+    def userIsInvestorStake(self, user):       
+        qs = self.investor_set.filter(user=user).first()
+        if qs:
+            curr = self.current_investment
+            max_val = max(self.total_value,curr)
+            if max_val !=0:
+                return round(qs.value*100/max_val,2)
+            else:
+                return 0
+
+        return 0
 class InvestmentDetails(models.Model):
     investment = models.OneToOneField(Investment, on_delete=models.CASCADE)
     strategy = models.TextField(blank=True,null=True)
@@ -119,13 +150,20 @@ class InvestmentDetails(models.Model):
         return str(self.investment) 
   
 class Investor(models.Model):
+    APLLICATION_STATUS_CHOICE = (("pending", "pending"), ("recieved", "recieved"), 
+                               ("verification", "verification"), ("engagement", "engagement"),
+                               ("accepted", "accepted"), ("rejected", "rejected") )
     investment = models.ForeignKey(Investment, on_delete=models.SET_NULL, null=True) 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, verbose_name='Keywords')
     description = models.TextField(verbose_name='Investment Proposal')
-    value= models.IntegerField(default= 0, verbose_name='Funds Pledge')
+    #postiv float
+    value= models.PositiveBigIntegerField(default= 0, verbose_name='Funds Pledge')
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
+    application_status = models.CharField(
+        choices=APLLICATION_STATUS_CHOICE, max_length=64, default="pending"
+    )
     class Meta:
         ordering = ['-date_created']
 
@@ -139,17 +177,17 @@ class Investor(models.Model):
     @property
     def trading_df(self):
         investments_df = pd.DataFrame(Investment.objects.all().values())	
-        investors_df = pd.DataFrame(Investor.objects.filter(user=self.user).values())
+        investors_df = pd.DataFrame(Investor.objects.filter(Q(user=self.user), Q(investment__id__isnull=False)).values())
         users_df = pd.DataFrame(User.objects.all().values())
         categories_df = pd.DataFrame(InvestmentCategory.objects.all().values()) 
 
-        df = pd.DataFrame(columns =['fail_date','loco'])
+        df = pd.DataFrame(columns =['iid','retain_id'])
         if investments_df.shape[0]>0 and investors_df.shape[0] > 0 : 
             investments_df['investment_id'] = investments_df['id']
             # mwrge
-            pd.merge_asof
+          
             df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop([
-                        'likes','hits','date_created_y','date_created_x','description_y'
+                        'likes','views','date_created_y','date_created_x','description_y'
                         ,'name_y','user_id','investment_id'], axis=1).rename(
                         {'id_x': 'iid','id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
                         'name_x':'inv_name' }, axis=1)

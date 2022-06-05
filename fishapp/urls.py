@@ -18,7 +18,10 @@ urlpatterns = [
     #Model TankDesignparameters
     path('add_model_tankdesignparameters_ajax/', views.general_page.add_model_tankdesignparameters_ajax, name="add_model_tankdesignparameters_ajax"),
     path('edit_model_tankdesignparameters_ajax/<int:id>/', views.general_page.edit_model_tankdesignparameters_ajax, name="edit_model_tankdesignparameters_ajax"),
-   
+    path('add_model_tankdesignparameters_ajax2/<int:model_id>/', views.general_page.add_model_tankdesignparameters_ajax2, name="add_model_tankdesignparameters_ajax2"),
+    path('update_model_tankdesignparameters_ajax/<int:id>/', views.general_page.update_model_tankdesignparameters_ajax, name="update_model_tankdesignparameters_ajax"),
+
+
     #get selected model spreadsheet
     path('get_fish_model_spreadsheets/<int:model_id>/', views.usermodels.get_model_spreadsheets, name="get_fish_model_spreadsheets"),
     

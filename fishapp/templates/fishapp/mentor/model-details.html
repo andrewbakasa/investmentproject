@@ -36,7 +36,14 @@
 
 {%endblock content%}
 
-
+{% block modal_divs %}
+    <!-- EDIT DISPLAY HOLDER -->
+    <div class="modal fade" id="modal-usermodel">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+    </div>   
+{% endblock %} 
 
  <!-- ======= Footer ======= --> 
  {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
@@ -78,8 +85,10 @@
         <script>
             var check_url_ajax= "{% url 'check_model_fish' usermodel.id %}"  
         </script>
+        <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
         <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
         <script src="{% static 'basic_ui/js/tank.js' %}"></script>
+
 {% endblock %}
 
 

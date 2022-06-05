@@ -21,7 +21,7 @@
         <li class="breadcrumb-item"><a href="{% url 'user_models' %}">{% trans 'User Models' %}</a></li>
         {% if usermodel %}
             <li class="breadcrumb-item"><a href="{{ usermodel.get_absolute_url }}">{{usermodel.name | truncatechars:15}}</a></li>
-            <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-update" href="#" data-url="{% url 'get_beef_model_spreadsheets' usermodel.id %}" 
+            <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-download" href="#" data-url="{% url 'get_beef_model_spreadsheets' usermodel.id %}" 
                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                 title='Download as Excel'><i class="fas fa-download"></i>
                 </a></li>
@@ -37,11 +37,6 @@
             <li class="breadcrumb-item active">{% trans 'Create' %}</li>
         {% endif %}
     </ol>
-{% endblock %}
-
-{% block mainscripts %}
-
-    
 {% endblock %}
 
 {% block scripts %}
@@ -71,6 +66,7 @@
         var check_url_ajax= "{% url 'check_model_beef' usermodel.id %}"  
     </script>
     <!--Model specific JS-->
+    <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
     <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
     <script src="{% static 'basic_ui/js/feedlot.js' %}"></script>
 {% endblock %}

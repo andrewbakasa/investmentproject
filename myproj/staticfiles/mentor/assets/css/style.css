@@ -1195,6 +1195,31 @@ section {
   background: #5fcf80;
   color: #fff;
 }
+
+.umodels .umodel-item {
+ 
+  /* padding: 20px; */
+  /* background: #fff; */
+   /* text-align: center; */
+  /*border: 1px solid #eef0ef;
+  border-radius: 0; */
+  position: relative;
+  overflow: hidden; 
+}
+
+.umodels .advanced {
+  text-align: center;
+  width: 200px;
+  position: absolute;
+  top: 20px;
+  right: -68px;
+  transform: rotate(45deg);
+  z-index: 1;
+  font-size: 14px;
+  padding: 1px 0 3px 0;
+  background: #5fa2cf;
+  color: #fff;
+}
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
@@ -1571,3 +1596,14 @@ Add a dark border to the very last row to signify the end of the table */
   overflow-y: scroll !important;
   max-height:20px !important;
 }
+
+/* Edit mode display */
+
+.edit-mode td{
+  color: green;
+  font-family: "Raleway", sans-serif;
+  font-style: italic;
+  background-color: white;
+  /* box-shadow: 0px 0 18px rgba(55, 66, 59, 0.08); */
+}
+

@@ -11,7 +11,7 @@
 {% block stylesheets %}
 <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
 
-<
+<!-- < -->
 {% endblock %}
 
 {% block content_header %}   
@@ -54,16 +54,17 @@
                             <div class="table-responsive">
                                 <table id="userBusinessTable" class="table table-striped">
                                     <thead class="thead-dark">
-                                    <th style="width: 1%" >#</th>    
-                                    <th style="width: 12%" >Name</th>
-                                    <th style="width: 18%" >description</th>
-                                    <th style="width: 8%" >category</th>
-                                    <th style="width: 7%" >Value</th>
-                                    <th style="width: 7%" >Current</th>
-                                    <th style="width: 3%" >%</th>
-                                    <th style="width: 8%" >Investors</th>
-                                    <th style="width: 17%" >Date Created</th>
-                                    <th style="width: 7%" class="text-right">Actions</th>
+                                        <th style="width: 2%" >#</th>    
+                                        <th style="width: 13%" >Name</th>
+                                        <th style="width: 20%" >description</th>
+                                        <th style="width: 8%" >category</th>
+                                        <th style="width: 7%" >Value</th>
+                                        <th style="width: 7%" >Current</th>
+                                        <th style="width: 3%" >%</th>
+                                        <th style="width: 8%" >Investors</th>
+                                        <th style="width: 20%" >Date Created</th>
+                                        <th style="width: 4%" >Public</th>
+                                        <th style="width: 8%" class="text-right">Actions</th>
                                     </thead>
                                     <tbody id="userbusiness-table-tbody">
                                     {% for item in first_page  %}
@@ -71,7 +72,7 @@
                                         <td class="modelData" name="counter">{{forloop.counter}}</td>
                                         <td class="modelData" name="name" >{{item.name|truncatechars:12}}</td>
                                         <td class="modelData" name="description" >{{item.description|truncatechars:20}}</td>
-                                        <td class="modelData" name="category" >{{item.category}}</td>
+                                        <td class="modelData" name="category" >{{item.category|truncatechars:20}}</td>
                                         <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
                                         <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
                                         <td class="modelData" name="current_investment_percent" >{{item.current_investment_percent| floatformat:-1| intcomma}}%</td>
@@ -80,22 +81,28 @@
                                     
                                             
                                         <td class="modelData" name="date_created" >{{item.date_created}}</td>
+
+                                        <td class="modelData" name="public" >
+                                            {% if item.public %}<i style='color:blue;' class="bi bi-check-circle"></i>
+                                            {% else %} <i class="bi-square"></i>{% endif %}
+                                        </td>
+                                       
                                         <td class="text-right modelAction modelData" name="action">
                                             <a href="{% url 'edit-investment' item.id %}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                                title='Manage Business'><i class="fa fa-eye"></i>
+                                                title='Manage Business'><i class="fas fa-wrench"></i>
                                             </a>
                                     
                                             <!-- EDIT MODEL -->
                                             <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
                                                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                                title='Edit Model'><i  class="fas fa-edit"></i>
+                                                title='Edit Data'><i  class="fas fa-edit"></i>
                                             </a>
                                             
                                             <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                             data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
                                             data-delete-url="{% url 'delete_investment_ajax' item.id 1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Delete' > <i class="fa fa-trash "></i> 
+                                            title='Delete' > <i class="fas fa-trash"></i> 
                                             </a>
 
                                         
@@ -198,7 +205,7 @@
             <div class="modal-content">
                 <!--Header-->
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Add Your Business</h4>
+                    <h4 class="modal-title myModalLabel">Add Your Business</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -249,6 +256,24 @@
     var csrftoken = getToken('csrftoken');
     var display_business_ajax_url= "{% url 'display_business_ajax' %}" 
     
+    function sentenceCase(input){
+       
+        if (input.length >0){
+            if (input.length > 1){
+                // at least teo letter
+                var first =input.slice(0, 1).toUpperCase()
+                var trail =first + input.slice(1, input.length)
+                return trail
+            }else {
+                // one leer
+                var first =input.slice(0, 0).toUpperCase()
+                return first
+            }
+           
+        }
+        return input
+       
+    }
     $(document).ready(function (){ 
         $("#investments a:first").addClass( "active") 
         $("#enterprenuer a:first").addClass( "active") 
@@ -258,7 +283,10 @@
         var name = $(e.relatedTarget).data('object-name');
         var url = $(e.relatedTarget).data('delete-url');
         var comment_id = $(e.relatedTarget).data('item-id');
-        $('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
+      
+        var name =truncChar(name,25)
+        $('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b> <i>" + name + "</i>?");
+   
         $('#confirmdelete .modal-footer input').attr('data-url', url);
         $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
     });
@@ -356,46 +384,64 @@
                       //console.log('added data' ,data.model)
                       if(data.model){
                           //console.log(data.model)
-                          appendTable(data.model)
+                          var item_exist= $("#userbusiness-table-tbody").length
+                          if (item_exist>0){
+                            appendTable(data.model)
+                          }else {
+                            //
+                            addTable(data.model)                            
+                          }
+                         
                           $('.close-modal').click()
                           if (data.total_pages){
                               updatePaging(data.total_pages)
                           }
                       } else {
                           // ADDITION NOT SUCCESSFUL
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (data['error']) {
-                              var form_vars=['__all__','name','description','category', 'total_value','creater']
+                              //console.log('1. ERROR::::', data['error'])
+                              var form_vars=['__all__','name','description','tags', 'category', 'total_value']
                               for (let p=0; p < form_vars.length; p++ ){
-                                  let name_var = form_vars[p]
-                                  if (data['error'][name_var]){
-                                      a_html = 	`<div class='alert alert-danger alert dismissable'>
-                                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                          <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
-                                      </div> ` ;
-                                      $('#public_toggle_form-errors').append(a_html)
-                                  }
+                                    let name_var = form_vars[p]
+                                    //console.log('2. inside loop::::', data['error'][name_var], name_var)
+                                    if (data['error'][name_var]){
+                                            //console.log('3. inside::::', data['error'][name_var][0], name_var)
+                                            // Find a better method here
+                                            if (data['error'][name_var][0]=='This field is required.'){
+                                                error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+                                               
+                                            }else {
+                                                error_content= data['error'][name_var][0] 
+                                            }
+                                            a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span></button>${error_content}
+                                                        </div> ` ;
+                                            $('.public_toggle_form-errors').append(a_html)
+                                    }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              //console.log('Out.......')
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                               //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
 
@@ -408,6 +454,93 @@
               })
               return false;
           })
+
+        function addTable(item){
+
+             //console.log(item) 
+            var js_date_created = new Date(item.date_created) 
+            var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
+            var current_investment=numberWithCommas(item.current_investment)
+            var name_trunc =truncChar(item.name,12)
+            var description_trunc =truncChar(item.description,20)
+            var category_trunc =truncChar(item.category,20)
+           
+            var public= ''
+            var page_no = 1//dummy;
+            //console.log(item)
+            if (item.public){
+                public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+            }else{
+                public= "<i class='bi-square'></i>"
+            }
+           
+            a_html =`<h4 style="text-align:center;">My Businesses</h4>
+                    <hr>
+                    <div class="table-responsive">
+                        <table id="userBusinessTable" class="table table-striped">
+                            <thead class="thead-dark">
+                                <th style="width: 2%" >#</th>    
+                                <th style="width: 13%" >Name</th>
+                                <th style="width: 20%" >description</th>
+                                <th style="width: 8%" >category</th>
+                                <th style="width: 7%" >Value</th>
+                                <th style="width: 7%" >Current</th>
+                                <th style="width: 3%" >%</th>
+                                <th style="width: 8%" >Investors</th>
+                                <th style="width: 20%" >Date Created</th>
+                                <th style="width: 4%" >Public</th>
+                                <th style="width: 8%" class="text-right">Actions</th>
+                            </thead>
+                            <tbody id="userbusiness-table-tbody">
+                            
+                                <tr id="item-${item.id}" class='edit-mode'>
+                                    <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
+                                    <td class="modelData" name="name" >${name_trunc}</td>
+                                    <td class="modelData" name="description" >${description_trunc}</td>
+                                    <td class="modelData" name="category" >${category_trunc}</td>
+                                    <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
+                                    <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
+                                    <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
+                                    
+                                    
+                                    <td class="modelData" name="investors_count" >${numberWithCommas(item.investors_count)}</td>
+                                    
+                                        
+                                    <td class="modelData" name="date_created" >${js_date_created}</td>
+
+                                    <td class="modelData" name="public" >${public}</td>
+
+                                    <td class="text-right modelAction modelData" name="action">
+                                    
+                                        <a href="/trading/edit-investment/${item.id}"
+                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Manage Business'><i class="fas fa-wrench"></i>
+                                        </a>
+
+                                            <!-- EDIT MODEL -->
+                                        <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${item.id}/" 
+                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Edit Data'><i  class="fas fa-edit"></i>
+                                        </a>
+                                            
+                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                            data-object-name="${item.name }"  data-item-id="${item.id}" 
+                                            data-delete-url="/trading/delete_investment_ajax/${item.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Delete' > <i class="fas fa-trash"></i> 
+                                        </a>
+
+                                        
+                                        </td>
+                                    
+                                </tr>
+                            
+                            </tbody>
+                        </table>
+                    
+                    </div>`
+           //append Table and attache first item 
+            $(".box-body").append(a_html)
+        }
         function appendTable(item){  
             //console.log(item) 
             var js_date_created = new Date(item.date_created) 
@@ -415,12 +548,21 @@
             var current_investment=numberWithCommas(item.current_investment)
             var name_trunc =truncChar(item.name,12)
             var description_trunc =truncChar(item.description,20)
+            var category_trunc =truncChar(item.category,20)
+
+            var public= ''
+            if (item.public){
+                public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+            }else{
+                public= "<i class='bi-square'></i>"
+            }
+           
             a_html =`
-                <tr id="item-${item.id}" >
-                    <td  class="modelData" name="counter"><i class="fa fa-edit"></i></td>
+                <tr id="item-${item.id}" class="edit-mode" >
+                    <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
                     <td class="modelData" name="name" >${name_trunc}</td>
                     <td class="modelData" name="description" >${description_trunc}</td>
-                    <td class="modelData" name="category" >${item.category}</td>
+                    <td class="modelData" name="category" >${category_trunc}</td>
                     <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
                     <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
                     <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
@@ -430,22 +572,26 @@
                     
                         
                     <td class="modelData" name="date_created" >${js_date_created}</td>
+
+                    <td class="modelData" name="public" >${public}</td>
+
                     <td class="text-right modelAction modelData" name="action">
-                        <a href="#"
+                      
+                        <a href="/trading/edit-investment/${item.id}"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='View Business'><i class="fas fa-eye"></i>
+                            title='Manage Business'><i class="fas fa-wrench"></i>
                         </a>
 
                             <!-- EDIT MODEL -->
                         <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${item.id}/" 
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Edit Model'><i  class="fas fa-edit"></i>
+                            title='Edit Data'><i  class="fas fa-edit"></i>
                         </a>
                             
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                             data-object-name="${item.name }"  data-item-id="${item.id}" 
-                            data-delete-url="/trading/delete_investment_ajax/${item.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                            title='Delete' > <i class="fa fa-trash "></i> 
+                            data-delete-url="/trading/delete_investment_ajax/${item.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            title='Delete' > <i class="fas fa-trash"></i> 
                         </a>
 
                         
@@ -453,21 +599,37 @@
                     
                 </tr>
                  `
-                $("#userbusiness-table-tbody").append(a_html) 
+               // $("#userbusiness-table-tbody").append(a_html) 
+               // $("#userbusiness-table-tbody").fadeIn()
+                $("#userbusiness-table-tbody").append(
+                    $(a_html)
+                    .hide()
+                    .fadeIn('fast', function(){ 
+                            console.log('Added ele')
+                            //$(".log").text('Fade In Transition Complete');
+                        })
+                );
+               
             }
       
         function updateTable(item){
             //after edit update the table
             $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
-                console.log(item.name)
+                
+                
+                var td=$(`#item-${item.id}`).addClass('edit-mode')
+                
+                //console.log(item.name)
                 var attr = $(this).attr("name");
                 var name_trunc =truncChar(item.name,12)
                 var description_trunc =truncChar(item.description,20)
+                var category_trunc =truncChar(item.category,20)
+
                 if (attr == "description") {
 
                     $(this).text(description_trunc);
                 } else if (attr == "category") {
-                    $(this).text(item.category);
+                    $(this).text(category_trunc);
                 } else if (attr == "name") {
                     $(this).text(name_trunc);   
                 } else if (attr == "total_value") {
@@ -478,10 +640,24 @@
                     $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
                 
                 } else if (attr == "counter") {
-                    var a_html= `<td  class="modelData" name="counter"><i class="fa fa-edit"></i></td>`
+                    var a_html= `<td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>`
+                    $(this).html(a_html);
+               
+                } else if (attr == "public") {
+                    var public= ''
+                   
+                    if (item.public){
+                        public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                    }else{
+                        public= "<i class='bi-square'></i>"
+                    }
+                    var a_html= `<td  class="modelData" name="pubic">${public}</td>`
                     $(this).html(a_html);
                 
-                }  
+                }   
+
+
+              
                 
             });
         }  
@@ -502,7 +678,7 @@
                   success: function(data){
                       //console.log('its mot get here', data)
                       if(data.model){
-                          console.log(data.model)
+                          //console.log(data.model)
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           updateTable(data.model);
@@ -515,45 +691,55 @@
                           if (data.model.investors_count){
                             $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
                           }
+
+                        
+
                         
 
                           
                       } else {
-                          $('#public_toggle_form-errors').html('');
+                          $('.public_toggle_form-errors').html('');
                           if (data.error) {
-                              var form_vars=['__all__','investment','user','name', 'description','value']//,
-                      
+                              var form_vars=[ '__all__','name','description','tags', 'category', 'total_value']//,
+                             
                               for (let p=0; p < form_vars.length; p++ ){
-                                  let name_var = form_vars[p]
-                                  if (data.error[name_var]){
-                                  a_html = 	`<div class='alert alert-danger alert dismissable'>
-                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                      <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
-                                  </div> ` ;
-                                  $('#public_toggle_form-errors').append(a_html)
-                                  
-                                  }
+                                    let name_var = form_vars[p]
+                                    let error_content =''
+                                    if (data.error[name_var]){
+                                            // Find a better method here
+                                            if (data['error'][name_var][0]=='This field is required.'){
+                                                error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+                                            }else {
+                                                error_content= data['error'][name_var][0] 
+                                            }
+                                            
+                                            a_html = `<div class='alert alert-danger alert dismissable'>
+                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span></button>${error_content}
+                                                    </div> ` ;
+                                            $('.public_toggle_form-errors').append(a_html)
+                                    }
                               }
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                               }, 4000);
                           //-----------------------
                           } else  {
                               // Data locked:  No edit allowed
-                              $('#public_toggle_form-errors').html('');
+                              $('.public_toggle_form-errors').html('');
                               a_html = 	`<div class='alert alert-danger alert dismissable'>
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                               <span aria-hidden="true">&times;</span></button>${data['locked']}
                               </div> ` ;
-                              $('#public_toggle_form-errors').append(a_html)
-                              $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
                               window.setTimeout(function() {
-                                  $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $("#public_toggle_form-errors").html('');
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
                                   });
                                   }, 4000);
                           } 
@@ -576,7 +762,7 @@
         });
         function updatePaging2(data){
             var has_previous=''
-            console.log(data)
+            //console.log(data)
             if (data.has_previous){
                 has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
                     <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
@@ -607,31 +793,40 @@
 
             var name_trunc =truncChar(val.name,12)
             var description_trunc =truncChar(val.description,20)
+            var category_trunc =truncChar(val.category,20)
+
+            var public= ''
+            if (val.public){
+                public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+            }else{
+                public= "<i class='bi-square'></i>"
+            }
 
             a_html=`
             <tr id="item-${val.id}">
                 <td class="modelData" name="counter">${counter}</td>
                 <td class="modelData" name="name" >${name_trunc}</td>
                 <td class="modelData" name="description" >${description_trunc}</td>
-                <td class="modelData" name="category" >${val.category}</td>
+                <td class="modelData" name="category" >${category_trunc}</td>
                 <td class="modelData" name="total_value" >${numberWithCommas(val.total_value)}</td>
                 <td class="modelData" name="current_investment" >${numberWithCommas(val.current_investment)}</td>
                 <td class="modelData" name="current_investment_percent" >${parseFloat(val.current_investment_percent).toFixed(1)}%</td>  
                 <td class="modelData" name="investors_count" >${numberWithCommas(val.investors_count)}</td>                      
                 <td class="modelData" name="date_created" >${js_date_created}</td>
+                <td class="modelData" name="public" >${public}</td>
                 <td class="text-right modelAction modelData" name="action">
                     <a href="/trading/edit-investment/${val.id}"
                         style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                        title='Manage Business'><i class="fa fa-eye"></i>
+                        title='Manage Business'><i class="fas fa-wrench"></i>
                     </a>
                     <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${val.id}/" 
                         data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                        title='Edit Model'><i  class="fas fa-edit"></i>
+                        title='Edit Data'><i  class="fas fa-edit"></i>
                     </a>
                     <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                         data-object-name="${val.name}"  data-item-id="${val.id}" 
                         data-delete-url="/trading/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                        title='Delete'> <i class="fa fa-trash "></i> 
+                        title='Delete'> <i class="fas fa-trash"></i> 
                     </a>
                     </td>
             </tr>` ;

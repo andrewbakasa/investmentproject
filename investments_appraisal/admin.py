@@ -25,4 +25,4 @@ admin.site.register(Events)
 
 
 admin.site.register(PurchasePlan)
-
+admin.site.register(SimulationParameters)
