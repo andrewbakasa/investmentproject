@@ -3,7 +3,7 @@
 # Create your views here.
 import copy
 import math
-from tkinter.messagebox import NO
+
 import numpy as np
 import pandas as pd
 from common.data_utils import create_downloads_instance
