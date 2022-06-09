@@ -169,7 +169,7 @@
                             }
                             a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
                                     style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                        title='${pledge_title}'><i  style="color:green"  class="fas fa-edit"></i>
+                                        title='${pledge_title}'><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
                                     </a>`
 
                             $('#breadcrumb_changeto_edit').html(a_html)
@@ -447,6 +447,87 @@
                 return false;
             })
             
+
+             
+      $('body').on("submit",".investor-status-update",function(e){
+              e.preventDefault();
+              var data = new FormData(this);
+              var formData
+              var form = $(this);
+            
+              var url=form.attr('data-url')
+              $.ajax({
+                  url: form.attr('data-url'),
+                  data : data,
+                  type: form.attr('method'),
+                  dataType: 'json',
+                  processData:false,
+                  contentType: false,
+                  success: function(data){
+                      if(data.error == false){
+                         //console.log('Success...', data)
+                        $('.public_toggle_form-errors').html('');
+                        a_html = 	`</br><div class='alert alert-success alert dismissable'>
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span></button> Saved Successfully!!
+                                  </div> ` ;
+                        $('.public_toggle_form-errors').append(a_html)
+                        $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
+                                  });
+                              }, 4000);
+                      } else {
+                          //console.log('Error data...', data.data)
+                          $('.public_toggle_form-errors').html('</br>');
+                          if (data.error == true) {
+                              //console.log('Error', data.error)
+                              var form_vars=['__all__','application_status']//,
+                      
+                              for (let p=0; p < form_vars.length; p++ ){
+                                  let name_var = form_vars[p]
+                                  if (data.data[name_var]){
+                                  a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span></button> ${data['data'][name_var][0]}
+                                  </div> ` ;
+                                  $('.public_toggle_form-errors').append(a_html)
+                                  
+                                  }
+                              }
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
+                                  });
+                              }, 4000);
+                          //-----------------------
+                          } else  {
+                              // Data locked:  No edit allowed
+                              $('.public_toggle_form-errors').html('');
+                              a_html = 	`<div class='alert alert-danger alert dismissable'>
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span></button> ${data['locked']}
+                              </div> ` ;
+                              $('.public_toggle_form-errors').append(a_html)
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                              window.setTimeout(function() {
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+                          } 
+                      //LAST ELSE--------------------------------------                
+                      }
+                  //END SUCCESS
+                  }
+              // END AJAX
+              })
+              return false;
+          })
+     
         })
 
     </script>

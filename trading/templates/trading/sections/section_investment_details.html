@@ -11,7 +11,7 @@
         <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}">{% trans 'Investments' %}</a></li>
         <li class="breadcrumb-item" ><a href="{% url 'user_investments' %}">{% trans 'Personal Investments' %}</a></li>
        
-        {% if is_user_investor%}
+        <!-- {% if is_user_investor%}
           <li  class="breadcrumb-item active">
             
               <a id="breadcrumb_changeto_edit" class="model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
@@ -25,7 +25,7 @@
               {% if is_user_record_owner %} title='Add New Equity' {% else %} title='Add New Investment' {% endif %}><i style="color:red"  class="fas fa-plus"></i>
               </a>
           </li> 
-        {% endif%}
+        {% endif%} -->
        
         {% if is_user_record_owner %}
         <li  class="breadcrumb-item">
@@ -75,10 +75,10 @@
       </div>
       <div class="col-lg-4">
 
-        <div class="project-info d-flex justify-content-between align-items-center">
+        <!-- <div class="project-info d-flex justify-content-between align-items-center">
           <h5>Creater</h5>
           <p><a href="#">{{model.creater}}</a></p>
-        </div>
+        </div> -->
 
         <div class="project-info d-flex justify-content-between align-items-center">
           <h5>Sector</h5>
@@ -93,7 +93,26 @@
         </div>
 
         <div class="project-info d-flex justify-content-between align-items-center">
-          <h5>of which My Stake</h5>
+       
+          {% if is_user_investor%}
+            
+              <a id="breadcrumb_changeto_edit" class="model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
+              data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                {% if is_user_record_owner %} title='Edit Equity'{% else %} title='Edit Investment Pledge'{% endif %}><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
+             </a>     
+          {%else %}
+                <a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
+                {% if is_user_record_owner %} title='Add New Equity' {% else %} title='Add New Investment' {% endif %}><h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>
+                </a>
+          {% endif%}
+
+
+
+
+
+
+
+
           <p id="user_stake">{% UserIsInvestorStake model request.user %} %</p>
         </div>
 

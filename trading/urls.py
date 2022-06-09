@@ -38,6 +38,7 @@ urlpatterns = [
     path('u_investor_jax/', views.create_userinvestor_ajax, name="create_userinvestor_ajax"),
     path('update_investor/<str:pk>/', views.userinvestor_update_ajax, name="update_investor"),
     path('delete_investor_ajax/<int:id>/<int:page_no>/', views.delete_investor_ajax, name="delete_investor_ajax"),
+    path('delete_investor_this_user_ajax/<int:investment_id>/', views.delete_investor_this_user_ajax, name="delete_investor_this_user_ajax"),
   
     path('u_business_jax/', views.create_userbusiness_ajax, name="create_userbusiness_ajax"),
     path('delete_investment_ajax/<int:id>/<int:page_no>/', views.delete_investment_ajax, name="delete_investment_ajax"),
@@ -47,4 +48,6 @@ urlpatterns = [
     path('add_model_investment_paragraph_ajax/<int:id>/', views.add_model_investment_paragraph_ajax, name="add_model_investment_paragraph_ajax"),
   
   
+    path('investor/status/<int:id>/', views.update_investorStatus_ajax,  name='update_investorStatus_ajax'),  
+
 ]

@@ -36,6 +36,31 @@
 
 {%endblock content%}
 
+{% block modal_divs %}
+   
+
+    <!-- Delete confirmation modal -->
+    <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %} 
 
 
  <!-- ======= Footer ======= --> 
@@ -48,6 +73,7 @@
   {% block scripts %}
       <!-- Search Button JS -->
       <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+      <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
       <script>
          //first timme
           var display_investment_ajax_url= "{% url 'display_investment_ajax' %}" 
@@ -102,7 +128,7 @@
           }
           function append_html(counter,val){
               var simulation_checked=''
-              if (val.simulation_run) {
+              if (val.simulation_run==true) {
                   simulation_checked='checked'
               }
 
@@ -110,30 +136,51 @@
               var ready_attr=''
               var model_class_added=''
               var inlinestyle=''
-              if (val.userIsInvestor) {
+              var delete_my_investment = ''
+              if (val.userIsInvestor ==true) {
                   eye_style='style="color:blue"'
                   ready_attr='myinvestment'
                   model_class_added= 'model-complete'
                   inlinestyle="style ='background-color:beige';"
-                  
+
+                  delete_my_investment= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" ${ready_attr} class="mydeleteclass iconClass"
+                      data-object-name="${val.name}"  data-item-id="div-${val.id}" data-invest-value ="${val.user_investment_value}"
+                      data-delete-url="/trading/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                      title='Withdraw Investment' > <i class="fas fa-cut"></i><span class="counter counter-lg">${val.user_investment_percent}</span> 
+                    </a>`
+              
+                    
               }else{
-                  
+                
+                  ready_attr='myinvestment_na'
                   eye_style='style="color:inherit"'
               }
 
-              if (val.userIsOwner) {
+              if (val.userIsOwner == true) {
                   myportifolio= `<a href="/trading/edit-investment/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='Manage Investment'>
-                      <span class="advanced">My Portifolio</span>
+                      <span class="advanced">Enterprenuer</span>
                     </a>`
                   
               }else{                  
                   myportifolio=''
               }
+             
+              if (val.userIsInvestor == true) {
+                  myinvestment= `<a href="/trading/investment-details/${val.id}/" 
+                      data-toggle="tooltip" data-placement="bottom"  
+                      title='View Investment'>
+                      <span class="advanced2">Investor</span>
+                    </a>`
+                  
+              }else{                  
+                myinvestment=''
+              }
 
+         
               var design_complete_checked=''
-              if (val.design_complete) {
+              if (val.design_complete == true) {
                   design_complete_checked='checked'
               }
               var js_date_created = new Date(val.date_created)
@@ -146,14 +193,21 @@
              
               var descript_trunc =truncChar(val.description,100)
               var name_trunc =truncChar(val.name,25)
+
               a_html=`
               <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
                 <div ${ready_attr} class="project-item umodel-item ${model_class_added}" ${inlinestyle}>
                   <img src="${imgval}" class="img-fluid" alt="...">
-                  ${myportifolio}              
+                  ${myportifolio} ${myinvestment}             
                   <div class="project-content">
+
+                  
+
                     <h3><a href="/trading/investment-details/${val.id}/">${name_trunc}</a></h3>
-                    <p>${descript_trunc}</p>
+                    
+                    ${delete_my_investment}
+
+                    ${descript_trunc}
                     <div class="trainer d-flex justify-content-between align-items-center">
                       <div class="trainer-rank d-flex align-items-center">
                         <i class="bx bx-download"></i>&nbsp;${val.views}
@@ -172,13 +226,128 @@
                   
   return a_html
 }
+          function append_html2(counter,val){
+              var simulation_checked=''
+              if (val.simulation_run == true) {
+                  simulation_checked='checked'
+              }
+
+              var eye_style=''
+              var ready_attr=''
+              var model_class_added=''
+              var inlinestyle=''
+              var delete_my_investment = ''
+              if (val.userIsInvestor == true) {
+                  eye_style='style="color:blue"'
+                  ready_attr='myinvestment'
+                  model_class_added= 'model-complete'
+                  inlinestyle="style ='background-color:beige';"
+                  
+              }else{
+                  
+                  eye_style='style="color:inherit"'
+                  ready_attr='myinvestment_na'
+              }
+
+              if (val.userIsOwner ==true) {
+                  myportifolio= `<a href="/trading/edit-investment/${val.id}/" 
+                      data-toggle="tooltip" data-placement="bottom"  
+                      title='Manage Investment'>
+                      <span class="advanced">Enterprenuer</span>
+                    </a>`
+                  
+              }else{                  
+                  myportifolio=''
+              }
+             
+              if (val.userIsInvestor ==true) {
+                  myinvestment= `<a href="/trading/investment-details/${val.id}/" 
+                      data-toggle="tooltip" data-placement="bottom"  
+                      title='View Investment'>
+                      <span class="advanced2">Investor</span>
+                    </a>`
+
+                    delete_my_investment= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" ${ready_attr} class="mydeleteclass iconClass"
+                      data-object-name="${val.name}"  data-item-id="div-${val.id}" data-invest-value ="${val.user_investment_value}"
+                      data-delete-url="/trading/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                      title='Withdraw Investment' > <i class="fas fa-cut"></i> <span class="counter counter-lg">${val.user_investment_percent}</span>
+                    </a>`
+                  
+              }else{                  
+                myinvestment=''
+              }
+
+         
+              var design_complete_checked=''
+              if (val.design_complete ==true) {
+                  design_complete_checked='checked'
+              }
+              var js_date_created = new Date(val.date_created)
+              //append to post
+             
+              counter=  counter+1
+              var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
+              imgval= baseimageURL + val.uniqueid +'.jpg'
+
+             
+              var descript_trunc =truncChar(val.description,100)
+              var name_trunc =truncChar(val.name,25)
+              
+              a_html=`
+              <div ${ready_attr} class="project-item umodel-item ${model_class_added}" ${inlinestyle}>
+                  <img src="${imgval}" class="img-fluid" alt="...">
+                  ${myportifolio} ${myinvestment}             
+                  <div class="project-content">
+                    <h3><a href="/trading/investment-details/${val.id}/">${name_trunc}</a></h3>
+                    ${delete_my_investment}
+                    ${descript_trunc}
+                    <div class="trainer d-flex justify-content-between align-items-center">
+                      <div class="trainer-rank d-flex align-items-center">
+                        <i class="bx bx-download"></i>&nbsp;${val.views}
+                      </div>
+                      <div class="trainer-rank d-flex align-items-center">
+                          <a class="model-likes" href="#" data-url="/trading/update_investment_likes/${val.id}/" 
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
+                          </a>
+                      </div>
+                    </div>
+                  </div>
+                </div> ` ;
+                        
+                  
+  return a_html
+}
 
           function set_my_portifolio(){
+          
+               // display:none and remove ele
+              $('.mydeleteclass[myinvestment_na]').each( function (){
+                  $(this).css(
+                     { "display":"none",
+                        // "title":"", 
+                      }
+                  ).remove()          
+              })
+
               $('.myspan[myportifolio]').each( function (){
                   $(this).addClass('advanced')                   
               })
                // display:none and remove ele
               $('.myspan[portifolio_na]').each( function (){
+                  $(this).css(
+                     { "display":"none",
+                        // "title":"", 
+                      }
+                  ).remove()          
+              })
+
+
+              $('.myspan[myinvestment]').each( function (){
+                  $(this).addClass('advanced2')                   
+              })
+               // display:none and remove ele
+              $('.myspan[myinvestment_na]').each( function (){
                   $(this).css(
                      { "display":"none",
                         // "title":"", 
@@ -208,6 +377,19 @@
               set_model_complete()
               
           })
+          $('#confirmdelete').on('show.bs.modal', function(e) {
+            var name = $(e.relatedTarget).data('object-name');
+            var url = $(e.relatedTarget).data('delete-url');
+            var item_id = $(e.relatedTarget).data('item-id');
+            var user_invest_value = $(e.relatedTarget).data('invest-value');
+          
+
+            //console.log(item_id)
+            var name =truncChar(name,25)
+            $('#confirmdelete .modal-body').html("Are you sure you want to <b>withdraw</b> $" + numberWithCommas(user_invest_value) + " your <b>investment</b> in <i>[" + name + "]</i>?");
+            $('#confirmdelete .modal-footer input').attr('data-url', url);
+            $('#confirmdelete .modal-footer input').attr('item-id', item_id);
+        });
           $("body").on("keyup", "#search", function(){
             var search_val = $(this).val().toLowerCase();
             var tag_name ="{{tag_name}}"
@@ -285,7 +467,7 @@
                             $('#project_div').append(a_html)
                         });
                         set_model_complete()
-
+                        set_my_portifolio()
                         },
                         error: function () {
                             alert('Error Occured');
@@ -379,7 +561,39 @@
             })
             
           })
-      </script>
+          
+          
+        $('body').on('click', '.delete-button', function (e) {
+            e.preventDefault();
+            var tr_id =$('#delete-button').attr('item-id')
+            row = $('#'+ tr_id.trim());
+           
+            var formData = {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            };
+            $.ajax({
+                type: 'POST',      
+                url:   $('#delete-button').attr('data-url'), 
+                encode: true,
+                contentType: 'application/x-www-form-urlencoded',
+                crossDomain: false,
+                dataType: 'json',
+                data: formData,     // our data object
+                success: function (response) {
+                    $('.close-modal').click()                    
+                    a_html=append_html2(1,response.data.model)
+                    row.html(a_html)
+                    set_my_portifolio()
+                 
+                },
+                error: function (exception) {
+                    alert('Exeption:' + exception);
+                }
+            });
+        });
+  
+     
+     </script>
 
   {% endblock %}
 

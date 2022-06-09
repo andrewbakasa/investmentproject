@@ -122,8 +122,33 @@ class Investment(models.Model):
         if qs:
             return 'myinvestment'
 
-        return ''
+        return 'myinvestment_na'
     
+    def userInvestorValue(self, user):       
+        qs = self.investor_set.filter(user=user).first()
+        if qs:
+            return qs.value
+
+        return 0
+
+    def userInvestorPercent(self, user):       
+        qs = self.investor_set.filter(user=user).first()
+        if qs:
+            percent = 0
+            user_val = qs.value
+            if self.total_value !=0:
+                percent = user_val*100/self.total_value
+                if percent < 1:
+                    percent= round(percent,2)
+                else:
+                    #==remove commas for any percent greater than 1
+                    percent= int(percent)
+            # between 0-100
+            return str(min(max(percent,0),100)) + '%'
+
+        return 0
+
+
     def userIsInvestorStake(self, user):       
         qs = self.investor_set.filter(user=user).first()
         if qs:
@@ -169,6 +194,7 @@ class Investor(models.Model):
 
     def __str__(self):
         return self.name 
+    
     
     @property
     def deleted_df(self):

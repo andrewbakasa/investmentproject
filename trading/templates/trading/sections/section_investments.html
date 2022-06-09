@@ -34,14 +34,29 @@
                 
                 
                 <a href="{% url 'edit-investment' model.id %}" data-toggle="tooltip" data-placement="bottom"  title='Manage Investment'>
-                  <span {% userIsOwnerAttrMethod model request.user %} class="myspan">My Portifolio</span>
+                  <span {% userIsOwnerAttrMethod model request.user %} class="myspan">Enterprenuer</span>
+
+                </a>
+                <a href="{% url 'investment-details' model.id %}" data-toggle="tooltip" data-placement="bottom"  title='View Investment'>
+                   <span {% userInvestorMethod model request.user %} class="myspan">Investor</span>
                 </a>
               
-               
+                
                 <div class="project-content">
-                 
+                  
                   <p>
-                    <h3><a href="{% url 'investment-details' model.id %}">{{model.name|truncatechars:25}}</a></h3>
+                    <h3><a href="{% url 'investment-details' model.id %}"  
+                     
+                    >{{model.name|truncatechars:25}}</a></h3>
+
+                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" {% userInvestorMethod model request.user %} class="mydeleteclass iconClass"
+                      data-object-name="{{ model.name }}"  data-item-id="div-{{model.id}}" data-invest-value ="{% userInvestorValueMethod model request.user %}"
+                      data-delete-url="{% url 'delete_investor_this_user_ajax' model.id  %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                      title='Withdraw Investment' > <i class="fas fa-cut"></i><span class="counter counter-lg">{% userInvestorPercentMethod model request.user %}</span>
+                      <!-- badge rounded-pill bg-light text-dark  -->
+                    </a>
+
+                    
                     {{model.description|truncatechars:100}}
                   </p>
                   <div class="trainer d-flex justify-content-between align-items-center">

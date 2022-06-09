@@ -1196,6 +1196,17 @@ section {
   color: #fff;
 }
 
+
+.fmodels .fmodel-item {
+ 
+  /* padding: 20px; */
+  /* background: #fff; */
+   /* text-align: center; */
+  /*border: 1px solid #eef0ef;
+  border-radius: 0; */
+  position: relative;
+}
+
 .umodels .umodel-item {
  
   /* padding: 20px; */
@@ -1207,17 +1218,33 @@ section {
   overflow: hidden; 
 }
 
+
+
 .umodels .advanced {
   text-align: center;
   width: 200px;
   position: absolute;
   top: 20px;
-  right: -68px;
+  right: -64px;
   transform: rotate(45deg);
   z-index: 1;
-  font-size: 14px;
+  font-size: 11px;
   padding: 1px 0 3px 0;
   background: #5fa2cf;
+  color: #fff;
+}
+
+.umodels .advanced2 {
+  text-align: center;
+  width: 200px;
+  position: absolute;
+  top: 10px;
+  right: -84px;
+  transform: rotate(45deg);
+  z-index: 1;
+  font-size: 11px;
+  padding: 1px 0 3px 0;
+  background: #d19da0;
   color: #fff;
 }
 /*--------------------------------------------------------------
@@ -1605,5 +1632,17 @@ Add a dark border to the very last row to signify the end of the table */
   font-style: italic;
   background-color: white;
   /* box-shadow: 0px 0 18px rgba(55, 66, 59, 0.08); */
+}
+
+
+.iconClass{
+  position: relative;
+}
+.iconClass span{
+  position: absolute;
+  top: -11px; 
+  right: -15px;
+  font-size: 11px;
+  font-family: "Poppins", sans-serif;
 }
 

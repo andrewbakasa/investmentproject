@@ -16,9 +16,21 @@ def call_method(obj, method_name, *args):
 def userIsOwnerAttrMethod(model, user):
     return model.userIsOwnerAttr(user)
 
+
+
 @register.simple_tag
 def userInvestorMethod(model, user):
     return model.userIsInvestorAttr(user)
+
+@register.simple_tag
+def userInvestorValueMethod(model, user):
+    return model.userInvestorValue(user)
+
+@register.simple_tag
+def userInvestorPercentMethod(model, user):
+    return model.userInvestorPercent(user)
+
+
 
 @register.simple_tag
 def UserIsInvestorStatement(model, user):

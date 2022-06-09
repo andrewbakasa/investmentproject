@@ -1,6 +1,8 @@
 {% load i18n %}
 {% load static %}
 {% load tags %}
+
+{% load widget_tweaks %}
 {% load humanize %}
 <section style= 'padding: 5px 0;' id="project-details" class="project-details">
   <div class="container" data-aos="fade-up">
@@ -32,7 +34,7 @@
         <!-- Summary -->
         <h3>Investor Summary:</h3>
         <p>
-          My total pledge is $<i><b>{{model.value}}</b></i> </br>
+          My total pledge is $<i><b>{{model.value | intcomma}}</b></i> </br>
           {{model.description}}
         </p>
 
@@ -57,10 +59,39 @@
           <i>{{userprofile.aboutyou}}</i>
        
         </p>
-
-        <p>
-          <a href="#" class="more-btn">Invite Investor</a>
-   
+          <!-- Details -->
+          <h3>Invite Investor</h3>
+         <p>
+            <div class="col-lg-12 mt-5 mt-lg-0">
+              <form  enctype="multipart/form-data" method="POST" class="form-horizontal investor-status-update" data-url="{% url 'update_investorStatus_ajax' model.id  %}">
+                <div class="box-body">
+                      {% csrf_token %}
+      
+                    <div class="form-group {% if form.application_status.errors%} has-error{% endif%}">
+                        <label class="col-sm-2 control-label" for="{{ form.application_status.id_for_label }}">{{ form.application_status.label }}</label>
+                        <div class="col-sm-4  {% if form.application_status.errors %} has-error{% endif %}">
+                            {{ form.application_status|add_class:"form-control" }}
+                            {% for error in form.application_status.errors %}
+                            <span class="help-block">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                       
+                    </div>
+              </div>
+            </br>
+              <div class="box-footer">
+                  <div class="col-sm-offset-2 col-sm-8">
+                    <button type="submit" class="btn btn-primary investor-status-update">{% trans 'Update' %}</button>
+      
+                  </div>
+              </div>
+      
+              <div class="form-error2 public_toggle_form-errors form-group" style='display:none'>
+              </div>
+          </form>
+             
+      
+            </div>
         </p>
         
        

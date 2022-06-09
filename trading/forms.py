@@ -101,7 +101,14 @@ class UserInvestmentForm(forms.ModelForm):
         model = Investment
         fields = ['name','description','category', 'total_value','creater', 'tags', 'public' ]
        
-   
+    def clean_total_value(self):
+        total_value = self.cleaned_data['total_value']
+        max_val=50
+        min_val=1
+       
+        if total_value < min_val:
+            raise ValidationError(_(f'{total_value} is less than min allowed of {min_val}'))
+        return total_value
     def save(self, commit=True):
         transaction = super().save(commit)
         
@@ -134,7 +141,14 @@ class UserInvestmentFormUpdate(forms.ModelForm):
         fields = ['name','description','category', 'total_value', 'tags', 'public']
   
 
-
+    def clean_total_value(self):
+        total_value = self.cleaned_data['total_value']
+        max_val=50
+        min_val=1
+       
+        if total_value < min_val:
+            raise ValidationError(_(f'{total_value} is less than min allowed of {min_val}'))
+        return total_value 
 
 class InvestmentDetailsForm(forms.ModelForm):   
     def __init__(self, user=None, *args, **kwargs):
@@ -248,3 +262,12 @@ class InvestmentROIFormUpdate(forms.ModelForm):
     class Meta:
         model = InvestmentDetails
         fields = ['investment','roi',]
+
+class InvestorStatusUpdate(forms.ModelForm):    
+    def __init__(self, *args, **kwargs):
+        super(InvestorStatusUpdate,self).__init__(*args, **kwargs)
+    class Meta:
+        model = Investor
+        fields = ['application_status']
+
+

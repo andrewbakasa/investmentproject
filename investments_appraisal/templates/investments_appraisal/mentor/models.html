@@ -126,7 +126,17 @@
             }
           var csrftoken = getToken('csrftoken');
           var display_models_ajax_url= "{% url 'display_models_ajax' %}"  
-      
+         
+          function show_item_overflow(){
+                // loop all records
+                $('.umodels').find('.umodel-item').each( function (){                   
+                    $(this).css(
+                      { "position":"relative",
+                        "overflow":"visible",  
+                      }
+                    ) 
+                })
+          }
           $(document).ready(function (){ 
                 $("#investments a:first").addClass( "active") 
                 $("#models a").addClass( "active") 
@@ -135,6 +145,9 @@
                 $('.project-content[ready]').each( function (){
                     $(this).addClass('model-complete')
                 })
+                //overflow
+                show_item_overflow()
+    
                
                
                     
@@ -304,13 +317,13 @@
                         }
                         var records
                         if (response.data.totalrecords == 0) {
-                          records= `No records found`
-                          html_text= `<div class="col-lg-12 text-center"><p>${records}</p></div>`
-                          $('#project_div').html(html_text)
+                            records= `No records found`
+                            html_text= `<div class="col-lg-12 text-center"><p>${records}</p></div>`
+                            $('#project_div').html(html_text)
                         }else if(response.data.totalrecords == 1){
-                          records= `${response.data.totalrecords} record found`;
+                            records= `${response.data.totalrecords} record found`;
                         }else{
-                          records= `${response.data.totalrecords} records found`;
+                            records= `${response.data.totalrecords} records found`;
                         }
                         
                         html_a= `<label id="total_projects_searched"><i>${records}</i></label>`
@@ -320,6 +333,7 @@
                         updatePaging2(response.data)
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
+                        //append pages
                         $.each(response.data.results, function(i, val) {
                            
                             a_html=append_html(counter,val)
@@ -327,10 +341,13 @@
                             $('#project_div').append(a_html)
 
                         });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
+                        //after adding content format the pics
+                        //overflow
+                        show_item_overflow()
+                    },
+                    error: function () {
+                        alert('Error Occured');
+                    }
                 }); 
           
           
@@ -354,6 +371,7 @@
                         }
                         var base_counter =(parseInt(page_no)-1)*per_page
                         var counter=base_counter
+                        //load pages
                         $.each(response.data.results, function(i, val) {
 
                             a_html=append_html(counter,val)
@@ -361,10 +379,13 @@
                             $('#project_div').append(a_html)
 
                         });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
+                        //after adding content format the pics
+                        //overflow
+                        show_item_overflow()
+                    },
+                    error: function () {
+                        alert('Error Occured');
+                    }
                         
                 });
                 //add_model_class()

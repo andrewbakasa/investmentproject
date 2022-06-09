@@ -6,7 +6,7 @@ from investments_appraisal.models import ModelCategory, UserModel, UserPreferenc
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 
-from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, UserInvestmentForm, UserInvestmentFormUpdate
+from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, InvestorStatusUpdate, UserInvestmentForm, UserInvestmentFormUpdate
 from .models import *
 from django.db.models.expressions import F
 from django.contrib.auth.decorators import login_required 
@@ -103,6 +103,8 @@ def get_user_investments(request):
             request.session['pertable']= 10
     pertable=request.session['pertable']
     
+
+    print(colms)
     obj_paginator = Paginator(dict_, pertable)
     first_page = obj_paginator.page(1).object_list
     current_page = obj_paginator.get_page(1)
@@ -212,6 +214,8 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
                 item_object['uniqueid']=i.category.uniqueid
                 item_object['userIsInvestor']=i.userIsInvestor(request.user)
                 item_object['userIsOwner']=i.userIsOwner(request.user)
+                item_object['user_investment_value']=i.userInvestorValue(request.user)
+                item_object['user_investment_percent']=i.userInvestorPercent(request.user)
 
                 taglist = []
                 for j in i.tags.all():
@@ -296,7 +300,8 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
                 item_object['uniqueid']=i.category.uniqueid
                 item_object['userIsInvestor']=i.userIsInvestor(request.user)
                 item_object['userIsOwner']=i.userIsOwner(request.user)
-
+                item_object['user_investment_value']=i.userInvestorValue(request.user)
+                item_object['user_investment_percent']=i.userInvestorPercent(request.user)
                 taglist = []
                 for j in i.tags.all():
                     taglist.append(j.name)
@@ -386,7 +391,8 @@ def display_investment_ajax(request):
             item_object['uniqueid']=i.category.uniqueid
             item_object['userIsInvestor']=i.userIsInvestor(request.user)
             item_object['userIsOwner']=i.userIsOwner(request.user)
-
+            item_object['user_investment_value']=i.userInvestorValue(request.user)
+            item_object['user_investment_percent']=i.userInvestorPercent(request.user)
 
             #print(item_object)
             taglist = []
@@ -457,24 +463,20 @@ def investment_details(request,id):
 
 @login_required
 def investor_details(request,id, investment_id):
-    investor_obj = get_object_or_404(Investor,pk=id)
-    investment_obj = get_object_or_404(Investment,pk=investment_id)
-    userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
     
-    # user = models.OneToOneField(User, on_delete= models.CASCADE)
-    # last_modified = models.DateTimeField(auto_now=True)
-    # age = models.IntegerField(default=18)
-    # country = models.CharField(max_length=200, blank=True, null=True)
-    # sex = models.CharField(max_length=200, blank=True, null=True)
-    # profession = models.CharField(max_length=200, blank=True, null=True) 
-    # aboutyou = models.TextField(blank=True, null=True, verbose_name='About Me') 
-    #print(userprofile_obj)
+    # limit investment to my own ONLY: avoid other users accessing private data
+    investment_obj = get_object_or_404(Investment,pk=investment_id,creater=request.user)
+    #only investors of current investments
+    investor_obj = get_object_or_404(Investor,pk=id, investment=investment_obj)
   
+    userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
+
+    form = InvestorStatusUpdate(instance=investor_obj) 
     context = {
         'model':investor_obj,
         'investment':investment_obj,
         'userprofile':userprofile_obj,
-     
+        'form':form
     }
     return render(request, 'trading/investor-details.html', context)
 
@@ -751,7 +753,8 @@ def save_all_user_investor_update(request,form,template_name):
                     item_object['current_investment_percent']=parent_invest.current_investment_percent
                     item_object['user_investor']=parent_invest.userIsInvestorStatement(request.user)
                     data['is_user_investor_bool']=parent_invest.userIsInvestor(request.user)
-     
+                    item_object['user_investment_value']=parent_invest.userInvestorValue(request.user)
+                    item_object['user_investment_percent']=parent_invest.userInvestorPercent(request.user)
                     item_object['userIsOwner']=parent_invest.userIsOwner(request.user)
                     
                     item_object['investors_count']=parent_invest.investors_count
@@ -815,7 +818,8 @@ def create_all_user_business(request,form,template_name):
             item_object['user_stake']=record.userIsInvestorStake(request.user)
             item_object['user_investor']=record.userIsInvestorStatement(request.user)
             item_object['userIsOwner']=record.userIsOwner(request.user)
-
+            item_object['user_investment_value']=record.userInvestorValue(request.user)
+            item_object['user_investment_percent']=record.userInvestorPercent(request.user)
             item_object['current_investment_percent']=record.current_investment_percent
                     
             item_object['investors_count']= record.investors_count
@@ -869,7 +873,8 @@ def create_all_user_investor(request,form,template_name):
                 item_object['user_stake']=parent_invest.userIsInvestorStake(request.user)
                 item_object['user_investor']=parent_invest.userIsInvestorStatement(request.user)
                 item_object['userIsOwner']=parent_invest.userIsOwner(request.user)
-
+                item_object['user_investment_value']=parent_invest.userInvestorValue(request.user)
+                item_object['user_investment_percent']=parent_invest.userInvestorPercent(request.user)
                 item_object['current_investment_percent']=parent_invest.current_investment_percent
                     
                 item_object['investors_count']=parent_invest.investors_count
@@ -929,6 +934,51 @@ def dataframe_to_list_dict(df, isDataFrame):
         output_list.append(record_dict)
     return output_list, columns_list
 
+@login_required(login_url="account_login")
+def delete_investor_this_user_ajax(request, investment_id, *args, **kwargs):
+    
+    if request.method == 'POST':
+        #print(request.POST)
+        if request.is_ajax():
+            investment = get_object_or_404(Investment, pk=investment_id)
+
+            model_ = get_object_or_404(Investor, user=request.user, investment=investment)
+
+            model_.delete()
+            #refreshed
+            i = get_object_or_404(Investment, pk=investment_id)
+
+            cdate= i.date_created.ctime()
+            item_object = model_to_dict(i)
+            item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
+            item_object['date_created']=f'{i.date_created.ctime()}'
+            item_object['uniqueid']=i.category.uniqueid
+            item_object['userIsInvestor']=i.userIsInvestor(request.user)
+            item_object['userIsOwner']=i.userIsOwner(request.user)
+
+
+            #print(item_object)
+            taglist = []
+            for j in i.tags.all():
+                taglist.append(j.name)
+            item_object['tags']= taglist
+            print(item_object)
+
+            data= {}
+         
+
+            #print(item_object)
+            data['model']=item_object
+            
+            return JsonResponse({'error': False, 'data': data})
+            
+        else:
+            return JsonResponse({'error': True, 'data': "errors encontered"})
+    else:
+        error = {
+            'message': 'Error, must be an Ajax call.'
+        }
+        return JsonResponse(error, content_type="application/json")
 
 @login_required(login_url="account_login")
 def delete_investor_ajax(request, id, page_no, *args, **kwargs):
@@ -1089,7 +1139,8 @@ def save_all_user_investment(request,form,template_name):
             item_object['user_stake']=item_instance.userIsInvestorStake(request.user)
             item_object['user_investor']=item_instance.userIsInvestorStatement(request.user)
             item_object['userIsOwner']=item_instance.userIsOwner(request.user)
-
+            item_object['user_investment_value']=item_instance.userInvestorValue(request.user)
+            item_object['user_investment_percent']=item_instance.userInvestorPercent(request.user)
             item_object['current_investment_percent']=item_instance.current_investment_percent            
             item_object['investors_count']=item_instance.investors_count                
             item_object['total_value']=item_instance.total_value
@@ -1254,7 +1305,8 @@ def display_business_ajax(request):
             item_object['current_investment_percent']=i.current_investment_percent  
             item_object['user_investor']=i.userIsInvestorStatement(request.user)
             item_object['userIsOwner']=i.userIsOwner(request.user)
-            
+            item_object['user_investment_value']=i.userInvestorValue(request.user)
+            item_object['user_investment_percent']=i.userInvestorPercent(request.user)
             item_object['investors_count']=i.investors_count                
             item_object['total_value']=i.total_value
             taglist = []
@@ -1320,14 +1372,47 @@ def display_myinvestment_ajax(request):
             item_object['summary']=i['summary']
             item_object['total_value']=i['total_value']
             item_object['myinvest']=i['myinvest']
+            item_object['application_status']=i['application_status']
             item_object['cat_name']=i['cat_name']
             item_object['email']=i['email']
             item_object['inv_name']=i['inv_name']
             item_object['id']=i['id']
             item_object['iid']=i['iid']
+
+           
             results.append(item_object)
 
         #print(results)
         data["results"]=results
         return JsonResponse({"data":data})
 
+@login_required(login_url="account_login")
+def update_investorStatus_ajax(request, id, *args, **kwargs):
+    investor_obj = get_object_or_404(Investor,pk=id)
+    #investment_obj = get_object_or_404(Investment,pk=investment_id)
+    #userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
+
+
+    if request.method == 'POST':
+        if request.is_ajax():
+            form = InvestorStatusUpdate(request.POST or None,instance=investor_obj)
+            #form.instance.user =request.user
+            if form.is_valid():
+                form.save()
+               
+            else:
+                errors = form.errors
+                #print('error:' , errors)
+                return JsonResponse({'error': True, 'data': errors})  
+            
+            latest = Investor.objects.latest('id').id
+            record = Investor.objects.get(pk=latest)
+            item_object = model_to_dict(record)
+            #print (item_object)
+            return JsonResponse({'error': False, 'data': item_object})
+        else:
+            return JsonResponse({'error': True, 'data': "Request not ajax"})
+  
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
+  

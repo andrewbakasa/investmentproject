@@ -107,7 +107,7 @@
   <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
   <script>
        
-        var investment_capital = 0
+        var investment_capital = '{{model.total_value}}'
         var curr_pledge = 0
 
         var user_is_owner = '{{is_user_record_owner}}'
@@ -134,19 +134,13 @@
               type: 'get',
               dataType:'json',
               beforeSend: function(){
-                  
-                  $('#modal-usermodel').modal('show');
+                $('#modal-usermodel').modal('show');
               },
               success: function(data){
-                   console.log(btn.attr("data-url"))
-                   //validate user
-                    
-
                   user_is_owner= data.user_is_owner 
                   is_user_investor= data.is_user_investor_bool 
                   investment_capital=data.total_value
-                  curr_pledge=data.value   
-
+                  curr_pledge=data.value 
                   $('#modal-usermodel .modal-content').html(data.html_form);
               }
               });
@@ -200,7 +194,7 @@
 
                           a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                    title='Edit Equity'><i  style="color:green"  class="fas fa-edit"></i>
+                                    title='Edit Equity'><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
                                 </a>`
 
                            $('#breadcrumb_changeto_edit').html(a_html)
@@ -562,7 +556,7 @@
             })
             function get_investment (dynamic_val){
 
-                //console.log(dynamic_val)
+                //console.log(dynamic_val, 'of', investment_capital)
                 var curr_percent= roundTo(parseFloat(curr_pledge* 100/investment_capital),3)
                 var dynamic_percent= roundTo(parseFloat(dynamic_val*100/investment_capital),3)
                 var direction_verb
