@@ -7,25 +7,10 @@
      <!-- ======= Breadcrumbs ======= -->
      <div class="row">
       <ol class="breadcrumb" >
-        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-        <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}">{% trans 'Investments' %}</a></li>
-        <li class="breadcrumb-item" ><a href="{% url 'user_investments' %}">{% trans 'Personal Investments' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success">{% trans 'Investments' %}</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'user_investments' %}" class ="badge rounded-pill bg-success">{% trans 'Personal Investments' %}</a></li>
        
-        <!-- {% if is_user_investor%}
-          <li  class="breadcrumb-item active">
-            
-              <a id="breadcrumb_changeto_edit" class="model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
-              data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                {% if is_user_record_owner %} title='Edit Equity'{% else %} title='Edit Investment Pledge'{% endif %}><i  style="color:green"  class="fas fa-edit"></i>
-             </a>
-          </li>         
-        {%else %}
-          <li  class="breadcrumb-item active">
-              <a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
-              {% if is_user_record_owner %} title='Add New Equity' {% else %} title='Add New Investment' {% endif %}><i style="color:red"  class="fas fa-plus"></i>
-              </a>
-          </li> 
-        {% endif%} -->
        
         {% if is_user_record_owner %}
         <li  class="breadcrumb-item">
@@ -53,7 +38,7 @@
               <div class="col-lg-8">
                   Tags:
                   {% for tag in model.tags.all %}
-                      <a href="{% url 'investment_load_tags' tag.id %}">{{tag.name}}</a>
+                      <a href="{% url 'investment_load_tags' tag.id %}" class="badge rounded-pill bg-warning text-dark">{{tag.name}}</a>
                   {% endfor %}
               </div>
 

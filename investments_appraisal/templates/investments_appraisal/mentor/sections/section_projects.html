@@ -8,8 +8,8 @@
          <!-- ======= Breadcrumbs ======= -->
          <div class="row">
             <ol class="breadcrumb" >
-              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-              <li class="breadcrumb-item" ><a href="{% url 'projects' %}">{% trans 'Projects' %}</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'projects' %}" class ="badge rounded-pill bg-light text-dark">{% trans 'Projects' %}</a></li>
              
               <li class="breadcrumb-item" >
                 <label id="total_projects_searched"></label>
@@ -27,7 +27,7 @@
                           <div class="project-content">
                              
                               <p>
-                                <h3><a href="{% url 'project-details' model.id %}">{{model.name|truncatechars:25}}</a></h3> 
+                                <h3><a href="{% url 'project-details' model.id %}" class ="badge rounded-pill bg-warning">{{model.name|truncatechars:25}}</a></h3> 
                                 {{model.description|truncatechars:100}}
                               </p>
                               <div class="trainer d-flex justify-content-between align-items-center">

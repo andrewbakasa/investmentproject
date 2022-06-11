@@ -120,7 +120,7 @@
 
           } 
           function truncChar(str,length){
-              var myTruncatedString = str.substring(0,length);              
+              var myTruncatedString = str.substring(0,length-1);              
               if (str.length > myTruncatedString.length){
                 return myTruncatedString + "..."
               }
@@ -145,8 +145,8 @@
 
                   delete_my_investment= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" ${ready_attr} class="mydeleteclass iconClass"
                       data-object-name="${val.name}"  data-item-id="div-${val.id}" data-invest-value ="${val.user_investment_value}"
-                      data-delete-url="/trading/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                      title='Withdraw Investment' > <i class="fas fa-cut"></i><span class="counter counter-lg">${val.user_investment_percent}</span> 
+                      data-delete-url="/tr/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                      title='Cancel Investment Application' > <i class="fas fa-cut"></i><span class="counter counter-lg">${val.user_investment_percent}</span> 
                     </a>`
               
                     
@@ -157,7 +157,7 @@
               }
 
               if (val.userIsOwner == true) {
-                  myportifolio= `<a href="/trading/edit-investment/${val.id}/" 
+                  myportifolio= `<a href="/tr/i-edit/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='Manage Investment'>
                       <span class="advanced">Enterprenuer</span>
@@ -168,10 +168,10 @@
               }
              
               if (val.userIsInvestor == true) {
-                  myinvestment= `<a href="/trading/investment-details/${val.id}/" 
+                  myinvestment= `<a href="/tr/i-details/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='View Investment'>
-                      <span class="advanced2">Investor</span>
+                      <span class="advanced2">Investor</span> 
                     </a>`
                   
               }else{                  
@@ -203,7 +203,8 @@
 
                   
 
-                    <h3><a href="/trading/investment-details/${val.id}/">${name_trunc}</a></h3>
+                    <h3><a href="/tr/i-details/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment' 
+                      class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
                     
                     ${delete_my_investment}
 
@@ -213,7 +214,7 @@
                         <i class="bx bx-download"></i>&nbsp;${val.views}
                       </div>
                       <div class="trainer-rank d-flex align-items-center">
-                          <a class="model-likes" href="#" data-url="/trading/update_investment_likes/${val.id}/" 
+                          <a class="model-likes" href="#" data-url="/tr/update_investment_likes/${val.id}/" 
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
                           </a>
@@ -250,7 +251,7 @@
               }
 
               if (val.userIsOwner ==true) {
-                  myportifolio= `<a href="/trading/edit-investment/${val.id}/" 
+                  myportifolio= `<a href="/tr/i-edit/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='Manage Investment'>
                       <span class="advanced">Enterprenuer</span>
@@ -261,7 +262,7 @@
               }
              
               if (val.userIsInvestor ==true) {
-                  myinvestment= `<a href="/trading/investment-details/${val.id}/" 
+                  myinvestment= `<a href="/tr/i-details/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='View Investment'>
                       <span class="advanced2">Investor</span>
@@ -269,8 +270,8 @@
 
                     delete_my_investment= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" ${ready_attr} class="mydeleteclass iconClass"
                       data-object-name="${val.name}"  data-item-id="div-${val.id}" data-invest-value ="${val.user_investment_value}"
-                      data-delete-url="/trading/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                      title='Withdraw Investment' > <i class="fas fa-cut"></i> <span class="counter counter-lg">${val.user_investment_percent}</span>
+                      data-delete-url="/tr/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                      title='Cancel Investment Application' > <i class="fas fa-cut"></i> <span class="counter counter-lg">${val.user_investment_percent}</span>
                     </a>`
                   
               }else{                  
@@ -298,7 +299,8 @@
                   <img src="${imgval}" class="img-fluid" alt="...">
                   ${myportifolio} ${myinvestment}             
                   <div class="project-content">
-                    <h3><a href="/trading/investment-details/${val.id}/">${name_trunc}</a></h3>
+                    <h3><a href="/tr/i-details/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment'  
+                      class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
                     ${delete_my_investment}
                     ${descript_trunc}
                     <div class="trainer d-flex justify-content-between align-items-center">
@@ -306,7 +308,7 @@
                         <i class="bx bx-download"></i>&nbsp;${val.views}
                       </div>
                       <div class="trainer-rank d-flex align-items-center">
-                          <a class="model-likes" href="#" data-url="/trading/update_investment_likes/${val.id}/" 
+                          <a class="model-likes" href="#" data-url="/tr/update_investment_likes/${val.id}/" 
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
                           </a>
@@ -405,6 +407,8 @@
                   display_investment_ajax_url = `{% url 'investment_tags_ajax' 12345 %}`.replace(/12345/, tag_id.toString()); 
           
                 }
+                 //clear value
+                 $('#total_projects_searched').val('')
           
             } else{
                if (tag_name.length  == 0){
@@ -548,7 +552,7 @@
                             const ref="#div-" + response.data.id
                             val= $(ref).children().find('.trainer').find('a')
                           
-                            htmal_a= `<a class="model-likes" href="#" data-url="/trading/update_investment_likes/${response.data.id}/" 
+                            htmal_a= `<a class="model-likes" href="#" data-url="/tr/update_investment_likes/${response.data.id}/" 
                               style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                               title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
                             $(val).html(htmal_a)

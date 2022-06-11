@@ -17,11 +17,11 @@
     
                 <div class="project-content">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4>{{model.name}}</h4>
+                    <!-- <h4>{{model.name}}</h4> -->
                     <!-- <p class="price">$169</p> -->
                   </div>
   
-                  <h3><a href="{% url 'project-details' model.id %}">{{model.name|truncatechars:25}}</a></h3>
+                  <h3><a href="{% url 'project-details' model.id %}" class ="badge rounded-pill bg-warning">{{model.name|truncatechars:25}}</a></h3>
                   <p>{{model.description|truncatechars:100}}</p>
                   <div class="trainer d-flex justify-content-between align-items-center">
                     <div class="trainer-rank d-flex align-items-center">

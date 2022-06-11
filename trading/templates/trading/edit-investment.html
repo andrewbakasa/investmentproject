@@ -106,6 +106,14 @@
   {% block scripts %}
   <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
   <script>
+
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length-1);              
+            if (str.length > myTruncatedString.length){
+            return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        }
        
         var investment_capital = '{{model.total_value}}'
         var curr_pledge = 0
@@ -192,7 +200,7 @@
                               $('#investors_count').html(`${data.model.investors_count}`);
                           }
 
-                          a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
+                          a_html=`<a class="model-edit show-form-update" href="#" data-url="/tr/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                     title='Edit Equity'><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
                                 </a>`
@@ -283,8 +291,9 @@
                           if (data.model.investors_count){
                             $('#investors_count').html(`${data.model.investors_count}`);
                           }
-                        
-
+                          var name_trunc =truncChar(data.model.name,25)
+                          var header_text= `${name_trunc} valued @ $${numberWithCommas(data.model.total_value)} </h3>`
+                          $('#header_text').html(`${header_text}`);
                           
                       } else {
                           $('.public_toggle_form-errors').html('');

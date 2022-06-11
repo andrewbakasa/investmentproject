@@ -28,11 +28,11 @@
        <!-- ======= Breadcrumbs ======= -->
         <div class="row">
             <ol class="breadcrumb" >
-                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Financial Models' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'trading_home' %}">{% trans 'Investments' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'models' %}" class ="badge rounded-pill bg-success">{% trans ' Financial Models' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success">{% trans 'Investments' %}</a></li>
                 <li class="breadcrumb-item" >
-                    <label id="total_projects_searched">Personal Investments [{{total}}]</label>
+                    <label id="total_projects_searched" class ="badge rounded-pill bg-light text-dark" >Personal Investments [{{total}}]</label>
                 </li>  
             </ol>      
         </div> 
@@ -81,7 +81,7 @@
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                           data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
                                           data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Withdraw Investment' > <i class="fas fa-cut"></i> 
+                                          title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
                                         </a>
 
                                      
@@ -171,7 +171,7 @@
 {% block scripts %}
 <script>
      function truncChar(str,length){
-        var myTruncatedString = str.substring(0,length);              
+        var myTruncatedString = str.substring(0,length-1);              
         if (str.length > myTruncatedString.length){
         return myTruncatedString + "..."
         }
@@ -338,15 +338,15 @@
                     
                     
                     <td class="text-right modelAction modelData" name="action">
-                        <a href="/trading/investment-details/${val.iid}/"
+                        <a href="/tr/i-details/${val.iid}/"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='View Investment'><i class="fas fa-eye"></i>
                         </a>
                             
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                             data-object-name="${val.inv_name}"  data-item-id="${val.id}" 
-                            data-delete-url="/trading/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                            title='Withdraw Investment' > <i class="fas fa-cut"></i> 
+                            data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            title='Cancel Investment Application' > <i class="fas fa-cut"></i> 
                         </a>
                     </td>
 

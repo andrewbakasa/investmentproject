@@ -41,11 +41,13 @@
 {% block modal_divs %}
     <!-- EDIT DISPLAY HOLDER -->
     <div class="modal fade" id="modal-usermodel">
-        <div class="modal-dialog">
+        <div id='dynamic-div' class="modal-dialog">
             <div class="modal-content"></div>
         </div>
     </div> 
-    
+    <!-- <div class="modal-dialog modal-lg">
+        <div class="modal-content"></div>
+    </div> -->
 {% endblock %} 
 
 
@@ -64,8 +66,24 @@
       $("#models a").addClass( "active") 
      /*  if it has this class do somthing....
       $ ("#models a").hasClass( "active").css("","")*/ 
-      console.log('added models active')             
+    
+        $(document).on('shown.bs.modal','.modal',function(e){
+            //var form_id= $(this).find('form').attr('id')
+            var form_para= $(this).find('form')
+            var modal_wide= form_para.hasClass('modal-wide')
+            if(modal_wide){
+                //console.log('modal_wide',modal_wide)
+                $('#dynamic-div').addClass('modal-lg')
+            }else{
+                console.log('modal_wide',modal_wide)
+                $('#dynamic-div').removeClass('modal-lg') 
+            }
+        })
+
     })
+
+
+
     </script>
     <style>
         .progressBar {
@@ -91,12 +109,131 @@
     
     <script>
         var check_url_ajax= "{% url 'check_model_beef' usermodel.id %}" 
-        
+        var usermodel= "{{ usermodel }}"
          
-      </script>
+    </script>
     <script src="{% static 'basic_ui/js/input-range.js' %}"></script>  
     <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
     <script src="{% static 'basic_ui/js/feedlot.js' %}"></script>
+
+    <script>
+         //------LOAD THE FORM ON MODAL DIV----------
+         $('body').on('click', '.show-form-update', function(){
+              var btn = $(this);// fix button  delay
+              $.ajax({
+              url: btn.attr("data-url"),
+              type: 'get',
+              dataType:'json',
+              beforeSend: function(){
+                    var form_para= $(this)
+                    tittle=btn.attr('title')
+                    //var modal_wide= btn.hasClass('modal-wide')
+                    if(tittle == 'Edit Model'){
+                        //console.log('modal_wide',tittle)
+                        $('#dynamic-div').addClass('modal-lg')
+                    }else{
+                        //console.log('modal_wide',tittle)
+                        $('#dynamic-div').removeClass('modal-lg') 
+                    }
+                    $('#modal-usermodel').modal('show');
+              },
+              success: function(data){
+                  $('#modal-usermodel .modal-content').html(data.html_form);
+              }
+              });
+          })
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length-1);              
+            if (str.length > myTruncatedString.length){
+            return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        }  
+        function sweep (data){
+            if (data.simulation_run == true) {
+                $('.simulation').css("display", "block");                
+            }else {
+                $('.simulation').css("display", "none");
+            }
+        }
+        function update_header_olist(data){ 
+            $('#simulation-iterations').html(`${data.simulation_iterations}`)
+            $('#model_name').text(`${truncChar(data.name,15)}`)
+        }
+
+           //EDIT NEW MODEL
+        $('body').on("submit",".model-form-edit",function(e){
+            e.preventDefault();
+            var data = new FormData(this);
+            var formData
+            var form = $(this);
+           
+            var url=form.attr('data-url')
+            $.ajax({
+                url: form.attr('data-url'),
+                data : data,
+                type: form.attr('method'),
+                dataType: 'json',
+                processData:false,
+                contentType: false,
+                success: function(data){
+                    if(data.model){
+                        //console.log(form.attr('data-url'),)
+                        //console.log('updating', data)
+                        update_header_olist(data.model);
+                        sweep(data.model)
+                        //hide the form after editing
+                        $('#modal-usermodel').modal('hide');
+                        $('.close-modal').click() 
+                    } else {
+                        $('#public_toggle_form-errors').html('');
+                        if (data.error) {
+                            var form_vars=['__all__','name','model_type', 'currency', 'simulation_iterations',  'simulation_run', 'npv_bin_size']//,
+                    
+                            for (let p=0; p < form_vars.length; p++ ){
+                                let name_var = form_vars[p]
+                                if (data.error[name_var]){
+                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span></button>${data['error'][name_var][0]}
+                                </div> ` ;
+                                $('#public_toggle_form-errors').append(a_html)
+                                
+                                }
+                            }
+                            $('#public_toggle_form-errors').slideUp(50).fadeIn();
+                            window.setTimeout(function() {
+                                $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                    $("#public_toggle_form-errors").html('');
+                                });
+                            }, 4000);
+                        //-----------------------
+                        } else  {
+                            // Data locked:  No edit allowed
+                            $('#public_toggle_form-errors').html('');
+                            a_html = 	`<div class='alert alert-danger alert dismissable'>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>${data['locked']}
+                            </div> ` ;
+                            $('#public_toggle_form-errors').append(a_html)
+                            $('#public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                            window.setTimeout(function() {
+                                $("#public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                    $("#public_toggle_form-errors").html('');
+                                });
+                                }, 4000);
+                        } 
+                    //LAST ELSE--------------------------------------                
+                    }
+                //END SUCCESS
+                }
+            // END AJAX
+            })
+            return false;
+        })
+    </script>
+
 
 {% endblock %}
 

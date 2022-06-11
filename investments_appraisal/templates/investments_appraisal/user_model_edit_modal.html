@@ -13,7 +13,7 @@
 </div>
 
 <div class="modal-body">
-    <form class="model-form-edit form-horizontal" enctype="multipart/form-data" method="post" data-url="{% url 'update_model' pk=form.instance.id %}">
+    <form class="model-form-edit form-horizontal modal-wide" enctype="multipart/form-data" method="post" data-url="{% url 'update_model' pk=form.instance.id %}">
       {% csrf_token %}
       
         <div class="modal-body">

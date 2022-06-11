@@ -104,7 +104,7 @@ def get_user_investments(request):
     pertable=request.session['pertable']
     
 
-    print(colms)
+    #print(colms)
     obj_paginator = Paginator(dict_, pertable)
     first_page = obj_paginator.page(1).object_list
     current_page = obj_paginator.get_page(1)
@@ -489,9 +489,9 @@ def edit_investment(request,id):
     is_user_investor=False
     investor_id=1
     obj=Investor.objects.filter(user=request.user, investment=investmet_obj) 
-    print('chck.....')
+    #print('chck.....')
     if obj.first():
-        print('.....Found',obj.first() )
+        #print('.....Found',obj.first() )
         is_user_investor=True
         investor_id=obj.first().id
 
@@ -962,7 +962,7 @@ def delete_investor_this_user_ajax(request, investment_id, *args, **kwargs):
             for j in i.tags.all():
                 taglist.append(j.name)
             item_object['tags']= taglist
-            print(item_object)
+            #print(item_object)
 
             data= {}
          

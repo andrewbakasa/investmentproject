@@ -14,9 +14,9 @@ urlpatterns = [
     path('', views.home, name="trading_home"), 
     path('view/<int:model_id>/', views.project_details, name="view_trading"),
     path('investor-details/<int:id>/<int:investment_id>/', views.investor_details, name="investor-details"), 
-    path('investment-details/<int:id>/', views.investment_details, name="investment-details"), 
-    path('edit-investment/<int:id>/', views.edit_investment, name="edit-investment"), 
-    path('view-investors/<int:id>/', views.view_investors, name="view-investors"),
+    path('i-details/<int:id>/', views.investment_details, name="investment-details"), 
+    path('i-edit/<int:id>/', views.edit_investment, name="edit-investment"), 
+    path('i-view/<int:id>/', views.view_investors, name="view-investors"),
   
     path('display_investment_ajax/', views.display_investment_ajax, name="display_investment_ajax"),
     path('display_business_ajax/', views.display_business_ajax, name="display_business_ajax"),
@@ -27,8 +27,8 @@ urlpatterns = [
     path('investment_search/<str:tag_id>/<str:slug>/search/tags/', views.investment_search_and_tags_ajax,{'search_type': 1}, name='investment_search_and_tags_ajax'), 
     path('investment_search/<str:tag_id>/tags/', views.investment_search_and_tags_ajax,{'search_type': 0}, name='investment_tags_ajax'), 
 
-    path('t/<str:tag_id>/', views.investment_load_tags, name='investment_load_tags'), 
-    path('t/search/<str:tagname>/<str:search_str>/', views.investment_load_tags_search_string, name='investment_load_tags_search_string'),
+    path('tag/<str:tag_id>/', views.investment_load_tags, name='investment_load_tags'), 
+    path('tag/search/<str:tagname>/<str:search_str>/', views.investment_load_tags_search_string, name='investment_load_tags_search_string'),
     
     path('update_investment_likes/<int:id>/',views.update_investment_likes_ajax,  name='update_investment_likes'),
     path('u/i/', views.get_user_investments, name="user_investments"),

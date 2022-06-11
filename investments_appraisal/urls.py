@@ -130,7 +130,7 @@ urlpatterns = [
 
     path('', views.general_page.index, name="index"),#Home
     path('about/', views.general_page.about, name="about"),
-    path('projects/', views.general_page.projects, name="projects"),
+    path('pr/', views.general_page.projects, name="projects"),
     
     path('project_search/<str:slug>/',
         views.general_page.project_search_ajax,  name='project_search_ajax'), 
@@ -141,7 +141,7 @@ urlpatterns = [
     path('events/', views.general_page.events, name="events"),
     path('pricing/', views.general_page.pricing, name="pricing"),
     path('contact/', views.general_page.contact, name="contact"),
-    path('project-details/<int:id>/', views.general_page.project_details, name="project-details"),
+    path('pr-details/<int:id>/', views.general_page.project_details, name="project-details"),
     # path('model-details/<int:id>/', views.general_page.model_details, name="model-details"),
 
     path('vacancy-details/<int:id>/', views.general_page.vacancy_details, name="vacancy-details"),

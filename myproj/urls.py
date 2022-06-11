@@ -9,7 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('common/', include('common.urls')),
     path('', include('investments_appraisal.urls')),
-    path('trading/', include('trading.urls')),
+    path('tr/', include('trading.urls')),
     path('beef/', include('beefapp.urls')),
     path('fish/', include('fishapp.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

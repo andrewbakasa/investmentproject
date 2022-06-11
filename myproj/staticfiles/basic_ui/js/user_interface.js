@@ -1365,7 +1365,7 @@ $(document).ready(function(){
         }
 
         function truncChar(inpstr,length){
-            var myTruncatedString = inpstr.substring(0,length);              
+            var myTruncatedString = inpstr.substring(0,length-1);              
             if (inpstr.length > myTruncatedString.length){
               return myTruncatedString + "..."
             }

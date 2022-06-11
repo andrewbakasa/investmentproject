@@ -9,8 +9,8 @@
      <!-- ======= Breadcrumbs ======= -->
      <div class="row">
       <ol class="breadcrumb" >
-        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-        <li class="breadcrumb-item" ><a href="{% url 'view-investors' investment.id %}" %}">{% trans 'Back to Investors' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'view-investors' investment.id %}" class ="badge rounded-pill bg-success" >{% trans 'Back to Investors' %}</a></li>
       
         <li class="breadcrumb-item" >
           <label id="total_projects_searched"></label>

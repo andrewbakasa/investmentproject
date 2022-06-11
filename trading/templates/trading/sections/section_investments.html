@@ -8,17 +8,22 @@
      <!-- ======= Breadcrumbs ======= -->
      <div class="row">
         <ol class="breadcrumb" >
-          <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-          <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}">{% trans 'Investments' %}</a></li>
-        
+          <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
+          <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-light text-dark">{% trans 'Investments' %}</a></li>
+             
+          {%if search_tags %}
           <li class="breadcrumb-item" >
-            {%if search_tags %}
-              <a href="{% url 'trading_home' %}" style="color:inherit" 
+          
+              <a href="{% url 'trading_home' %}"
                 data-toggle="tooltip" data-placement="bottom" 
-                title='Remove Tag'><i>[{{tag_name}}]</i> <span aria-hidden="true">×</span>
+                title='Remove Tag' class ="badge rounded-pill bg-success"><i>[{{tag_name}}]</i> <span aria-hidden="true">×</span>
              </a>             
-            {% endif %}
-          </li>  
+           
+          </li>
+         {% endif %}
+         <li class="breadcrumb-item" >
+          <label id="total_projects_searched"></label>
+        </li>
         </ol>
       </div>
 
@@ -46,13 +51,13 @@
                   
                   <p>
                     <h3><a href="{% url 'investment-details' model.id %}"  
-                     
-                    >{{model.name|truncatechars:25}}</a></h3>
+                      data-toggle="tooltip" data-placement="bottom"  title='View Investment'  
+                      class ="badge rounded-pill bg-warning">{{model.name|truncatechars:25}}</a></h3>
 
                     <a href="#"  data-toggle="modal" data-target="#confirmdelete" {% userInvestorMethod model request.user %} class="mydeleteclass iconClass"
                       data-object-name="{{ model.name }}"  data-item-id="div-{{model.id}}" data-invest-value ="{% userInvestorValueMethod model request.user %}"
                       data-delete-url="{% url 'delete_investor_this_user_ajax' model.id  %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                      title='Withdraw Investment' > <i class="fas fa-cut"></i><span class="counter counter-lg">{% userInvestorPercentMethod model request.user %}</span>
+                      title='Cancel Investment Application' > <i class="fas fa-cut"></i><span class="counter counter-lg">{% userInvestorPercentMethod model request.user %}</span>
                       <!-- badge rounded-pill bg-light text-dark  -->
                     </a>
 

@@ -98,6 +98,8 @@
             if (search_val.length == 0){
                 //change here
                 display_projects_ajax_url = "{% url 'display_projects_ajax' %}"
+                //clear value
+                $('#total_projects_searched').val('')
           
             }else{
               //change here
@@ -167,7 +169,7 @@
                               <div class="project-item umodel-item">
                                 <img src="${imgval}" class="img-fluid" alt="...">
                                 <div class="project-content">    
-                                  <h3><a href="/project-details/${val.id}/">${name_trunc}</a></h3>
+                                  <h3><a href="/project-details/${val.id}/"  class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
                                   <p>${descript_trunc}</p>
                                   <div class="trainer d-flex justify-content-between align-items-center">
                                     <div class="trainer-rank d-flex align-items-center">
@@ -197,7 +199,7 @@
           });
          
           function truncChar(str,length){
-              var myTruncatedString = str.substring(0,length);              
+              var myTruncatedString = str.substring(0,length-1);              
               if (str.length > myTruncatedString.length){
                 return myTruncatedString + "..."
               }
@@ -269,7 +271,7 @@
                               <div class="project-item umodel-item">
                                 <img src="${imgval}" class="img-fluid" alt="...">
                                 <div class="project-content">    
-                                  <h3><a href="/project-details/${val.id}/">${name_trunc}</a></h3>
+                                  <h3><a href="/project-details/${val.id}/" class ="badge rounded-pill bg-warning" >${name_trunc}</a></h3>
                                   <p>${descript_trunc}</p>
                                   <div class="trainer d-flex justify-content-between align-items-center">
                                     <div class="trainer-rank d-flex align-items-center">

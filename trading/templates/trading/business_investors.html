@@ -28,8 +28,8 @@
        <!-- ======= Breadcrumbs ======= -->
         <div class="row">
             <ol class="breadcrumb" >
-                <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment.id %}">{% trans 'Go To Business' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" >{% trans 'Home' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment.id %}"  class ="badge rounded-pill bg-success">{% trans ' Business' %}</a></li>
                 
                 <li class="breadcrumb-item" >
                     <label id="total_projects_searched">Personal Investors</label>
@@ -355,14 +355,14 @@
                         </a>
 
                             <!-- EDIT MODEL -->
-                        <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${item.id}/" 
+                        <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Edit Model'><i  class="fas fa-edit"></i>
                         </a>
                             
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                             data-object-name="${ item.name }"  data-item-id="${item.id}" 
-                            data-delete-url="/trading/delete_investment_ajax/${item.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            data-delete-url="/tr/delete_investment_ajax/${item.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                             title='Delete' > <i class="fas fa-trash"></i> 
                         </a>
 
@@ -426,7 +426,10 @@
                           if (data.model.investors_count){
                             $('#investors_count').html(`${data.model.investors_count}`);
                           }
-                        
+
+                        //   var header_text= `${data.model.name} valued @ $${numberWithCommas(model.total_value)} </h3>`
+                        //   $('#header_text').html(`${header_text}`);
+                          
 
                           
                       } else {

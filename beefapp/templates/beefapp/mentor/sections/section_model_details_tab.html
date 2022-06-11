@@ -10,25 +10,37 @@
         <h3 >0 %</h3>
     </div>
     <!-- ======= Breadcrumbs ======= -->
-      <ol class="breadcrumb" >
-        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-        <li class="breadcrumb-item" ><a href="{% url 'models' %}">{% trans 'User Models' %}</a></li>
+      <ol id='header_olist' class="breadcrumb" >
+        <li class="breadcrumb-item"><a href="{% url 'index' %}"  class ="badge rounded-pill bg-success">Home</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'models' %}"  class ="badge rounded-pill bg-success">{% trans 'User Models' %}</a></li>
+        <li class="breadcrumb-item" >
+            <!-- EDIT MODEL -->
+            <a class="model-edit show-form-update badge rounded-pill bg-success" href="#" data-url="{% url 'update_model' usermodel.id %}" 
+              data-target="#modal-edit-product-div" data-toggle="tooltip" data-placement="bottom" 
+              title='Edit Model'><i  class="fas fa-edit"></i>
+            </a>
+          
+        </li>
+        
+      
+        
         {% if usermodel %}
-            <li class="breadcrumb-item"><a href="{{ model.get_absolute_url }}">{{usermodel.name | truncatechars:15}}</a></li>
+            <li class="breadcrumb-item"><a id ='model_name'  href="{{ model.get_absolute_url }}" class ="badge rounded-pill bg-light text-dark">{{usermodel.name | truncatechars:15}}</a></li>
             <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-download"   href="#" data-url="{% url 'get_beef_model_spreadsheets' usermodel.id %}" 
                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                 title='Download Excel'><i class="fas fa-download"></i>
                 </a></li> 
             <li id ='progress_iter' class="breadcrumb-item active">{{ progress_count}} of 8 Complete</li>            
             <li class="breadcrumb-item active">{% trans 'Beef Model' %}</li>
-            {% if usermodel.simulation_run %}
-            <li class="breadcrumb-item active">{% trans 'Simulation' %} </li>
-            <li class="breadcrumb-item active">{{usermodel.simulation_iterations}} </li>
-            {% endif %}
+           
+            <li id ='simulation-label' class="breadcrumb-item active simulation"  {% if usermodel.simulation_run == False %} style='display:none'  {% endif %}>{% trans 'Simulation' %} </li>
+            <li id ='simulation-iterations' class="breadcrumb-item active simulation" {% if usermodel.simulation_run == False %} style='display:none'  {% endif %} >{{usermodel.simulation_iterations}} </li>
+            
         {% else %}
             <li class="breadcrumb-item active">{% trans 'Create' %}</li>
         {% endif %}
       </ol> 
+
     <div class="row">
       <div class="col-lg-3">
         <ul class="nav nav-tabs flex-column">

@@ -195,7 +195,7 @@
                           if (data.model.user_investor==true){
                             pledge_title ="Edit Equity"
                           }
-                          a_html=`<a class="model-edit show-form-update" href="#" data-url="/trading/update_investor/${data.model.investor_id}/" 
+                          a_html=`<a class="model-edit show-form-update" href="#" data-url="/tr/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                     title='${pledge_title}'><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
                                 </a>`
@@ -499,7 +499,7 @@
                             
                             //val= $('.trainer-rank').find('a')
                             val= $('.model-likes')
-                            htmal_a= `<a class="model-likes" href="#" data-url="/trading/update_investment_likes/${response.data.id}/" 
+                            htmal_a= `<a class="model-likes" href="#" data-url="/tr/update_investment_likes/${response.data.id}/" 
                               style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                               title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
                             //$(val).html(htmal_a)

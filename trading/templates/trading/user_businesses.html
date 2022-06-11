@@ -30,15 +30,17 @@
         <!-- ======= Breadcrumbs ======= -->
             <div class="row">
                 <ol class="breadcrumb" >
-                    <li class="breadcrumb-item"><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'models' %}">{% trans 'Go To Financial Models' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}"  class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
+                    <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success">{% trans 'Investments' %}</a></li>
+     
+                    <li class="breadcrumb-item"><a href="{% url 'models' %}"  class ="badge rounded-pill bg-success">{% trans ' Financial Models' %}</a></li>
                     <li class="breadcrumb-item active">
-                        <a href="#"   style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
-                        title='Add New Business'><i style="color:red"  class="fas fa-plus"></i>
+                        <a href="#"   data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
+                        title='Create New Business' class ="badge rounded-pill bg-success"><i  class="fas fa-plus"></i>
                         </a>
                     </li> 
                     <li class="breadcrumb-item" >
-                        <label id="total_projects_searched">Personal Businesses [{{total}}]</label>
+                        <label id="total_projects_searched"  class ="badge rounded-pill bg-light text-dark">Personal Businesses [{{total}}]</label>
                     </li>  
                 </ol>        
             </div> 
@@ -227,7 +229,7 @@
 {% block scripts %}
 <script>
     function truncChar(str,length){
-        var myTruncatedString = str.substring(0,length);              
+        var myTruncatedString = str.substring(0,length-1);              
         if (str.length > myTruncatedString.length){
         return myTruncatedString + "..."
         }
@@ -512,20 +514,20 @@
 
                                     <td class="text-right modelAction modelData" name="action">
                                     
-                                        <a href="/trading/edit-investment/${item.id}"
+                                        <a href="/tr/i-edit/${item.id}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                             title='Manage Business'><i class="fas fa-wrench"></i>
                                         </a>
 
                                             <!-- EDIT MODEL -->
-                                        <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${item.id}/" 
+                                        <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                             title='Edit Data'><i  class="fas fa-edit"></i>
                                         </a>
                                             
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                             data-object-name="${item.name }"  data-item-id="${item.id}" 
-                                            data-delete-url="/trading/delete_investment_ajax/${item.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                            data-delete-url="/tr/delete_investment_ajax/${item.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                                             title='Delete' > <i class="fas fa-trash"></i> 
                                         </a>
 
@@ -577,20 +579,20 @@
 
                     <td class="text-right modelAction modelData" name="action">
                       
-                        <a href="/trading/edit-investment/${item.id}"
+                        <a href="/tr/i-edit/${item.id}"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Manage Business'><i class="fas fa-wrench"></i>
                         </a>
 
                             <!-- EDIT MODEL -->
-                        <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${item.id}/" 
+                        <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Edit Data'><i  class="fas fa-edit"></i>
                         </a>
                             
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                             data-object-name="${item.name }"  data-item-id="${item.id}" 
-                            data-delete-url="/trading/delete_investment_ajax/${item.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            data-delete-url="/tr/delete_investment_ajax/${item.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                             title='Delete' > <i class="fas fa-trash"></i> 
                         </a>
 
@@ -815,17 +817,17 @@
                 <td class="modelData" name="date_created" >${js_date_created}</td>
                 <td class="modelData" name="public" >${public}</td>
                 <td class="text-right modelAction modelData" name="action">
-                    <a href="/trading/edit-investment/${val.id}"
+                    <a href="/tr/i-edit/${val.id}"
                         style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                         title='Manage Business'><i class="fas fa-wrench"></i>
                     </a>
-                    <a class="model-edit show-form-update" href="#" data-url="/trading/update_investment_ajax/${val.id}/" 
+                    <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${val.id}/" 
                         data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                         title='Edit Data'><i  class="fas fa-edit"></i>
                     </a>
                     <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                         data-object-name="${val.name}"  data-item-id="${val.id}" 
-                        data-delete-url="/trading/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        data-delete-url="/tr/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                         title='Delete'> <i class="fas fa-trash"></i> 
                     </a>
                     </td>
