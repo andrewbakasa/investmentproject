@@ -17,132 +17,138 @@
 
 
 {% block content %} 
-<main id="main">
-  <!-- ======= Breadcrumbs ======= -->
-  <div class="breadcrumbs">
-  </div>
-  <!-- End Breadcrumbs -->
-  <!---Removed padding from 70px-- 0px-->
-<section style= 'padding: 5px 0;' id="projects" class="projects">  
-    <div class="container" data-aos="fade-up">
-       <!-- ======= Breadcrumbs ======= -->
-        <div class="row">
-            <ol class="breadcrumb" >
-                <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'models' %}" class ="badge rounded-pill bg-success">{% trans ' Financial Models' %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success">{% trans 'Investments' %}</a></li>
-                <li class="breadcrumb-item" >
-                    <label id="total_projects_searched" class ="badge rounded-pill bg-light text-dark" >Personal Investments [{{total}}]</label>
-                </li>  
-            </ol>      
-        </div> 
-   
-      
-        <!-- Table Section -->
-        <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
-            <div class="col-md-12">
-                <div class="box">
-                    <div class="box-body">
-                        {%if first_page %}
-                        <h4 style="text-align:center;" id="personal_totals"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
-                        <hr>
-                        <div class="table-responsive">
-                            <table id="usersTable" class="table table-striped">
-                                <thead class="thead-dark">
-                                <th style="width: 1%" >#</th>    
-                                <th style="width: 15%" >Investment Title</th>
-                                <th style="width: 35%" >Investment Summary</th>
-                                <th style="width: 10%" >Total value</th>
-                                <th style="width: 10%" >My Contr</th>
-                                <th style="width: 10%" >Category</th>
-                                <th style="width: 10%" >Owner</th>
-                                <th style="width: 10%" >Application Status</th>
-                                <th style="width: 7%" class="text-right">Actions</th>
-                                </thead>
-                                <tbody id="userinvestment-table-tbody">
-                                {% for item in first_page  %}
-                                <tr id="item-{{item.id}}" >
-                                    <td>{{forloop.counter}}</td>
-                                  
-                                    <td class="modelData" name="name" >{{item.inv_name |truncatechars:15}}</td>
-                                    <td class="modelData" name="description" >{{item.summary|truncatechars:40}}</td>
-                                    <td class="modelData" name="category" >${{item.total_value| intcomma}}</td>
-                                    <td class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
-                                    <td class="modelData" name="category" >{{item.cat_name}}</td>
-                                    
-                                    <td class="modelData" name="email" > {% if item.application_status == "accepted" %} {{item.email}} {% else %} N/A {%endif%}</td>
-                                    <td class="modelData" name="application_status" >{{ item.application_status }}</td>
-                                    <td class="text-right modelAction modelData" name="action">
-                                        <a href="{% url 'investment-details' item.iid %}"
-                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='View Investment'><i class="fas fa-eye"></i>
-                                        </a>
-                                         
-                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                          data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
-                                          data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
-                                        </a>
+    <main id="main">
+        <!-- ======= Breadcrumbs ======= -->
+        <div class="breadcrumbs">
+        </div>
+        <!-- End Breadcrumbs -->
+        <!---Removed padding from 70px-- 0px-->
+        <section style= 'padding: 5px 0;' id="projects" class="projects">  
+            <div class="container" data-aos="fade-up">
+            <!-- ======= Breadcrumbs ======= -->
+                <div class="row">
+                    <ol class="breadcrumb" >
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'models' %}" class ="badge rounded-pill bg-success">{% trans ' Financial Models' %}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success">{% trans 'Investments' %}</a></li>
+                        <li class="breadcrumb-item" >
+                            <label id="total_projects_searched" class ="badge rounded-pill bg-light text-dark" >Personal Investments [{{total}}]</label>
+                        </li>
+                        <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
+                            <a id='current_status' href="{% url 'user_investments' %}"
+                                data-toggle="tooltip" data-placement="bottom" 
+                                title='Remove Status' class ="badge rounded-pill bg-success"><i>[{{status}}]</i> <span aria-hidden="true">×</span>
+                            </a> 
+                        </li>
+                    </ol>      
+                </div>       
+                <!-- Table Section -->
+                <div id="user_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="col-md-12">
+                        <div class="box">
+                            <div class="box-body">
+                                {%if first_page %}
+                                <h4 style="text-align:center;" id="personal_totals"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        Application Status:
+                                        {% for tag in APLLICATION_STATUS_CHOICE %}
+                                        
+                                            <a id={{tag}} {% if status == tag %} class="filter-status badge rounded-pill bg-light text-dark" {% else %}class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_investments_load_status_ajax' tag %}" 
+                                                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Filter'>{{tag}}
+                                            </a>     
+                                            <!-- <a href="{% url 'user_investments_load_status' tag %}" {% if status == tag %} class="badge rounded-pill bg-light text-dark" {% else %}class="badge rounded-pill bg-warning text-dark" {% endif %}>{{tag}}</a> -->
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table id="usersTable" class="table table-striped">
+                                        <thead class="thead-dark">
+                                        <th style="width: 1%" >#</th>    
+                                        <th style="width: 15%" >Investment Title</th>
+                                        <th style="width: 35%" >Investment Summary</th>
+                                        <th style="width: 10%" >Total value</th>
+                                        <th style="width: 10%" >My Contr</th>
+                                        <th style="width: 10%" >Category</th>
+                                        <th style="width: 10%" >Owner</th>
+                                        <th style="width: 10%" >Application Status</th>
+                                        <th style="width: 7%" class="text-right">Actions</th>
+                                        </thead>
+                                        <tbody id="userinvestment-table-tbody">
+                                        {% for item in first_page  %}
+                                        <tr id="item-{{item.id}}" >
+                                            <td>{{forloop.counter}}</td>
+                                        
+                                            <td class="modelData" name="name" >{{item.inv_name |truncatechars:15}}</td>
+                                            <td class="modelData" name="description" >{{item.summary|truncatechars:40}}</td>
+                                            <td class="modelData" name="category" >${{item.total_value| intcomma}}</td>
+                                            <td class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
+                                            <td class="modelData" name="category" >{{item.cat_name}}</td>
+                                            
+                                            <td class="modelData" name="email" > {% if item.application_status == "accepted" %} {{item.email}} {% else %} N/A {%endif%}</td>
+                                            <td class="modelData" name="application_status" >{{ item.application_status }}</td>
+                                            <td class="text-right modelAction modelData" name="action">
+                                                <a href="{% url 'investment-details' item.iid %}"
+                                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                    title='View Investment'><i class="fas fa-eye"></i>
+                                                </a>
+                                                
+                                                <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                                data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
+                                                data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
+                                                </a>
 
-                                     
-                                      </td>
-                                   
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                           
+                                            
+                                            </td>
+                                        
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                
+                                </div>
+
+                                {%else%}
+
+                                <h3>No investments available</h3>
+
+                                {%endif%}
+
+                            </div>
+
                         </div>
-
-                        {%else%}
-
-                        <h3>No investments available</h3>
-
-                        {%endif%}
-
                     </div>
-
                 </div>
-            </div>
-        </div>
-
-          <!--Pagination  -->
-          <div id= "page_section" class="pagination">
-            <ul class="pagination newpagination">
-                {% if current_page.has_previous %}
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
-                    
-                {% endif %}
-        
-                <span class="current"  style="margin-left:5px">
-                Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
-                </span>
-        
-                {% if current_page.has_next %}
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+                <!--Pagination  -->
+                <div id= "page_section" class="pagination">
+                    <ul class="pagination newpagination">
+                        {% if current_page.has_previous %}
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                            
+                        {% endif %}
                 
-                {% endif %}
-            </ul>
-        </div>
-  
-    </div>
-  </section><!-- End User Section -->
-  
-
- 
-
- 
-  
-</main><!-- End #main -->
-
+                        <span class="current"  style="margin-left:5px">
+                        Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+                        </span>
+                
+                        {% if current_page.has_next %}
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+                        
+                        {% endif %}
+                    </ul>
+                </div>  
+            </div>
+        </section><!-- End User Section -->
+    </main><!-- End #main -->
 {%endblock%}
 
 
 {% block modal_divs %}
-   
-
     <!-- Delete confirmation modal -->
     <div class="modal fade" id="confirmdelete" role="dialog">
         <div class="modal-dialog">
@@ -165,22 +171,19 @@
     </div>
 
 {% endblock %} 
-
-
-
 {% block scripts %}
 <script>
-     function truncChar(str,length){
-        var myTruncatedString = str.substring(0,length-1);              
-        if (str.length > myTruncatedString.length){
-        return myTruncatedString + "..."
-        }
-        return myTruncatedString
+    function truncChar(str,length){
+    var myTruncatedString = str.substring(0,length-1);              
+    if (str.length > myTruncatedString.length){
+    return myTruncatedString + "..."
     }
-     function numberWithCommas(x) {
-        var parts = x.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return parts.join(".");
+    return myTruncatedString
+    }
+    function numberWithCommas(x) {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
     }
     function getToken(name) {
                 let cookieValue = null;
@@ -200,13 +203,23 @@
   
     var csrftoken = getToken('csrftoken');
     var display_myinvestement_ajax_url= "{% url 'display_myinvestment_ajax' %}" 
+    var app_status
     
     $(document).ready(function (){ 
         $("#investments a:first").addClass( "active") 
         $("#investors a:first").addClass( "active") 
         $("#exploreinvestments a:first").addClass( "active") 
+
+         var boo_status = "{{search_status}}"
+        
+         if (boo_status == true ){
+            app_status ='{{status}}' 
+            //console.log('seting....', boo_status, app_status,)
+            
+         } 
+              
     })
-     $('#confirmdelete').on('show.bs.modal', function(e) {
+    $('#confirmdelete').on('show.bs.modal', function(e) {
         var name = $(e.relatedTarget).data('object-name');
         var url = $(e.relatedTarget).data('delete-url');
         var item_id = $(e.relatedTarget).data('item-id');
@@ -217,7 +230,6 @@
         $('#confirmdelete .modal-footer input').attr('item-id', item_id);
     });
 
-  
     $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
             var tr_id =$('#delete-button').attr('item-id')
@@ -278,115 +290,178 @@
                 }
             });
         });
-          
     
-        $('body').on('click', '.a_page_nav', function (event) {
-            // preventing default actions
-            event.preventDefault();
-            var page_no = $(this).attr('href');
-            // ajax call
-            loadPageAjax(page_no)
-        });
-        function updatePaging2(data){
-            var has_previous=''
-            //console.log(data)
-            if (data.has_previous){
-                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
-            
-            }       
-            var has_next= ''          
-            if (data.has_next){
-                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
-                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
-                    `; 
-            }       
-            a_html=`
-            <div id= "page_section" class="pagination">
-                <ul class="pagination newpagination">
-                    ${has_previous}            
-                    <span class="current" style="margin-left:5px" >
-                        Page ${ data.current_page } of ${ data.last }.
-                    </span>                   
-                    ${has_next}
-                </ul>
-                </div>`
-                $("#page_section").html(a_html)
-          }
-
-        function append_html(counter,val,page_no){
-            //console.log(counter,page_no, val)
-            var owner_details =''
-            if (val.application_status == "accepted"){
-
-                owner_details= val.email
-            }  else{
-                owner_details='N/A' 
-            }
-           
-
-            a_html=`
-                <tr id="item-${val.id}" >
-                    <td>${counter}</td>
-                    <td class="modelData" name="name" >${val.inv_name}</td>
-                    <td class="modelData" name="description" >${val.summary}</td>
-                    <td class="modelData" name="category" >$${numberWithCommas(val.total_value)}</td>
-                    <td class="modelData" name="myinvest" >$${numberWithCommas(val.myinvest)}</td>
-                    <td class="modelData" name="category" >${val.cat_name}</td>
-                    <td class="modelData" name="email" >${owner_details}</td>
-                    <td class="modelData" name="application_status" >${val.application_status}</td>
-                    
-                    
-                    <td class="text-right modelAction modelData" name="action">
-                        <a href="/tr/i-details/${val.iid}/"
-                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='View Investment'><i class="fas fa-eye"></i>
-                        </a>
-                            
-                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                            data-object-name="${val.inv_name}"  data-item-id="${val.id}" 
-                            data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                            title='Cancel Investment Application' > <i class="fas fa-cut"></i> 
-                        </a>
-                    </td>
-
-                </tr>` ;
-            return a_html
+    $('body').on('click', '.a_page_nav', function (event) {
+        // preventing default actions
+        event.preventDefault();
+        var page_no = $(this).attr('href');
+        // ajax call
+        loadPageAjax(page_no)
+    });
+    function updatePaging2(data){
+        var has_previous=''
+        //console.log(data)
+        if (data.has_previous){
+            has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+        
+        }       
+        var has_next= ''          
+        if (data.has_next){
+            has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                `; 
+        }       
+        a_html=`
+        <div id= "page_section" class="pagination">
+            <ul class="pagination newpagination">
+                ${has_previous}            
+                <span class="current" style="margin-left:5px" >
+                    Page ${ data.current_page } of ${ data.last }.
+                </span>                   
+                ${has_next}
+            </ul>
+            </div>`
+            $("#page_section").html(a_html)
         }
-        function loadPageAjax(page_no){
-            $.ajax({
-                    type: "POST",
-                    // define url name
-                    url: display_myinvestement_ajax_url, 
-                    data : {    
-                        page_no : page_no, 
-                        csrfmiddlewaretoken: csrftoken,
-                    },
-                    // handle a successful response
-                    success: function (response) {
-                        console.log('url', display_myinvestement_ajax_url)
-                        $('#userinvestment-table-tbody').html('')
-                        updatePaging2(response.data)
-                        if (response.data.per_table){
-                            per_table=response.data.per_table
-                        }
-                        var base_counter =(parseInt(page_no)-1)*per_table
-                        var counter=base_counter
-                        $.each(response.data.results, function(i, val) {
-                            counter=  counter +1
-                            a_html=append_html(counter,val,page_no)                           
-                            // add each model on every line
-                            $('#userinvestment-table-tbody').append(a_html)
-                        });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
+
+    function append_html(counter,val,page_no){
+        //console.log(counter,page_no, val)
+        var owner_details =''
+        if (val.application_status == "accepted"){
+            owner_details= val.email
+        }  else{
+            owner_details='N/A' 
+        }
+        
+
+        a_html=`
+            <tr id="item-${val.id}" >
+                <td>${counter}</td>
+                <td class="modelData" name="name" >${val.inv_name}</td>
+                <td class="modelData" name="description" >${val.summary}</td>
+                <td class="modelData" name="category" >$${numberWithCommas(val.total_value)}</td>
+                <td class="modelData" name="myinvest" >$${numberWithCommas(val.myinvest)}</td>
+                <td class="modelData" name="category" >${val.cat_name}</td>
+                <td class="modelData" name="email" >${owner_details}</td>
+                <td class="modelData" name="application_status" >${val.application_status}</td>
+                
+                
+                <td class="text-right modelAction modelData" name="action">
+                    <a href="/tr/i-details/${val.iid}/"
+                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='View Investment'><i class="fas fa-eye"></i>
+                    </a>
                         
+                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                        data-object-name="${val.inv_name}"  data-item-id="${val.id}" 
+                        data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
+                    </a>
+                </td>
+
+            </tr>` ;
+        return a_html
+    }
+    function loadPageAjax(page_no){
+        //var app_status ='{{status}}'
+        var data
+        if (app_status) {
+            data = {    
+                    page_no : page_no,
+                    app_status : app_status, 
+                    csrfmiddlewaretoken: csrftoken,
+                }
+        }else {
+            data = {    
+                    page_no : page_no,
+                    csrfmiddlewaretoken: csrftoken,
+                }
+        }
+        //console.log(app_status,)
+        $.ajax({
+                type: "POST",
+                // define url name
+                url: display_myinvestement_ajax_url, 
+                data :data,
+                // handle a successful response
+                success: function (response) {
+                    //console.log('url', display_myinvestement_ajax_url)
+                    $('#userinvestment-table-tbody').html('')
+                    updatePaging2(response.data)
+                    if (response.data.per_table){
+                        per_table=response.data.per_table
+                    }
+                    var base_counter =(parseInt(page_no)-1)*per_table
+                    var counter=base_counter
+                    $.each(response.data.results, function(i, val) {
+                        counter=  counter +1
+                        a_html=append_html(counter,val,page_no)                           
+                        // add each model on every line
+                        $('#userinvestment-table-tbody').append(a_html)
+                    });
+                    },
+                    error: function () {
+                        alert('Error Occured');
+                    }
+                    
+            });
+            //add_model_class()
+        }
+    $('body').on('click', '.filter-status', function (e) {
+                e.preventDefault();  
+                var clicked_id = $(this).attr('id')
+                var url = $(this).attr('data-url');
+                var myclass =$('.filter-status')
+                app_status =$(this).attr('id')
+                $('#li_current_status').css('display','block')
+                $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+              
+                $.each(myclass, function(i, val) {
+                    let loop_id= $(this).attr('id')
+                    if (clicked_id == loop_id){
+                        $(this).removeClass('bg-warning')
+                        $(this).addClass('bg-light')
+                    
+                    }else {
+                        $(this).addClass('bg-warning')
+                        $(this).removeClass('bg-light')
+                    }
                 });
-                //add_model_class()
-          }
+         
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: url, 
+                        data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
+                        },
+                        // handle a successful response
+                        success: function (response) {
+                            $('#userinvestment-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_page){
+                                per_page=response.data.per_page
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_page
+                            var counter=base_counter
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#userinvestment-table-tbody').append(a_html)
+                            });
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                    }); 
           
-    
+          });
+      
 </script>
 {% endblock %}

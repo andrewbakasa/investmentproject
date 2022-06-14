@@ -66,7 +66,7 @@
                     //console.log('modal_wide',modal_wide)
                     $('#dynamic-div').addClass('modal-lg')
                 }else{
-                    console.log('modal_wide',modal_wide)
+                    //console.log('modal_wide',modal_wide)
                     $('#dynamic-div').removeClass('modal-lg') 
                 }
             })             
@@ -144,8 +144,13 @@
             }
         }
         function update_header_olist(data){ 
-            $('#simulation-iterations').html(`${data.simulation_iterations}`)
-            $('#model_name').text(`${truncChar(data.name,15)}`)
+           if (data.simulation_iterations){
+                $('#simulation-iterations').html(`${data.simulation_iterations}`)
+           }
+           
+           if (data.name){
+                $('#model_name').text(`${truncChar(data.name,15)}`)
+           }
         }
 
            //EDIT NEW MODEL
@@ -154,7 +159,7 @@
             var data = new FormData(this);
             var formData
             var form = $(this);
-           
+            console.log('grgrgr')
             var url=form.attr('data-url')
             $.ajax({
                 url: form.attr('data-url'),

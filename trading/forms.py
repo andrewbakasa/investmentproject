@@ -99,7 +99,7 @@ class UserInvestmentForm(forms.ModelForm):
     
     class Meta:
         model = Investment
-        fields = ['name','description','category', 'total_value','creater', 'tags', 'public' ]
+        fields = ['name','description','category', 'total_value','creater', 'tags', 'public', 'closing_date' ]
        
     def clean_total_value(self):
         total_value = self.cleaned_data['total_value']
@@ -138,7 +138,7 @@ class UserInvestmentFormUpdate(forms.ModelForm):
 
     class Meta:
         model = Investment
-        fields = ['name','description','category', 'total_value', 'tags', 'public']
+        fields = ['name','description','category', 'total_value', 'tags', 'public', 'closing_date']
   
 
     def clean_total_value(self):

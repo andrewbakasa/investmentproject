@@ -100,7 +100,8 @@
   {% block scripts %}
        <!-- Search Button JS -->
        <script src="{% static 'mentor/assets/js/search.js' %}"></script>
-       
+       <script src="{% static 'basic_ui/js/custom-dates.js' %}"></script>
+  
       <script>
             function truncChar(str,length){
                 var myTruncatedString = str.substring(0,length-1);              
@@ -154,7 +155,7 @@
           })
           function updatePaging2(data){
             var has_previous=''
-            console.log(data)
+            //console.log(data)
             if (data.has_previous){
                 has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
                     <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
@@ -217,6 +218,7 @@
                             }
 
                             var js_date_created = new Date(val.date_created)
+                            js_date_created= getfullDateTime_(js_date_created)
                             //append to post
                             counter=  counter +1
                             var baseimageURL = "{% static 'mentor/assets/img/models/' %}"
@@ -548,7 +550,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+              //console.log('before editing...')
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),
@@ -620,7 +622,7 @@
             var data = new FormData(this);
             var formData
             var form = $(this);
-        
+            //console.log('grgrgr')
             $.ajax({
                 url: form.attr('data-url'),
                 //data: form.serialize(),

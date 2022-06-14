@@ -181,7 +181,7 @@
             var data = new FormData(this);
             var formData
             var form = $(this);
-           
+            console.log('grgrgr aaaaa111')
             var url=form.attr('data-url')
             $.ajax({
                 url: form.attr('data-url'),
@@ -251,7 +251,7 @@
             var data = new FormData(this);
             var formData
             var form = $(this);
-        
+            console.log('grgrgr')
             $.ajax({
                 url: form.attr('data-url'),
                 //data: form.serialize(),

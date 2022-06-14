@@ -152,7 +152,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-          
+              console.log('grgrgr')
               $.ajax({
                   url: form.attr('data-url'),
                   //data: form.serialize(),
@@ -256,7 +256,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+              console.log('grgrgr testing...')
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),
@@ -266,6 +266,7 @@
                   processData:false,
                   contentType: false,
                   success: function(data){
+                      console.log( 'url', form.attr('data-url'))
                       if(data.model){
                           
                           //updateTable(data.model);
@@ -294,6 +295,7 @@
                       } else {
                           $('.public_toggle_form-errors').html('');
                           if (data.error) {
+                              console.log('error: ' ,data.error)
                               var form_vars=['__all__','investment','user','name', 'description','value']//,
                       
                               for (let p=0; p < form_vars.length; p++ ){
@@ -419,7 +421,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+              console.log('grgrgr')
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),

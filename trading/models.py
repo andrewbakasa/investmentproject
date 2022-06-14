@@ -9,7 +9,7 @@ from django.db import models
 from django.contrib.auth.models import User
 #from common.models import User
 from django.utils.translation import gettext_lazy as _
-from datetime import date
+from datetime import date, timedelta
 # from store.models import Currency
 from django.contrib.postgres.fields import ArrayField
 import pandas as pd
@@ -48,7 +48,9 @@ class Investment(models.Model):
     views = models.IntegerField(default=0, verbose_name='Views')# downloads
     total_value = models.IntegerField(default=0)
     tags = models.ManyToManyField(Tag, null=True, blank =True)
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)    
+    closing_date = models.DateField(default=datetime.date.today() + timedelta(days=60), null=True)
+    
     public= models.BooleanField(default=True)
     class Meta:
         ordering = ['-views']
@@ -155,7 +157,7 @@ class Investment(models.Model):
             curr = self.current_investment
             max_val = max(self.total_value,curr)
             if max_val !=0:
-                return round(qs.value*100/max_val,2)
+                return round(qs.value*100/max_val,1)
             else:
                 return 0
 
@@ -202,8 +204,60 @@ class Investor(models.Model):
         #get all that has null investments
     @property
     def trading_df(self):
-        investments_df = pd.DataFrame(Investment.objects.all().values())	
+        
+        investments_df = pd.DataFrame(Investment.objects.all().values())
         investors_df = pd.DataFrame(Investor.objects.filter(Q(user=self.user), Q(investment__id__isnull=False)).values())
+        
+        users_df = pd.DataFrame(User.objects.all().values())
+        categories_df = pd.DataFrame(InvestmentCategory.objects.all().values()) 
+
+        df = pd.DataFrame(columns =['iid','retain_id'])
+        if investments_df.shape[0]>0 and investors_df.shape[0] > 0 : 
+            investments_df['investment_id'] = investments_df['id']
+            # mwrge
+          
+            df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop([
+                        'likes','views','date_created_y','date_created_x','description_y'
+                        ,'name_y','user_id','investment_id'], axis=1).rename(
+                        {'id_x': 'iid','id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
+                        'name_x':'inv_name' }, axis=1)
+
+            if users_df.shape[0]>0:
+                users_df['creater_id'] = users_df['id']
+                # merge
+                df =pd.merge(df, users_df, on='creater_id',how="left").drop([
+                    'id',  'password', 'last_login', 'is_superuser',
+                    'is_staff', 'is_active',  'date_joined'
+                ], axis=1).rename(
+                            {}, axis=1)
+
+            if categories_df.shape[0]>0:
+                categories_df['category_id'] = categories_df['id']
+                # merge
+                df =pd.merge(df, categories_df, on='category_id',how="left").drop([
+                    'date_created', 'likes', 'hits', 'creater_id', 'category_id','id'
+                ], axis=1).rename(
+                            {'description':'cat_descript','name':'cat_name', 'retain_id':'id'}, axis=1)
+
+                            
+
+            # 'inv_name', 'summary',  'total_value',
+            # 'username', 'first_name', 'last_name', 'email', 'id', 'cat_name',
+            # 'cat_descript', 'uniqueid'
+        else:
+            #select only for current user
+            return df#[~df['id'].isna()]
+        #select only for current user
+        return df#[~df['id'].isna()]
+    
+    def trading_df_status(self, application_status=None):
+        
+        investments_df = pd.DataFrame(Investment.objects.all().values())
+        if 	application_status==None:
+            investors_df = pd.DataFrame(Investor.objects.filter(Q(user=self.user), Q(investment__id__isnull=False)).values())
+        else:
+            investors_df = pd.DataFrame(Investor.objects.filter(Q(user=self.user), Q(investment__id__isnull=False), Q(application_status=application_status)).values())
+        
         users_df = pd.DataFrame(User.objects.all().values())
         categories_df = pd.DataFrame(InvestmentCategory.objects.all().values()) 
 

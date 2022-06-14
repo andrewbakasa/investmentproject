@@ -75,7 +75,7 @@
                 //console.log('modal_wide',modal_wide)
                 $('#dynamic-div').addClass('modal-lg')
             }else{
-                console.log('modal_wide',modal_wide)
+                //console.log('modal_wide',modal_wide)
                 $('#dynamic-div').removeClass('modal-lg') 
             }
         })
@@ -157,17 +157,23 @@
             }
         }
         function update_header_olist(data){ 
-            $('#simulation-iterations').html(`${data.simulation_iterations}`)
-            $('#model_name').text(`${truncChar(data.name,15)}`)
+           if (data.simulation_iterations){
+                $('#simulation-iterations').html(`${data.simulation_iterations}`)
+           }
+           
+           if (data.name){
+                $('#model_name').text(`${truncChar(data.name,15)}`)
+           }
         }
 
            //EDIT NEW MODEL
         $('body').on("submit",".model-form-edit",function(e){
+            // ALL EDITS PASS THRU THIS METHOD: TA, WC,FLD,MEP,DEP, FIN etc
             e.preventDefault();
             var data = new FormData(this);
             var formData
             var form = $(this);
-           
+            //console.log('beef...before editing')
             var url=form.attr('data-url')
             $.ajax({
                 url: form.attr('data-url'),
@@ -177,9 +183,10 @@
                 processData:false,
                 contentType: false,
                 success: function(data){
+                    console.log('url', url)
                     if(data.model){
                         //console.log(form.attr('data-url'),)
-                        //console.log('updating', data)
+                        //console.log('updating', data.model)
                         update_header_olist(data.model);
                         sweep(data.model)
                         //hide the form after editing
@@ -188,6 +195,7 @@
                     } else {
                         $('#public_toggle_form-errors').html('');
                         if (data.error) {
+                            
                             var form_vars=['__all__','name','model_type', 'currency', 'simulation_iterations',  'simulation_run', 'npv_bin_size']//,
                     
                             for (let p=0; p < form_vars.length; p++ ){

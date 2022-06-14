@@ -32,7 +32,13 @@ urlpatterns = [
     
     path('update_investment_likes/<int:id>/',views.update_investment_likes_ajax,  name='update_investment_likes'),
     path('u/i/', views.get_user_investments, name="user_investments"),
+    path('u/i/load_status/<str:status>', views.get_user_investments_load_status, name="user_investments_load_status"),
+
+    path('u/i/load_status_ajax/<str:status>', views.get_user_investments_load_status_ajax, name="user_investments_load_status_ajax"),
+
     path('u/b/', views.get_user_businesses, name="user_businesses"),
+    path('u/b/load_status_ajax/<str:status>', views.get_user_businesses_load_status_ajax, name="user_business_load_status_ajax"),
+
 
     path('u_investment_jax/', views.create_userinvestment_ajax, name="create_userinvestment_ajax"),
     path('u_investor_jax/', views.create_userinvestor_ajax, name="create_userinvestor_ajax"),

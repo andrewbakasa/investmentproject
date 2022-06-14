@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block stylesheets %}
-<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
+
 
 <!-- < -->
 {% endblock %}
@@ -41,7 +43,13 @@
                     </li> 
                     <li class="breadcrumb-item" >
                         <label id="total_projects_searched"  class ="badge rounded-pill bg-light text-dark">Personal Businesses [{{total}}]</label>
-                    </li>  
+                    </li> 
+                    <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
+                        <a id='current_status' href="{% url 'user_businesses' %}"
+                            data-toggle="tooltip" data-placement="bottom" 
+                            title='Remove Status' class ="badge rounded-pill bg-success"><i>[{{status}}]</i> <span aria-hidden="true">×</span>
+                        </a> 
+                    </li> 
                 </ol>        
             </div> 
         
@@ -53,6 +61,19 @@
                             {%if first_page %}
                             <h4 style="text-align:center;">My Businesses</h4>
                             <hr>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    Business Status:
+                                    {% for tag in BUSINESS_STATUS_CHOICE %}
+                                    
+                                        <a id={{tag}} {% if status == tag %} class="filter-status badge rounded-pill bg-light text-dark" {% else %}class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_business_load_status_ajax' tag %}" 
+                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            title='Filter'>{{tag}}
+                                        </a>     
+                                        <!-- <a href="{% url 'user_investments_load_status' tag %}" {% if status == tag %} class="badge rounded-pill bg-light text-dark" {% else %}class="badge rounded-pill bg-warning text-dark" {% endif %}>{{tag}}</a> -->
+                                    {% endfor %}
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="userBusinessTable" class="table table-striped">
                                     <thead class="thead-dark">
@@ -98,7 +119,7 @@
                                             <!-- EDIT MODEL -->
                                             <a class="model-edit show-form-update" href="#" data-url="{% url 'update_investment_ajax' item.id %}" 
                                                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                                title='Edit Data'><i  class="fas fa-edit"></i>
+                                                title='Quick Edit'><i  class="fas fa-edit"></i>
                                             </a>
                                             
                                             <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
@@ -225,9 +246,25 @@
 {% endblock %}
 
 
-
 {% block scripts %}
+    <script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+    <script src="{% static 'basic_ui/js/custom-dates.js' %}"></script>
+  
+    <script>
+        $(function() {
+        $('.date-input').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        orientation: 'bottom'
+        
+        });
+        
+        $('.date-input').attr('autocomplete', 'off');
+        })
+    </script>
 <script>
+    var bus_status
     function truncChar(str,length){
         var myTruncatedString = str.substring(0,length-1);              
         if (str.length > myTruncatedString.length){
@@ -280,6 +317,15 @@
         $("#investments a:first").addClass( "active") 
         $("#enterprenuer a:first").addClass( "active") 
         $("#registerbusiness a:first").addClass( "active") 
+
+        
+        var boo_status = "{{search_status}}"
+        
+        if (boo_status == true ){
+           bus_status ='{{status}}' 
+           //console.log('seting....', boo_status, app_status,)
+           
+        } 
     })
      $('#confirmdelete').on('show.bs.modal', function(e) {
         var name = $(e.relatedTarget).data('object-name');
@@ -458,9 +504,11 @@
           })
 
         function addTable(item){
-
+           
              //console.log(item) 
             var js_date_created = new Date(item.date_created) 
+            js_date_created= getDateTime_(js_date_created)
+            //console.log('1. time: ', js_date_created.getTime())
             var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
             var current_investment=numberWithCommas(item.current_investment)
             var name_trunc =truncChar(item.name,12)
@@ -522,7 +570,7 @@
                                             <!-- EDIT MODEL -->
                                         <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Edit Data'><i  class="fas fa-edit"></i>
+                                            title='Quick Edit'><i  class="fas fa-edit"></i>
                                         </a>
                                             
                                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
@@ -546,6 +594,7 @@
         function appendTable(item){  
             //console.log(item) 
             var js_date_created = new Date(item.date_created) 
+            js_date_created= getDateTime_(js_date_created)
             var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
             var current_investment=numberWithCommas(item.current_investment)
             var name_trunc =truncChar(item.name,12)
@@ -587,7 +636,7 @@
                             <!-- EDIT MODEL -->
                         <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Edit Data'><i  class="fas fa-edit"></i>
+                            title='Quick Edit'><i  class="fas fa-edit"></i>
                         </a>
                             
                         <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
@@ -668,7 +717,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+              //console.log('before ajax')
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),
@@ -702,7 +751,8 @@
                       } else {
                           $('.public_toggle_form-errors').html('');
                           if (data.error) {
-                              var form_vars=[ '__all__','name','description','tags', 'category', 'total_value']//,
+                              var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date']//,
+                              //console.log('before throwing error:',form.attr('data-url'),)
                              
                               for (let p=0; p < form_vars.length; p++ ){
                                     let name_var = form_vars[p]
@@ -791,8 +841,10 @@
 
         function append_html(counter,val,page_no){
             //loading the page #
+            //console.log (val)
             var js_date_created = new Date(val.date_created)
-
+            js_date_created= getDateTime_(js_date_created)
+            //console.log('2. time: ', js_date_created.getTime())
             var name_trunc =truncChar(val.name,12)
             var description_trunc =truncChar(val.description,20)
             var category_trunc =truncChar(val.category,20)
@@ -823,7 +875,7 @@
                     </a>
                     <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${val.id}/" 
                         data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                        title='Edit Data'><i  class="fas fa-edit"></i>
+                        title='Quick Edit'><i  class="fas fa-edit"></i>
                     </a>
                     <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                         data-object-name="${val.name}"  data-item-id="${val.id}" 
@@ -835,14 +887,26 @@
             return a_html
         }
         function loadPageAjax(page_no){
+
+
+            var data
+            if (bus_status) {
+                data = {    
+                        page_no : page_no,
+                        bus_status : bus_status, 
+                        csrfmiddlewaretoken: csrftoken,
+                    }
+            }else {
+                data = {    
+                        page_no : page_no,
+                        csrfmiddlewaretoken: csrftoken,
+                    }
+            }
             $.ajax({
                     type: "POST",
                     // define url name
                     url: display_business_ajax_url, 
-                    data : {    
-                        page_no : page_no, 
-                        csrfmiddlewaretoken: csrftoken,
-                    },
+                    data :data,
                     // handle a successful response
                     success: function (response) {
                         $('#userbusiness-table-tbody').html('')
@@ -867,6 +931,60 @@
                 //add_model_class()
           }
       
-     
+          $('body').on('click', '.filter-status', function (e) {
+                e.preventDefault();  
+                var clicked_id = $(this).attr('id')
+                var url = $(this).attr('data-url');
+                var myclass =$('.filter-status')
+                bus_status =$(this).attr('id')
+                $('#li_current_status').css('display','block')
+                $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+              
+                $.each(myclass, function(i, val) {
+                    let loop_id= $(this).attr('id')
+                    if (clicked_id == loop_id){
+                        $(this).removeClass('bg-warning')
+                        $(this).addClass('bg-light')
+                    
+                    }else {
+                        $(this).addClass('bg-warning')
+                        $(this).removeClass('bg-light')
+                    }
+                });
+         
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: url, 
+                        data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
+                        },
+                        // handle a successful response
+                        success: function (response) {
+                            $('#userbusiness-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#userbusiness-table-tbody').append(a_html)
+                            });
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                    }); 
+          
+          });
+ 
 </script>
 {% endblock %}

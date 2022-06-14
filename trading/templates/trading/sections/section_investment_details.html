@@ -107,6 +107,11 @@
             <p id="user_investor"> {% UserIsInvestorStatement model request.user %}</p>
         </div>
 
+        <div class="project-info d-flex justify-content-between align-items-center">            
+          <h5>Closing Date</h5>
+          <p id="closing_date"> {{ model.closing_date }}</p>
+      </div>
+        
           
 
       </div>

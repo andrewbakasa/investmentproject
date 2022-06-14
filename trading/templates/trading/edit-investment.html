@@ -11,7 +11,7 @@
 
 
 {% block stylesheets %}
- 
+<link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
 {% endblock %}
 
 {% block content_header %}
@@ -46,10 +46,10 @@
 {% block modal_divs %}
     <!-- EDIT DISPLAY HOLDER -->
     <div class="modal fade" id="modal-usermodel">
-        <div class="modal-dialog">
+        <div id='dynamic-div' class="modal-dialog">
             <div class="modal-content"></div>
         </div>
-    </div>
+    </div> 
 
     <!-- Delete confirmation modal -->
     <div class="modal fade" id="confirmdelete" role="dialog">
@@ -104,10 +104,26 @@
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   {% block scripts %}
-  <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
-  <script>
+    <script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
 
-        function truncChar(str,length){
+    <script>
+        $(function() {
+        $('.date-input').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        orientation: 'bottom'
+
+        });
+        
+        $('.date-input').attr('autocomplete', 'off');
+    })
+    </script>
+  <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
+  <script src="{% static 'basic_ui/js/custom-dates.js' %}"></script>
+  
+  <script>
+          function truncChar(str,length){
             var myTruncatedString = str.substring(0,length-1);              
             if (str.length > myTruncatedString.length){
             return myTruncatedString + "..."
@@ -126,6 +142,31 @@
             $("#investors a:first").addClass( "active") 
             $("#iamaninvestor a:first").addClass( "active")  
             
+
+            $(document).on('shown.bs.modal','.modal',function(e){
+            //var form_id= $(this).find('form').attr('id')
+                var form_para= $(this).find('form')
+                var modal_wide= form_para.hasClass('modal-wide')
+                if(modal_wide){
+                    //console.log('modal_wide',modal_wide)
+                    $('#dynamic-div').addClass('modal-lg')
+                }else{
+                    //console.log('modal_wide',modal_wide)
+                    $('#dynamic-div').removeClass('modal-lg') 
+                }
+                //user own business
+                if (user_is_owner ==true) {
+                    if (is_user_investor ==true ){
+                        $('.myModalLabel').html('Edit Investment Equity')
+                    }else if (is_user_investor ==false )  {
+                        $('.myModalLabel').html('Add Investment Equity')
+                    }   
+                }
+                console.log('user_is_owner',user_is_owner)
+                console.log('is_user_investor',is_user_investor)
+
+            })
+
             function numberWithCommas(x) {
                 var parts = x.toString().split(".");
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -138,17 +179,33 @@
               e.stopPropagation() 
               var btn = $(this);// fix button  delay
               $.ajax({
-              url: btn.attr("data-url"),
-              type: 'get',
-              dataType:'json',
-              beforeSend: function(){
-                $('#modal-usermodel').modal('show');
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType:'json',
+                beforeSend: function(){
+                    $('#modal-usermodel').modal('show');
+
+                    var form_para= $(this)
+                    tittle=btn.attr('title')
+                    //console.log("this", btn)
+                   
+                    //var modal_wide= btn.hasClass('modal-wide')
+                    if(tittle == 'Edit Data'){ 
+                        console.log("tittle", tittle)
+                        //console.log('modal_wide',tittle)
+                        $('#dynamic-div').addClass('modal-lg')
+                    }else{
+                        //console.log('modal_wide',tittle)
+                        $('#dynamic-div').removeClass('modal-lg') 
+                    }
+                    $('#modal-usermodel').modal('show');
               },
               success: function(data){
                   user_is_owner= data.user_is_owner 
                   is_user_investor= data.is_user_investor_bool 
                   investment_capital=data.total_value
                   curr_pledge=data.value 
+                  //console.log('got here...')
                   $('#modal-usermodel .modal-content').html(data.html_form);
               }
               });
@@ -165,7 +222,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-          
+              //console.log('grgrgr ccc')
               $.ajax({
                   url: form.attr('data-url'),
                   //data: form.serialize(),
@@ -175,6 +232,7 @@
                   processData:false,
                   contentType: false,
                   success: function(data){ 
+                      //console.log('url:::', url)
                       //console.log('added data' ,data.model)
                       if(data.model){
                           $('.close-modal').click()
@@ -188,6 +246,15 @@
                           if (data.model.current_investment_percent){
                               $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
                           }
+
+                          if (data.model.closing_date){  
+                                                      
+                              var js_closing_date = new Date(data.model.closing_date) 
+                              //console.log('getshortDate_:', getshortDate_(js_closing_date))  
+                              $('#closing_date').html(`${getshortDate_(js_closing_date)}`);
+                          }
+
+                          
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
                           }
@@ -261,7 +328,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+             
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),
@@ -271,6 +338,8 @@
                   processData:false,
                   contentType: false,
                   success: function(data){
+                      //console.log('pass back from url:',form.attr('data-url'))
+                      //console.log('data:',data.model)
                       if(data.model){
                           
                           //updateTable(data.model);
@@ -280,6 +349,13 @@
                           $('.close-modal').click()
                           if (data.model.current_investment_percent){
                             $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
+                          }
+
+                          if (data.model.closing_date){
+                              var js_closing_date = new Date(data.model.closing_date)
+                              //console.log('getshortDate_:', getshortDate_(js_closing_date)) 
+                             
+                              $('#closing_date').html(`${getshortDate_(js_closing_date)}`);
                           }
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
@@ -298,8 +374,10 @@
                       } else {
                           $('.public_toggle_form-errors').html('');
                           if (data.error) {
-                              var form_vars=['__all__','investment','user','name', 'description','value']//,
-                      
+                              //console.log('before throwing error:',form.attr('data-url'),)
+                              var form_vars=['__all__','investment','user','name', 'description','value',//form 1 var 
+                                           'category', 'total_value','creater', 'tags', 'public','closing_date']// form2 var: 
+                             
                               for (let p=0; p < form_vars.length; p++ ){
                                   let name_var = form_vars[p]
                                   if (data.error[name_var]){
@@ -390,6 +468,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
+              //console.log('grgrgr aaaaa44444')
               $.ajax({
                   url: form.attr('data-url'),
                   //data: form.serialize(),
@@ -457,7 +536,7 @@
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+              //console.log('grgrgr wwwww')
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),
@@ -519,23 +598,7 @@
               return false;
           })
         
-         
-            $(document).on('shown.bs.modal','.modal',function(e){             
-                
-                //user own business
-                if (user_is_owner ==true) {
-                    if (is_user_investor ==true ){
-                        $('.myModalLabel').html('Edit Investment Equity')
-                    }else if (is_user_investor ==false )  {
-                        $('.myModalLabel').html('Add Investment Equity')
-                    }   
-                }
-                // console.log('user_is_owner',user_is_owner)
-                // console.log('is_user_investor',is_user_investor)
-               
-            
-            }) 
-            
+     
             
             // $('body').on("change","#id_value",function(e){
             //     //var item_id=$(this).attr('id') 

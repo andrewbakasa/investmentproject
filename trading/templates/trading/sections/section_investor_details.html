@@ -5,18 +5,29 @@
 {% load widget_tweaks %}
 {% load humanize %}
 <section style= 'padding: 5px 0;' id="project-details" class="project-details">
+
   <div class="container" data-aos="fade-up">
-     <!-- ======= Breadcrumbs ======= -->
-     <div class="row">
-      <ol class="breadcrumb" >
-        <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
-        <li class="breadcrumb-item" ><a href="{% url 'view-investors' investment.id %}" class ="badge rounded-pill bg-success" >{% trans 'Back to Investors' %}</a></li>
       
-        <li class="breadcrumb-item" >
-          <label id="total_projects_searched"></label>
-        </li>  
-      </ol>
+     <!-- ======= Breadcrumbs ======= -->
+    <div class="row">
+        <ol class="breadcrumb" >
+            <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
+            <li class="breadcrumb-item" ><a href="{% url 'view-investors' investment.id %}" class ="badge rounded-pill bg-success" >{% trans 'Back to Investors' %}</a></li>
+          
+            <li class="breadcrumb-item" >
+              <label id="total_projects_searched"></label>
+            </li>  
+        </ol>
     </div>
+    <div class="flash-message">
+        {% for message in messages %}
+        <div class="alert alert-dismissable">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        </div>
+        {% endfor %}
+    </div>
+
 
     <div class="row">
       <div class="col-lg-12">
