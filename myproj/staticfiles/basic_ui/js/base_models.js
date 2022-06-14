@@ -178,11 +178,10 @@
         //EDIT NEW MODEL
         $('body').on("submit",".model-form-edit",function(e){
             e.preventDefault();
-            console.log('grgrgr aaaaa222')
             var data = new FormData(this);
             var formData
             var form = $(this);
-            console.log('grgrgr')
+           
             var url=form.attr('data-url')
             $.ajax({
                 url: form.attr('data-url'),
