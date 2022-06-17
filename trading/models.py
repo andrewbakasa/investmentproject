@@ -75,6 +75,11 @@ class Investment(models.Model):
         return self.investor_set.count()
     
     @property
+    def incoming_investors(self):       
+        return self.investor_set.filter(Q(application_status ="pending")).count()
+        
+
+    @property
     def current_investment(self):
         total = 0
         investments = self.investor_set.all()

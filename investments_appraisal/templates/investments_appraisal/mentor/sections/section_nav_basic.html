@@ -1,6 +1,9 @@
 {% load static %}
 {% load i18n %}
 {% load account %}
+{% load i18n %}
+{% load tags %}
+{% load humanize %}
 
 <h1 class="logo me-auto"><a href="{% url 'index' %}">Finflex</a></h1>
 <nav id="navbar" class="navbar order-last order-lg-0">
@@ -41,18 +44,31 @@
         </li> 
         <li><a href="{% url 'contact' %}">Contact</a></li>
         {% if request.user.is_authenticated %}
+               <!-- Dispaly or hide LI -->
+              <!-- If else statement cant be fiigured out yet -->
+              <li {% userhasNewInvestorsMethod request.user %} class="my_messages_li">
+                <a href="{% url 'user_businesses' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have {% userNewInvestorsCountMethod request.user %} new Investor(s)'>
+                    <i  style="color:orange" class="fas fa-envelope"></i>
+                    <span class="counter counter-lg" style="top:4px ;">{% userNewInvestorsCountMethod request.user %} </span>
+                </a>
+              </li>
+        {% endif %}
+        {% if request.user.is_authenticated %}
           <li class="nav-item dropdown user user-menu">
               <a href="#" class="nav-link" id="navbarDropdownMenuAvatar" data-toggle="dropdown">
-              <i class="fas fa-user" aria-hidden="true"></i>
-              <span class="hidden-xs">{% user_display user %}</span>
+                <i class="fas fa-user" aria-hidden="true"></i>
+                <span class="hidden-xs">{% user_display user %}</span>
+                 
               </a>
           
+            
 
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
 
                     <li>
                         <a class="dropdown-item" href="{% url 'upload_form_user_profile' %}" >My profile</a>
                     </li>
+
                     <li>
                         <a class="dropdown-item" href="{% url 'upload_form_user_pref' %}" >Settings</a>
                         

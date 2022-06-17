@@ -263,11 +263,32 @@ class InvestmentROIFormUpdate(forms.ModelForm):
         model = InvestmentDetails
         fields = ['investment','roi',]
 
-class InvestorStatusUpdate(forms.ModelForm):    
+class InvestorStatusUpdate(forms.ModelForm):
+    initial_arguments = None  
     def __init__(self, *args, **kwargs):
         super(InvestorStatusUpdate,self).__init__(*args, **kwargs)
+        self.initial_arguments= kwargs.get('instance', None)
+         
     class Meta:
         model = Investor
         fields = ['application_status']
+
+    def clean_application_status(self): 
+        application_status = self.cleaned_data['application_status']
+        #db_var = self.application_status
+        #should not change placeholder of pending...
+        if application_status =='pending':
+            if self.initial_arguments:
+                if self.initial_arguments.user:
+                    user = self.initial_arguments.user
+                    #superuser is allowed
+                    if not user.is_superuser:
+                       raise ValidationError(_(f'This operation is not allowed'))  
+                   
+        return application_status
+
+
+
+     
 
 

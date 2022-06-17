@@ -78,8 +78,8 @@
                                 <table id="userBusinessTable" class="table table-striped">
                                     <thead class="thead-dark">
                                         <th style="width: 2%" >#</th>    
-                                        <th style="width: 13%" >Name</th>
-                                        <th style="width: 20%" >description</th>
+                                        <th style="width: 12%" >Name</th>
+                                        <th style="width: 17%" >description</th>
                                         <th style="width: 8%" >category</th>
                                         <th style="width: 7%" >Value</th>
                                         <th style="width: 7%" >Current</th>
@@ -87,12 +87,14 @@
                                         <th style="width: 8%" >Investors</th>
                                         <th style="width: 20%" >Date Created</th>
                                         <th style="width: 4%" >Public</th>
-                                        <th style="width: 8%" class="text-right">Actions</th>
+                                        <th style="width: 12%" class="text-right">Actions</th>
                                     </thead>
                                     <tbody id="userbusiness-table-tbody">
                                     {% for item in first_page  %}
                                     <tr id="item-{{item.id}}" >
-                                        <td class="modelData" name="counter">{{forloop.counter}}</td>
+                                        <td class="modelData " name="counter"> 
+                                            {{forloop.counter}}                                           
+                                        </td>
                                         <td class="modelData" name="name" >{{item.name|truncatechars:12}}</td>
                                         <td class="modelData" name="description" >{{item.description|truncatechars:20}}</td>
                                         <td class="modelData" name="category" >{{item.category|truncatechars:20}}</td>
@@ -111,6 +113,7 @@
                                         </td>
                                        
                                         <td class="text-right modelAction modelData" name="action">
+                                            
                                             <a href="{% url 'edit-investment' item.id %}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                                 title='Manage Business'><i class="fas fa-wrench"></i>
@@ -123,10 +126,17 @@
                                             </a>
                                             
                                             <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                            data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
-                                            data-delete-url="{% url 'delete_investment_ajax' item.id 1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Delete' > <i class="fas fa-trash"></i> 
+                                                data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
+                                                data-delete-url="{% url 'delete_investment_ajax' item.id 1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Delete' > <i class="fas fa-trash"></i> 
                                             </a>
+
+                                            {% if item.incoming_investors != 0 %}
+                                                <a href="{% url 'view-investors' item.id %}" class="iconClass-primary" data-toggle="tooltip"  title='You have {{item.incoming_investors}} new Investor(s)'>
+                                                    <i  style="color:orange" class="fas fa-envelope"></i>
+                                                    <span class="counter counter-lg">{{item.incoming_investors}}</span>
+                                                </a>
+                                            {% endif%}
 
                                         
                                         </td>
@@ -856,6 +866,21 @@
                 public= "<i class='bi-square'></i>"
             }
 
+
+
+            if (val.incoming_investors !=0){               
+                counter_html=`<a href="/tr/i-view/${val.id}/" class="iconClass-primary" data-toggle="tooltip"  title='You have ${val.incoming_investors} new Investor(s)'>
+                        <i  style="color:orange" class="fas fa-envelope"></i>
+                        <span class="counter counter-lg">${val.incoming_investors}</span>
+                    </a>`
+            }else{
+                counter_html= ''
+            }
+
+           
+                                           
+
+
             a_html=`
             <tr id="item-${val.id}">
                 <td class="modelData" name="counter">${counter}</td>
@@ -869,6 +894,7 @@
                 <td class="modelData" name="date_created" >${js_date_created}</td>
                 <td class="modelData" name="public" >${public}</td>
                 <td class="text-right modelAction modelData" name="action">
+                   
                     <a href="/tr/i-edit/${val.id}"
                         style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                         title='Manage Business'><i class="fas fa-wrench"></i>
@@ -882,7 +908,8 @@
                         data-delete-url="/tr/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                         title='Delete'> <i class="fas fa-trash"></i> 
                     </a>
-                    </td>
+                    ${counter_html}
+                </td>
             </tr>` ;
             return a_html
         }

@@ -1,5 +1,8 @@
 from django import template
 
+from trading.models import Investment, Investor
+from django.db.models import Q
+
 
 register = template.Library()
 
@@ -40,6 +43,23 @@ def UserIsInvestorStatement(model, user):
 def UserIsInvestorStake(model, user):
     return model.userIsInvestorStake(user)
 
+
+
+@register.simple_tag
+def userhasNewInvestorsMethod(user):
+    #All investors who are investing in investments i created 
+    queryset = Investor.objects.filter(Q(investment__creater=user),Q(application_status='pending'))#
+    #print(queryset,queryset.count()) 
+    if queryset.count() > 0 :     
+        return 'mymessages'
+
+    return 'mymessages_na'
+
+@register.simple_tag
+def userNewInvestorsCountMethod(user):
+    queryset = Investor.objects.filter(Q(investment__creater=user),Q(application_status='pending'))#
+    #print(queryset,queryset.count()) 
+    return queryset.count()
 
 @register.filter
 def negate(value):

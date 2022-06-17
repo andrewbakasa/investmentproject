@@ -181,7 +181,9 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
                 item_object['date_created']=f'{i.date_created.ctime()}'
                 item_object['current_investment']=i.current_investment
                 item_object['user_stake']=i.userIsInvestorStake(request.user)
-                item_object['current_investment_percent']=i.current_investment_percent  
+                item_object['current_investment_percent']=i.current_investment_percent 
+                item_object['incoming_investors']=i.incoming_investors  
+                
                 item_object['user_investor']=i.userIsInvestorStatement(request.user)
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
@@ -771,6 +773,9 @@ def investor_details(request,id, investment_id):
     userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
 
     form = InvestorStatusUpdate(instance=investor_obj) 
+
+    #form = InvestorStatusUpdate(initial={'user': request.user, 'investment': investmet_obj})
+
     context = {
         'model':investor_obj,
         'investment':investment_obj,
@@ -1048,6 +1053,7 @@ def save_all_user_investor_update(request,form,template_name):
                     item_object['user_stake']=parent_invest.userIsInvestorStake(request.user)
                     
                     item_object['current_investment_percent']=parent_invest.current_investment_percent
+                    item_object['incoming_investors']=parent_invest.incoming_investors
                     item_object['user_investor']=parent_invest.userIsInvestorStatement(request.user)
                     data['is_user_investor_bool']=parent_invest.userIsInvestor(request.user)
                     item_object['user_investment_value']=parent_invest.userInvestorValue(request.user)
@@ -1118,7 +1124,7 @@ def create_all_user_business(request,form,template_name):
             item_object['user_investment_value']=record.userInvestorValue(request.user)
             item_object['user_investment_percent']=record.userInvestorPercent(request.user)
             item_object['current_investment_percent']=record.current_investment_percent
-                    
+            item_object['incoming_investors']=record.incoming_investors        
             item_object['investors_count']= record.investors_count
             item_object['total_value']=record.total_value
             item_object['date_created']= record.date_created.ctime()
@@ -1174,7 +1180,7 @@ def create_all_user_investor(request,form,template_name):
                 item_object['user_investment_value']=parent_invest.userInvestorValue(request.user)
                 item_object['user_investment_percent']=parent_invest.userInvestorPercent(request.user)
                 item_object['current_investment_percent']=parent_invest.current_investment_percent
-                    
+                item_object['incoming_investors']=parent_invest.incoming_investors    
                 item_object['investors_count']=parent_invest.investors_count
                 item_object['total_value']=parent_invest.total_value
             item_object['investor_id']=latest
@@ -1442,6 +1448,7 @@ def save_all_user_investment(request,form,template_name):
             item_object['user_investment_value']=item_instance.userInvestorValue(request.user)
             item_object['user_investment_percent']=item_instance.userInvestorPercent(request.user)
             item_object['current_investment_percent']=item_instance.current_investment_percent            
+            item_object['incoming_investors']=item_instance.incoming_investors
             item_object['investors_count']=item_instance.investors_count                
             item_object['total_value']=item_instance.total_value
             taglist = []
@@ -1614,7 +1621,8 @@ def display_business_ajax(request):
             item_object['date_created']=f'{i.date_created.ctime()}'
             item_object['current_investment']=i.current_investment
             item_object['user_stake']=i.userIsInvestorStake(request.user)
-            item_object['current_investment_percent']=i.current_investment_percent  
+            item_object['current_investment_percent']=i.current_investment_percent 
+            item_object['incoming_investors']=i.incoming_investors 
             item_object['user_investor']=i.userIsInvestorStatement(request.user)
             item_object['userIsOwner']=i.userIsOwner(request.user)
             item_object['user_investment_value']=i.userInvestorValue(request.user)

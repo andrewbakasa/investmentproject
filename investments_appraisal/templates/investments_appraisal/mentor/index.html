@@ -129,9 +129,24 @@
     <!-- This one is removed else No Conflict of double coding WhooH.  -->
     <!-- GOD IS GOOD ALL THE TIME -->
     <script>
-      $(document).ready(function (){ 
+
+    // $('.my_messages_li[mymessages]').each( function (){
+    //         $(this).addClass('advanced') 
+    // })
+    // display:none and remove ele
+    
+    $(document).ready(function (){ 
         // $("#index").removeClass( "active")
-        $("#index a").addClass( "active") 
+        $("#index a").addClass( "active")
+        
+        $('.my_messages_li[mymessages_na]').each( function (){
+            console.log('here....')
+            $(this).css(
+                { "display":"none",
+                // "title":"", 
+                }
+            ).remove()          
+        })  
        
         function getToken(name) {
                 let cookieValue = null;
