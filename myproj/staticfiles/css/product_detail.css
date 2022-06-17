@@ -1,0 +1,11 @@
+#detail-wrapper {
+    padding-top: 10%;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+#img-and-btn-wrapper {
+    width: 50%;
+    height: 50%;
+    float: left;
+}
