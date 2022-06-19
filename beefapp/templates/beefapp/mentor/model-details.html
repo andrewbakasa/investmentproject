@@ -187,7 +187,8 @@
                 success: function(data){
                     //console.log('url....>>>>', url)
                     //console.log('data.model', data.model)
-                    if (modeltype != data.model.model_type){
+                    //console.log(modeltype , data.model.model_type)
+                    if (modeltype != data.model.model_type & data.model.model_type != undefined){
                         //console.log('DIFFERENT')
                         window.location = "{% url 'select_model_mentor' usermodel.id %}"
                     }

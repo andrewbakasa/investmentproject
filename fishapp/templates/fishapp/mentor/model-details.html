@@ -176,10 +176,11 @@
                         //console.log('updating', data)
                         update_header_olist(data.model);
                         sweep(data.model)
-                        if (modeltype != data.model.model_type){                           
+                        //console.log(modeltype , data.model.model_type)
+                        if (modeltype != data.model.model_type & data.model.model_type != undefined){                           
                             // reffresh....
                             //reroute
-                            console.log('DIFFERENT')
+                           // console.log('DIFFERENT')
                             window.location = "{% url 'select_model_mentor' usermodel.id %}"
                         }
                         //hide the form after editing
