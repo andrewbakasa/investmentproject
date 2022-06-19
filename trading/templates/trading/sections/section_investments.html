@@ -46,6 +46,13 @@
                 <a href="{% url 'investment-details' model.id %}" data-toggle="tooltip" data-placement="bottom"  title='View Investment'>
                    <span {% userInvestorMethod model request.user %} class="myspan">Investor</span>
                 </a>
+
+                <span {% userIsOwnerAttrMethod model request.user %} class="semi-donut margin myspan" 
+                    style="--percentage : {{model.current_investment_percent}}; --fill: #085bf5 ;">
+                    {{model.current_investment_percent| floatformat:-1 | intcomma}} %
+                </span>
+
+                
               
                 
                 <div class="project-content">

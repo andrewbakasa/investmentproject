@@ -267,6 +267,7 @@ class InvestorStatusUpdate(forms.ModelForm):
     initial_arguments = None  
     def __init__(self, *args, **kwargs):
         super(InvestorStatusUpdate,self).__init__(*args, **kwargs)
+        print(kwargs)
         self.initial_arguments= kwargs.get('instance', None)
          
     class Meta:

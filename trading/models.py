@@ -95,6 +95,13 @@ class Investment(models.Model):
         curr = self.current_investment
         if self.total_value !=0:
             percent= curr*100/self.total_value 
+        
+       
+            if percent < 1:
+                percent= round(percent,2)
+            else:
+                #==remove commas for any percent greater than 1
+                percent= int(percent)
         # between 0-100
         return str(min(max(percent,0),100))
     

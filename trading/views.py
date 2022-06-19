@@ -509,7 +509,7 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
                 item_object['user_investment_percent']=i.userInvestorPercent(request.user)
-
+                item_object['current_investment_percent']=i.current_investment_percent 
                 taglist = []
                 for j in i.tags.all():
                     taglist.append(j.name)
@@ -596,6 +596,7 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
                 item_object['user_investment_percent']=i.userInvestorPercent(request.user)
+                item_object['current_investment_percent']=i.current_investment_percent 
                 taglist = []
                 for j in i.tags.all():
                     taglist.append(j.name)
@@ -689,7 +690,7 @@ def display_investment_ajax(request):
             item_object['userIsOwner']=i.userIsOwner(request.user)
             item_object['user_investment_value']=i.userInvestorValue(request.user)
             item_object['user_investment_percent']=i.userInvestorPercent(request.user)
-
+            item_object['current_investment_percent']=i.current_investment_percent 
             #print(item_object)
             taglist = []
             for j in i.tags.all():
@@ -1260,9 +1261,9 @@ def delete_investor_this_user_ajax(request, investment_id, *args, **kwargs):
             item_object['uniqueid']=i.category.uniqueid
             item_object['userIsInvestor']=i.userIsInvestor(request.user)
             item_object['userIsOwner']=i.userIsOwner(request.user)
+            item_object['current_investment_percent']=i.current_investment_percent
 
-
-            #print(item_object)
+            print('**********', item_object)
             taglist = []
             for j in i.tags.all():
                 taglist.append(j.name)
@@ -1316,7 +1317,7 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
             item_object['total_sum']=int(sum_total)
             item_object['average']=round(aver_val,2)
 
-            #print(item_object)
+            print('>>>>>>>>', item_object)
             data['model']=item_object
             
             return JsonResponse({'error': False, 'data': data})
@@ -1351,7 +1352,7 @@ def delete_investment_ajax(request, id,page_no, *args, **kwargs):
             item_object['tags'] =[]#taglist 
             data['model']=item_object
 
-            
+            print('..........', item_object)
             #messages.success(request, "Successfully deleted  model")
             
             return JsonResponse({'error': False, 'data': data})

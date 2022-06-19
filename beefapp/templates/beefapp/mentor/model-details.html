@@ -110,7 +110,8 @@
     <script>
         var check_url_ajax= "{% url 'check_model_beef' usermodel.id %}" 
         var usermodel= "{{ usermodel }}"
-         
+        var modeltype= "{{ usermodel.model_type }}"
+        //console.log('modeltype.........', modeltype)
     </script>
     <script src="{% static 'basic_ui/js/input-range.js' %}"></script>  
     <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
@@ -125,6 +126,7 @@
               type: 'get',
               dataType:'json',
               beforeSend: function(){
+                   // console.log('url...', btn.attr("data-url"))
                     var form_para= $(this)
                     tittle=btn.attr('title')
                     //var modal_wide= btn.hasClass('modal-wide')
@@ -183,12 +185,19 @@
                 processData:false,
                 contentType: false,
                 success: function(data){
-                    console.log('url', url)
+                    //console.log('url....>>>>', url)
+                    //console.log('data.model', data.model)
+                    if (modeltype != data.model.model_type){
+                        //console.log('DIFFERENT')
+                        window.location = "{% url 'select_model_mentor' usermodel.id %}"
+                    }
+                   
                     if(data.model){
                         //console.log(form.attr('data-url'),)
                         //console.log('updating', data.model)
                         update_header_olist(data.model);
                         sweep(data.model)
+                        checkReadyModel(); 
                         //hide the form after editing
                         $('#modal-usermodel').modal('hide');
                         $('.close-modal').click() 

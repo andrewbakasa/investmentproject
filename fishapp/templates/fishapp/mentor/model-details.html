@@ -95,7 +95,9 @@
         </style>
     
         <script>
-            var check_url_ajax= "{% url 'check_model_fish' usermodel.id %}"  
+            var check_url_ajax= "{% url 'check_model_fish' usermodel.id %}"
+            var modeltype= "{{ usermodel.model_type }}"
+            //console.log('modeltype.........', modeltype) 
         </script>
         <script src="{% static 'basic_ui/js/input-range.js' %}"></script>
         <script src="{% static 'basic_ui/js/user_interface.js' %}"></script>
@@ -159,7 +161,7 @@
             var data = new FormData(this);
             var formData
             var form = $(this);
-            console.log('grgrgr')
+            //console.log('grgrgr')
             var url=form.attr('data-url')
             $.ajax({
                 url: form.attr('data-url'),
@@ -174,6 +176,12 @@
                         //console.log('updating', data)
                         update_header_olist(data.model);
                         sweep(data.model)
+                        if (modeltype != data.model.model_type){                           
+                            // reffresh....
+                            //reroute
+                            console.log('DIFFERENT')
+                            window.location = "{% url 'select_model_mentor' usermodel.id %}"
+                        }
                         //hide the form after editing
                         $('#modal-usermodel').modal('hide');
                         $('.close-modal').click() 

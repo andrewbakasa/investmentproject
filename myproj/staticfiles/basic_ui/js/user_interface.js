@@ -29,9 +29,10 @@ function getToken(name) {
 
 function checkReadyModel() {
     var att = $('#run_simu').css("display");
+    //console.log('i m in', att)
     if(att=='block'){
-        //console.log('block found', att) 
-        return  
+      //  console.log('block found', att) 
+      return  
     }
     //console.log('check-display-attr', att)
     var formData = {

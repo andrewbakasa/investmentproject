@@ -1658,3 +1658,43 @@ Add a dark border to the very last row to signify the end of the table */
   color: gray;
   font-family: "Poppins", sans-serif;
 }
+
+
+.umodels .semi-donut{
+  --percentage: 0;
+  --fill: #085bf5;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  overflow: hidden;
+  /* color: var(--fill); */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing : border-box;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+}
+
+
+.umodels .semi-donut::after {
+    content: '';
+    width: 100px;
+    height: 100px;
+    border:10px solid;
+    border-color : rgba(0,0,0,0.15) rgba(0,0,0,0.15) var(--fill) var(--fill);
+    position: absolute;
+    border-radius: 50%;
+    box-sizing : border-box;
+    transform: rotate( calc( 1deg * ( -45 + var(--percentage) * 1.8 ) ) );
+    animation : fillAnimation 1s ease-in;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+  }
+
+
