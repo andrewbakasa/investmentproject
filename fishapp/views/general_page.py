@@ -527,6 +527,11 @@ def check_run_requirements_ajax(request, model_id, *args, **kwargs):
 		   
 			#succes here
 			if progress_count<8:
+				#may happen ONLY when model is changed
+				if usermodel.design_complete== True:
+					#update database
+					usermodel.design_complete= False
+					usermodel.save()
 				return JsonResponse({'error': False, 'data': False, 'status': f'{progress_count} of 8 Complete'})
 			else:
 

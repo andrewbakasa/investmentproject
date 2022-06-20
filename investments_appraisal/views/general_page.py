@@ -720,7 +720,7 @@ def projects(request):
 	return render(request, 'investments_appraisal/mentor/projects.html', context)
 
 @login_required(login_url="account_login")
-def models(request):
+def financial_user_models(request):
 	usermodels= UserModel.objects.filter(user=request.user)#.order_by('-date')
 	form = UserBusinessModelForm(initial={'user': request.user})
 	# articles per page
@@ -2380,6 +2380,10 @@ def save_all_usermodel(request,form,template_name):
 	# retrieve product
 	pk = form.instance.id
 	item_instance = get_object_or_404(UserModel,pk=pk)
+	
+	# before update keep model_type
+	#initial_model_type =item_instance.model_type
+	
 	if request.method == 'POST':
 		# retrieve product
 		pk = form.instance.id
@@ -2398,6 +2402,14 @@ def save_all_usermodel(request,form,template_name):
 				form.save()
 				pk = form.instance.id
 				item_instance = get_object_or_404(UserModel,pk=pk)
+				current_model_type =item_instance.model_type
+                #=check if model type has changed
+				# if not current_model_type ==initial_model_type:
+				# 	#check if  current model has data
+				# 	print(f'Change from  {initial_model_type} to {current_model_type}')
+				# 	item_instance.design_complete =False
+				# 	item_instance.save()
+
 				data['form_is_valid'] = True
 				item_object = model_to_dict(item_instance)
 				item_object['currency']=item_instance.currency.symbol

@@ -172,20 +172,29 @@
                 contentType: false,
                 success: function(data){
                     if(data.model){
-                        //console.log(form.attr('data-url'),)
-                        //console.log('updating', data)
-                        update_header_olist(data.model);
-                        sweep(data.model)
                         //console.log(modeltype , data.model.model_type)
                         if (modeltype != data.model.model_type & data.model.model_type != undefined){                           
-                            // reffresh....
-                            //reroute
-                           // console.log('DIFFERENT')
+                            
+                            new_ = data.model.model_type.toLowerCase()
+                            //console.log('model tyep:', new_)
+                            //console.log('check_url_ajax:', check_url_ajax)
+                            new_check_url_ajax = `${check_url_ajax}`.replace(/fish/, new_.toString()); 
+                            new_check_url_ajax = `${new_check_url_ajax}`.replace(/fish/, new_.toString()); 
+                            //console.log('in fish new:', new_check_url_ajax)
+                            //reset ready model
+                            checkReadyModelAfterChanged(new_check_url_ajax); 
                             window.location = "{% url 'select_model_mentor' usermodel.id %}"
                         }
+
+                        /* ------This part only necessary if the above sub is not executed------ */
+                        //console.log('updating', data.model)
+                        update_header_olist(data.model);
+                        sweep(data.model)                        
                         //hide the form after editing
                         $('#modal-usermodel').modal('hide');
                         $('.close-modal').click() 
+                        /* ----------------------------------------------------- --------*/
+                        
                     } else {
                         $('#public_toggle_form-errors').html('');
                         if (data.error) {

@@ -8,7 +8,19 @@ from . import views
 
 
 urlpatterns = [
+    path('', views.general_page.index, name="index"),#Home
+    path('about/', views.general_page.about, name="about"),
+    path('pr/', views.general_page.projects, name="projects"),
     
+    path('project_search/<str:slug>/',
+        views.general_page.project_search_ajax,  name='project_search_ajax'), 
+
+    path('um/', views.general_page.financial_user_models, name="fin_user_models"),
+    path('experts/', views.general_page.experts, name="experts"),
+    path('jobs/', views.general_page.jobs, name="jobs"),
+    path('events/', views.general_page.events, name="events"),
+    path('pricing/', views.general_page.pricing, name="pricing"),
+    path('contact/', views.general_page.contact, name="contact"),
     path('commingsoon/', views.general_page.commingsoon, name="commingsoon"),
     path('u/comments/', views.general_page.get_users_comments, name="ucomments"),
     path('u/last_login/', views.general_page.get_users_last_login, name="ulogin"),
@@ -128,19 +140,7 @@ urlpatterns = [
     path('u/profile/',
         views.general_page.upload_form_user_profile,  name='upload_form_user_profile'),
 
-    path('', views.general_page.index, name="index"),#Home
-    path('about/', views.general_page.about, name="about"),
-    path('pr/', views.general_page.projects, name="projects"),
     
-    path('project_search/<str:slug>/',
-        views.general_page.project_search_ajax,  name='project_search_ajax'), 
-
-    path('um/', views.general_page.models, name="models"),
-    path('experts/', views.general_page.experts, name="experts"),
-    path('jobs/', views.general_page.jobs, name="jobs"),
-    path('events/', views.general_page.events, name="events"),
-    path('pricing/', views.general_page.pricing, name="pricing"),
-    path('contact/', views.general_page.contact, name="contact"),
     path('pr-details/<int:id>/', views.general_page.project_details, name="project-details"),
     # path('model-details/<int:id>/', views.general_page.model_details, name="model-details"),
 

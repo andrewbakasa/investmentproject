@@ -209,7 +209,7 @@ $(document).ready(function(){
         var data = new FormData(this);
         var formData
         var form = $(this);
-        console.log('Gettting.....') 
+        //console.log('Gettting.....') 
         $.ajax({
             url: form.attr('data-url'),
             data : data,

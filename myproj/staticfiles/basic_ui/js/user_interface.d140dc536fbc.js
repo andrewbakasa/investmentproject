@@ -65,7 +65,39 @@ function checkReadyModel() {
     })
     return false;
 }
-
+function checkReadyModelAfterChanged(url_ajax) {
+   
+    var formData = {
+        csrfmiddlewaretoken: csrftoken,
+        contentType: 'application/x-www-form-urlencoded',
+        encode: true,
+    };
+    
+    $.ajax({
+        type: 'POST',
+        url: url_ajax,
+        encode: true,
+        contentType: 'application/x-www-form-urlencoded',
+        crossDomain: false,
+        dataType: 'json',
+        data: formData,     // our data object
+        success: function(data){
+            console.log('data',data)
+            if (data.data) {
+                $('#run_simu').css("display", "block");
+                $('#progress_iter').css("display", "none");
+                
+            }else if (data.status){
+                $('#progress_iter').text(data.status);
+            }
+        },
+        error: function (exception) {
+            console.log(exception);
+           
+        }
+    })
+    return false;
+}
 var csrftoken = getToken('csrftoken');
 $(document).ready(function(){
        $('.progressBar').css("display", "none"); 
