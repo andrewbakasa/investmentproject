@@ -27,17 +27,18 @@
    <div class="breadcrumbs" data-aos="fade-in">
    </div>
    <!-- End Breadcrumbs -->
-    <!-- ======= Project Details Section ======= -->
-  {% include 'trading/sections/section_investment_details_edit.html' %} 
-  <!-- Each project write it own DATA -->
-  {% if model.category.uniqueid %}   
-      <!-- ======= Project Details Tabs Section ======= -->
-    {% with template_tab_name="trading/sections/section_investment_details_tab_edit.html" %}
-      {% include template_tab_name %}
-    {% endwith %}
-  {% endif %}
+   <div class='container box-element'>
+            <!-- ======= Project Details Section ======= -->
+        {% include 'trading/sections/section_investment_details_edit.html' %} 
+        <!-- Each project write it own DATA -->
+        {% if model.category.uniqueid %}   
+            <!-- ======= Project Details Tabs Section ======= -->
+            {% with template_tab_name="trading/sections/section_investment_details_tab_edit.html" %}
+            {% include template_tab_name %}
+            {% endwith %}
+        {% endif %}
 
-  
+    </div>
 </main><!-- End #main -->
 
 

@@ -24,7 +24,7 @@
         <!-- End Breadcrumbs -->
         <!---Removed padding from 70px-- 0px-->
         <section style= 'padding: 5px 0;' id="projects" class="projects">  
-            <div class="container" data-aos="fade-up">
+            <div class="container   box-element" data-aos="fade-up">
             <!-- ======= Breadcrumbs ======= -->
                 <div class="row">
                     <ol class="breadcrumb" >
@@ -48,7 +48,7 @@
                         <div class="box">
                             <div class="box-body">
                                 {%if first_page %}
-                                <h4 style="text-align:center;" id="personal_totals"> <b>Value</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
+                                <h4 style="text-align:center;" id="personal_totals"> <b>Personal Investments: Total</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
                                 <hr>
                                 <div class="row">
                                     <div class="col-lg-8">

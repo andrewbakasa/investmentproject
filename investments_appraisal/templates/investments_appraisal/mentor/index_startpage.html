@@ -1,0 +1,1838 @@
+{% extends 'locomotives/loco_main.html' %}
+
+ {% load i18n %}
+ {% load static %}
+ {% load tags %}
+ {% load humanize %}
+ 
+ {% block content_header %}
+ <h1>{% trans 'Dashboard' %}
+   <small>{% trans 'locomotives' %}</small>
+ </h1>
+ <div  id='div_messages'>
+            
+</div>
+ <ol class="breadcrumb">
+   <li class="active">{% trans 'Home' %}</li>
+   <li><a href="#"
+    data-toggle="tooltip" data-placement="bottom" title='Download as Excel' 
+    ><i class="fa fa-download fa-fw"></i></a></li>
+    
+    <li><a class="updateprefs" href="#" data-url="{% url 'update_loco_graph_pref' %}" 
+      data-toggle="tooltip" data-placement="bottom" title="Save My Graph Pref"><i class="fa fa-user fa-fw"></i>
+    </a>
+    </li> 
+     
+ </ol>
+ {% endblock %}
+ {% block content %}
+ {% if overdue_transactions %}
+    <div class="row">
+      <div class="col-md-2">
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h4>{% trans 'Active Locos' %}</h4>
+            <h3>{{ total_active_locos|intcomma }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h4>{% trans 'WIP' %}</h4>
+            <h3>{{ wip_locos|intcomma }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h4>{% trans 'Pending' %}</h4>
+            <h3>{{ pending_locos|intcomma }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="small-box bg-blue">
+          <div class="inner">
+            <h4>{% trans 'Failure To approve' %}</h4>
+            <h3>{{ not_approved_locos|intcomma }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+ {% endif %}
+ <div class="row">
+      <div class="col-md-4 col-md-push-8">
+        
+          <!-- Failue/Release Table -->
+          <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">{% trans 'Detention/Releases' %}</h3>
+              </div>
+              <div class="box-content">
+                  <table class="table">
+                    <tr>
+                      <th><a href="#" data-toggle="modal" data-target="#modal_show_failures_ranking_global" 
+                        data-toggle="tooltip" data-placement="bottom" title='Aggregated Pareto Failure Ranking'>All</a> |
+                        <a href="#" data-toggle="modal" data-target="#modal_show_failures_ranking_12month" 
+                        data-toggle="tooltip" data-placement="bottom" title='Last 12 Months Pareto Failure Ranking'>12_M</a>                        |
+                        <a href="#" data-toggle="modal" data-target="#modal_show_failures_ranking_this_year" 
+                        data-toggle="tooltip" data-placement="bottom" title="Current Year {{  today|date:'Y'  }} Pareto Failure Ranking">Y_{{  today|date:"Y"  }}</a>
+                      </th></th>
+                      <th><a href="#" data-toggle="modal" data-target="#modal_show_failures_ranking" 
+                        data-toggle="tooltip" data-placement="bottom" title='{{  today|date:"F"  }} Pareto Failure Ranking'>{{  today|date:"F"  }}</a></th>
+                      <th><a href="#" data-toggle="modal" data-target="#modal_show_failures_prev_ranking" 
+                          data-toggle="tooltip" data-placement="bottom" title='{{ last_month|date:"F" }} Pareto Failure Ranking' >{{ last_month|date:"F" }}</a></th>
+                    </tr>
+                    <tr>
+                      <th>{% trans 'Releases' %}</th>
+                      <td><a href="#" data-toggle="modal" data-target="#modal_show_releases_current" 
+                        data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Detailed Releases' >{{ releases|intcomma }}</a></td>
+                      <td><a href="#" data-toggle="modal" data-target="#modal_show_releases_previous" 
+                        data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Detailed Releases'>{{ previous_releases|intcomma }}</a></td>
+                      
+                    </tr>
+                    
+                    <tr>
+                      <!-- <th>{% trans 'Failure' %}</th> -->
+                      <th class="text-red"><a href="#" data-toggle="modal" data-target="#modal_show_detention_time"
+                        data-toggle="tooltip" data-placement="bottom" title='Show Active Detailed Failures'>{% trans 'Failure' %}</a></th>
+                
+                        <td class="text-red"><a href="#" data-toggle="modal" data-target="#modal_show_failures_current"
+                          data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Detailed Failures'>{{ failures|intcomma }}</a></td>
+                        <td class="text-red"><a href="#" data-toggle="modal" data-target="#modal_show_failures_previous"
+                          data-toggle="tooltip" data-placement="bottom" title='Show {{  last_month|date:"F"  }} Detailed Failures'>{{ previous_failures|intcomma }}</a></td>
+                    </tr>
+                    <tr>
+                      <th>{% trans 'Difference' %}</th><td{% if difference < 0 %} class="text-red"{% endif %}>{{ difference|intcomma }}</td><td{% if previous_difference < 0 %} class="text-red"{% endif %}>{{ previous_difference|intcomma }}</td>
+                    </tr>
+                  </table>
+              </div>
+          </div>
+          
+          <!-- Avaialbility -->
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">{% trans 'Availability' %} [number]</h3>
+            </div>
+            <div class="box-content">
+              <table class="table">
+                <tr>
+                    <th>{% trans 'Month' %}</th>
+                    {% for item in availability_all_months %}
+                    <!-- <th>{{item.name }}</th> -->
+                    <th class="text-red"><a  data-toggle="modal" 
+                      data-toggle="tooltip" data-placement="bottom" title='{{item.annotation }}'>{{item.name }}</a>
+                    </th>
+              
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td >{{ today|date:"M" }}</td>
+                    {% for item in availability_current_month %}
+                      <td {% if item.value < 0 %} class="text-red"{% endif %}><a data-toggle="tooltip" data-placement="bottom" title='{{item.annotation }}'>{{item.value }}</a>
+                      </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td >{{ last_month|date:"M" }}</td>
+                    {% for item in availability_previous_month %}
+                    <td {% if item.value < 0 %} class="text-red"{% endif %}><a data-toggle="tooltip" data-placement="bottom" title='{{item.annotation }}'>{{item.value }}</a>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% for account in accounts %}
+                <tr>
+                    <td><a href="{{ account.get_absolute_url }}">{{ account.name }}</a></td>
+                    <td {% if account.balance < 0 %} class="text-red"{% endif %}>{{ account.balance|intcomma }}</td>
+                </tr>
+                {% endfor %}
+                </table>
+            </div>
+          </div>
+        
+          <!-- Services -->
+          <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">{% trans 'Services' %}</h3>
+              </div>
+              <div class="box-body">
+                  <table class="table">
+                  <tr>
+                      <th>{% trans 'Month' %}</th> 
+                      {% for item in services_current_month %}
+                      <th>{{item.name }}</th>
+                    
+                      {% endfor %}
+                  </tr>
+                  <tr>
+                      <td >{{ today|date:"M" }}</td>
+                      {% for item in services_current_month %}
+                        <td {% if item.value < 0 %} class="text-red"{% endif %}>{{item.value }}</td>
+                      {% endfor %}
+                  </tr>
+                  <tr>
+                      <td >{{ last_month|date:"M" }}</td>
+                      {% for item in services_previous_month %}
+                          <td {% if item.value < 0 %} class="text-red"{% endif %}>{{item.value }}</td>
+                      {% endfor %}
+                  </tr>
+                  {% for account in accounts %}
+                  <tr>
+                    <td><a href="{{ account.get_absolute_url }}">{{ account.name }}</a></td>
+                    <td {% if account.balance < 0 %} class="text-red"{% endif %}>{{ account.balance|intcomma }}</td>
+                  </tr>
+                  {% endfor %}
+                  </table>
+              </div>
+          </div>
+
+       
+          <!-- MTBF -->
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">{% trans 'RELIABILITY' %}: MTBF [Days]</h3>
+            </div>
+            <div class="box-content">
+              <table class="table">
+                <tr>
+                    <th>{% trans 'Month' %}</th>
+                    {% for item in mtbf_current_month %}
+                    <th>{{item.name }}</th>
+                  
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td >{{ today|date:"M" }}</td>
+                    {% for item in mtbf_current_month %}
+                      <td {% if item.value < 0 %} class="text-red"{% endif %}>{{item.value|floatformat:'-0' }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td >{{ last_month|date:"M" }}</td>
+                    {% for item in mtbf_previous_month %}
+                      <td {% if item.value < 0 %} class="text-red"{% endif %}>{{item.value |floatformat:'-0' }}</td>
+                    {% endfor %}
+                </tr>
+               
+                </table>
+            </div>
+          </div> 
+      </div>
+    
+      <div class="col-md-8 col-md-pull-4">
+          <div class="box">
+              <div class="box-header">
+                  <div class="row text-center">
+                    <button id="entireperiod" class="btn btn-s btn-default range-chooser">{% trans 'Full' %}</button>
+                    <button id="10year" class="btn btn-s btn-default range-chooser">{% trans 'Last 10 yrs' %}</button>
+                    <button id="5year" class="btn btn-s btn-default range-chooser">{% trans 'Last 5 yrs' %}</button>
+                  
+                    <button id="12month" class="btn btn-s btn-default range-chooser">{% trans 'Last year' %}</button>
+                    <button id="6month" class="btn btn-s btn-default range-chooser">{% trans 'Last 6 Months' %}</button>
+                    <button id="3month" class="btn btn-s btn-default range-chooser">{% trans 'Last 3 Months' %}</button>
+                    <button id="currentMonth" class="btn btn-s btn-default range-chooser">{% trans 'Current Month' %}</button>
+                    <!--button id="custom" class="btn btn-s btn-default range-chooser">Custom Range</button-->
+                  </div>
+              </div>
+          </div>
+          <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">{% trans 'Failure/Releases' %}</h3>
+                </div>
+                <div class="box-body">
+                    <canvas id="myreleasesChart" width="400" height="200"></canvas>
+                </div>
+          </div>
+          <div class="box">
+              <div class="box-header">
+                  <h3 class="box-title">{% trans 'Availability' %} [number]</h3>
+              </div>
+              <div class="box-body">
+                  <canvas id="myavailabilityChart" width="400" height="200"></canvas>
+              </div>
+          </div>
+          <div class="box">
+              <div class="box-header">
+                  <h3 class="box-title">{% trans 'MTBF' %}</h3>
+              </div>
+              <div class="box-body">
+                  <canvas id="mymtbfChart" width="400" height="200"></canvas>
+              </div>
+           </div>
+
+           <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">{% trans 'Services Done' %}</h3>
+            </div>
+            <div class="box-body">
+                <canvas id="myserviceChart" width="400" height="200"></canvas>
+            </div>
+         </div>
+      </div>
+ </div>
+ <div class="row">
+   <div class="col-md-12">
+     <div class="box">
+       <div class="box-header with-border">
+         <h3 class="box-title">{% trans 'Recent Transactions' %}</h3>
+       </div>
+       <div class="box-body">
+         <table class="table table-striped">
+           <tr>
+             <th>{% trans 'Title' %}</th>
+             <th class="hidden-xs">{% trans 'Type' %}</th>
+             <th>{% trans 'Date' %}</th>
+             <th>{% trans 'Amount' %}</th>
+             <th class="hidden-xs">{% trans 'Account' %}</th>
+             <th class="hidden-xs">{% trans 'Opposing Account' %}</th>
+             <th class="hidden-xs">{% trans 'Category' %}</th>
+           </tr>
+           {% for transaction in transactions %}
+           <tr>
+             <td><a href="{{ transaction.get_absolute_url }}">{{ transaction.title }}</a></td>
+             <td class="hidden-xs">{{ transaction.transaction.get_transaction_type_str }}</td>
+             <td>{{ transaction.date|date:'d.m.Y' }}</td>
+             <td class="text-{% if transaction.is_deposit %}green{% elif transaction.is_withdraw %}red{% endif %}">{% if transaction.is_transfer %}{{ transaction.amount|negate|intcomma }}{% else %}{{ transaction.amount|intcomma }}{% endif %}</td>
+             <td class="hidden-xs"><a href="{{ transaction.account.get_absolute_url }}">{{ transaction.account }}</a></td>
+             <td class="hidden-xs">{% if not transaction.is_system %}<a href="{{ transaction.opposing_account.get_absolute_url }}">{{ transaction.opposing_account }}</a>{% endif %}</td>
+             <td class="hidden-xs">
+               {% if transaction.category %}
+               <a href="{{ transaction.category.get_absolute_url }}">{{ transaction.category }}</a>
+               {% endif %}
+             </td>
+           </tr>
+           {% endfor %}
+         </table>
+       </div>
+     </div>
+   </div>
+ </div>
+
+
+  <!-- modal Releases Current -->
+  <div class="modal fade" id="modal_show_releases_current" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content rounded-10" style="border-radius: 10px;">
+          <!--Header-->
+          <div class="modal-header">
+              <div class="row ">
+                <div class="pull-left">
+                  <h4 class="modal-title" id="myModalLabel">Loco Releases [{{releases_locos|length}}] {{ today|date:"F" }} {{ today|date:"Y" }}
+                  </h4>
+                 
+                </div>
+                <div class="pull-right">
+                    freq code:
+                  <button style="background-color:grey;color: white;">1</button>                   
+                  <button style="background-color:blue ;color: white;">2</button>
+                  <button style="background-color:green ;color: white;">3</button>
+                  <button style="background-color:red ;color:white" >4</button>
+                  <button style="background-color: yellowgreen;color: black;">5</button>
+                  <button style="background-color: blueviolet;color:black">>5</button>
+                </div>
+              </div>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body">
+            {% if releases_locos %}
+              <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>Loco</th>
+                    <th>Release Date</th>
+                    <th>Symptom</th>
+                    <th>Downtime</th>
+                    <th>seq</th>
+                    <th>Link</th>
+                  </tr>
+                  {% for item in releases_locos %}
+                  <tr>
+                    <td >{{ forloop.counter }}</td>
+                    <td >{{item.name }}</td>
+                    <td >{{item.date }}</td>
+                    <td >{{item.text }}</td>
+                    <td >{{item.downtime }}</td>
+                    <td class ={{item.rank}}>{{item.tbf }}</td>
+                    <td ><a href="{% url 'failures_lists2_typical_loco' item.name %}" data-toggle="tooltip" 
+                      data-placement="bottom" title='Show History Failures'><i class="fa fa-eye"></i></a>
+                    </td>
+                  </tr>
+                  {%endfor%}
+              </table>
+            {%else%} 
+            <p>No Releases</p> 
+            {% endif %}
+           
+          </div>
+          <!--Footer-->
+          <div class="modal-footer">
+              <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                  type="reset">Close
+              </button>
+          </div>
+      </div>
+  </div>
+  </div>
+
+  <!-- modal Releases Previous -->
+  <div class="modal fade" id="modal_show_releases_previous" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-10" style="border-radius: 10px;">
+            <!--Header-->
+            <div class="modal-header">
+                <div class="row ">
+                  <div class="pull-left">
+                    <h4 class="modal-title" id="myModalLabel">Loco Releases [{{previous_releases_locos|length}}] {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                    </h4>
+                   
+                    
+                  </div>
+                  <div class="pull-right">
+                      freq code:
+                    <button style="background-color:grey;color: white;">1</button>                   
+                    <button style="background-color:blue ;color: white;">2</button>
+                    <button style="background-color:green ;color: white;">3</button>
+                    <button style="background-color:red ;color:white" >4</button>
+                    <button style="background-color: yellowgreen;color: black;">5</button>
+                    <button style="background-color: blueviolet;color:black">>5</button>
+                  </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body" >
+              {% if previous_releases_locos %}
+                <table class="table">
+                    <tr>
+                      <th>#</th>
+                      <th>Loco</th>
+                      <th>Release Date</th>
+                      <th>Symptom</th>
+                      <th>Downtime</th>
+                      <th>seq</th>
+                      <th>Link</th>
+                    </tr>
+                    {% for item in previous_releases_locos %}
+                    <tr>
+                      <td >{{ forloop.counter }}</td>
+                      <td class ={{item.rank}}>{{item.name }}</td>
+                      <td class ={{item.rank}}>{{item.date }}</td>
+                      <td class ={{item.rank}}>{{item.text }}</td>
+                      <td class ={{item.rank}}>{{item.downtime }}</td>
+                      <td class ={{item.rank}}>{{item.tbf }}</td>
+                      <td ><a href="{% url 'failures_lists2_typical_loco' item.name %}" data-toggle="tooltip" 
+                        data-placement="bottom" title='Show History Failures'><i class="fa fa-eye"></i>                 </a>
+                      </td>
+                    </tr>
+                    {%endfor%}
+                </table>
+                {% else %}
+                <p>No Releases</p>
+                {%  endif %}
+             
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                    type="reset">Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+  </div>
+  
+  <!-- modal Failures -->
+  <div class="modal fade" id="modal_show_detention_time" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content rounded-10" style="border-radius: 10px;">
+          <!--Header-->
+          <div class="modal-header">
+               <div class="row ">
+                <div class="pull-left">
+                  <h4 class="modal-title" id="myModalLabel">Locomotives WIP [{{locos_under_detention|length}}]
+                  </h4>
+                
+                </div>
+                <div class="pull-right">
+                    Detention Days code:
+                  <button style="background-color:grey;color: white;">under 3</button>                   
+                  <button style="background-color:blue ;color: white;">7</button>
+                  <button style="background-color:green ;color: white;">30</button>
+                  <button style="background-color:red ;color:white" >60</button>
+                  <button style="background-color: yellowgreen;color: black;">90</button>
+                  <button style="background-color: blueviolet;color:black">>90</button>
+                </div>
+              </div>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body">
+            {% if locos_under_detention %}
+              <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>Loco #</th>
+                    <th>Failure Date</th>
+                    <th>Description</th>
+                    <th>Detention Time</th>
+                    <th>seq</th>
+                    <th>Link</th>
+                  </tr>
+                  {% for item in locos_under_detention %}
+                  <tr>
+                    <td >{{ forloop.counter }}</td>
+                    <td class ={{item.rank}}>{{item.name }}</td>
+                    <td class ={{item.rank}}>{{item.date }}</td>
+                    <td class ={{item.rank}}>{{item.text }}</td>
+                    <td class ={{item.rank}}>{{item.downtime }}</td>
+                    <td class ={{item.rank}}>{{item.tbf }}</td>
+                    <td ><a href="{% url 'failures_lists2_typical_loco' item.name %}" data-toggle="tooltip" 
+                      data-placement="bottom" title='Show History Failures'><i class="fa fa-eye"></i></a></td>
+                  
+                    
+                  </tr>
+                  {%endfor%}
+              </table>
+              {% else %}
+              <p>No Failures</p>
+              {%  endif %}
+          </div>
+          <!--Footer-->
+          <div class="modal-footer">
+              <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                  type="reset">Close
+              </button>
+          </div>
+
+      </div>
+  </div>
+</div>
+
+   <!-- modal Failure current -->
+   <div class="modal fade" id="modal_show_failures_current" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-10" style="border-radius: 10px;">
+              <!--Header-->
+              <div class="modal-header">
+                   <div class="row ">
+                    <div class="pull-left">
+                      <h4 class="modal-title" id="myModalLabel">Loco Failures[{{failures_locos| length }}] {{ today|date:"F" }} {{ today|date:"Y" }}
+                      </h4>
+                    
+                    </div>
+                    <div class="pull-right">
+                        freq code:
+                      <button style="background-color:grey;color: white;">1</button>                   
+                      <button style="background-color:blue ;color: white;">2</button>
+                      <button style="background-color:green ;color: white;">3</button>
+                      <button style="background-color:red ;color:white" >4</button>
+                      <button style="background-color: yellowgreen;color: black;">5</button>
+                      <button style="background-color: blueviolet;color:black">>5</button>
+                    </div>
+                  </div>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                  </button>
+              </div>
+              <!--Body-->
+              <div class="modal-body">
+                {% if failures_locos %}
+                  <table class="table">
+                      <tr>
+                        <th>#</th>
+                        <th>Loco</th>
+                        <th>Failure Date</th>
+                        <th>Description</th>
+                        <th>Released</th>
+                        <th>seq</th>
+                        <th>Link</th>
+                      </tr>
+                      {% for item in failures_locos %}
+                      <tr>
+                        <td >{{ forloop.counter }}</td>
+                        <td class ={{item.rank}}>{{item.name }}</td>
+                        <td class ={{item.rank}}>{{item.date }}</td>
+                        <td class ={{item.rank}}>{{item.text }}</td>
+                        <td>
+                          <input type="checkbox" {% if item.released %} checked{% endif %} disabled>
+                        </td>
+                        <td class ={{item.rank}}>{{item.tbf }}</td>
+                        <td ><a href="{% url 'failures_lists2_typical_loco' item.name %}" data-toggle="tooltip" 
+                          data-placement="bottom" title='Show History Failures'><i class="fa fa-eye"></i></a></td>
+                      
+                      </tr>
+                      {%endfor%}
+                  </table>
+                  {% else %}
+                  <p>No Failures</p>
+                  {%  endif %}
+              </div>
+              <!--Footer-->
+              <div class="modal-footer">
+                  <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                      type="reset">Close
+                  </button>
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+   <!-- modal Failure Previous -->
+   <div class="modal fade" id="modal_show_failures_previous" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-10" style="border-radius: 10px;">
+              <!--Header-->
+              <div class="modal-header">
+                   <div class="row ">
+                        <div class="pull-left">
+                            <h4 class="modal-title" id="myModalLabel">Loco Failures [{{previous_failures_locos|length}}] {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                            </h4>
+                        </div>
+                        <div class="pull-right">
+                            freq code:
+                          <button style="background-color:grey;color: white;">1</button>                   
+                          <button style="background-color:blue ;color: white;">2</button>
+                          <button style="background-color:green ;color: white;">3</button>
+                          <button style="background-color:red ;color:white" >4</button>
+                          <button style="background-color: yellowgreen;color: black;">5</button>
+                          <button style="background-color: blueviolet;color:black">>5</button>
+                        </div>
+                  </div>
+
+                  
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                  </button>
+              </div>
+              <!--Body-->
+              <div class="modal-body">
+                {% if previous_failures_locos %}
+                <table class="table">
+                    <tr>
+                      <th>#</th>
+                      <th>Loco</th>
+                      <th>Failure Date</th>
+                      <th>Description</th>
+                      <th>Released</th>
+                      <th>seq</th>
+                      <th>Link</th>
+                    </tr>
+                    {% for item in previous_failures_locos %}
+                    <tr>
+                      <td >{{ forloop.counter }}</td>
+                      <td class ={{item.rank}}>{{item.name }}</td>
+                      <td class ={{item.rank}}>{{item.date }}</td>
+                      <td class ={{item.rank}}>{{item.text }}</td>
+                      <td>
+                        <input type="checkbox" {% if item.released %} checked{% endif %} disabled>
+                      </td>
+                      <td class ={{item.rank}}>{{item.tbf }}</td>
+                      <td ><a href="{% url 'failures_lists2_typical_loco' item.name %}" data-toggle="tooltip" 
+                        data-placement="bottom" title='Show History Failures'><i class="fa fa-eye"></i></a>
+                      </td>
+                    
+                    </tr>
+                    {%endfor%}
+                </table>
+                {% else %}
+                <p>No Failures</p>
+                {%  endif %}
+              </div>
+              <!--Footer-->
+              <div class="modal-footer">
+                  <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                      type="reset">Close
+                  </button>
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+   <!-- modal Systoms Ranking Previous -->
+  <div class="modal fade" id="modal_show_failures_prev_ranking" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content rounded-10" style="border-radius: 10px;">
+          <!--Header-->
+          <div class="modal-header">
+               <div class="row ">
+                    <div class="pull-left">
+                        <h4 class="modal-title" id="myModalLabel">Ranking Failures [{{prev_symptom_ranking|length}}] {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                        </h4>
+                    </div>
+                    <div class="pull-right">
+                        freq code:
+                      <button style="background-color:grey;color: white;">1</button>                   
+                      <button style="background-color:blue ;color: white;">2-5</button>
+                      <button style="background-color:green ;color: white;">5-7</button>
+                      <button style="background-color:red ;color:white" >7-10</button>
+                      <button style="background-color: yellowgreen;color: black;">10-15</button>
+                      <button style="background-color: blueviolet;color:black">>15</button>
+                    </div>
+              </div>
+
+              
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body">
+            {% if prev_symptom_ranking %}
+            <table class="table">
+                <tr>
+                  <th>#</th>
+                  <th>Symptom</th>
+                  <th>Count</th>
+                </tr>
+                {% for item in prev_symptom_ranking %}
+                <tr>
+                  <td >{{ forloop.counter }}</td>
+                  <td class ={{item.rank}}>{{item.symptom }}</td>
+                  <td class ={{item.rank}}>{{item.freq }}</td>
+                </tr>
+                {%endfor%}
+            </table>
+            {% else %}
+            <p>No Failures</p>
+            {%  endif %}
+          </div>
+          <!--Footer-->
+          <div class="modal-footer">
+              <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                  type="reset">Close
+              </button>
+          </div>
+
+      </div>
+  </div>
+</div>
+ <!-- modal Systoms Ranking Current -->
+ <div class="modal fade" id="modal_show_failures_ranking" tabindex="-1" role="dialog"
+ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+ <div class="modal-dialog" role="document">
+     <div class="modal-content rounded-10" style="border-radius: 10px;">
+         <!--Header-->
+         <div class="modal-header">
+              <div class="row ">
+                   <div class="pull-left">
+                       <h4 class="modal-title" id="myModalLabel">Ranking Failures [{{symptom_ranking|length}}] {{ today|date:"F" }} {{ today|date:"Y" }}
+                       </h4>
+                   </div>
+                   <div class="pull-right">
+                       freq code:
+                     <button style="background-color:grey;color: white;">1</button>                   
+                     <button style="background-color:blue ;color: white;">2-5</button>
+                     <button style="background-color:green ;color: white;">5-7</button>
+                     <button style="background-color:red ;color:white" >7-10</button>
+                     <button style="background-color: yellowgreen;color: black;">10-15</button>
+                     <button style="background-color: blueviolet;color:black">>15</button>
+                   </div>
+             </div>
+
+             
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">×</span>
+             </button>
+         </div>
+         <!--Body-->
+         <div class="modal-body">
+           {% if symptom_ranking %}
+           <table class="table">
+               <tr>
+                 <th>#</th>
+                 <th>Symptom</th>
+                 <th>Count</th>
+               </tr>
+               {% for item in symptom_ranking %}
+               <tr>
+                <td >{{ forloop.counter }}</td>
+                 <td class ={{item.rank}}>{{item.symptom }}</td>
+                 <td class ={{item.rank}}>{{item.freq }}</td>
+               </tr>
+               {%endfor%}
+           </table>
+           {% else %}
+           <p>No Failures</p>
+           {%  endif %}
+         </div>
+         <!--Footer-->
+         <div class="modal-footer">
+             <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                 type="reset">Close
+             </button>
+         </div>
+
+     </div>
+ </div>
+</div>
+
+ <!-- modal Systoms Ranking Global -->
+ <div class="modal fade" id="modal_show_failures_ranking_global" tabindex="-1" role="dialog"
+ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+ <div class="modal-dialog" role="document">
+     <div class="modal-content rounded-10" style="border-radius: 10px;">
+         <!--Header-->
+         <div class="modal-header">
+              <div class="row ">
+                   <div class="pull-left">
+                       <h4 class="modal-title" id="myModalLabel">Ranking Failures [{{symptom_ranking_global|length}}] All Time
+                       </h4>
+                   </div>
+                   <div class="pull-right">
+                       freq code:
+                       {% for item in symptom_ranking_mapping %}  
+                            {% if forloop.counter == 1 %}
+                            <button style="background-color:skyblue; color:white;">{{item.lb}}-{{item.ub}}</button>
+                      
+                          {% elif forloop.counter == 2 %}
+                              <button style="background-color:lightgray;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 3 %}
+                              <button style="background-color:blue ;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 4 %}
+                              <button style="background-color:green ;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 5 %}
+                              <button style="background-color:red ;color:white" >{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 6 %}
+                              <button style="background-color: yellowgreen;color: black;">{{item.lb}}-{{item.ub}}</button>
+
+                          {% else %}
+                              <button style="background-color: blueviolet;color:white">>{{item.lb}}</button>
+
+                            
+                             
+                            
+                          {% endif %}
+
+                       {% endfor %}   
+                   </div>
+             </div>
+
+             
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">×</span>
+             </button>
+         </div>
+         <!--Body-->
+         <div class="modal-body">
+           {% if symptom_ranking_global %}
+           <table class="table">
+               <tr>
+                 <th>#</th>
+                 <th>Symptom</th>
+                 <th>Freq</th>
+                 <th>Cum.Freq</th>
+                 <th>Percentile</th>
+                  <th>Pareto</th>
+               </tr>
+               {% for item in symptom_ranking_global %}
+                <!-- Border line -->
+                {% if forloop.counter == srg_pareto_so_iter %}
+
+                  <tr style="border-bottom:2px solid red">
+                      <td colspan="100%"></td>
+                  </tr>
+                {% endif %}
+
+                <tr>
+                    <td >{{ forloop.counter }}</td>
+                    <td class ={{item.rank}}>{{item.symptom }}</td>
+                    <td class ={{item.rank}}>{{item.freq }}</td>
+                    <td class ={{item.rank}}>{{item.cum_freq }}</td>
+                    <td class ={{item.rank}}>{{item.percentile|floatformat:'-1'|intcomma }}%</td>
+                    <td>
+                      <input type="checkbox" {% if item.pareto_critical %} checked{% endif %} disabled>
+                    </td>
+                </tr>
+               {%endfor%}
+           </table>
+           {% else %}
+           <p>No Failures</p>
+           {%  endif %}
+         </div>
+         <!--Footer-->
+         <div class="modal-footer">
+             <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                 type="reset">Close
+             </button>
+         </div>
+
+     </div>
+ </div>
+</div>
+<!-- modal Systoms Ranking Last 12 Months -->
+<div class="modal fade" id="modal_show_failures_ranking_12month" tabindex="-1" role="dialog"
+aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+<div class="modal-dialog" role="document">
+    <div class="modal-content rounded-10" style="border-radius: 10px;">
+        <!--Header-->
+        <div class="modal-header">
+             <div class="row ">
+                  <div class="pull-left">
+                      <h4 class="modal-title" id="myModalLabel">Ranking Failures [{{symptom_ranking_last_12month|length}}] Last 12 Months
+                      </h4>
+                  </div>
+                  <div class="pull-right">
+                      freq code:
+                      {% for item in symptom_ranking_mapping_this_year %}  
+                          {% if forloop.counter == 1 %}
+                          <button style="background-color:skyblue; color:white;">{{item.lb}}-{{item.ub}}</button>
+                      
+                          {% elif forloop.counter == 2 %}
+                              <button style="background-color:lightgray;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 3 %}
+                              <button style="background-color:blue ;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 4 %}
+                              <button style="background-color:green ;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 5 %}
+                              <button style="background-color:red ;color:white" >{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 6 %}
+                              <button style="background-color: yellowgreen;color: black;">{{item.lb}}-{{item.ub}}</button>
+
+                          {% else %}
+                              <button style="background-color: blueviolet;color:white">>{{item.lb}}</button>
+
+                            
+                            
+                            
+                          {% endif %}
+
+                      {% endfor %}   
+                  </div>
+            </div>
+
+            
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <!--Body-->
+        <div class="modal-body">
+          {% if symptom_ranking_last_12month %}
+          <table class="table">
+              <tr>
+                <th>#</th>
+                 <th>Symptom</th>
+                 <th>Freq</th>
+                 <th>Cum.Freq</th>
+                 <th>Percentile</th>
+                 <th>Pareto</th>
+              </tr>
+              {% for item in symptom_ranking_last_12month %}
+                 <!-- Border line -->
+                 {% if forloop.counter == sr12m_pareto_so_iter %}
+                  <tr style="border-bottom:2px solid red">
+                      <td colspan="100%"></td>
+                  </tr>
+                {% endif %}
+
+                <tr>
+                  <td >{{ forloop.counter }}</td>
+                    <td class ={{item.rank}}>{{item.symptom }}</td>
+                    <td class ={{item.rank}}>{{item.freq }}</td>
+                    <td class ={{item.rank}}>{{item.cum_freq }}</td>
+                    <td class ={{item.rank}}>{{item.percentile |floatformat:'-1'|intcomma}}%</td>
+                    <td>
+                      <input type="checkbox" {% if item.pareto_critical %} checked{% endif %} disabled>
+                    </td>
+                </tr>
+              {%endfor%}
+          </table>
+          {% else %}
+          <p>No Failures</p>
+          {%  endif %}
+        </div>
+        <!--Footer-->
+        <div class="modal-footer">
+            <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                type="reset">Close
+            </button>
+        </div>
+
+    </div>
+</div>
+</div>
+
+<!-- modal Systoms Ranking Current Year -->
+<div class="modal fade" id="modal_show_failures_ranking_this_year" tabindex="-1" role="dialog"
+aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+<div class="modal-dialog" role="document">
+    <div class="modal-content rounded-10" style="border-radius: 10px;">
+        <!--Header-->
+        <div class="modal-header">
+             <div class="row ">
+                  <div class="pull-left">
+                      <h4 class="modal-title" id="myModalLabel">Ranking Failures [{{symptom_ranking_current_year|length}}] This Year
+                      </h4>
+                  </div>
+                  <div class="pull-right">
+                      freq code:
+                      {% for item in symptom_ranking_mapping_this_year %}  
+                            {% if forloop.counter == 1 %}
+                            <button style="background-color:skyblue; color:white;">{{item.lb}}-{{item.ub}}</button>
+                      
+                          {% elif forloop.counter == 2 %}
+                              <button style="background-color:lightgray;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 3 %}
+                              <button style="background-color:blue ;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 4 %}
+                              <button style="background-color:green ;color: white;">{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 5 %}
+                              <button style="background-color:red ;color:white" >{{item.lb}}-{{item.ub}}</button>
+                          {% elif forloop.counter == 6 %}
+                              <button style="background-color: yellowgreen;color: black;">{{item.lb}}-{{item.ub}}</button>
+
+                          {% else %}
+                              <button style="background-color: blueviolet;color:white">>{{item.lb}}</button>
+
+                            
+                            
+                            
+                          {% endif %}
+
+                      {% endfor %}   
+                  </div>
+            </div>
+
+            
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <!--Body-->
+        <div class="modal-body">
+          {% if symptom_ranking_current_year %}
+          <table class="table">
+              <tr>
+                <th>#</th>
+                 <th>Symptom {{srcy_pareto_so_iter}}</th>
+                 <th>Freq</th>
+                 <th>Cum.Freq</th>
+                 <th>Percentile</th>
+                  <th>Pareto</th>
+              </tr>
+              {% for item in symptom_ranking_current_year %}
+              
+                <!-- Border line -->
+                {% if forloop.counter == srcy_pareto_so_iter %}
+
+                  <tr style="border-bottom:2px solid red">
+                      <td colspan="100%"></td>
+                  </tr>
+                {% endif %}
+
+                <tr>
+                    <td >{{ forloop.counter }}</td>
+                    <td class ={{item.rank}}>{{item.symptom }}</td>
+                    <td class ={{item.rank}}>{{item.freq }}</td>
+                    <td class ={{item.rank}}>{{item.cum_freq }}</td>
+                    <td class ={{item.rank}}>{{item.percentile|floatformat:'-1'|intcomma }}%</td>                
+                    <td>
+                    <input type="checkbox" {% if item.pareto_critical %} checked{% endif %} disabled>
+                    </td>
+                </tr>
+              {%endfor%}
+          </table>
+          {% else %}
+          <p>No Failures</p>
+          {%  endif %}
+        </div>
+        <!--Footer-->
+        <div class="modal-footer">
+            <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                type="reset">Close
+            </button>
+        </div>
+
+    </div>
+</div>
+</div>
+ {% endblock %}
+ 
+ {% block stylesheets %}
+ <!-- overflow:auto'; in contain div -->
+   <style type="text/css">
+      td.zero{
+       color:skyblue;
+     }
+      td.one {
+       color:lightgray;
+     } 
+     td.two {
+       color:blue
+     }
+     td.three{
+       color:green;
+     }
+     td.four{
+       color:red;
+     }
+     td.five{
+       color:yellowgreen;
+     }
+     td.six{
+       color:blueviolet;
+     }
+    
+     </style>
+ {% endblock %}
+ 
+ {% block scripts %}
+ <script src="{% static 'vendor/js/Chart.bundle.min.js' %}"></script>
+ <script>
+     function getToken(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+      var csrftoken = getToken('csrftoken'); 
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+  </script>
+ <script type="text/javascript">
+
+
+ var colors =
+   ['#357ca5',
+    '#008d4c',
+    '#db8b0b',
+    '#ca195a',
+    '#555299',
+    '#4285f4',
+    '#db4437',
+    '#f4b400',
+    '#0f9d58',
+    '#ab47bc',
+    '#00acc1',
+    '#ff7043',
+    '#9e9d24',
+    '#5c6bc0',
+    '#f06292',
+    '#00796b',
+    '#c2185b'
+ ];
+ //var balanceChart = null;
+ var releasesChart = null;
+ var servicesChart = null;
+ var availabilityChart = null;
+ var mtbfChart = null;
+
+ var drawServices = function(res) {
+  var ctx = document.getElementById("myserviceChart").getContext('2d');
+  var data = {
+      labels: res.labels,
+      datasets: []
+  };
+  for (var i = 0; i < res.dataset.length; i++) {
+    var dataset = {
+      label: res.dataset[i].name,
+      fill: false,
+      pointRadius: 2,
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      data: res.dataset[i].data
+    };
+    data.datasets.push(dataset);
+  }
+  servicesChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+
+      options: {
+          tooltips: {
+            mode: 'index',
+            position: 'nearest',
+            intersect: false,
+            caretPadding: 5
+          },
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+
+      }
+
+  });
+};
+
+var drawMtbf = function(res) {
+  var ctx = document.getElementById("mymtbfChart").getContext('2d');
+  var data = {
+      labels: res.labels,
+      datasets: []
+  };
+  for (var i = 0; i < res.dataset.length; i++) {
+    var dataset = {
+      label: res.dataset[i].name,
+      fill: false,
+      pointRadius: 2,
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      data: res.dataset[i].data
+    };
+    data.datasets.push(dataset);
+  }
+  mtbfChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+          tooltips: {
+            mode: 'index',
+            position: 'nearest',
+            intersect: false,
+            caretPadding: 5
+          },
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+      }
+  });
+};
+
+
+ var drawReleases = function(res) {
+  var ctx = document.getElementById("myreleasesChart").getContext('2d');
+  var data = {
+      labels: res.labels,
+      datasets: []
+  };
+  for (var i = 0; i < res.dataset.length; i++) {
+    var dataset = {
+      label: res.dataset[i].name,
+      fill: false,
+      pointRadius: 2,
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      data: res.dataset[i].data
+    };
+    data.datasets.push(dataset);
+  }
+  releasesChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+          tooltips: {
+            mode: 'index',
+            position: 'nearest',
+            intersect: false,
+            caretPadding: 5
+          },
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+      }
+  });
+};
+
+var updatereleasesChart = function(chartData) {
+  releasesChart.data.labels = chartData.labels;
+  for (var i = 0; i < chartData.dataset.length; i++) {
+    releasesChart.data.datasets[i].data = chartData.dataset[i].data;
+
+  }
+  releasesChart.update();
+};
+
+
+var drawAvailabilty = function(res) {
+  var ctx = document.getElementById("myavailabilityChart").getContext('2d');
+  var data = {
+      labels: res.labels,
+      datasets: []
+  };
+  for (var i = 0; i < res.dataset.length; i++) {
+    var dataset = {
+      label: res.dataset[i].name,
+      fill: false,
+      pointRadius: 2,
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      data: res.dataset[i].data
+    };
+    data.datasets.push(dataset);
+  }
+  availabilityChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+          tooltips: {
+            mode: 'index',
+            position: 'nearest',
+            intersect: false,
+            caretPadding: 5
+          },
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+      
+          
+      }
+  });
+};
+var updateavailabilityChart = function(chartData) {
+  availabilityChart.data.labels = chartData.labels;
+  for (var i = 0; i < chartData.dataset.length; i++) {
+    availabilityChart.data.datasets[i].data = chartData.dataset[i].data;
+
+  }
+  availabilityChart.update();
+};
+
+
+var updateservicesChart = function(chartData) {
+  servicesChart.data.labels = chartData.labels;
+  for (var i = 0; i < chartData.dataset.length; i++) {
+    servicesChart.data.datasets[i].data = chartData.dataset[i].data;
+
+  }
+  servicesChart.update();
+};
+
+var updatemtbfChart = function(chartData) {
+  mtbfChart.data.labels = chartData.labels;
+  for (var i = 0; i < chartData.dataset.length; i++) {
+    mtbfChart.data.datasets[i].data = chartData.dataset[i].data;
+
+  }
+  mtbfChart.update();
+};
+
+
+var one_month = 0;
+var three_months = 1;
+var six_months = 2;
+var twelve_months = 3;
+var five_year = 4;
+var ten_year = 5;
+var twenty_year = 6;
+var releasesChartData = new Array(4);
+var availabilityChartData = new Array(4);
+var servicesChartData = new Array(4);
+var mtbfChartData = new Array(4);
+//set focus with time delay
+setTimeout(function () {
+ $('#3month').focus();
+}, 100);  
+// initialize- First Graph
+$.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' minus_3_months today %}", {}, function(res, status) {
+  drawReleases(res);
+  releasesChartData[three_months] = res;
+});
+
+// initialize-- Second Graph
+$.getJSON("{% url 'get_availability_by_loco_class' minus_3_months today %}", {}, function(res, status) {
+  drawAvailabilty(res);
+  availabilityChartData[three_months] = res;
+  set_availability_user_pref_on_start()
+});
+
+//initialize--Third Graph
+$.getJSON("{% url 'get_services_graph_by_rolling_month' minus_3_months today %}", {}, function(res, status) {
+  drawServices(res);
+  servicesChartData[three_months] = res;
+  set_services_user_pref_on_start()
+
+});
+//initialize--Forth Graph
+$.getJSON("{% url 'get_mtbf_graph_by_rolling_month' minus_3_months today %}", {}, function(res, status) {
+  drawMtbf(res);
+  mtbfChartData[three_months] = res;
+  set_mtbf_user_pref_on_start()
+});
+
+function set_availability_user_pref_on_start(){
+  // This method initialise user specific pref when page loads 
+    var iter=0
+    var user_pref_array = JSON.parse("{{json_userprefs_loco_availability_graph_options}}")
+    //console.log('user pref:',user_pref_array)
+    availabilityChart.data.datasets.forEach(function(ds) {
+      iter +=1
+      //chech if iter is not i user_pref      
+      if (!user_pref_array.includes(iter)){
+          // hide all other except [user prefs]
+          ds.hidden = true
+          //console.log('{label,state}', ds.label, !ds.hidden)
+      } else{
+         // console.log('{label,state}', ds.label, !ds.hidden)
+      }    
+      
+    });
+    availabilityChart.update();
+}
+function set_mtbf_user_pref_on_start(){
+  // This method initialise user specific pref when page loads 
+    var iter=0
+    var user_pref_array = JSON.parse("{{json_userprefs_loco_mtbf_graph_options}}")
+    //console.log('user pref:',user_pref_array)
+    mtbfChart.data.datasets.forEach(function(ds) {
+      iter +=1
+      //chech if iter is not i user_pref      
+      if (!user_pref_array.includes(iter)){
+          // hide all other except [user prefs]
+          ds.hidden = true
+         // console.log('{label,state}', ds.label, !ds.hidden)
+      } else{
+        //console.log('{label,state}', ds.label, !ds.hidden)
+      }    
+      
+    });
+    mtbfChart.update();
+}
+
+function set_services_user_pref_on_start(){
+  // This method initialise user specific pref when page loads 
+    var iter=0
+    var user_pref_array = JSON.parse("{{json_userprefs_loco_services_graph_options}}")
+    //console.log('user pref:',user_pref_array)
+    servicesChart.data.datasets.forEach(function(ds) {
+      iter +=1
+      //chech if iter is not i user_pref      
+      if (!user_pref_array.includes(iter)){
+          // hide all other except [user prefs]
+          ds.hidden = true
+          //console.log('{label,state}', ds.label, !ds.hidden)
+      } else{
+        //console.log('{label,state}', ds.label, !ds.hidden)
+      }    
+      
+    });
+    servicesChart.update();
+}
+function get_availability_user_pref(){
+    var iter=0
+    var arr =[]
+    //update what available
+    availabilityChart.update()
+
+    
+    for(var i=0; i< availabilityChart.data.datasets.length; i++) {
+        // It seems some value updated in metadata, but there is a method available.
+        // var metaDatasets = myLineChart.getDatasetMeta(i);
+        var dict = {};
+        dict["label"] = availabilityChart.data.datasets[i].label;
+        if (!availabilityChart.isDatasetVisible(i)) {
+            // or ctx.getDatasetMeta(i);
+            dict["state"] = 0;
+            
+        }else{
+          dict["state"] = 1;
+
+        }
+
+        arr.push(dict)
+    }
+   
+    return arr
+   
+} 
+function get_services_user_pref(){
+    var iter=0
+    var arr =[]
+    for(var i=0; i< servicesChart.data.datasets.length; i++) {
+        // It seems some value updated in metadata, but there is a method available.
+        // var metaDatasets = myLineChart.getDatasetMeta(i);
+        var dict = {};
+        dict["label"] = servicesChart.data.datasets[i].label;
+        if (!servicesChart.isDatasetVisible(i)) {
+            // or ctx.getDatasetMeta(i);
+            dict["state"] = 0;
+            
+        }else{
+          dict["state"] = 1;
+
+        }
+
+        arr.push(dict)
+    }
+
+    return arr
+   
+} 
+function get_mtbf_user_pref(){
+    var iter=0
+    var arr =[]
+    for(var i=0; i< mtbfChart.data.datasets.length; i++) {
+        // It seems some value updated in metadata, but there is a method available.
+        // var metaDatasets = myLineChart.getDatasetMeta(i);
+        var dict = {};
+        dict["label"] = mtbfChart.data.datasets[i].label;
+        if (!mtbfChart.isDatasetVisible(i)) {
+            // or ctx.getDatasetMeta(i);
+            dict["state"] = 0;
+            
+        }else{
+          dict["state"] = 1;
+
+        }
+
+        arr.push(dict)
+    }
+    
+    return arr
+   
+} 
+$('body').on('click', '.updateprefs',function(e){// for each update url 
+        e.preventDefault(); // prevent navigation
+        var url = $(this).data('url'); // get the update form url
+        //console.log("url:", url)
+        availabilityChart.update()
+        servicesChart.update()
+        mtbfChart.update()
+        var formData = {
+          'services':  JSON.stringify(get_services_user_pref()),
+          'mtbf':  JSON.stringify(get_mtbf_user_pref()),
+          'availability':  JSON.stringify(get_availability_user_pref()),         
+          csrfmiddlewaretoken: csrftoken,
+          contentType: 'application/x-www-form-urlencoded',
+          encode: true,
+        };
+
+      
+        $.ajax({
+            type: 'POST', 
+            url: url,
+            data: formData,
+            dataType:  'json',
+            success: function(data) { // on success..
+              console.log(data)
+              update_messages(data.message);
+            },
+            error: function(xhr, ajaxOptions, thrownError) { // on error..
+                
+            }
+        });
+        return false; 
+    });
+  
+
+   
+function update_messages(message){
+    $("#div_messages").html("");
+   // $.each(messages, function (i, m) {
+       $("#div_messages").append("<div class='alert alert-dismissable'>"+message+
+        "<button type='button' class ='close' data-dismiss='alert' aria-hidden='true'>x</button></div>");
+   // });
+   //console.log($("#div_messages").html())
+   //console.log(message)
+  }
+
+ 
+
+
+
+
+// update charts
+$('#entireperiod').click(function() {
+    if (releasesChartData[twenty_year] == null) {
+      $.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' minus_20_year today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[twenty_year] = res;
+      });
+    } else {
+        updatereleasesChart(releasesChartData[twenty_year]);
+    }
+ 
+    //Second Graph
+    if (availabilityChartData[twenty_year] == null) {
+      $.getJSON("{% url 'get_availability_by_loco_class' minus_20_year today %}", {}, function(res, status) {
+        updateavailabilityChart(res);
+        availabilityChartData[twenty_year] = res;
+      });
+    } else {
+        updateavailabilityChart(availabilityChartData[twenty_year]);
+    } 
+  
+    //Third Graph
+    if (servicesChartData[twenty_year] == null) {
+      $.getJSON("{% url 'get_services_graph_by_rolling_month' minus_20_year today %}", {}, function(res, status) {
+        updateservicesChart(res);
+        servicesChartData[twenty_year] = res;
+      });
+    } else {
+      updateservicesChart(servicesChartData[twenty_year]);
+    }
+
+    //Fourth Graph
+    if (mtbfChartData[twenty_year] == null) {
+          $.getJSON("{% url 'get_mtbf_graph_by_rolling_month' minus_20_year today %}", {}, function(res, status) {
+            updatemtbfChart(res);
+            mtbfChartData[twenty_year] = res;
+          });
+      } else {
+        updatemtbfChart(mtbfChartData[twenty_year]);
+      }
+  
+});
+
+// update charts
+$('#10year').click(function() {
+    if (releasesChartData[ten_year] == null) {
+      $.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' minus_10_year today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[ten_year] = res;
+      });
+    } else {
+        updatereleasesChart(releasesChartData[ten_year]);
+    }
+ 
+    //Second Graph
+    if (availabilityChartData[ten_year] == null) {
+      $.getJSON("{% url 'get_availability_by_loco_class' minus_10_year today %}", {}, function(res, status) {
+        updateavailabilityChart(res);
+        availabilityChartData[ten_year] = res;
+      });
+    } else {
+        updateavailabilityChart(availabilityChartData[ten_year]);
+    } 
+  
+    //Third Graph
+    if (servicesChartData[ten_year] == null) {
+      $.getJSON("{% url 'get_services_graph_by_rolling_month' minus_10_year today %}", {}, function(res, status) {
+        updateservicesChart(res);
+        servicesChartData[ten_year] = res;
+      });
+    } else {
+      updateservicesChart(servicesChartData[ten_year]);
+    }
+
+      //Fourth Graph
+      if (mtbfChartData[ten_year] == null) {
+        $.getJSON("{% url 'get_mtbf_graph_by_rolling_month' minus_10_year today %}", {}, function(res, status) {
+          updatemtbfChart(res);
+          mtbfChartData[ten_year] = res;
+        });
+      } else {
+        updatemtbfChart(mtbfChartData[ten_year]);
+      }
+  
+});
+
+// update charts
+$('#5year').click(function() {
+    if (releasesChartData[five_year] == null) {
+      $.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' minus_5_year today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[five_year] = res;
+      });
+    } else {
+        updatereleasesChart(releasesChartData[five_year]);
+    }
+ 
+    //Second Graph
+    if (availabilityChartData[five_year] == null) {
+      $.getJSON("{% url 'get_availability_by_loco_class' minus_5_year today %}", {}, function(res, status) {
+        updateavailabilityChart(res);
+        availabilityChartData[five_year] = res;
+      });
+    } else {
+        updateavailabilityChart(availabilityChartData[five_year]);
+    } 
+  
+    //Third Graph
+    if (servicesChartData[five_year] == null) {
+      $.getJSON("{% url 'get_services_graph_by_rolling_month' minus_5_year today %}", {}, function(res, status) {
+        updateservicesChart(res);
+        servicesChartData[five_year] = res;
+      });
+    } else {
+      updateservicesChart(servicesChartData[five_year]);
+    }
+
+    //Fourth Graph
+    if (mtbfChartData[five_year] == null) {
+        $.getJSON("{% url 'get_mtbf_graph_by_rolling_month' minus_5_year today %}", {}, function(res, status) {
+          updatemtbfChart(res);
+          mtbfChartData[five_year] = res;
+        });
+      } else {
+        updatemtbfChart(mtbfChartData[five_year]);
+      }
+  
+});
+
+
+
+
+
+ // update charts
+$('#12month').click(function() {
+    if (releasesChartData[twelve_months] == null) {
+      $.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' minus_12_months today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[twelve_months] = res;
+      });
+    } else {
+        updatereleasesChart(releasesChartData[twelve_months]);
+    }
+ 
+    //Second Graph
+    if (availabilityChartData[twelve_months] == null) {
+      $.getJSON("{% url 'get_availability_by_loco_class' minus_12_months today %}", {}, function(res, status) {
+        updateavailabilityChart(res);
+        availabilityChartData[twelve_months] = res;
+      });
+    } else {
+        updateavailabilityChart(availabilityChartData[twelve_months]);
+    } 
+  
+    //Third Graph
+    if (servicesChartData[twelve_months] == null) {
+      $.getJSON("{% url 'get_services_graph_by_rolling_month' minus_12_months today %}", {}, function(res, status) {
+        updateservicesChart(res);
+        servicesChartData[twelve_months] = res;
+      });
+    } else {
+      updateservicesChart(servicesChartData[twelve_months]);
+    }
+
+       //Fourth Graph
+   if (mtbfChartData[twelve_months] == null) {
+      $.getJSON("{% url 'get_mtbf_graph_by_rolling_month' minus_12_months today %}", {}, function(res, status) {
+        updatemtbfChart(res);
+        mtbfChartData[twelve_months] = res;
+      });
+    } else {
+      updatemtbfChart(mtbfChartData[twelve_months]);
+    }
+  
+});
+
+
+
+$('#6month').click(function() {
+    if (releasesChartData[six_months] == null) {
+      $.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' minus_6_months today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[six_months] = res;
+      });
+    } else {
+      updatereleasesChart(releasesChartData[six_months]);
+    }
+
+   //Second Graph
+    if (availabilityChartData[six_months] == null) {
+      $.getJSON("{% url 'get_availability_by_loco_class' minus_6_months today %}", {}, function(res, status) {
+        updateavailabilityChart(res);
+        availabilityChartData[six_months] = res;
+      });
+    } else {
+        updateavailabilityChart(availabilityChartData[six_months]);
+    } 
+    // Third
+    if (servicesChartData[six_months] == null) {
+      $.getJSON("{% url 'get_services_graph_by_rolling_month' minus_6_months today %}", {}, function(res, status) {
+        updateservicesChart(res);
+        servicesChartData[six_months] = res;
+      });
+    } else {
+      updateservicesChart(servicesChartData[six_months]);
+    }
+
+     //Fourth Graph
+   if (mtbfChartData[six_months] == null) {
+      $.getJSON("{% url 'get_mtbf_graph_by_rolling_month' minus_6_months today %}", {}, function(res, status) {
+        updatemtbfChart(res);
+        mtbfChartData[six_months] = res;
+      });
+    } else {
+      updatemtbfChart(mtbfChartData[six_months]);
+    }
+
+ 
+});
+
+$('#3month').click(function() {
+  updatereleasesChart(releasesChartData[three_months]);
+  updateavailabilityChart(availabilityChartData[three_months]);
+  updateservicesChart(servicesChartData[three_months]);
+  updatemtbfChart(mtbfChartData[three_months]);
+});
+
+
+$('#currentMonth').click(function() {
+  if (releasesChartData[one_month] == null) {
+    $.getJSON("{% url 'get_failures_releases_graph_by_rolling_month' first_day_of_month last_day_of_month %}", {}, function(res, status) {
+      updatereleasesChart(res);
+      releasesChartData[one_month] = res;
+    });
+  } else {
+    updatereleasesChart(releasesChartData[one_month]);
+  }
+
+   //Second Graph
+   if (availabilityChartData[one_month] == null) {
+    $.getJSON("{% url 'get_availability_by_loco_class' first_day_of_month last_day_of_month %}", {}, function(res, status) {
+      updateavailabilityChart(res);
+      availabilityChartData[one_month] = res;
+    });
+  } else {
+      updateavailabilityChart(availabilityChartData[one_month]);
+  } 
+  //Third Graph
+  if (servicesChartData[one_month] == null) {
+    $.getJSON("{% url 'get_services_graph_by_rolling_month' first_day_of_month last_day_of_month %}", {}, function(res, status) {
+      updateservicesChart(res);
+      servicesChartData[one_month] = res;
+    });
+  } else {
+    updateservicesChart(servicesChartData[one_month]);
+  }
+  
+   //Fourth Graph
+   if (mtbfChartData[one_month] == null) {
+    $.getJSON("{% url 'get_mtbf_graph_by_rolling_month' first_day_of_month last_day_of_month %}", {}, function(res, status) {
+      updatemtbfChart(res);
+      mtbfChartData[one_month] = res;
+    });
+  } else {
+    updatemtbfChart(mtbfChartData[one_month]);
+  }
+  
+});
+  
+ 
+ </script>
+ {% endblock %}

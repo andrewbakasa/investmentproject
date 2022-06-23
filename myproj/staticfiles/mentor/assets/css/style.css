@@ -1697,4 +1697,14 @@ Add a dark border to the very last row to signify the end of the table */
     z-index: 1;
   }
 
+  .box-element{
+    box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 15px;
+    /* margin-top: 2px; */
+    /* margin:10px */
+  }
+  
+
 

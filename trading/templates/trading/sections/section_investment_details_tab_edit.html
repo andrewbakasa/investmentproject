@@ -2,134 +2,127 @@
 <section id="cource-details-tabs" class="cource-details-tabs">
   <div class="container" data-aos="fade-up">
 
-    <div class="row">
-      <div class="col-lg-3">
-        <ul class="nav nav-tabs flex-column">
-          <li class="nav-item">
-            <a class="nav-link active show" data-bs-toggle="tab" href="#tab-1">Business Logic</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-2">Investment Summary</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-3">ROI</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-4">Shareholding Strategy</a>
-          </li>         
-         
-        </ul>
-      </div>
-      <div class="col-lg-9 mt-4 mt-lg-0">
-        <div class="tab-content">
-          <div class="tab-pane active show" id="tab-1">
-            <div class="row">
-              <div class="col-lg-8 details order-2 order-lg-1">
-                <h3>Business Strategy</h3>
-                <p class="fst-italic">
-                  Strategy
-                </p>
-                <p id="model-strategy">
-                  {{model.details.strategy}}
-                  
-                  {% if model.details.strategy and is_user_record_owner %}
-                    </br>
-                    <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                    data-target="#modal_add_investment_strategy"> <i class="fas fa-edit"></i></a>
-
-                  {% elif is_user_record_owner %}
-                    <!-- Add For First Time -->
-                    <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                    data-target="#modal_add_investment_strategy"> <i class="fas fa-plus"></i></a>
-                   
-                  {% endif%}
-                </p>
-              </div>
-              
-            </div>
-          </div>
-          <div class="tab-pane" id="tab-2">
-            <div class="row">
-              <div class="col-lg-8 details order-2 order-lg-1">
-                  <h3>Summary</h3>
-                  <p class="fst-italic">
-                    Summary:
-                  </p>
-                  <p id="model-summary">
-                      {{model.details.summary}}
+    
+    
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              Business Logic
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">                 
+                  <strong>Business Strategy</strong>
+                  <code> Strategy</code>
+                  <p id="model-strategy">
+                    {{model.details.strategy}}
                     
-                      {% if model.details.summary and is_user_record_owner %}
-                          </br>
-                          <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                          data-target="#modal_add_investment_summary"> <i class="fas fa-edit"></i></a>
-                          
-                      {% elif is_user_record_owner %}
-                          <!-- Add For First Time -->
-                          <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                          data-target="#modal_add_investment_summary"> <i class="fas fa-plus"></i></a>
-                      {% endif%}
-                  </p>
-              </div>
-             
-            </div>
-          </div>
-          <div class="tab-pane" id="tab-3">
-            <div class="row">
-              <div class="col-lg-8 details order-2 order-lg-1">
-                  <h3>The profit margin</h3>
-                  <p class="fst-italic">ROI.
-                  </p>
-                  
-                  <p id="model-roi">
-                    {{model.details.roi}}
-                  
-                    {% if model.details.roi and is_user_record_owner %}
-                        </br>
-                        <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                        data-target="#modal_add_investment_roi"> <i class="fas fa-edit"></i></a>
-                        
+                    {% if model.details.strategy and is_user_record_owner %}
+                      </br>
+                      <a href="#" class="btn btn-primary btn-round" data-toggle="modal" data-placement="bottom" title='Edit Business Logic'
+                      data-target="#modal_add_investment_strategy"> <i class="fas fa-edit"></i></a>
+
                     {% elif is_user_record_owner %}
-                        <!-- Add For First Time -->
-                        <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                        data-target="#modal_add_investment_roi"> <i class="fas fa-plus"></i></a>
-                        
+                      <!-- Add For First Time -->
+                      <a href="#" class="btn btn-danger btn-round" data-toggle="modal" data-placement="bottom" title='Add Business Logic'
+                      data-target="#modal_add_investment_strategy"> <i class="fas fa-plus"></i></a>
+                    
                     {% endif%}
                   </p>
-               
-              </div>
-              
             </div>
           </div>
-          <div class="tab-pane" id="tab-4">
-            <div class="row">
-              <div class="col-lg-8 details order-2 order-lg-1">
-                  <h3> Shareholding</h3>
-                  <p class="fst-italic">
-                    Shareholding Strategy
-                  </p>
-                  <p id="model-shareholding">
-                      {{model.details.shareholding}}
-                    
-                      {% if model.details.shareholding and is_user_record_owner %}
-                      </br>
-                      <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
-                      data-target="#modal_add_investment_shareholding"> <i class="fas fa-edit"></i></a>
-                      {% elif is_user_record_owner %}
-                        <!-- Add For First Time -->
-                        <a href="#" class="btn btn-danger btn-round" data-toggle="modal"
-                        data-target="#modal_add_investment_shareholding"> <i class="fas fa-plus"></i></a>
-                      {% endif%}
-
-                  </p>
-              </div>
-             
-            </div>
-          </div>
-          
-        </div>
       </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Investment Summary
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+              <strong>Summary</strong>
+              <code> Investment</code>
+              <p id="model-summary">
+                  {{model.details.summary}}
+                
+                  {% if model.details.summary and is_user_record_owner %}
+                      </br>
+                      <a href="#" class="btn btn-primary btn-round" data-toggle="modal" data-placement="bottom" title='Edit Business Summary'
+                      data-target="#modal_add_investment_summary"> <i class="fas fa-edit"></i></a>
+                      
+                  {% elif is_user_record_owner %}
+                      <!-- Add For First Time -->
+                      <a href="#" class="btn btn-danger btn-round" data-toggle="modal" data-placement="bottom" title='Add Business Summary'
+                      data-target="#modal_add_investment_summary"> <i class="fas fa-plus"></i></a>
+                  {% endif%}
+              </p>
+          </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            ROI
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+             
+              <strong>The profit margin</strong>
+              <code> ROI</code>
+              
+              <p id="model-roi">
+                {{model.details.roi}}
+              
+                {% if model.details.roi and is_user_record_owner %}
+                    </br>
+                    <a href="#" class="btn btn-primary btn-round" data-toggle="modal" data-placement="bottom" title='Edit ROI'
+                    data-target="#modal_add_investment_roi"> <i class="fas fa-edit"></i></a>
+                    
+                {% elif is_user_record_owner %}
+                    <!-- Add For First Time -->
+                    <a href="#" class="btn btn-danger btn-round" data-toggle="modal" data-placement="bottom" title='Add ROI'
+                    data-target="#modal_add_investment_roi"> <i class="fas fa-plus"></i></a>
+                    
+                {% endif%}
+              </p>
+          
+          
+          </div>
+        </div>
     </div>
 
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingFour">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+          Shareholding Strategy
+        </button>
+      </h2>
+      <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <strong>Shareholding</strong>
+            <code> Strategy</code>
+            <p id="model-shareholding">
+                {{model.details.shareholding}}
+              
+                {% if model.details.shareholding and is_user_record_owner %}
+                </br>
+                <a href="#" class="btn btn-primary btn-round" data-toggle="modal" data-placement="bottom" title='Edit Shareholding'
+                data-target="#modal_add_investment_shareholding"> <i class="fas fa-edit"></i></a>
+                {% elif is_user_record_owner %}
+                  <!-- Add For First Time -->
+                  <a href="#" class="btn btn-danger btn-round" data-toggle="modal" data-placement="bottom" title='Add Shareholding'
+                  data-target="#modal_add_investment_shareholding"> <i class="fas fa-plus"></i></a>
+                {% endif%}
+
+            </p>
+        </div>
+      </div>
+  </div>
+  </div>
+    
+  
   </div>
 </section><!-- End Cource Details Tabs Section -->
 {% include 'trading/forms/investment_summary.html' %}

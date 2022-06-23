@@ -8,6 +8,11 @@ from . import views
 
 
 urlpatterns = [
+
+      # api
+    path('api/get_failures_releases_graph_by_rolling_month/<dstart>/<dend>/',
+         views.api.get_failures_releases_graph_by_rolling_month, name='get_failures_releases_graph_by_rolling_month'),
+   
     path('', views.general_page.index, name="index"),#Home
     path('about/', views.general_page.about, name="about"),
     path('pr/', views.general_page.projects, name="projects"),

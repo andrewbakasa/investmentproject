@@ -11,6 +11,8 @@
         <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success">{% trans 'Investments' %}</a></li>
      
         <li class="breadcrumb-item" ><a href="{% url 'user_businesses' %}" class ="badge rounded-pill bg-success">{% trans 'My Businesses' %}</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'investment-details' model.id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
+   
        
         <li class="breadcrumb-item" >
             <!-- EDIT MODEL -->
