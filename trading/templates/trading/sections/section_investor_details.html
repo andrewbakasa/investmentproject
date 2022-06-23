@@ -6,7 +6,7 @@
 {% load humanize %}
 <section style= 'padding: 5px 0;' id="project-details" class="project-details">
 
-  <div class="container" data-aos="fade-up">
+  <div class="container box-element" data-aos="fade-up">
       
      <!-- ======= Breadcrumbs ======= -->
     <div class="row">
@@ -19,15 +19,7 @@
             </li>  
         </ol>
     </div>
-    <!-- <div class="flash-message">
-        {% for message in messages %}
-        <div class="alert alert-dismissable">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        </div>
-        {% endfor %}
-    </div> -->
-   
+    
     {% for message in messages %}
     <div class="flash-message">
       <div class="alert-{{ message.tags }} alert dismissable">         
