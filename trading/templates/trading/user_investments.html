@@ -54,12 +54,10 @@
                                     <div class="col-lg-8">
                                         Application Status:
                                         {% for tag in APLLICATION_STATUS_CHOICE %}
-                                        
                                             <a id={{tag}} {% if status == tag %} class="filter-status badge rounded-pill bg-light text-dark" {% else %}class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_investments_load_status_ajax' tag %}" 
                                                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                                 title='Filter'>{{tag}}
                                             </a>     
-                                            <!-- <a href="{% url 'user_investments_load_status' tag %}" {% if status == tag %} class="badge rounded-pill bg-light text-dark" {% else %}class="badge rounded-pill bg-warning text-dark" {% endif %}>{{tag}}</a> -->
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -68,13 +66,13 @@
                                         <thead class="thead-dark">
                                         <th style="width: 1%" >#</th>    
                                         <th style="width: 15%" >Investment Title</th>
-                                        <th style="width: 35%" >Investment Summary</th>
+                                        <th style="width: 22%" >Investment Summary</th>
                                         <th style="width: 10%" >Total value</th>
                                         <th style="width: 10%" >My Contr</th>
                                         <th style="width: 10%" >Category</th>
                                         <th style="width: 10%" >Owner</th>
                                         <th style="width: 10%" >Application Status</th>
-                                        <th style="width: 7%" class="text-right">Actions</th>
+                                        <th style="width: 12%" class="text-right">Actions</th>
                                         </thead>
                                         <tbody id="userinvestment-table-tbody">
                                         {% for item in first_page  %}
@@ -100,6 +98,13 @@
                                                 data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                                                 title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
                                                 </a>
+
+                                                {% if item.application_status == "accepted" %} 
+                                                    <a href="{% url 'investment-blogs' item.iid %}"
+                                                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                        title='Business Forum'><i class="fas fa-comment-alt"></i>
+                                                    </a>
+                                                {%endif%}
 
                                             
                                             </td>
@@ -330,16 +335,23 @@
         var owner_details =''
         if (val.application_status == "accepted"){
             owner_details= val.email
+
+            business_forum_connection= `<a href="/forum/i-blogs/${val.iid}/"
+                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='Business Forum'><i class="fas fa-comment-alt"></i>
+                    </a>`
         }  else{
             owner_details='N/A' 
+            business_forum_connection= ''
         }
-        
 
+      
+      
         a_html=`
             <tr id="item-${val.id}" >
                 <td>${counter}</td>
-                <td class="modelData" name="name" >${val.inv_name}</td>
-                <td class="modelData" name="description" >${val.summary}</td>
+                <td class="modelData" name="name" >${truncChar(val.inv_name,15)}</td>
+                <td class="modelData" name="description" >${truncChar(val.summary,40)}</td>
                 <td class="modelData" name="category" >$${numberWithCommas(val.total_value)}</td>
                 <td class="modelData" name="myinvest" >$${numberWithCommas(val.myinvest)}</td>
                 <td class="modelData" name="category" >${val.cat_name}</td>
@@ -358,6 +370,7 @@
                         data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                         title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
                     </a>
+                    ${business_forum_connection}
                 </td>
 
             </tr>` ;

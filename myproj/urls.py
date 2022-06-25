@@ -5,11 +5,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    
+    path('', include('investments_appraisal.urls')),
     path('acc/', include('silverstrike.urls')),
     path('admin/', admin.site.urls),
     path('common/', include('common.urls')),
-    path('', include('investments_appraisal.urls')),
     path('tr/', include('trading.urls')),
+    path('forum/', include('businessforum.urls')),
     path('beef/', include('beefapp.urls')),
     path('fish/', include('fishapp.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

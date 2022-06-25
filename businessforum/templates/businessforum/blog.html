@@ -1,0 +1,409 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Blogs</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+    <main id="main">
+        <!-- ======= Breadcrumbs ======= -->
+        <div class="breadcrumbs">
+        </div>
+        <!-- End Breadcrumbs -->
+        <!---Removed padding from 70px-- 0px-->
+        <section style= 'padding: 5px 0;' id="projects" class="projects">  
+            <div class="container   box-element" data-aos="fade-up">
+            <!-- ======= Breadcrumbs ======= -->
+                <div class="row">
+                    <ol class="breadcrumb" >
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>
+                                      
+                        <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
+                            <a id='current_status' href="{% url 'user_investments' %}"
+                                data-toggle="tooltip" data-placement="bottom" 
+                                title='Remove Status' class ="badge rounded-pill bg-success"><i>[{{status}}]</i> <span aria-hidden="true">×</span>
+                            </a> 
+                        </li>
+                    </ol>      
+                </div>       
+                
+               
+                
+                    {% for post in posts %}
+                        <article class="media content-section">
+                            <img class="rounded-circle article-img"  src="{{ post.author.profile.image.url }}" />
+                            <div class="media-body">
+                                <div class="article-matadata">
+                                    <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}">{{ post.author }}</a>
+                                    <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                                </div>
+                                <h2><a class="article-title" href="{% url 'blog-detail' post.id %}">{{ post.title }}</a></h2>
+                                <p class="article-content">{{ post.content }}</p>
+                            </div>
+                        </article>
+                    {% endfor %}
+
+                    {% if is_paginated %}
+                        {% if page_obj.has_previous %}
+                            <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                            {% elif num > page_obj.num|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number}}">Next</a>
+                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                        {% endif %}
+
+                    {% endif %}
+            </div>
+        </section><!-- End User Section -->
+    </main><!-- End #main -->
+{%endblock%}
+
+
+{% block modal_divs %}
+    <!-- Delete confirmation modal -->
+    <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %} 
+{% block scripts %}
+<script>
+    function truncChar(str,length){
+    var myTruncatedString = str.substring(0,length-1);              
+    if (str.length > myTruncatedString.length){
+    return myTruncatedString + "..."
+    }
+    return myTruncatedString
+    }
+    function numberWithCommas(x) {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+    }
+    function getToken(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+  
+    var csrftoken = getToken('csrftoken');
+    var display_myinvestement_ajax_url= "{% url 'display_myinvestment_ajax' %}" 
+    var app_status
+    
+    $(document).ready(function (){ 
+        $("#investments a:first").addClass( "active") 
+        $("#investors a:first").addClass( "active") 
+        $("#exploreinvestments a:first").addClass( "active") 
+
+         var boo_status = "{{search_status}}"
+        
+         if (boo_status == true ){
+            app_status ='{{status}}' 
+            //console.log('seting....', boo_status, app_status,)
+            
+         } 
+              
+    })
+    $('#confirmdelete').on('show.bs.modal', function(e) {
+        var name = $(e.relatedTarget).data('object-name');
+        var url = $(e.relatedTarget).data('delete-url');
+        var item_id = $(e.relatedTarget).data('item-id');
+        //console.log(item_id)
+        var name =truncChar(name,25)
+        $('#confirmdelete .modal-body').html("Are you sure you want to <b>withdraw</b> your <b>investment</b> in <i>[" + name + "]</i>?");
+        $('#confirmdelete .modal-footer input').attr('data-url', url);
+        $('#confirmdelete .modal-footer input').attr('item-id', item_id);
+    });
+
+    $('body').on('click', '.delete-button', function (e) {
+            e.preventDefault();
+            var tr_id =$('#delete-button').attr('item-id')
+            row = $('#item-'+ tr_id.trim());
+            var formData = {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            };
+            $.ajax({
+                type: 'POST',      
+                url:   $('#delete-button').attr('data-url'), 
+                encode: true,
+                contentType: 'application/x-www-form-urlencoded',
+                crossDomain: false,
+                dataType: 'json',
+                data: formData,     // our data object
+                success: function (response) {
+                    $('.close-modal').click()
+                    //console.log('rrr',response)
+                    
+                    ahtml= `<h4 style="text-align:center;" id="personal_totals"> 
+                        <b>Value</b>:$${numberWithCommas(response.data.model.total_sum)} 
+                        <b>Aver</b>:$${numberWithCommas(response.data.model.average)}</h4>`
+                    $('#personal_totals').html(ahtml)  
+                    row.fadeOut(1000, function () {
+                        //remove the row deleted
+                        $(this).remove();
+                        // if deleted page make the page disappear, point to prev page
+                        //page-1
+                        if (response.data.total_pages < response.data.deleted_page){                     
+                            var index= parseInt(response.data.total_pages)-1
+                            window.setTimeout(function() {
+                                $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                            }, 1000);
+                        }else{
+                            // if item on the current page get to zero
+                            // point to page-1
+                            var total = $('#userinvestment-table-tbody').children().length
+                            if (total == 0){
+                                //refresh the current pages
+                                var index= parseInt(response.data.deleted_page)-1
+                                if (index<1){
+                                    // if deleteting first page  then scroll all into first page
+                                    index=1
+                                } 
+                                
+                                loadPageAjax(index)
+                            }
+
+                        }
+                        
+                       
+                    });
+                    // if deleting page one and there are more pages behind.... push al those pages
+                  
+                },
+                error: function (exception) {
+                    alert('Exeption:' + exception);
+                }
+            });
+        });
+    
+    $('body').on('click', '.a_page_nav', function (event) {
+        // preventing default actions
+        event.preventDefault();
+        var page_no = $(this).attr('href');
+        // ajax call
+        loadPageAjax(page_no)
+    });
+    function updatePaging2(data){
+        var has_previous=''
+        //console.log(data)
+        if (data.has_previous){
+            has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+        
+        }       
+        var has_next= ''          
+        if (data.has_next){
+            has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                `; 
+        }       
+        a_html=`
+        <div id= "page_section" class="pagination">
+            <ul class="pagination newpagination">
+                ${has_previous}            
+                <span class="current" style="margin-left:5px" >
+                    Page ${ data.current_page } of ${ data.last }.
+                </span>                   
+                ${has_next}
+            </ul>
+            </div>`
+            $("#page_section").html(a_html)
+        }
+
+    function append_html(counter,val,page_no){
+        //console.log(counter,page_no, val)
+        var owner_details =''
+        if (val.application_status == "accepted"){
+            owner_details= val.email
+           
+            business_forum_connection= `<a href="/forum/i-blogs/${val.iid}/"
+                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='Business Forum'><i class="fas fa-comment-alt"></i>
+                    </a>`
+        }  else{
+            owner_details='N/A' 
+            business_forum_connection= ''
+        }
+
+      
+      
+        a_html=`
+            <tr id="item-${val.id}" >
+                <td>${counter}</td>
+                <td class="modelData" name="name" >${truncChar(val.inv_name,15)}</td>
+                <td class="modelData" name="description" >${truncChar(val.summary,40)}</td>
+                <td class="modelData" name="category" >$${numberWithCommas(val.total_value)}</td>
+                <td class="modelData" name="myinvest" >$${numberWithCommas(val.myinvest)}</td>
+                <td class="modelData" name="category" >${val.cat_name}</td>
+                <td class="modelData" name="email" >${owner_details}</td>
+                <td class="modelData" name="application_status" >${val.application_status}</td>
+                
+                
+                <td class="text-right modelAction modelData" name="action">
+                    <a href="/tr/i-details/${val.iid}/"
+                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='View Investment'><i class="fas fa-eye"></i>
+                    </a>
+                        
+                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                        data-object-name="${val.inv_name}"  data-item-id="${val.id}" 
+                        data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
+                    </a>
+                    ${business_forum_connection}
+                </td>
+
+            </tr>` ;
+        return a_html
+    }
+    function loadPageAjax(page_no){
+        //var app_status ='{{status}}'
+        var data
+        if (app_status) {
+            data = {    
+                    page_no : page_no,
+                    app_status : app_status, 
+                    csrfmiddlewaretoken: csrftoken,
+                }
+        }else {
+            data = {    
+                    page_no : page_no,
+                    csrfmiddlewaretoken: csrftoken,
+                }
+        }
+        //console.log(app_status,)
+        $.ajax({
+                type: "POST",
+                // define url name
+                url: display_myinvestement_ajax_url, 
+                data :data,
+                // handle a successful response
+                success: function (response) {
+                    //console.log('url', display_myinvestement_ajax_url)
+                    $('#userinvestment-table-tbody').html('')
+                    updatePaging2(response.data)
+                    if (response.data.per_table){
+                        per_table=response.data.per_table
+                    }
+                    var base_counter =(parseInt(page_no)-1)*per_table
+                    var counter=base_counter
+                    $.each(response.data.results, function(i, val) {
+                        counter=  counter +1
+                        a_html=append_html(counter,val,page_no)                           
+                        // add each model on every line
+                        $('#userinvestment-table-tbody').append(a_html)
+                    });
+                    },
+                    error: function () {
+                        alert('Error Occured');
+                    }
+                    
+            });
+            //add_model_class()
+        }
+    $('body').on('click', '.filter-status', function (e) {
+                e.preventDefault();  
+                var clicked_id = $(this).attr('id')
+                var url = $(this).attr('data-url');
+                var myclass =$('.filter-status')
+                app_status =$(this).attr('id')
+                $('#li_current_status').css('display','block')
+                $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+              
+                $.each(myclass, function(i, val) {
+                    let loop_id= $(this).attr('id')
+                    if (clicked_id == loop_id){
+                        $(this).removeClass('bg-warning')
+                        $(this).addClass('bg-light')
+                    
+                    }else {
+                        $(this).addClass('bg-warning')
+                        $(this).removeClass('bg-light')
+                    }
+                });
+         
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: url, 
+                        data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
+                        },
+                        // handle a successful response
+                        success: function (response) {
+                            $('#userinvestment-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_page){
+                                per_page=response.data.per_page
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_page
+                            var counter=base_counter
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#userinvestment-table-tbody').append(a_html)
+                            });
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                    }); 
+          
+          });
+      
+</script>
+{% endblock %}

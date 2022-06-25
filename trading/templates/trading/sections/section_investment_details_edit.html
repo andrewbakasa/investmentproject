@@ -12,8 +12,9 @@
      
         <li class="breadcrumb-item" ><a href="{% url 'user_businesses' %}" class ="badge rounded-pill bg-success">{% trans 'My Businesses' %}</a></li>
         <li class="breadcrumb-item" ><a href="{% url 'investment-details' model.id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
-   
-       
+        <li class="breadcrumb-item" ><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success" 
+          data-toggle="tooltip" data-placement="bottom" title='Business Forum'><i class="fas fa-comment-alt"></i></a></li>
+  
         <li class="breadcrumb-item" >
             <!-- EDIT MODEL -->
             <a class="model-edit show-form-update badge rounded-pill bg-success" href="#" data-url="{% url 'update_investment_ajax' model.id %}" 

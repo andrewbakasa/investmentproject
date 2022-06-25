@@ -788,6 +788,8 @@ def investor_details(request,id, investment_id):
        
 @login_required
 def edit_investment(request,id):
+    
+   
     #limit
     investmet_obj = get_object_or_404(Investment,pk=id, creater=request.user)
     id =investmet_obj.id
@@ -819,6 +821,7 @@ def edit_investment(request,id):
 
     context = {
         'model':investmet_obj,
+        'investment_id':id,
         "is_user_investor": is_user_investor,
         "is_user_record_owner": True if investmet_obj.creater == request.user else False,
         'first_entry': False,

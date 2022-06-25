@@ -49,11 +49,12 @@ INSTALLED_APPS = [
     'django_filters',
     'investments_appraisal.apps.InvestmentsAppraisalConfig',
     'trading.apps.TradingConfig',
+    'businessforum.apps.BusinessforumConfig',
     'fishapp.apps.FishappConfig',
     'beefapp.apps.BeefappConfig',   
     'import_export',   
     "common",
-    
+
 ]
 
 MIDDLEWARE = [
