@@ -23,9 +23,20 @@ from django.db.models import Q
 
 
 @login_required(login_url="account_login")
-def get_user_businesses(request):
-    BUSINESS_STATUS_CHOICE = ["closed", "open",] 
-    queryset = Investment.objects.filter(creater=request.user)
+def get_user_businesses(request, type):
+    BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"] 
+    current_time = datetime.datetime.now()
+      
+
+    if type =="unread":
+        queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
+    elif type =="closed": 
+        queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
+    elif type =="open":
+        queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
+    else:
+       queryset = Investment.objects.filter(creater=request.user)
+  
     form = UserInvestmentForm(initial={'creater': request.user})
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -55,18 +66,28 @@ def get_user_businesses(request):
         "total": queryset.count(),
         "user": request.user,
         'form': form,
+         'status': type,
         "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE
     }
     return render(request, 'trading/user_businesses.html', context)
- 
+
 @login_required(login_url="account_login")
 def get_user_businesses_load_status(request, status):
-    BUSINESS_STATUS_CHOICE = ["closed", "open",]
+    # this looks redudant
+    
+    
+    BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"]
     current_time = datetime.datetime.now() 
-    if status =="closed": 
+    if status =="unread":
+        queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
+    elif status =="closed": 
         queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
-    else:
+    elif status =="open":
         queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
+    else:
+        #all
+        queryset = Investment.objects.filter(Q(creater=request.user))
+
 
     form = UserInvestmentForm(initial={'creater': request.user})
     
@@ -111,12 +132,18 @@ def get_user_businesses_load_status(request, status):
 def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
-            BUSINESS_STATUS_CHOICE = ["closed", "open",]
+            BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"]
             current_time = datetime.datetime.now() 
-            if status =="closed": 
+           
+            if status =="unread":
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
+            elif status =="closed": 
                 queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
-            else:
+            elif status =="open":
                 queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
+            else:
+                #allll
+                queryset = Investment.objects.filter(Q(creater=request.user))
 
             
             if not ('pertable' in request.session):
@@ -182,8 +209,8 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
                 item_object['current_investment']=i.current_investment
                 item_object['user_stake']=i.userIsInvestorStake(request.user)
                 item_object['current_investment_percent']=i.current_investment_percent 
-                item_object['incoming_investors']=i.incoming_investors  
-                
+                item_object['blogs_count']=i.blogs_count
+                item_object['incoming_investors']=i.incoming_investors 
                 item_object['user_investor']=i.userIsInvestorStatement(request.user)
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
@@ -221,14 +248,16 @@ def view_investors(request, id):
 
     return render(request, 'trading/business_investors.html', context)
 
-    
+   
 
 @login_required(login_url="account_login")
 def get_user_investments_load_status(request, status):
+    #this method is redundant: verify my assertion
     APLLICATION_STATUS_CHOICE = ["pending", "recieved",
                             "verification","engagement",
                              "accepted","rejected"]  
     queryset = Investor.objects.filter(Q(user=request.user)).first()  
+    #print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw')
     df=queryset.trading_df_status(status)
     sum_total=0
     aver_val=0
@@ -239,7 +268,7 @@ def get_user_investments_load_status(request, status):
         aver_val = df['myinvest'].mean()
 
     dict_,colms= dataframe_to_list_dict(df,True)
-
+    #print(1, colms, dict_)
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()
         if obj:
@@ -279,6 +308,7 @@ def get_user_investments_load_status(request, status):
     return render(request, 'trading/user_investments.html', context)
 
 def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
+    #print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
     if request.method == 'POST':
         if request.is_ajax():
             APLLICATION_STATUS_CHOICE = ["pending", "recieved",
@@ -295,7 +325,7 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
                 aver_val = df['myinvest'].mean()
 
             dict_,colms= dataframe_to_list_dict(df,True)
-
+            #print(1, colms, dict_)
             if not ('pertable' in request.session):
                 obj= UserPreference.objects.filter(user=request.user).first()
                 if obj:
@@ -353,7 +383,11 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
             for i in obj_paginator.page(1).object_list:	
                 item_object = {}
                 for col_ in colms:
-                    item_object[col_]=i[col_]              
+                    item_object[col_]=i[col_] 
+                #----get the investment id----
+                investment_id = i['iid']
+                investment_obj= get_object_or_404(Investment, pk=investment_id)
+                item_object['blogs_count']=investment_obj.blogs_count             
                 results.append(item_object)
                 
             data["results"]=results
@@ -369,6 +403,7 @@ def get_user_investments(request):
                             "verification","engagement",
                              "accepted","rejected"]
     queryset = Investor.objects.filter(user=request.user).first()  
+    
     df=queryset.trading_df
     sum_total=0
     aver_val=0
@@ -379,7 +414,6 @@ def get_user_investments(request):
         aver_val = df['myinvest'].mean()
 
     dict_,colms= dataframe_to_list_dict(df,True)
-
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()
         if obj:
@@ -509,7 +543,9 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
                 item_object['user_investment_percent']=i.userInvestorPercent(request.user)
-                item_object['current_investment_percent']=i.current_investment_percent 
+                item_object['current_investment_percent']=i.current_investment_percent
+                item_object['blogs_count']=i.blogs_count
+                 
                 taglist = []
                 for j in i.tags.all():
                     taglist.append(j.name)
@@ -597,6 +633,7 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
                 item_object['user_investment_percent']=i.userInvestorPercent(request.user)
                 item_object['current_investment_percent']=i.current_investment_percent 
+                item_object['blogs_count']=i.blogs_count
                 taglist = []
                 for j in i.tags.all():
                     taglist.append(j.name)
@@ -691,7 +728,7 @@ def display_investment_ajax(request):
             item_object['user_investment_value']=i.userInvestorValue(request.user)
             item_object['user_investment_percent']=i.userInvestorPercent(request.user)
             item_object['current_investment_percent']=i.current_investment_percent 
-            #print(item_object)
+            item_object['blogs_count']=i.blogs_count
             taglist = []
             for j in i.tags.all():
                 taglist.append(j.name)
@@ -1065,7 +1102,7 @@ def save_all_user_investor_update(request,form,template_name):
                     item_object['userIsOwner']=parent_invest.userIsOwner(request.user)
                     
                     item_object['investors_count']=parent_invest.investors_count
-                    
+                    item_object['blogs_count']=parent_invest.blogs_count
                 item_object['investor_id']=pk
                 item_object['total_value']=parent_invest.total_value
 
@@ -1128,6 +1165,7 @@ def create_all_user_business(request,form,template_name):
             item_object['user_investment_value']=record.userInvestorValue(request.user)
             item_object['user_investment_percent']=record.userInvestorPercent(request.user)
             item_object['current_investment_percent']=record.current_investment_percent
+            item_object['blogs_count']=record.blogs_count
             item_object['incoming_investors']=record.incoming_investors        
             item_object['investors_count']= record.investors_count
             item_object['total_value']=record.total_value
@@ -1184,6 +1222,7 @@ def create_all_user_investor(request,form,template_name):
                 item_object['user_investment_value']=parent_invest.userInvestorValue(request.user)
                 item_object['user_investment_percent']=parent_invest.userInvestorPercent(request.user)
                 item_object['current_investment_percent']=parent_invest.current_investment_percent
+                item_object['blogs_count']=parent_invest.blogs_count
                 item_object['incoming_investors']=parent_invest.incoming_investors    
                 item_object['investors_count']=parent_invest.investors_count
                 item_object['total_value']=parent_invest.total_value
@@ -1265,8 +1304,8 @@ def delete_investor_this_user_ajax(request, investment_id, *args, **kwargs):
             item_object['userIsInvestor']=i.userIsInvestor(request.user)
             item_object['userIsOwner']=i.userIsOwner(request.user)
             item_object['current_investment_percent']=i.current_investment_percent
-
-            print('**********', item_object)
+            item_object['blogs_count']=i.blogs_count
+            #print('**********', item_object)
             taglist = []
             for j in i.tags.all():
                 taglist.append(j.name)
@@ -1309,6 +1348,7 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
            
             
             queryset = Investor.objects.filter(user=request.user).first()  
+            #print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw3')
             df=queryset.trading_df
             sum_total=0
             aver_val=0
@@ -1320,7 +1360,7 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
             item_object['total_sum']=int(sum_total)
             item_object['average']=round(aver_val,2)
 
-            print('>>>>>>>>', item_object)
+            #print('>>>>>>>>', item_object)
             data['model']=item_object
             
             return JsonResponse({'error': False, 'data': data})
@@ -1355,7 +1395,7 @@ def delete_investment_ajax(request, id,page_no, *args, **kwargs):
             item_object['tags'] =[]#taglist 
             data['model']=item_object
 
-            print('..........', item_object)
+            #print('..........', item_object)
             #messages.success(request, "Successfully deleted  model")
             
             return JsonResponse({'error': False, 'data': data})
@@ -1452,6 +1492,7 @@ def save_all_user_investment(request,form,template_name):
             item_object['user_investment_value']=item_instance.userInvestorValue(request.user)
             item_object['user_investment_percent']=item_instance.userInvestorPercent(request.user)
             item_object['current_investment_percent']=item_instance.current_investment_percent            
+            item_object['blogs_count']=item_instance.blogs_count
             item_object['incoming_investors']=item_instance.incoming_investors
             item_object['investors_count']=item_instance.investors_count                
             item_object['total_value']=item_instance.total_value
@@ -1562,11 +1603,15 @@ def display_business_ajax(request):
         bus_status = request.POST.get('bus_status', None)
         if bus_status == None:
             userdata= Investment.objects.filter(creater=request.user) 
-        else: 
-            if bus_status =="closed":
+        else:  
+            if bus_status =="unread":
+                userdata = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
+            elif bus_status =="closed": 
                 userdata = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
-            else:
+            elif bus_status =="open":
                 userdata = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
+            else:
+                userdata = Investment.objects.filter(creater=request.user)
 
     else:
         userdata= Investment.objects.filter(creater=request.user)
@@ -1626,6 +1671,7 @@ def display_business_ajax(request):
             item_object['current_investment']=i.current_investment
             item_object['user_stake']=i.userIsInvestorStake(request.user)
             item_object['current_investment_percent']=i.current_investment_percent 
+            item_object['blogs_count']=i.blogs_count
             item_object['incoming_investors']=i.incoming_investors 
             item_object['user_investor']=i.userIsInvestorStatement(request.user)
             item_object['userIsOwner']=i.userIsOwner(request.user)
@@ -1662,6 +1708,7 @@ def display_myinvestment_ajax(request):
     if len(df)>0 :
         df['id'] = pd.to_numeric(df.id)
     userdata, _= dataframe_to_list_dict(df,True)
+    #print(3, userdata)
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()
         if obj:
@@ -1714,7 +1761,9 @@ def display_myinvestment_ajax(request):
             item_object['inv_name']=i['inv_name']
             item_object['id']=i['id']
             item_object['iid']=i['iid']
-
+            investment_id = i['iid']
+            investment_obj= get_object_or_404(Investment, pk=investment_id)
+            item_object['blogs_count']=investment_obj.blogs_count  
            
             results.append(item_object)
 

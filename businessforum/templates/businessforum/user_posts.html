@@ -28,11 +28,15 @@
             <!-- ======= Breadcrumbs ======= -->
                 <div class="row">
                     <ol class="breadcrumb" >
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success">{% trans ' Financial Models' %}</a></li>
+                        <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
                        
-                        <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
-                      
+                        <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
+                          
+                        <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
+                                data-toggle="tooltip" data-placement="bottom" title='View Investment'><i class="fas fa-balance-scale"></i></a></li>
+                        
                         <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
                         <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id%}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>
   
@@ -44,8 +48,9 @@
                         </li>
                     </ol>      
                 </div>       
-                
-                <h1 class="mb-3">Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count}})</h1>
+                <h5>{{investment.description |truncatechars:50}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                <hr>
+                <h5 class="mb-3">Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count}})</h5>
                 {% for post in posts %}
                     <article class="media content-section">
                         <img class="rounded-circle article-img"  src="{{ post.author.profile.image.url }}" />
@@ -54,7 +59,11 @@
                                 <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}">{{ post.author }}</a>
                                 <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
                             </div>
-                            <h2><a class="article-title" href="{% url 'blog-detail' post.id %}">{{ post.title }}</a></h2>
+                            <h5>
+                                <a  class="article-title" href="{% url 'blog-detail' post.id %}"
+                                    data-toggle="tooltip" data-placement="bottom"  title='Click To Edit' >{{ post.title }}
+                                </a>
+                            </h5>
                             <p class="article-content">{{ post.content }}</p>
                         </div>
                     </article>

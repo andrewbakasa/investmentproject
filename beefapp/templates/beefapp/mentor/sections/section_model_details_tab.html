@@ -11,8 +11,12 @@
     </div>
     <!-- ======= Breadcrumbs ======= -->
       <ol id='header_olist' class="breadcrumb" >
-        <li class="breadcrumb-item"><a href="{% url 'index' %}"  class ="badge rounded-pill bg-success">Home</a></li>
-        <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}"  class ="badge rounded-pill bg-success">{% trans 'User Models' %}</a></li>
+        <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+          data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+   
+        <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
+          data-toggle="tooltip" data-placement="bottom" title='User Models'><i class="fas fa-chart-line"></i></a></li>
+    
         <li class="breadcrumb-item" >
             <!-- EDIT MODEL -->
             <a class="model-edit show-form-update badge rounded-pill bg-success" href="#" data-url="{% url 'update_model' usermodel.id %}" 

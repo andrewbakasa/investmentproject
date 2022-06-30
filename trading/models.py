@@ -7,6 +7,7 @@ from unicodedata import category
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 #from common.models import User
 from django.utils.translation import gettext_lazy as _
 from datetime import date, timedelta
@@ -57,7 +58,29 @@ class Investment(models.Model):
 
     def __str__(self):
         return self.name 
-
+    
+    
+    @property
+    def time_to_close_attr(self):
+        if self.closing_date > datetime.date.today():
+            return 'Closing in: ' + str((self.closing_date - datetime.date.today()).days) + ' days'
+        else:
+            return  'Closed: ' +str((datetime.date.today()-self.closing_date).days) + ' days ago'
+    
+    @property
+    def time_to_close(self):
+        if self.closing_date > datetime.date.today():
+            #
+            return str((self.closing_date - datetime.date.today()).days) + ' days'
+        else:
+            return  str((datetime.date.today()-self.closing_date).days) + ' days'
+    
+    @property
+    def closed_status(self):
+        if self.closing_date > datetime.date.today():
+            return False 
+        else:
+            return  True
     @property
     def details(self):
         
@@ -90,6 +113,15 @@ class Investment(models.Model):
         return total
     
     @property
+    def accepted_investment(self):
+        total = 0
+        acc_investments = self.investor_set.filter(Q(application_status ="accepted"))
+
+        for investment in acc_investments:
+            total += investment.value 
+
+        return total
+    @property
     def current_investment_percent(self):
         percent = 0
         curr = self.current_investment
@@ -104,7 +136,22 @@ class Investment(models.Model):
                 percent= int(percent)
         # between 0-100
         return str(min(max(percent,0),100))
-    
+   
+    @property
+    def accepted_investment_percent(self):
+        percent = 0
+        curr = self.accepted_investment
+        if self.total_value !=0:
+            percent= curr*100/self.total_value 
+        
+       
+            if percent < 1:
+                percent= round(percent,2)
+            else:
+                #==remove commas for any percent greater than 1
+                percent= int(percent)
+        # between 0-100
+        return str(min(max(percent,0),100))
     def userIsInvestor(self, user):       
         qs = self.investor_set.filter(user=user).first()
         if qs:
@@ -174,6 +221,24 @@ class Investment(models.Model):
                 return 0
 
         return 0
+
+    @property
+    def blogs_count(self): 
+        if  hasattr(self,'investmentblog'):   
+            item = self.investmentblog
+            return item.blogitem_set.count()
+        # if item:
+        #     blogs_count=BlogItem.objects.filter(investmentblog=item).count()
+        #     return blogs_count
+        return 0
+    @property
+    def has_blogs(self): 
+        if  hasattr(self,'investmentblog'):     
+            item = self.investmentblog
+            if item.blogitem_set:
+                if item.blogitem_set.count()>0:
+                    return True       
+        return False
 class InvestmentDetails(models.Model):
     investment = models.OneToOneField(Investment, on_delete=models.CASCADE)
     strategy = models.TextField(blank=True,null=True)
@@ -216,6 +281,7 @@ class Investor(models.Model):
         #get all that has null investments
     @property
     def trading_df(self):
+        #print('gettting')
         
         investments_df = pd.DataFrame(Investment.objects.all().values())
         investors_df = pd.DataFrame(Investor.objects.filter(Q(user=self.user), Q(investment__id__isnull=False)).values())
@@ -257,11 +323,20 @@ class Investor(models.Model):
             # 'username', 'first_name', 'last_name', 'email', 'id', 'cat_name',
             # 'cat_descript', 'uniqueid'
         else:
+            #print('AL NO>>>>>>>>>>>>>>>>>>>>>>')
             #select only for current user
             return df#[~df['id'].isna()]
         #select only for current user
-        return df#[~df['id'].isna()]
-    
+        #print('#############################################33')
+        #print(df.columns)
+        df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))    
+        return df #[~df['id'].isna()]
+
+    def get_blogs_count(self, id):
+        investment_obj= get_object_or_404(Investment, pk=id)
+        cnt=investment_obj.blogs_count
+        return cnt
+
     def trading_df_status(self, application_status=None):
         
         investments_df = pd.DataFrame(Investment.objects.all().values())
@@ -306,10 +381,15 @@ class Investor(models.Model):
             # 'inv_name', 'summary',  'total_value',
             # 'username', 'first_name', 'last_name', 'email', 'id', 'cat_name',
             # 'cat_descript', 'uniqueid'
+            
         else:
+            print('AL NO>>>>>>>>>>>>>>>>>>>>>>')
             #select only for current user
             return df#[~df['id'].isna()]
         #select only for current user
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        print(df.columns)
+        df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))    
         return df#[~df['id'].isna()]
 
 class Enterprenuer(models.Model):

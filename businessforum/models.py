@@ -3,6 +3,8 @@ from django.urls import reverse
 
 from trading.models import Investment
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
+from comment.models import Comment
 # Create your models here.
 class InvestmentBlog(models.Model):
     investment = models.OneToOneField(Investment, on_delete=models.CASCADE)
@@ -21,6 +23,8 @@ class BlogItem(models.Model):
     content = models.TextField(verbose_name='Post Content',null=True)
     date_posted = models.DateTimeField(auto_now_add=True, null=True)
 
+         # comment app
+    comments = GenericRelation(Comment)
     class Meta:
         ordering = ['-date_posted']
 

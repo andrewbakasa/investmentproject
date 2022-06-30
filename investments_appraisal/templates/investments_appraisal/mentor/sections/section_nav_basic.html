@@ -47,7 +47,7 @@
                <!-- Dispaly or hide LI -->
               <!-- If else statement cant be fiigured out yet -->
               <li {% userhasNewInvestorsMethod request.user %} class="my_messages_li">
-                <a href="{% url 'user_businesses' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have {% userNewInvestorsCountMethod request.user %} new Investor(s)'>
+                <a href="{% url 'user_businesses_unread' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have {% userNewInvestorsCountMethod request.user %} new Investor(s)'>
                     <i  style="color:orange" class="fas fa-envelope"></i>
                     <span class="counter counter-lg" style="top:4px ;">{% userNewInvestorsCountMethod request.user %} </span>
                 </a>

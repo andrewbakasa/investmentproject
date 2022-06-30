@@ -28,8 +28,9 @@
             <!-- ======= Breadcrumbs ======= -->
                 <div class="row">
                     <ol class="breadcrumb" >
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-                
+                        <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                    
                         <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
                             <a id='current_status' href="{% url 'user_investments' %}"
                                 data-toggle="tooltip" data-placement="bottom" 
@@ -38,13 +39,14 @@
                         </li>
                     </ol>      
                 </div>       
-                
+                <!-- <h5>{{investment.description |truncatechars:50}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                <hr> -->
                 <div class="content-section">
                     <form method="POST">
                         {% csrf_token %}
                         <fieldset class="form-group">
                             <legend class="border-bottom mb-4">Delete Post</legend>
-                            <h2>Are you sure you want to delete the post "{{ object.title }}"</h2>
+                            <h5>Are you sure you want to delete the post "{{ object.title }}"</h5>
                         </fieldset>
                         <div class="form-group">
                             <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>

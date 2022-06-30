@@ -373,6 +373,7 @@ class MacroeconomicParameters(models.Model):
 class UserPreference(models.Model):
     user = models.OneToOneField(User, on_delete= models.CASCADE)
     last_modified = models.DateTimeField(auto_now=True)
+    perpage_blogs = models.IntegerField(default=6, verbose_name='Blogs Page Records')
     perpage = models.IntegerField(default=6, verbose_name='Page Records')
     pertable = models.IntegerField(default=10, verbose_name='Table Records')
     g2 = models.BooleanField(default=True, verbose_name='G2: another')

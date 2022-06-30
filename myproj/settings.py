@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'beefapp.apps.BeefappConfig',   
     'import_export',   
     "common",
+    'comment',
 
 ]
 

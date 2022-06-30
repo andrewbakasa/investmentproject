@@ -4,6 +4,8 @@
 {% load tags %}
 {% load widget_tweaks %}
 {% load humanize %}
+{% load comment_tags %}
+
 {% block page_title %}
     <title>Blogs</title>
 {% endblock %}
@@ -28,11 +30,18 @@
             <!-- ======= Breadcrumbs ======= -->
                 <div class="row">
                     <ol class="breadcrumb" >
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success">{% trans ' Financial Models' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
-                      
+                        <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                       
+                        <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
+                        
+                         
+                        <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
+                                    data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
+                              
                         <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
+                        
                         <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id%}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>
   
                         <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
@@ -45,7 +54,8 @@
                 </div>       
                 
                
-                
+                <h5>{{investment.description |truncatechars:50}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                <hr>
                 <article class="media content-section">
                     <img class="rounded-circle article-img"  src="{{ object.author.profile.image.url }}" />
                     <div class="media-body">
@@ -54,13 +64,23 @@
                             <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
                             {% if object.author == user %}
                                 <div>
-                                    <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'blog-update' object.id %}">Update</a>
-                                    <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'blog-delete' object.id %}">Delete</a>
+                                    
+                                        <a  class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'blog-update' object.id  %}"
+                                            data-toggle="tooltip" data-placement="bottom"  title='Click To Begin Update' ><i class="fas fa-edit"></i>
+                                        </a>
+                                    
+                                                               
+                                        <a  class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'blog-delete' object.id %}"
+                                            data-toggle="tooltip"  data-placement="bottom"  title='Click To Delete' ><i class="fas fa-trash"></i>
+                                        </a>
                                 </div>
                             {% endif %}
                         </div>
-                        <h2 class="article-title" > {{ object.title }}</h2>
+                        <h5 class="article-title" > {{ object.title }}</h5>
                         <p class="article-content">{{ object.content }}</p>
+
+                        {% render_comments object request %} 
+                        <!-- {% include_bootstrap %} -->
                     </div>
                 </article>
 

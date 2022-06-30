@@ -283,7 +283,7 @@ class MacroeconomicParametersForm(forms.ModelForm):
 class UserPreferenceForm(forms.ModelForm):
     class Meta:
         model = UserPreference
-        fields = ['perpage', 'pertable']
+        fields = ['perpage_blogs', 'perpage', 'pertable']
   
     def clean_pertable(self):
         pertable = self.cleaned_data['pertable']

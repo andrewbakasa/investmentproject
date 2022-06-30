@@ -28,11 +28,16 @@
        <!-- ======= Breadcrumbs ======= -->
         <div class="row">
             <ol class="breadcrumb" >
-                <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" >{% trans 'Home' %}</a></li>
-                <li class="breadcrumb-item" ><a href="{% url 'user_businesses' %}" class ="badge rounded-pill bg-success">{% trans 'My Businesses' %}</a></li>
-  
-                <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment.id %}"  class ="badge rounded-pill bg-success">{% trans ' Business' %}</a></li>
+                <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                    data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
                 
+               <li class="breadcrumb-item" ><a href="{% url 'user_businesses' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='My Businesses'><i class="fas fa-industry"></i></a></li>
+        
+                             
+                <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment.id %}" class ="badge rounded-pill bg-success" 
+                    data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
+          
                 <li class="breadcrumb-item" >
                     <label id="total_projects_searched">Personal Investors</label>
                 </li>  
@@ -53,6 +58,16 @@
                         <hr>
                         <a href="#" class ="filter-status badge rounded-pill bg-warning text-dark">Analytics</a>
                         <a href="#" class="filter-status badge rounded-pill bg-warning text-dark">Rank Your Investors</a>
+                        <a href="#" class="filter-status badge rounded-pill bg-light text-dark">Accepted : {{investment.accepted_investment_percent |intcomma}}%</a>
+                        <a href="#" class="filter-status badge rounded-pill bg-light text-dark">All : {{investment.current_investment_percent |intcomma}}%</a>
+                        
+                        <a href="#" 
+                            {% if investment.closed_status %} class="filter-status badge rounded-pill bg-primary text-dark" {%else%}
+                                                              class="filter-status badge rounded-pill bg-light text-dark" {%endif%}  >
+                             {{investment.time_to_close_attr}} 
+                        </a>
+                     
+                        
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-striped">
                                 <thead class="thead-dark">

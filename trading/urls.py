@@ -36,7 +36,11 @@ urlpatterns = [
 
     path('u/i/load_status_ajax/<str:status>', views.get_user_investments_load_status_ajax, name="user_investments_load_status_ajax"),
 
-    path('u/b/', views.get_user_businesses, name="user_businesses"),
+    path('u/b/0/', views.get_user_businesses,{'type': 'all'}, name="user_businesses"),
+    path('u/b/1/', views.get_user_businesses,{'type': 'open'}, name="user_businesses_open"),
+    path('u/b/2/', views.get_user_businesses,{'type': 'closed'}, name="user_businesses_closed"),
+    path('u/b/', views.get_user_businesses,{'type': 'unread'}, name="user_businesses_unread"),
+
     path('u/b/load_status_ajax/<str:status>', views.get_user_businesses_load_status_ajax, name="user_business_load_status_ajax"),
 
 

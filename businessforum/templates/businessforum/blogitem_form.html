@@ -28,14 +28,18 @@
             <!-- ======= Breadcrumbs ======= -->
                 <div class="row">
                     <ol class="breadcrumb" >
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
-                      
+                        <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                     
+                            <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
+                                data-toggle="tooltip" data-placement="bottom" title='View Investment'><i class="fas fa-balance-scale"></i></a></li>
+                         
                         <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
                 
                     </ol>      
                 </div>       
-                
+                <h5>{{investment.description |truncatechars:50}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                <hr>
                 <div class="content-section">
                     <form method="POST" >
                         {% csrf_token %}

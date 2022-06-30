@@ -4,14 +4,18 @@
 {% load humanize %}
 <!---Removed padding from 70px-- 0px-->
 <section style= 'padding: 5px 0;' id="projects" class="projects">
-  
+
   <div class="container  box-element" data-aos="fade-up">
       <!-- ======= Breadcrumbs ======= -->
       <div class="row">
         <ol class="breadcrumb" >
-          <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
-          <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success">{% trans 'Financial Models' %}</a></li>
-          
+          <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+        
+          <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
+            data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
+        
+           
           <li class="breadcrumb-item active">
               <a href="#"    data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_model"
                 title='Create New Financial Model' class ="badge rounded-pill bg-success"><i class="fas fa-plus"></i>

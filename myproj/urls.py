@@ -14,5 +14,7 @@ urlpatterns = [
     path('forum/', include('businessforum.urls')),
     path('beef/', include('beefapp.urls')),
     path('fish/', include('fishapp.urls')),
+    path('comment/', include('comment.urls')),
+    path('api/', include('comment.api.urls')),  # only required for API Framework
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

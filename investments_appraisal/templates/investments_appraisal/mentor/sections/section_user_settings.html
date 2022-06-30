@@ -27,6 +27,15 @@
                       <span class="help-block">{{ error }}</span>
                       {% endfor %}
                   </div>
+
+                  <label class="col-sm-2 control-label" for="{{ form.perpage_blogs.id_for_label }}">{{ form.perpage_blogs.label }}</label>
+                  <div class="col-sm-4  {% if form.perpage_blogs.errors %} has-error{% endif %}">
+                      {{ form.perpage_blogs|add_class:"form-control" }}
+                      {% for error in form.perpage_blogs.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                  </div>
+                  
                   <label class="col-sm-2 control-label" for="{{ form.pertable.id_for_label }}">{{ form.pertable.label }}</label>
                   <div class="col-sm-4  {% if form.pertable.errors %} has-error{% endif %}">
                       {{ form.pertable|add_class:"form-control" }}

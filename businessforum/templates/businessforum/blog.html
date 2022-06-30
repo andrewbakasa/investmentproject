@@ -26,37 +26,60 @@
         <section style= 'padding: 5px 0;' id="projects" class="projects">  
             <div class="container   box-element" data-aos="fade-up">
             <!-- ======= Breadcrumbs ======= -->
-                <div class="row">
-                    <ol class="breadcrumb" >
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}"class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'View Investment' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>
-                                      
-                        <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
-                            <a id='current_status' href="{% url 'user_investments' %}"
-                                data-toggle="tooltip" data-placement="bottom" 
-                                title='Remove Status' class ="badge rounded-pill bg-success"><i>[{{status}}]</i> <span aria-hidden="true">×</span>
-                            </a> 
-                        </li>
-                    </ol>      
-                </div>       
-                
-               
-                
-                    {% for post in posts %}
-                        <article class="media content-section">
-                            <img class="rounded-circle article-img"  src="{{ post.author.profile.image.url }}" />
-                            <div class="media-body">
-                                <div class="article-matadata">
-                                    <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}">{{ post.author }}</a>
-                                    <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                    <div class="row">
+                        <ol class="breadcrumb" >
+                            <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                        
+                            <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
+                                data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
+                            
+                            <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>
+                                        
+                            <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
+                                <a id='current_status' href="{% url 'user_investments' %}"
+                                    data-toggle="tooltip" data-placement="bottom" 
+                                    title='Remove Status' class ="badge rounded-pill bg-success"><i>[{{status}}]</i> <span aria-hidden="true">×</span>
+                                </a> 
+                            </li>
+                        </ol>      
+                    </div>       
+                    
+                    <h5>{{investment.description |truncatechars:50}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                    <hr>
+                    {% if posts %}
+                        {% for post in posts %}
+                            <article class="media content-section">
+                                <img class="rounded-circle article-img"  src="{{ post.author.profile.image.url }}" />
+                                <div class="media-body">
+                                    <div class="article-matadata">
+                                        <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}">{{ post.author }}</a>
+                                        <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                                    </div>
+                                    <h5>
+                                        <a  class="article-title" href="{% url 'blog-detail' post.id %}"
+                                            data-toggle="tooltip" data-placement="bottom"  title='Click To View' >{{ post.title }}
+                                        </a>
+                                    </h5>
+                                
+                                    <p class="article-content">{{ post.content }}</p>
                                 </div>
-                                <h2><a class="article-title" href="{% url 'blog-detail' post.id %}">{{ post.title }}</a></h2>
-                                <p class="article-content">{{ post.content }}</p>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                    <div class="col-md-12">
+                        <div class="box">
+                            <div class="box-body text-center">
+                                </br>
+                                <h5>No Post, Click <u><b><a href="{% url 'blog-create' investment_id %}" >{% trans 'New Post' %}</a></b></u> link to create blogs for this investment</h5>
+                                </br>
+                                </br>
                             </div>
-                        </article>
-                    {% endfor %}
+        
+                        </div>
+                    </div>
+                    {% endif %}
 
                     {% if is_paginated %}
                         {% if page_obj.has_previous %}

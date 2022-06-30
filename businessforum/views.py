@@ -59,7 +59,7 @@ def investment_blogs(request,id):
         "models": blogsqueryset,
         "total": blogsqueryset.count(),
         "user": request.user,
-        # 'form': form,
+        'investment': investment,
     }
     return render(request, 'businessforum/blog.html', context)
 
@@ -72,21 +72,21 @@ class PostListView(ListView):
 
     def get_queryset(self):
 
-        if not ('perpage' in self.request.session):
+        if not ('perpage_blogs' in self.request.session):
             obj= UserPreference.objects.filter(user=self.request.user).first()
             if obj:
-                self.request.session['perpage']=obj.perpage
+                self.request.session['perpage_blogs']=obj.perpage_blogs
             else:# nothing in db
-                self.request.session['perpage']= 3
+                self.request.session['perpage_blogs']= 3
         else:
             obj= UserPreference.objects.filter(user=self.request.user).first()
             if obj:
-                self.request.session['perpage']=obj.perpage
+                self.request.session['perpage_blogs']=obj.perpage_blogs
             else:# nothing in db
-                self.request.session['perpage']= 3      
+                self.request.session['perpage_blogs']= 3      
 
-        per_page=self.request.session['perpage']
-        self.paginate_by =per_page
+        perpage_blogs=self.request.session['perpage_blogs']
+        self.paginate_by =perpage_blogs
         # i am investment owner or i have investment in the business
         investment = get_object_or_404(Investment, pk=self.kwargs.get('id'))
 
@@ -101,7 +101,10 @@ class PostListView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super(PostListView, self).get_context_data(**kwargs)
-        context["investment_id"] = pk=self.kwargs.get('id')
+        id=self.kwargs.get('id')
+        investment = get_object_or_404(Investment,pk=id)
+        context["investment"] = investment
+        context["investment_id"] = id
         return context
 class UserPostListView(ListView):
     model = BlogItem
@@ -112,21 +115,21 @@ class UserPostListView(ListView):
 
 
     def get_queryset(self):
-        if not ('perpage' in self.request.session):
+        if not ('perpage_blogs' in self.request.session):
             obj= UserPreference.objects.filter(user=self.request.user).first()
             if obj:
-                self.request.session['perpage']=obj.perpage
+                self.request.session['perpage_blogs']=obj.perpage_blogs
             else:# nothing in db
-                self.request.session['perpage']= 3
+                self.request.session['perpage_blogs']= 3
         else:
             obj= UserPreference.objects.filter(user=self.request.user).first()
             if obj:
-                self.request.session['perpage']=obj.perpage
+                self.request.session['perpage_blogs']=obj.perpage_blogs
             else:# nothing in db
-                self.request.session['perpage']= 3      
+                self.request.session['perpage_blogs']= 3      
 
-        per_page=self.request.session['perpage']
-        self.paginate_by =per_page
+        perpage_blogs=self.request.session['perpage_blogs']
+        self.paginate_by =perpage_blogs
 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         investment = get_object_or_404(Investment, pk=self.kwargs.get('id'))
@@ -135,7 +138,10 @@ class UserPostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserPostListView, self).get_context_data(**kwargs)
-        context["investment_id"] = self.kwargs.get('id')
+        id=self.kwargs.get('id')
+        investment = get_object_or_404(Investment,pk=id)
+        context["investment"] = investment
+        context["investment_id"] = id
         return context
 class PostDetailView(DetailView):
     model = BlogItem
@@ -146,7 +152,11 @@ class PostDetailView(DetailView):
         blogitem = get_object_or_404(BlogItem, pk=self.kwargs.get('pk'))
         investmentblog_id = blogitem.investmentblog.id
         investmentblog = get_object_or_404(InvestmentBlog, pk=investmentblog_id)
-        context["investment_id"] = investmentblog.investment.id
+
+        id=investmentblog.investment.id
+        investment = get_object_or_404(Investment,pk=id)
+        context["investment"] = investment
+        context["investment_id"] = id
         return context
 class PostCreateView(LoginRequiredMixin,CreateView):
     model = BlogItem
@@ -158,7 +168,10 @@ class PostCreateView(LoginRequiredMixin,CreateView):
         investmentblog, created=InvestmentBlog.objects.get_or_create(investment=investment)
         form = self.form_class(initial={'investmentblog': investmentblog })
         context={}
-        context["investment_id"] = investmentblog.investment.id
+        id=investmentblog.investment.id
+        investment = get_object_or_404(Investment,pk=id)
+        context["investment"] = investment
+        context["investment_id"] = id
         context["form"] = form
         return render(request, self.template_name, context)
        
@@ -183,8 +196,11 @@ class PostUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 
         form = self.form_class(instance= blogitem)
         context={}
-        context["investment_id"] = investmentblog.investment.id
+        id=investmentblog.investment.id
+        context["investment_id"] = id 
         context["form"] = form
+        investment = get_object_or_404(Investment,pk=id)
+        context["investment"] = investment
         return render(request, self.template_name, context)
     
     def form_valid(self,form):

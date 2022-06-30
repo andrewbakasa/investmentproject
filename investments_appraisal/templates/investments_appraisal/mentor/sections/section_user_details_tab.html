@@ -7,9 +7,15 @@
       <!-- ======= Breadcrumbs ======= -->
       <div class="row">
         <ol class="breadcrumb" >
-          <li class="breadcrumb-item"><a href="{% url 'index' %}" class ="badge rounded-pill bg-success">Home</a></li>
-          <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success">{% trans 'Financial Models' %}</a></li>
+          <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+       
+          <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
+            data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
           
+            <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success" 
+              data-toggle="tooltip" data-placement="bottom" title='Explore Investments'><i class="fas fa-balance-scale"></i></a></li>
+    
         </ol>
       </div> 
       <div class="row">
