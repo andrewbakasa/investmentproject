@@ -1496,6 +1496,8 @@ def save_all_user_investment(request,form,template_name):
             item_object['incoming_investors']=item_instance.incoming_investors
             item_object['investors_count']=item_instance.investors_count                
             item_object['total_value']=item_instance.total_value
+            item_object['closed_status']=item_instance.closed_status
+            
             taglist = []
             for i in item_instance.tags.all():
                    taglist.append(i.name)

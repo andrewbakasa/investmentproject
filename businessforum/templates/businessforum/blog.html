@@ -54,8 +54,11 @@
                                 <img class="rounded-circle article-img"  src="{{ post.author.profile.image.url }}" />
                                 <div class="media-body">
                                     <div class="article-matadata">
-                                        <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}">{{ post.author }}</a>
+                                        <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}"
+                                            data-toggle="tooltip" data-placement="bottom"  title='View posts by {{post.author}}'>{{ post.author }}</a>
+
                                         <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                                        <i><small style="color:goldenrod">{{ post.comments_count_attr }}</small></i>
                                     </div>
                                     <h5>
                                         <a  class="article-title" href="{% url 'blog-detail' post.id %}"
@@ -289,7 +292,7 @@
             owner_details= val.email
            
             business_forum_connection= `<a href="/forum/i-blogs/${val.iid}/"
-                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        style="color:goldenrod" data-toggle="tooltip" data-placement="bottom" 
                         title='Business Forum'><i class="fas fa-comment-alt"></i>
                     </a>`
         }  else{

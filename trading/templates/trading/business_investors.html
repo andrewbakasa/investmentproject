@@ -54,19 +54,19 @@
                     <div class="box-body">
                         {% if models %}
                         <h4 style="text-align:center;"> <b>Investors</b> pledges for: <i>{{investment.name|truncatechars:50}}</i> [{{total}}]</h4>
-                        <h5>{{investment.description |truncatechars:150}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                        <h5>{{investment.motivation |truncatechars:150}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
                         <hr>
                         <a href="#" class ="filter-status badge rounded-pill bg-warning text-dark">Analytics</a>
-                        <a href="#" class="filter-status badge rounded-pill bg-warning text-dark">Rank Your Investors</a>
+                        <a href="#" class="filter-status badge rounded-pill bg-warning text-dark ">Rank Your Investors</a>
                         <a href="#" class="filter-status badge rounded-pill bg-light text-dark">Accepted : {{investment.accepted_investment_percent |intcomma}}%</a>
                         <a href="#" class="filter-status badge rounded-pill bg-light text-dark">All : {{investment.current_investment_percent |intcomma}}%</a>
                         
                         <a href="#" 
                             {% if investment.closed_status %} class="filter-status badge rounded-pill bg-primary text-dark" {%else%}
-                                                              class="filter-status badge rounded-pill bg-light text-dark" {%endif%}  >
-                             {{investment.time_to_close_attr}} 
+                                                            class="filter-status badge rounded-pill bg-light text-dark" {%endif%}  >
+                            {{investment.time_to_close_attr}} 
                         </a>
-                     
+                    
                         
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-striped">
@@ -74,7 +74,7 @@
                                 <th style="width: 1%" >#</th>    
                                 <th style="width: 9%" >Email</th>
                                 <th style="width: 9%" >Title</th>
-                                <th style="width: 25%" >description</th>
+                                <th style="width: 25%" >motivation</th>
                                 <th style="width: 8%" >Value</th>
                                 <th style="width: 17%" >Date Created</th>
                                 <th style="width: 10%" >Application Stage</th>
@@ -86,7 +86,7 @@
                                     <td class="modelData" name="counter" >{{forloop.counter}}</td>
                                     <td class="modelData" name="name" >{{item.user.email}}</td>
                                     <td class="modelData" name="name" >{{item.name}}</td>
-                                    <td class="modelData" name="description" >{{item.description|truncatechars:45}}</td>
+                                    <td class="modelData" name="motivation" >{{item.motivation|truncatechars:45}}</td>
                                     <td class="modelData" name="total_value" >${{item.value| intcomma}}</td>
                                          
                                     <td class="modelData" name="date_created" >{{ item.date_created }}</td>
@@ -306,7 +306,7 @@
                           // ADDITION NOT SUCCESSFUL
                           $('.public_toggle_form-errors').html('');
                           if (data['error']) {
-                              var form_vars=['__all__','name','description','category', 'total_value','creater']
+                              var form_vars=['__all__','name','motivation','category', 'total_value','creater']
                               for (let p=0; p < form_vars.length; p++ ){
                                   let name_var = form_vars[p]
                                   if (data['error'][name_var]){
@@ -356,7 +356,7 @@
                 <tr id="item-${item.id}" >
                     <td><i class="fas fa-edit"></i></td>
                     <td class="modelData" name="name" >${item.name}</td>
-                    <td class="modelData" name="description" >${item.description}</td>
+                    <td class="modelData" name="motivation" >${item.motivation}</td>
                     <td class="modelData" name="category" >${item.category}</td>
                     <td class="modelData" name="total_value" >${item.total_value}</td>
                     <td class="modelData" name="current_investment" >${item.current_investment}</td>
@@ -395,8 +395,8 @@
             $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
                 //console.log(item.name)
                 var attr = $(this).attr("name");
-                if (attr == "description") {
-                    $(this).text(item.description);
+                if (attr == "motivation") {
+                    $(this).text(item.motivation);
                 } else if (attr == "category") {
                     $(this).text(item.category);
                 } else if (attr == "name") {
@@ -451,7 +451,7 @@
                       } else {
                           $('.public_toggle_form-errors').html('');
                           if (data.error) {
-                              var form_vars=['__all__','investment','user','name', 'description','value']//,
+                              var form_vars=['__all__','investment','user','name', 'motivation','value']//,
                       
                               for (let p=0; p < form_vars.length; p++ ){
                                   let name_var = form_vars[p]

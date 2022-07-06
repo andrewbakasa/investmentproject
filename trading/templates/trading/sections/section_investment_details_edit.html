@@ -24,7 +24,7 @@
             data-toggle="tooltip" data-placement="bottom" 
             title='Business Forum [{{ model.blogs_count}}]'><i class="fas fa-comment-alt"></i>
             {% if model.blogs_count != 0 %} 
-            <span class="counter counter-lg" style="color: yellow; top:-2px;">{{model.blogs_count}}</span> {% endif %}
+            <span class="counter counter-lg" style="color: red; top:-2px;">{{model.blogs_count}}</span> {% endif %}
           </a>
         </li>
   
@@ -122,7 +122,7 @@
           <h5>As Percentage</h5>
           <p id="current_investment">{{model.current_investment_percent | floatformat:-1 | intcomma}} %</p>
         </div>
-        <div class="project-info d-flex justify-content-between align-items-center">            
+        <div id="closing_date_div" class="project-info d-flex justify-content-between align-items-center">            
           <h5 id="closing_date_header" 
             {% if model.closed_status %} style="color:red" {%else%} style="color:green"{%endif%}>
               {% if model.closed_status %} Closed on {%else%} Closing Date{%endif%}

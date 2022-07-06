@@ -19,31 +19,37 @@
           <div class="box-body">
                 {% csrf_token %}
 
-              <div class="form-group {% if form.perpage.errors%} has-error{% endif%}">
-                  <label class="col-sm-2 control-label" for="{{ form.perpage.id_for_label }}">{{ form.perpage.label }}</label>
-                  <div class="col-sm-4  {% if form.perpage.errors %} has-error{% endif %}">
-                      {{ form.perpage|add_class:"form-control" }}
-                      {% for error in form.perpage.errors %}
-                      <span class="help-block">{{ error }}</span>
-                      {% endfor %}
-                  </div>
+                <div class="form-group row">
+                   <label class="col-sm-2 control-label" for="{{ pref_form.perpage.id_for_label }}">{{ pref_form.perpage.label }}</label>
+                    <div class="col-sm-4  {% if pref_form.perpage.errors %} has-error{% endif %}">
+                        {{ pref_form.perpage|add_class:"form-control" }}
+                        {% for error in pref_form.perpage.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    </br>
 
-                  <label class="col-sm-2 control-label" for="{{ form.perpage_blogs.id_for_label }}">{{ form.perpage_blogs.label }}</label>
-                  <div class="col-sm-4  {% if form.perpage_blogs.errors %} has-error{% endif %}">
-                      {{ form.perpage_blogs|add_class:"form-control" }}
-                      {% for error in form.perpage_blogs.errors %}
-                      <span class="help-block">{{ error }}</span>
-                      {% endfor %}
-                  </div>
-                  
-                  <label class="col-sm-2 control-label" for="{{ form.pertable.id_for_label }}">{{ form.pertable.label }}</label>
-                  <div class="col-sm-4  {% if form.pertable.errors %} has-error{% endif %}">
-                      {{ form.pertable|add_class:"form-control" }}
-                      {% for error in form.pertable.errors %}
-                      <span class="help-block">{{ error }}</span>
-                      {% endfor %}
-                  </div>
-              </div>
+                    <label class="col-sm-2 control-label" for="{{ pref_form.perpage_blogs.id_for_label }}">{{ pref_form.perpage_blogs.label }}</label>
+                    <div class="col-sm-4  {% if pref_form.perpage_blogs.errors %} has-error{% endif %}">
+                        {{ pref_form.perpage_blogs|add_class:"form-control" }}
+                        {% for error in pref_form.perpage_blogs.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                </br>  
+                <div class="form-group row">
+              
+                    <label class="col-sm-2 control-label" for="{{ pref_form.pertable.id_for_label }}">{{ pref_form.pertable.label }}</label>
+                    <div class="col-sm-4  {% if pref_form.pertable.errors %} has-error{% endif %}">
+                        {{ pref_form.pertable|add_class:"form-control" }}
+                        {% for error in pref_form.pertable.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                </div>
+                </br>
         </div>
       </br>
         <div class="box-footer">
@@ -55,7 +61,7 @@
 
         <div class="form-error2 public_toggle_form-errors form-group" style='display:none'>
         </div>
-    </form>
+        </form>
        
 
       </div>

@@ -35,7 +35,7 @@
                             data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
                           
                         <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
-                                data-toggle="tooltip" data-placement="bottom" title='View Investment'><i class="fas fa-balance-scale"></i></a></li>
+                                data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
                         
                         <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
                         <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id%}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>
@@ -56,8 +56,10 @@
                         <img class="rounded-circle article-img"  src="{{ post.author.profile.image.url }}" />
                         <div class="media-body">
                             <div class="article-matadata">
-                                <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}">{{ post.author }}</a>
+                                <a class="mr-2" href="{% url 'user-blogs' investment_id post.author.username %}"
+                                data-toggle="tooltip" data-placement="bottom"  title='View posts by {{post.author}}'>{{ post.author }}</a>
                                 <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                                <i><small style="color:goldenrod">{{ post.comments_count_attr }}</small></i>
                             </div>
                             <h5>
                                 <a  class="article-title" href="{% url 'blog-detail' post.id %}"

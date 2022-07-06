@@ -60,7 +60,8 @@
                     <img class="rounded-circle article-img"  src="{{ object.author.profile.image.url }}" />
                     <div class="media-body">
                         <div class="article-matadata">
-                            <a class="mr-2" href="{% url 'user-blogs' investment_id object.author.username %}">{{ object.author }}</a>
+                            <a class="mr-2" href="{% url 'user-blogs' investment_id object.author.username %}"
+                            data-toggle="tooltip" data-placement="bottom"  title='View posts by {{object.author}}'>{{ object.author }}</a>
                             <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
                             {% if object.author == user %}
                                 <div>

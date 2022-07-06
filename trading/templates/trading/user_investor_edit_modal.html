@@ -13,7 +13,7 @@
 </div>
 
 <div class="modal-body">
-    <form class="model-form-edit form-horizontal" enctype="multipart/form-data" method="post" data-url="{% url 'update_investor' pk=form.instance.id %}">
+    <form class="model-form-edit form-horizontal modal-wide" enctype="multipart/form-data" method="post" data-url="{% url 'update_investor' pk=form.instance.id %}">
       {% csrf_token %}
       
         <div class="modal-body">
@@ -30,10 +30,10 @@
         
         </br>
         <div class="form-group row">  
-            <label class="col-sm-3 col-form-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
-            <div class="col-sm-9 {% if form.description.errors %} has-error{% endif %}">
-              {{ form.description|add_class:"form-control" }}
-              {% for error in form.description.errors %}
+            <label class="col-sm-3 col-form-label" for="{{ form.motivation.id_for_label }}">{{ form.motivation.label }}</label>
+            <div class="col-sm-9 {% if form.motivation.errors %} has-error{% endif %}">
+              {{ form.motivation|add_class:"form-control" }}
+              {% for error in form.motivation.errors %}
               <span class="help-block">{{ error }}</span>
               {% endfor %}
             </div>

@@ -11,12 +11,12 @@ from django.db.models import Q
 
 
 class InvestorFormUpdate(forms.ModelForm):
-    description = forms.CharField(
+    motivation = forms.CharField(
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
             'cols'          : "30", #size
             'rows'          : "5", #size
-            'placeholder'   : 'description', 
+            'placeholder'   : 'motivation', 
             'style'         : 'resize : none' 
             }), required=False) 
      
@@ -27,15 +27,15 @@ class InvestorFormUpdate(forms.ModelForm):
 
     class Meta:
         model = Investor
-        fields = ['investment','user','name', 'description','value' ]
+        fields = ['investment','user','name', 'motivation','value' ]
     
 class InvestorForm(forms.ModelForm): 
-    description = forms.CharField(
+    motivation = forms.CharField(
             help_text=" Describe the description",#text to help
             widget=forms.Textarea( attrs={
             'cols'          : "30", #size
-            'rows'          : "5", #size
-            'placeholder'   : 'description', 
+            'rows'          : "3", #size
+            'placeholder'   : 'motivation', 
             'style'         : 'resize : none' 
             }), required=False)   
     
@@ -53,7 +53,7 @@ class InvestorForm(forms.ModelForm):
     
     class Meta:
         model = Investor
-        fields = ['investment','user','name', 'description','value' ]
+        fields = ['investment','user','name', 'motivation','value' ]
     
     def save(self, commit=True):
         transaction = super().save(commit)

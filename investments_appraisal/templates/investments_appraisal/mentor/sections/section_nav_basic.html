@@ -66,13 +66,10 @@
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
 
                     <li>
-                        <a class="dropdown-item" href="{% url 'upload_form_user_profile' %}" >My profile</a>
+                        <a class="dropdown-item" href="{% url 'upload_form_user_profile' %}" >My Profile</a>
                     </li>
 
-                    <li>
-                        <a class="dropdown-item" href="{% url 'upload_form_user_pref' %}" >Settings</a>
-                        
-                    </li>
+                  
                     {% if request.user.is_superuser %}
                         <li>
                           <a class="dropdown-item" href="{% url 'ulogin' %}" >Users Logged in</a>                  

@@ -228,3 +228,16 @@ class PostDeleteView(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
         if self.request.user == post.author:
             return True
         return False
+
+""" 
+Method Flowchart
+1. dispatch()
+2. http_method_not_allowed()
+3. get_template_names()
+4. get_queryset()
+5. get_context_object_name()
+6. get_context_data()
+7. get()
+8. render_to_response() 
+
+"""

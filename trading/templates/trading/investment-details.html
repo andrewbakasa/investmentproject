@@ -48,12 +48,12 @@
 
 {% block modal_divs %}
     <!-- EDIT DISPLAY HOLDER -->
+    
     <div class="modal fade" id="modal-usermodel">
-        <div class="modal-dialog">
+        <div id='dynamic-div' class="modal-dialog">
             <div class="modal-content"></div>
         </div>
-    </div>
-
+    </div> 
     <!-- Delete confirmation modal -->
     <div class="modal fade" id="confirmdelete" role="dialog">
         <div class="modal-dialog">
@@ -122,16 +122,29 @@
             $("#investments a:first").addClass( "active") 
             $("#investors a:first").addClass( "active") 
             $("#iamaninvestor a:first").addClass( "active")             
-        
+            
            //------LOAD THE FORM ON MODAL DIV----------
            $('body').on('click', '.show-form-update', function(e){
               e.stopPropagation() 
               var btn = $(this);// fix button  delay
+              var url =btn.attr("data-url")
               $.ajax({
-              url: btn.attr("data-url"),
+              url: url,
               type: 'get',
               dataType:'json',
               beforeSend: function(){
+                var form_para= $(this)
+                    tittle=btn.attr('title')
+                    var modal_wide= btn.hasClass('modal-wide')
+                    //console.log('Check......', modal_wide, url, tittle)
+                    if(tittle == 'Edit Equity' || tittle == 'Edit Investment Pledge'){
+                        //console.log('modal_wide',tittle)
+                        $('#dynamic-div').addClass('modal-lg')
+                    }else{
+                        //console.log('modal_wide',tittle)
+                        $('#dynamic-div').removeClass('modal-lg') 
+                    }
+                  
                   $('#modal-usermodel').modal('show');
               },
               success: function(data){
@@ -140,7 +153,7 @@
                   is_user_investor= data.is_user_investor_bool 
                   investment_capital=data.total_value
                   curr_pledge=data.value   
-                  console.log('checkkkkkkk..', data)                
+                  //console.log('checkkkkkkk..', data)                
                   $('#modal-usermodel .modal-content').html(data.html_form);
               }
               });
@@ -271,7 +284,7 @@
                   processData:false,
                   contentType: false,
                   success: function(data){
-                      console.log( 'url', form.attr('data-url'))
+                      //console.log( 'url', form.attr('data-url'))
                       if(data.model){
                           
                           //updateTable(data.model);
@@ -300,7 +313,7 @@
                       } else {
                           $('.public_toggle_form-errors').html('');
                           if (data.error) {
-                              console.log('error: ' ,data.error)
+                              //console.log('error: ' ,data.error)
                               var form_vars=['__all__','investment','user','name', 'description','value']//,
                       
                               for (let p=0; p < form_vars.length; p++ ){

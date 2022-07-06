@@ -260,7 +260,7 @@ class Investor(models.Model):
     investment = models.ForeignKey(Investment, on_delete=models.SET_NULL, null=True) 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, verbose_name='Keywords')
-    description = models.TextField(verbose_name='Investment Proposal')
+    motivation = models.TextField(verbose_name='Investment Motivation')
     #postiv float
     value= models.PositiveBigIntegerField(default= 0, verbose_name='Funds Pledge')
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -295,9 +295,9 @@ class Investor(models.Model):
             # mwrge
           
             df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop([
-                        'likes','views','date_created_y','date_created_x','description_y'
+                        'likes','views','date_created_y','date_created_x','motivation'
                         ,'name_y','user_id','investment_id'], axis=1).rename(
-                        {'id_x': 'iid','id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
+                        {'id_x': 'iid','id_y': 'retain_id','description':'summary', 'value':'myinvest', 
                         'name_x':'inv_name' }, axis=1)
 
             if users_df.shape[0]>0:
@@ -354,9 +354,9 @@ class Investor(models.Model):
             # mwrge
           
             df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop([
-                        'likes','views','date_created_y','date_created_x','description_y'
+                        'likes','views','date_created_y','date_created_x','motivation'
                         ,'name_y','user_id','investment_id'], axis=1).rename(
-                        {'id_x': 'iid','id_y': 'retain_id','description_x':'summary', 'value':'myinvest', 
+                        {'id_x': 'iid','id_y': 'retain_id','description':'summary', 'value':'myinvest', 
                         'name_x':'inv_name' }, axis=1)
 
             if users_df.shape[0]>0:

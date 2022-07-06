@@ -163,8 +163,8 @@
                         $('.myModalLabel').html('Add Investment Equity')
                     }   
                 }
-                console.log('user_is_owner',user_is_owner)
-                console.log('is_user_investor',is_user_investor)
+                //console.log('user_is_owner',user_is_owner)
+                //console.log('is_user_investor',is_user_investor)
 
             })
 
@@ -179,6 +179,7 @@
            $('body').on('click', '.show-form-update', function(e){
               e.stopPropagation() 
               var btn = $(this);// fix button  delay
+              //console.log(btn)
               $.ajax({
                 url: btn.attr("data-url"),
                 type: 'get',
@@ -190,9 +191,10 @@
                     tittle=btn.attr('title')
                     //console.log("this", btn)
                    
-                    //var modal_wide= btn.hasClass('modal-wide')
-                    if(tittle == 'Edit Data'){ 
-                        console.log("tittle", tittle)
+                    var modal_wide= btn.hasClass('modal-wide')
+                    //console.log("invest-edit>>>>>:", modal_wide, tittle )
+                    if(tittle == 'Edit Data' || tittle == 'Edit Equity'){ 
+                        //console.log("tittle", tittle)
                         //console.log('modal_wide',tittle)
                         $('#dynamic-div').addClass('modal-lg')
                     }else{
@@ -253,6 +255,16 @@
                               var js_closing_date = new Date(data.model.closing_date) 
                               //console.log('getshortDate_:', getshortDate_(js_closing_date))  
                               $('#closing_date').html(`${getshortDate_(js_closing_date)}`);
+                          }
+
+                       
+                          if (data.model.closed_status){ 
+                                $('#closing_date_header').css({color:'red'}) 
+                                $('#closing_date_header').html(`Closed on`);
+                                
+                            }else {
+                                $('#closing_date_header').css({color:'green'})          
+                                $('#closing_date_header').html(`Closing Date`);
                           }
 
                           
@@ -354,10 +366,18 @@
 
                           if (data.model.closing_date){
                               var js_closing_date = new Date(data.model.closing_date)
-                              //console.log('getshortDate_:', getshortDate_(js_closing_date)) 
-                             
                               $('#closing_date').html(`${getshortDate_(js_closing_date)}`);
                           }
+
+                          if (data.model.closed_status){ 
+                                $('#closing_date_header').css({color:'red'}) 
+                                $('#closing_date_header').html(`Closed on`);
+                               
+                            }else {
+                                $('#closing_date_header').css({color:'green'})          
+                                $('#closing_date_header').html(`Closing Date`);
+                          }
+
                           if (data.model.current_investment){
                               $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
                           }
@@ -425,8 +445,7 @@
           function updateTable(item){
             // Model Strategy
             if (item.strategy){
-                ahtml= `<p id="model-strategy">
-                        ${item.strategy}</br>
+                ahtml= `${item.strategy}</br>
                         <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
                         data-target="#modal_add_investment_strategy"> <i class="fas fa-edit"></i>
                         </a>`
@@ -434,8 +453,7 @@
             }
            // Model Summary
             if (item.summary){
-                ahtml= `<p id="model-summary">
-                        ${item.summary}</br>
+                ahtml= `${item.summary}</br>
                         <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
                         data-target="#modal_add_investment_summary"> <i class="fas fa-edit"></i>
                         </a>`
@@ -444,8 +462,7 @@
 
             // Model ROI
             if (item.roi){
-                ahtml= `<p id="model-roi">
-                        ${item.roi}</br>
+                ahtml= `${item.roi}</br>
                         <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
                         data-target="#modal_add_investment_roi"> <i class="fas fa-edit"></i>
                         </a>`
@@ -454,8 +471,7 @@
 
              // Model ROI
              if (item.shareholding){
-                ahtml= `<p id="model-shareholding">
-                        ${item.shareholding}</br>
+                ahtml= `${item.shareholding}</br>
                         <a href="#" class="btn btn-primary btn-round" data-toggle="modal"
                         data-target="#modal_add_investment_shareholding"> <i class="fas fa-edit"></i>
                         </a>`

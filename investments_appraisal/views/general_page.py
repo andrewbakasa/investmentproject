@@ -2660,18 +2660,25 @@ def upload_form_user_pref(request):
 	pref, created = UserPreference.objects.get_or_create(user=request.user)
 	form = UserPreferenceForm(instance=pref)
 	context ={}
-	context['form']=form
+	context['pref_form']=form
 	return render(request, 'investments_appraisal/mentor/user_settings.html', context)
 
 def upload_form_user_profile(request):
-	pref, created = UserProfile.objects.get_or_create(user=request.user)
-	form = UserProfileForm(instance=pref)
+	prof, _ = UserProfile.objects.get_or_create(user=request.user)
+	profile_form = UserProfileForm(instance=prof)
 	context ={}
 	personal_record= False
-	if pref:
-		if pref.age or pref.country or pref.sex or pref.profession or pref.aboutyou:
+	if prof:
+		if prof.age or prof.country or prof.sex or prof.profession or prof.aboutyou:
 			personal_record=True
 
+	pref_record= False
+	pref, _ = UserPreference.objects.get_or_create(user=request.user)
+	pref_form = UserPreferenceForm(instance=pref)
+	
+	if pref:
+		if pref.perpage_blogs or pref.perpage or pref.pertable:
+			pref_record=True
 	#userobj = get_object_or_404(User,user=request.user)
 	user_extra_details_form = UserForm(instance=request.user)
 	user_extra_details_record= False
@@ -2681,11 +2688,15 @@ def upload_form_user_profile(request):
 			user_extra_details_record=True
     
 	context={
-		'form':form,
+		'profile_form':profile_form,
 		'personal_record':personal_record,
 		'user_extra_details_form':user_extra_details_form,
-		'user_extra_details_record':user_extra_details_record
+		'user_extra_details_record':user_extra_details_record,
+		'pref_form':pref_form,
+		'user_pref_record':pref_record,
+		'user_extra_details_form':user_extra_details_form,
 	}
+	
 	return render(request, 'investments_appraisal/mentor/user_profile.html', context)
 
 def update_user_pref(request):

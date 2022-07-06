@@ -110,10 +110,10 @@
 
                                                 {% if item.application_status == "accepted" %} 
                                                     <a href="{% url 'investment-blogs' item.iid %}" class ="iconClass-primary"
-                                                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                        style="color:goldenrod" data-toggle="tooltip" data-placement="bottom" 
                                                         title='Business Forum [{{ item.blogs_count}}]'><i class="fas fa-comment-alt"></i>
                                                         {% if item.blogs_count != 0 %} 
-                                                        <span class="counter counter-lg" style="color: brown;">{{item.blogs_count}}</span> {% endif %}
+                                                        <span class="counter counter-lg" style="color: red;">{{item.blogs_count}}</span> {% endif %}
                                                     </a>
                                                 {%endif%}
 
@@ -350,11 +350,11 @@
             owner_details= val.email
             span=``
             if (val.blogs_count != 0){
-                span=`<span class="counter counter-lg" style="color:brown;">${val.blogs_count}</span>`          
+                span=`<span class="counter counter-lg" style="color:red;">${val.blogs_count}</span>`          
             }
 
             business_forum_connection= `<a href="/forum/i-blogs/${val.iid}/" class ="iconClass-primary" 
-                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        style="color:goldenrod" data-toggle="tooltip" data-placement="bottom" 
                         title='Business Forum [${val.blogs_count}]'><i class="fas fa-comment-alt"></i>
                         ${span}
                     </a>`
