@@ -41,7 +41,7 @@ class Tag(models.Model):
 
    
 class Investment(models.Model):
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=60, verbose_name='title')
     description = models.TextField(null=True)
     creater = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey('InvestmentCategory', on_delete=models.SET_NULL, null=True,verbose_name="Category")
@@ -337,9 +337,14 @@ class Investor(models.Model):
         cnt=investment_obj.blogs_count
         return cnt
 
-    def trading_df_status(self, application_status=None):
+
+  
+    def trading_df_status(self, application_status=None, slug=None):
         
-        investments_df = pd.DataFrame(Investment.objects.all().values())
+        if 	slug==None:
+            investments_df = pd.DataFrame(Investment.objects.all().values())
+        else:
+            investments_df = pd.DataFrame(Investment.objects.filter(Q(description__icontains=slug)).values())
         if 	application_status==None:
             investors_df = pd.DataFrame(Investor.objects.filter(Q(user=self.user), Q(investment__id__isnull=False)).values())
         else:
@@ -383,12 +388,12 @@ class Investor(models.Model):
             # 'cat_descript', 'uniqueid'
             
         else:
-            print('AL NO>>>>>>>>>>>>>>>>>>>>>>')
+            #print('AL NO>>>>>>>>>>>>>>>>>>>>>>')
             #select only for current user
             return df#[~df['id'].isna()]
         #select only for current user
-        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-        print(df.columns)
+        #print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        #print(df.columns)
         df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))    
         return df#[~df['id'].isna()]
 

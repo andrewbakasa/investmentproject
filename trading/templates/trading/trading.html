@@ -414,91 +414,90 @@
             $('#confirmdelete .modal-footer input').attr('item-id', item_id);
         });
           $("body").on("keyup", "#search", function(){
-            var search_val = $(this).val().toLowerCase();
-            var tag_name ="{{tag_name}}"
-            var tag_id ="{{tag_id}}"
-            search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
-            if (search_val.length == 0 ){
-                if (tag_name.length  == 0){
-                  //console.log('searching only display :0')
-                  display_investment_ajax_url = "{% url 'display_investment_ajax' %}"
-                }else{
-                  // console.log('tag only display :1')
-                  //tag
-                  display_investment_ajax_url = `{% url 'investment_tags_ajax' 12345 %}`.replace(/12345/, tag_id.toString()); 
-          
+                var search_val = $(this).val().toLowerCase();
+                var tag_name ="{{tag_name}}"
+                var tag_id ="{{tag_id}}"
+                search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
+                if (search_val.length == 0 ){
+                    if (tag_name.length  == 0){
+                      //console.log('searching only display :0')
+                      display_investment_ajax_url = "{% url 'display_investment_ajax' %}"
+                    }else{
+                      // console.log('tag only display :1')
+                      //tag
+                      display_investment_ajax_url = `{% url 'investment_tags_ajax' 12345 %}`.replace(/12345/, tag_id.toString()); 
+              
+                    }
+                    //clear value
+                    $('#total_projects_searched').val('')
+              
+                } else{
+                  if (tag_name.length  == 0){
+                      // console.log('searching only display :3')
+                      //search
+                      display_investment_ajax_url = `{% url 'investment_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
+              
+                    }else{
+                      // console.log('tag and search display :4')
+                      // tag and search
+                      display_investment_ajax_url = `{% url 'investment_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, tag_id.toString()).replace(/6789/, search_val.toString()); 
+                    
+                    }
                 }
-                 //clear value
-                 $('#total_projects_searched').val('')
-          
-            } else{
-               if (tag_name.length  == 0){
-                  // console.log('searching only display :3')
-                  //search
-                  display_investment_ajax_url = `{% url 'investment_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
-          
-                }else{
-                  // console.log('tag and search display :4')
-                  // tag and search
-                  display_investment_ajax_url = `{% url 'investment_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, tag_id.toString()).replace(/6789/, search_val.toString()); 
-                 
-                }
-            }
+                
             
-         
-             // click first page
-            page_no=1
-
-             // ajax call
-             $.ajax({
-                    type: "POST",
-                    // define url name
-                    url: display_investment_ajax_url, 
-                    data : {    
-                        page_no : page_no, 
-                        csrfmiddlewaretoken: csrftoken,
-                    },
-                    // handle a successful response
-                    success: function (response) {
-                        $('#project_div').html('')
-                        var num_of_pages=1
-                        if (response.data.per_page){
-                            per_page=response.data.per_page
-                        }
-
-                        if (response.data.num_of_pages){
-                          num_of_pages=response.data.num_of_pages
-                        }
-                        var records
-                        if (response.data.totalrecords == 0) {
-                          records= `No records found`
-                          html_text= `<div class="col-lg-12 text-center"><p>${records}</p></div>`
-                          $('#project_div').html(html_text)
-                        }else if(response.data.totalrecords == 1){
-                          records= `${response.data.totalrecords} record found`;
-                        }else{
-                          records= `${response.data.totalrecords} records found`;
-                        }
-                        
-                        html_a= `<label id="total_projects_searched"><i>${records}</i></label>`
-                        $('#total_projects_searched').html(html_a)
-                       
-                        updatePaging2(response.data)
-                        var base_counter =(parseInt(page_no)-1)*per_page
-                        var counter=base_counter
-                        $.each(response.data.results, function(i, val) {
-                            a_html=append_html(counter,val)
-                            // add each model on every line
-                            $('#project_div').append(a_html)
-                        });
-                        set_model_complete()
-                        set_my_portifolio()
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_investment_ajax_url, 
+                        data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
                         },
-                        error: function () {
-                            alert('Error Occured');
-                        }
-                }); 
-          
+                        // handle a successful response
+                        success: function (response) {
+                            $('#project_div').html('')
+                            var num_of_pages=1
+                            if (response.data.per_page){
+                                per_page=response.data.per_page
+                            }
+
+                            if (response.data.num_of_pages){
+                              num_of_pages=response.data.num_of_pages
+                            }
+                            var records
+                            if (response.data.totalrecords == 0) {
+                              records= `No records found`
+                              html_text= `<div class="col-lg-12 text-center"><p>${records}</p></div>`
+                              $('#project_div').html(html_text)
+                            }else if(response.data.totalrecords == 1){
+                              records= `${response.data.totalrecords} record found`;
+                            }else{
+                              records= `${response.data.totalrecords} records found`;
+                            }
+                            
+                            html_a= `<label id="total_projects_searched"><i>${records}</i></label>`
+                            $('#total_projects_searched').html(html_a)
+                          
+                            updatePaging2(response.data)
+                            var base_counter =(parseInt(page_no)-1)*per_page
+                            var counter=base_counter
+                            $.each(response.data.results, function(i, val) {
+                                a_html=append_html(counter,val)
+                                // add each model on every line
+                                $('#project_div').append(a_html)
+                            });
+                            set_model_complete()
+                            set_my_portifolio()
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                    }); 
+              
           
           });
          
@@ -621,7 +620,7 @@
      </script>
 
   {% endblock %}
-
+<!---------------------- CUSTOM SEARCH ------------------>
   {% block content_custom_menu_navbar %}
   <!-- ======= Header ======= -->
   {% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}

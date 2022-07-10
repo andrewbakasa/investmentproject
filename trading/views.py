@@ -126,9 +126,229 @@ def get_user_businesses_load_status(request, status):
 
     return render(request, 'trading/user_businesses.html', context)
 
+def business_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
+    current_time = datetime.datetime.now()
+    if request.method == 'POST':
+        if search_type == 1:
+            if status =="unread":
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending'), Q(description__icontains=slug) )
+            elif status =="closed": 
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time),  Q(description__icontains=slug))
+            elif status =="open":
+                queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time), Q(description__icontains=slug))
+            else:
+                #allll
+                queryset = Investment.objects.filter(Q(creater=request.user), Q(description__icontains=slug))
+        else:
+            if status =="unread":
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
+            elif status =="closed": 
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
+            elif status =="open":
+                queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
+            else:
+                #allll
+                queryset = Investment.objects.filter(Q(creater=request.user))
+
+        if not ('pertable' in request.session):
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+        else:
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+
+        pertable=request.session['pertable']
+    
+
+        obj_paginator = Paginator(queryset, pertable)
+        first_page = obj_paginator.page(1).object_list
+        # = obj_paginator.get_page(1)
+        page_range = obj_paginator.page_range
+        
+        page_no = request.POST.get('page_no', None)
+        if page_no== None:
+            page_no=1
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)    
+        
+        
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+            #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+    
+
+            
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+        results=[]
 
 
+        for i in obj_paginator.page(page_no).object_list:			
+            cdate= i.date_created.ctime()
+            item_object = model_to_dict(i)
+            item_object['category']=i.category.name
+            item_object['closing_date']=i.closing_date.ctime()
+            item_object['date_created']=f'{i.date_created.ctime()}'
+            item_object['current_investment']=i.current_investment
+            item_object['user_stake']=i.userIsInvestorStake(request.user)
+            item_object['current_investment_percent']=i.current_investment_percent 
+            item_object['blogs_count']=i.blogs_count
+            item_object['incoming_investors']=i.incoming_investors 
+            item_object['user_investor']=i.userIsInvestorStatement(request.user)
+            item_object['userIsOwner']=i.userIsOwner(request.user)
+            item_object['user_investment_value']=i.userInvestorValue(request.user)
+            item_object['user_investment_percent']=i.userInvestorPercent(request.user)
+            item_object['investors_count']=i.investors_count                
+            item_object['total_value']=i.total_value
+            taglist = []
+            for j in i.tags.all():
+                taglist.append(j.name)
+            item_object['tags']= taglist
+            
+            results.append(item_object)									 
+        
+            
+        data["results"]=results
+        return JsonResponse({"data":data})
+    else:
+        return JsonResponse({'error': True, 'data': 'errors'})  
+    
 
+def investments_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
+    current_time = datetime.datetime.now()
+    if request.method == 'POST':
+        if search_type == 1:
+            if status =="unread":
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending'), Q(description__icontains=slug) )
+            elif status =="closed": 
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time),  Q(description__icontains=slug))
+            elif status =="open":
+                queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time), Q(description__icontains=slug))
+            else:
+                #allll
+                queryset = Investment.objects.filter(Q(creater=request.user), Q(description__icontains=slug))
+        else:
+            if status =="unread":
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
+            elif status =="closed": 
+                queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
+            elif status =="open":
+                queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
+            else:
+                #allll
+                queryset = Investment.objects.filter(Q(creater=request.user))
+
+        if not ('pertable' in request.session):
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+        else:
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+
+        pertable=request.session['pertable']
+    
+
+        obj_paginator = Paginator(queryset, pertable)
+        first_page = obj_paginator.page(1).object_list
+        # = obj_paginator.get_page(1)
+        page_range = obj_paginator.page_range
+        
+        page_no = request.POST.get('page_no', None)
+        if page_no== None:
+            page_no=1
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)    
+        
+        
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+            #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+    
+
+            
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+        results=[]
+
+
+        for i in obj_paginator.page(page_no).object_list:			
+            cdate= i.date_created.ctime()
+            item_object = model_to_dict(i)
+            item_object['category']=i.category.name
+            item_object['closing_date']=i.closing_date.ctime()
+            item_object['date_created']=f'{i.date_created.ctime()}'
+            item_object['current_investment']=i.current_investment
+            item_object['user_stake']=i.userIsInvestorStake(request.user)
+            item_object['current_investment_percent']=i.current_investment_percent 
+            item_object['blogs_count']=i.blogs_count
+            item_object['incoming_investors']=i.incoming_investors 
+            item_object['user_investor']=i.userIsInvestorStatement(request.user)
+            item_object['userIsOwner']=i.userIsOwner(request.user)
+            item_object['user_investment_value']=i.userInvestorValue(request.user)
+            item_object['user_investment_percent']=i.userInvestorPercent(request.user)
+            item_object['investors_count']=i.investors_count                
+            item_object['total_value']=i.total_value
+            taglist = []
+            for j in i.tags.all():
+                taglist.append(j.name)
+            item_object['tags']= taglist
+            
+            results.append(item_object)									 
+        
+            
+        data["results"]=results
+        return JsonResponse({"data":data})
+    else:
+        return JsonResponse({'error': True, 'data': 'errors'})  
+ 
 def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
@@ -163,18 +383,20 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
 
             obj_paginator = Paginator(queryset, pertable)
             first_page = obj_paginator.page(1).object_list
-            current_page = obj_paginator.get_page(1)
+            #current_page = obj_paginator.get_page(1)
             page_range = obj_paginator.page_range
             
-            #page_no = request.POST.get('page_no', None) 
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
             num_of_pages= int(obj_paginator.num_pages)
             totalrecords= int(obj_paginator.count)
-            current_page = obj_paginator.get_page(1)    
+            current_page = obj_paginator.get_page(page_no)    
             
             
             data={}	
             data["per_table"]=pertable
-            data["page_no"]=1
+            data["page_no"]=page_no
             data["num_of_pages"]=num_of_pages
             data["totalrecords"]=totalrecords
                 #data["has_previous"]=False
@@ -194,13 +416,13 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
         
 
             
-            if int(1)>int(num_of_pages):			
+            if int(page_no)>int(num_of_pages):			
                 data["results"]=[]
                 return JsonResponse({"data":data})
             results=[]
 
 
-            for i in obj_paginator.page(1).object_list:			
+            for i in obj_paginator.page(page_no).object_list:			
                 cdate= i.date_created.ctime()
                 item_object = model_to_dict(i)
                 item_object['category']=i.category.name
@@ -255,9 +477,11 @@ def get_user_investments_load_status(request, status):
     #this method is redundant: verify my assertion
     APLLICATION_STATUS_CHOICE = ["pending", "recieved",
                             "verification","engagement",
-                             "accepted","rejected"]  
+                             "accepted","rejected","all"]  
     queryset = Investor.objects.filter(Q(user=request.user)).first()  
     #print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw')
+    if status=='all':
+        status=None
     df=queryset.trading_df_status(status)
     sum_total=0
     aver_val=0
@@ -307,14 +531,112 @@ def get_user_investments_load_status(request, status):
 
     return render(request, 'trading/user_investments.html', context)
 
+
+def user_investments_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
+    
+  
+    if request.method == 'POST':
+        if request.is_ajax():
+            APLLICATION_STATUS_CHOICE = ["pending", "recieved",
+                            "verification","engagement",
+                                "accepted","rejected","all"]  
+            queryset = Investor.objects.filter(Q(user=request.user)).first() 
+            if status=='all':
+                status=None
+            if search_type != 1:
+                slug =None     
+            df=queryset.trading_df_status(status, slug)
+            sum_total=0
+            aver_val=0
+            if len(df)>0 :
+                df['id'] = pd.to_numeric(df.id)
+        
+                sum_total = df['myinvest'].sum()
+                aver_val = df['myinvest'].mean()
+
+            dict_,colms= dataframe_to_list_dict(df,True)
+            #print(1, colms, dict_)
+            if not ('pertable' in request.session):
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            else:
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            pertable=request.session['pertable']
+        
+
+            #print(colms)
+            obj_paginator = Paginator(dict_, pertable)
+            first_page = obj_paginator.page(1).object_list
+            current_page = obj_paginator.get_page(1)
+            page_range = obj_paginator.page_range
+
+            
+            #page_no = request.POST.get('page_no', None) 
+            num_of_pages= int(obj_paginator.num_pages)
+            totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(1)    
+            
+            
+            data={}	
+            data["per_page"]=pertable
+            data["page_no"]=1
+            data["num_of_pages"]=num_of_pages
+            data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+        
+
+            
+            if int(1)>int(num_of_pages):			
+                data["results"]=[]
+                return JsonResponse({"data":data})
+            results=[]											 
+            for i in obj_paginator.page(1).object_list:	
+                item_object = {}
+                for col_ in colms:
+                    item_object[col_]=i[col_] 
+                #----get the investment id----
+                investment_id = i['iid']
+                investment_obj= get_object_or_404(Investment, pk=investment_id)
+                item_object['blogs_count']=investment_obj.blogs_count             
+                results.append(item_object)
+                
+            data["results"]=results
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})  
 def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
     #print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
     if request.method == 'POST':
         if request.is_ajax():
             APLLICATION_STATUS_CHOICE = ["pending", "recieved",
                             "verification","engagement",
-                                "accepted","rejected"]  
-            queryset = Investor.objects.filter(Q(user=request.user)).first()  
+                                "accepted","rejected","all"]  
+            queryset = Investor.objects.filter(Q(user=request.user)).first() 
+            if status=='all':
+                status=None 
             df=queryset.trading_df_status(status)
             sum_total=0
             aver_val=0
@@ -401,7 +723,7 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
 def get_user_investments(request):
     APLLICATION_STATUS_CHOICE = ["pending", "recieved",
                             "verification","engagement",
-                             "accepted","rejected"]
+                             "accepted","rejected","all"]
     queryset = Investor.objects.filter(user=request.user).first()  
     
     df=queryset.trading_df
@@ -445,6 +767,7 @@ def get_user_investments(request):
         "total": len(dict_),
         'total_sum':sum_total,
         'average':aver_val,
+        'status':'all',
         'APLLICATION_STATUS_CHOICE': APLLICATION_STATUS_CHOICE
     }
 
@@ -1700,8 +2023,11 @@ def display_myinvestment_ajax(request):
     if request.method == 'POST':
         app_status = request.POST.get('app_status', None)
         if app_status == None:
-            df=queryset.trading_df 
-        else:  
+            df=queryset.trading_df
+
+        else: 
+            if app_status=='all':
+                app_status=None
             df=queryset.trading_df_status(app_status)
         #print(app_status)
     else:

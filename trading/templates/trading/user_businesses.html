@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Personal Businesses</title>
+    <title>My Businesses</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -72,10 +72,16 @@
                                     Business Status:
                                     {% for tag in BUSINESS_STATUS_CHOICE %}
                                     
-                                        <a id={{tag}} {% if status == tag %} class="filter-status badge rounded-pill bg-light text-dark" {% else %}class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_business_load_status_ajax' tag %}" 
+                                   
+                                        <a id={{tag}} {% if status == tag %} 
+                                            class="filter-status badge rounded-pill bg-light text-dark" {% else %} 
+                                            class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  
+                                            href="#" data-url="{% url 'user_business_load_status_ajax' tag %}" 
                                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                             title='Filter'>{{tag}}
                                         </a>     
+
+
                                         <!-- <a href="{% url 'user_investments_load_status' tag %}" {% if status == tag %} class="badge rounded-pill bg-light text-dark" {% else %}class="badge rounded-pill bg-warning text-dark" {% endif %}>{{tag}}</a> -->
                                     {% endfor %}
                                 </div>
@@ -263,6 +269,7 @@
 
 
 {% block scripts %}
+    <script src="{% static 'mentor/assets/js/search.js' %}"></script>
     <script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
     <script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
     <script src="{% static 'basic_ui/js/custom-dates.js' %}"></script>
@@ -279,741 +286,820 @@
         $('.date-input').attr('autocomplete', 'off');
         })
     </script>
-<script>
-    var bus_status
-    function truncChar(str,length){
-        var myTruncatedString = str.substring(0,length-1);              
-        if (str.length > myTruncatedString.length){
-        return myTruncatedString + "..."
-        }
-        return myTruncatedString
-    }
-    function numberWithCommas(x) {
-                var parts = x.toString().split(".");
-                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                return parts.join(".");
+    <script>
+        var bus_status
+        
+
+        
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length-1);              
+            if (str.length > myTruncatedString.length){
+            return myTruncatedString + "..."
             }
-    function getToken(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
+            return myTruncatedString
+        }
+        function numberWithCommas(x) {
+                    var parts = x.toString().split(".");
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return parts.join(".");
+                }
+        function getToken(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
                         }
                     }
+                    return cookieValue;
                 }
-                return cookieValue;
-            }
-    var csrftoken = getToken('csrftoken');
-    var display_business_ajax_url= "{% url 'display_business_ajax' %}" 
-    
-    function sentenceCase(input){
-       
-        if (input.length >0){
-            if (input.length > 1){
-                // at least teo letter
-                var first =input.slice(0, 1).toUpperCase()
-                var trail =first + input.slice(1, input.length)
-                return trail
-            }else {
-                // one leer
-                var first =input.slice(0, 0).toUpperCase()
-                return first
-            }
-           
-        }
-        return input
-       
-    }
-    $(document).ready(function (){ 
-        $("#investments a:first").addClass( "active") 
-        $("#enterprenuer a:first").addClass( "active") 
-        $("#registerbusiness a:first").addClass( "active") 
-
-        
-        var boo_status = "{{search_status}}"
-        
-        if (boo_status == true ){
-           bus_status ='{{status}}' 
-           //console.log('seting....', boo_status, app_status,)
-           
-        } 
-    })
-     $('#confirmdelete').on('show.bs.modal', function(e) {
-        var name = $(e.relatedTarget).data('object-name');
-        var url = $(e.relatedTarget).data('delete-url');
-        var comment_id = $(e.relatedTarget).data('item-id');
+        var csrftoken = getToken('csrftoken');
       
-        var name =truncChar(name,25)
-        $('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b> <i>" + name + "</i>?");
-   
-        $('#confirmdelete .modal-footer input').attr('data-url', url);
-        $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
-    });
-
-        $('body').on('click', '.delete-button', function (e) {
-            e.preventDefault();
-            var tr_id =$('#delete-button').attr('item-id')
-            row = $('#item-'+ tr_id.trim());
-            var formData = {
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            };
-            $.ajax({
-                type: 'POST',      
-                url:   $('#delete-button').attr('data-url'), 
-                encode: true,
-                contentType: 'application/x-www-form-urlencoded',
-                crossDomain: false,
-                dataType: 'json',
-                data: formData,     // our data object
-                success: function (data) {
-                    $('.close-modal').click()               
-                    row.fadeOut(1000, function () {
-                        //remove the row deleted
-                        $(this).remove();
-                        // if deleted page make the page disappear, point to prev page
-                        //page-1
-                        if (data.data.total_pages < data.data.deleted_page){                     
-                            var index= parseInt(data.data.total_pages)-1
-                            window.setTimeout(function() {
-                                $(".a_page_nav:eq(" +  index  +")").trigger('click');
-                            }, 1000);
-                        }else{
-                            // if item on the current page get to zero
-                            // point to page-1
-                            var total = $('#userbusiness-table-tbody').children().length
-                            if (total == 0){
-                                //refresh the current pages
-                                var index= parseInt(data.data.deleted_page)-1
-                                if (index<1){
-                                    // if deleteting first page  then scroll all into first page
-                                    index=1
-                                } 
-                                
-                                loadPageAjax(index)
-                            }
-
-                        }
-                        
-                       
-                    });
-                    // if deleting page one and there are more pages behind.... push al those pages
-                  
-                },
-                error: function (exception) {
-                    alert('Exeption:' + exception);
+        //first timme
+        var display_business_ajax_url= "{% url 'display_business_ajax' %}" 
+        var status= '{{status}}'
+        
+        if (status){ 
+                               
+            display_business_ajax_url = `{% url 'user_business_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
+        }
+        
+        function sentenceCase(input){
+        
+            if (input.length >0){
+                if (input.length > 1){
+                    // at least teo letter
+                    var first =input.slice(0, 1).toUpperCase()
+                    var trail =first + input.slice(1, input.length)
+                    return trail
+                }else {
+                    // one leer
+                    var first =input.slice(0, 0).toUpperCase()
+                    return first
                 }
-            });
-        });
-        $('body').on('click', '.close-modal', function (e) {
-            $('#modal-usermodel').modal('hide'); 
+            
+            }
+            return input
+        
+        }
+        $(document).ready(function (){ 
+            $("#investments a:first").addClass( "active") 
+            $("#enterprenuer a:first").addClass( "active") 
+            $("#registerbusiness a:first").addClass( "active") 
+
+            
+            var boo_status = "{{search_status}}"
+            
+            if (boo_status == true ){
+            bus_status ='{{status}}' 
+            //console.log('seting....', boo_status, app_status,)
+            
+            } 
         })
-          //------LOAD THE FORM ON MODAL DIV----------
-        $('body').on('click', '.show-form-update', function(e){
-              e.stopPropagation() 
-              var btn = $(this);// fix button  delay
-              $.ajax({
-              url: btn.attr("data-url"),
-              type: 'get',
-              dataType:'json',
-              beforeSend: function(){
-                  $('#modal-usermodel').modal('show');
-              },
-              success: function(data){
-                  $('#modal-usermodel .modal-content').html(data.html_form);
-              }
-              });
-          })
-          //EDIT  MODEL
-        //ADD MODEL FORM
-        $('body').on("submit",".model-form-add",function(e){
-              e.preventDefault();            
-              var data = new FormData(this);
-              var formData
-              var form = $(this);
-          
-              $.ajax({
-                  url: form.attr('data-url'),
-                  //data: form.serialize(),
-                  data : data,
-                  type: form.attr('method'),
-                  dataType: 'json',
-                  processData:false,
-                  contentType: false,
-                  success: function(data){ 
-                      //console.log('added data' ,data.model)
-                      if(data.model){
-                          //console.log(data.model)
-                          var item_exist= $("#userbusiness-table-tbody").length
-                          if (item_exist>0){
-                            appendTable(data.model)
-                          }else {
-                            //
-                            addTable(data.model)                            
-                          }
-                         
-                          $('.close-modal').click()
-                          if (data.total_pages){
-                              updatePaging(data.total_pages)
-                          }
-                      } else {
-                          // ADDITION NOT SUCCESSFUL
-                          $('.public_toggle_form-errors').html('');
-                          if (data['error']) {
-                              //console.log('1. ERROR::::', data['error'])
-                              var form_vars=['__all__','name','description','tags', 'category', 'total_value']
-                              for (let p=0; p < form_vars.length; p++ ){
-                                    let name_var = form_vars[p]
-                                    //console.log('2. inside loop::::', data['error'][name_var], name_var)
-                                    if (data['error'][name_var]){
-                                            //console.log('3. inside::::', data['error'][name_var][0], name_var)
-                                            // Find a better method here
-                                            if (data['error'][name_var][0]=='This field is required.'){
-                                                error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
-                                               
-                                            }else {
-                                                error_content= data['error'][name_var][0] 
-                                            }
-                                            a_html = 	`<div class='alert alert-danger alert dismissable'>
-                                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span></button>${error_content}
-                                                        </div> ` ;
-                                            $('.public_toggle_form-errors').append(a_html)
-                                    }
-                              }
-                              //console.log('Out.......')
-                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
-                              window.setTimeout(function() {
-                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $(".public_toggle_form-errors").html('');
-                                  });
-                                  }, 4000);
-                              //-----------------------
-                          } else  {
-                              // Data locked:  No edit allowed
-                              $('.public_toggle_form-errors').html('');
-                              a_html = 	`<div class='alert alert-danger alert dismissable'>
-                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span></button>${data['locked']}
-                              </div> ` ;
-                              $('.public_toggle_form-errors').append(a_html)
-                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
+        $('#confirmdelete').on('show.bs.modal', function(e) {
+            var name = $(e.relatedTarget).data('object-name');
+            var url = $(e.relatedTarget).data('delete-url');
+            var comment_id = $(e.relatedTarget).data('item-id');
+        
+            var name =truncChar(name,25)
+            $('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b> <i>" + name + "</i>?");
+    
+            $('#confirmdelete .modal-footer input').attr('data-url', url);
+            $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
+        });
 
-                              window.setTimeout(function() {
-                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $(".public_toggle_form-errors").html('');
-                                  });
-                                  }, 4000);
+            $('body').on('click', '.delete-button', function (e) {
+                e.preventDefault();
+                var tr_id =$('#delete-button').attr('item-id')
+                row = $('#item-'+ tr_id.trim());
+                var formData = {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                };
+                $.ajax({
+                    type: 'POST',      
+                    url:   $('#delete-button').attr('data-url'), 
+                    encode: true,
+                    contentType: 'application/x-www-form-urlencoded',
+                    crossDomain: false,
+                    dataType: 'json',
+                    data: formData,     // our data object
+                    success: function (data) {
+                        $('.close-modal').click()               
+                        row.fadeOut(1000, function () {
+                            //remove the row deleted
+                            $(this).remove();
+                            // if deleted page make the page disappear, point to prev page
+                            //page-1
+                            if (data.data.total_pages < data.data.deleted_page){                     
+                                var index= parseInt(data.data.total_pages)-1
+                                window.setTimeout(function() {
+                                    $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                                }, 1000);
+                            }else{
+                                // if item on the current page get to zero
+                                // point to page-1
+                                var total = $('#userbusiness-table-tbody').children().length
+                                if (total == 0){
+                                    //refresh the current pages
+                                    var index= parseInt(data.data.deleted_page)-1
+                                    if (index<1){
+                                        // if deleteting first page  then scroll all into first page
+                                        index=1
+                                    } 
+                                    
+                                    loadPageAjax(index)
+                                }
 
-                          } 
-                      //LAST ELSE--------------------------------------                
-                      }
-                  //END SUCCESS
-                  }
-              // END AJAX
-              })
-              return false;
-          })
-
-        function addTable(item){
-           
-             //console.log(item) 
-            var js_date_created = new Date(item.date_created) 
-            js_date_created= getDateTime_(js_date_created)
-            //console.log('1. time: ', js_date_created.getTime())
-            var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
-            var current_investment=numberWithCommas(item.current_investment)
-            var name_trunc =truncChar(item.name,12)
-            var description_trunc =truncChar(item.description,20)
-            var category_trunc =truncChar(item.category,20)
-           
-            var public= ''
-            var page_no = 1//dummy;
-            //console.log(item)
-            if (item.public){
-                public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
-            }else{
-                public= "<i class='bi-square'></i>"
-            }
-           
-            a_html =`<h4 style="text-align:center;">My Businesses</h4>
-                    <hr>
-                    <div class="table-responsive">
-                        <table id="userBusinessTable" class="table table-striped">
-                            <thead class="thead-dark">
-                                <th style="width: 2%" >#</th>    
-                                <th style="width: 13%" >Name</th>
-                                <th style="width: 20%" >description</th>
-                                <th style="width: 8%" >category</th>
-                                <th style="width: 7%" >Value</th>
-                                <th style="width: 7%" >Current</th>
-                                <th style="width: 3%" >%</th>
-                                <th style="width: 8%" >Investors</th>
-                                <th style="width: 20%" >Date Created</th>
-                                <th style="width: 4%" >Public</th>
-                                <th style="width: 8%" class="text-right">Actions</th>
-                            </thead>
-                            <tbody id="userbusiness-table-tbody">
+                            }
                             
-                                <tr id="item-${item.id}" class='edit-mode'>
-                                    <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
-                                    <td class="modelData" name="name" >${name_trunc}</td>
-                                    <td class="modelData" name="description" >${description_trunc}</td>
-                                    <td class="modelData" name="category" >${category_trunc}</td>
-                                    <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
-                                    <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
-                                    <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
-                                    
-                                    
-                                    <td class="modelData" name="investors_count" >${numberWithCommas(item.investors_count)}</td>
-                                    
+                        
+                        });
+                        // if deleting page one and there are more pages behind.... push al those pages
+                    
+                    },
+                    error: function (exception) {
+                        alert('Exeption:' + exception);
+                    }
+                });
+            });
+            $('body').on('click', '.close-modal', function (e) {
+                $('#modal-usermodel').modal('hide'); 
+            })
+            //------LOAD THE FORM ON MODAL DIV----------
+            $('body').on('click', '.show-form-update', function(e){
+                e.stopPropagation() 
+                var btn = $(this);// fix button  delay
+                $.ajax({
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType:'json',
+                beforeSend: function(){
+                    $('#modal-usermodel').modal('show');
+                },
+                success: function(data){
+                    $('#modal-usermodel .modal-content').html(data.html_form);
+                }
+                });
+            })
+            //EDIT  MODEL
+            //ADD MODEL FORM
+            $('body').on("submit",".model-form-add",function(e){
+                e.preventDefault();            
+                var data = new FormData(this);
+                var formData
+                var form = $(this);
+            
+                $.ajax({
+                    url: form.attr('data-url'),
+                    //data: form.serialize(),
+                    data : data,
+                    type: form.attr('method'),
+                    dataType: 'json',
+                    processData:false,
+                    contentType: false,
+                    success: function(data){ 
+                        //console.log('added data' ,data.model)
+                        if(data.model){
+                            //console.log(data.model)
+                            var item_exist= $("#userbusiness-table-tbody").length
+                            if (item_exist>0){
+                                appendTable(data.model)
+                            }else {
+                                //
+                                addTable(data.model)                            
+                            }
+                            
+                            $('.close-modal').click()
+                            if (data.total_pages){
+                                updatePaging(data.total_pages)
+                            }
+                        } else {
+                            // ADDITION NOT SUCCESSFUL
+                            $('.public_toggle_form-errors').html('');
+                            if (data['error']) {
+                                //console.log('1. ERROR::::', data['error'])
+                                var form_vars=['__all__','name','description','tags', 'category', 'total_value']
+                                for (let p=0; p < form_vars.length; p++ ){
+                                        let name_var = form_vars[p]
+                                        //console.log('2. inside loop::::', data['error'][name_var], name_var)
+                                        if (data['error'][name_var]){
+                                                //console.log('3. inside::::', data['error'][name_var][0], name_var)
+                                                // Find a better method here
+                                                if (data['error'][name_var][0]=='This field is required.'){
+                                                    error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+                                                
+                                                }else {
+                                                    error_content= data['error'][name_var][0] 
+                                                }
+                                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span></button>${error_content}
+                                                            </div> ` ;
+                                                $('.public_toggle_form-errors').append(a_html)
+                                        }
+                                }
+                                //console.log('Out.......')
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+                                //-----------------------
+                            } else  {
+                                // Data locked:  No edit allowed
+                                $('.public_toggle_form-errors').html('');
+                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>${data['locked']}
+                                </div> ` ;
+                                $('.public_toggle_form-errors').append(a_html)
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
+
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+
+                            } 
+                        //LAST ELSE--------------------------------------                
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
+
+            function addTable(item){
+            
+                //console.log(item) 
+                var js_date_created = new Date(item.date_created) 
+                js_date_created= getDateTime_(js_date_created)
+                //console.log('1. time: ', js_date_created.getTime())
+                var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
+                var current_investment=numberWithCommas(item.current_investment)
+                var name_trunc =truncChar(item.name,12)
+                var description_trunc =truncChar(item.description,20)
+                var category_trunc =truncChar(item.category,20)
+            
+                var public= ''
+                var page_no = 1//dummy;
+                //console.log(item)
+                if (item.public){
+                    public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                }else{
+                    public= "<i class='bi-square'></i>"
+                }
+            
+                a_html =`<h4 style="text-align:center;">My Businesses</h4>
+                        <hr>
+                        <div class="table-responsive">
+                            <table id="userBusinessTable" class="table table-striped">
+                                <thead class="thead-dark">
+                                    <th style="width: 2%" >#</th>    
+                                    <th style="width: 13%" >Name</th>
+                                    <th style="width: 20%" >description</th>
+                                    <th style="width: 8%" >category</th>
+                                    <th style="width: 7%" >Value</th>
+                                    <th style="width: 7%" >Current</th>
+                                    <th style="width: 3%" >%</th>
+                                    <th style="width: 8%" >Investors</th>
+                                    <th style="width: 20%" >Date Created</th>
+                                    <th style="width: 4%" >Public</th>
+                                    <th style="width: 8%" class="text-right">Actions</th>
+                                </thead>
+                                <tbody id="userbusiness-table-tbody">
+                                
+                                    <tr id="item-${item.id}" class='edit-mode'>
+                                        <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
+                                        <td class="modelData" name="name" >${name_trunc}</td>
+                                        <td class="modelData" name="description" >${description_trunc}</td>
+                                        <td class="modelData" name="category" >${category_trunc}</td>
+                                        <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
+                                        <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
+                                        <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
                                         
-                                    <td class="modelData" name="date_created" >${js_date_created}</td>
-
-                                    <td class="modelData" name="public" >${public}</td>
-
-                                    <td class="text-right modelAction modelData" name="action">
-                                    
-                                        <a href="/tr/i-edit/${item.id}"
-                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Manage Business'><i class="fas fa-wrench"></i>
-                                        </a>
-
-                                            <!-- EDIT MODEL -->
-                                        <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
-                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Quick Edit'><i  class="fas fa-edit"></i>
-                                        </a>
+                                        
+                                        <td class="modelData" name="investors_count" >${numberWithCommas(item.investors_count)}</td>
+                                        
                                             
-                                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                            data-object-name="${item.name }"  data-item-id="${item.id}" 
-                                            data-delete-url="/tr/delete_investment_ajax/${item.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Delete' > <i class="fas fa-trash"></i> 
-                                        </a>
+                                        <td class="modelData" name="date_created" >${js_date_created}</td>
 
+                                        <td class="modelData" name="public" >${public}</td>
+
+                                        <td class="text-right modelAction modelData" name="action">
                                         
-                                        </td>
-                                    
-                                </tr>
-                            
-                            </tbody>
-                        </table>
-                    
-                    </div>`
-           //append Table and attache first item 
-            $(".box-body").append(a_html)
-        }
-        function appendTable(item){  
-            //console.log(item) 
-            var js_date_created = new Date(item.date_created) 
-            js_date_created= getDateTime_(js_date_created)
-            var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
-            var current_investment=numberWithCommas(item.current_investment)
-            var name_trunc =truncChar(item.name,12)
-            var description_trunc =truncChar(item.description,20)
-            var category_trunc =truncChar(item.category,20)
+                                            <a href="/tr/i-edit/${item.id}"
+                                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Manage Business'><i class="fas fa-wrench"></i>
+                                            </a>
 
-            var public= ''
-            if (item.public){
-                public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
-            }else{
-                public= "<i class='bi-square'></i>"
-            }
-           
-            a_html =`
-                <tr id="item-${item.id}" class="edit-mode" >
-                    <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
-                    <td class="modelData" name="name" >${name_trunc}</td>
-                    <td class="modelData" name="description" >${description_trunc}</td>
-                    <td class="modelData" name="category" >${category_trunc}</td>
-                    <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
-                    <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
-                    <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
-                    
-                    
-                    <td class="modelData" name="investors_count" >${numberWithCommas(item.investors_count)}</td>
-                    
+                                                <!-- EDIT MODEL -->
+                                            <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
+                                                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Quick Edit'><i  class="fas fa-edit"></i>
+                                            </a>
+                                                
+                                            <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                                data-object-name="${item.name }"  data-item-id="${item.id}" 
+                                                data-delete-url="/tr/delete_investment_ajax/${item.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Delete' > <i class="fas fa-trash"></i> 
+                                            </a>
+
+                                            
+                                            </td>
+                                        
+                                    </tr>
+                                
+                                </tbody>
+                            </table>
                         
-                    <td class="modelData" name="date_created" >${js_date_created}</td>
-
-                    <td class="modelData" name="public" >${public}</td>
-
-                    <td class="text-right modelAction modelData" name="action">
-                      
-                        <a href="/tr/i-edit/${item.id}"
-                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Manage Business'><i class="fas fa-wrench"></i>
-                        </a>
-
-                            <!-- EDIT MODEL -->
-                        <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
-                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Quick Edit'><i  class="fas fa-edit"></i>
-                        </a>
-                            
-                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                            data-object-name="${item.name }"  data-item-id="${item.id}" 
-                            data-delete-url="/tr/delete_investment_ajax/${item.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                            title='Delete' > <i class="fas fa-trash"></i> 
-                        </a>
-
-                        
-                        </td>
-                    
-                </tr>
-                 `
-               // $("#userbusiness-table-tbody").append(a_html) 
-               // $("#userbusiness-table-tbody").fadeIn()
-                $("#userbusiness-table-tbody").append(
-                    $(a_html)
-                    .hide()
-                    .fadeIn('fast', function(){ 
-                            console.log('Added ele')
-                            //$(".log").text('Fade In Transition Complete');
-                        })
-                );
-               
+                        </div>`
+            //append Table and attache first item 
+                $(".box-body").append(a_html)
             }
-      
-        function updateTable(item){
-            //after edit update the table
-            $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
-                
-                
-                var td=$(`#item-${item.id}`).addClass('edit-mode')
-                
-                //console.log(item.name)
-                var attr = $(this).attr("name");
+            function appendTable(item){  
+                //console.log(item) 
+                var js_date_created = new Date(item.date_created) 
+                js_date_created= getDateTime_(js_date_created)
+                var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
+                var current_investment=numberWithCommas(item.current_investment)
                 var name_trunc =truncChar(item.name,12)
                 var description_trunc =truncChar(item.description,20)
                 var category_trunc =truncChar(item.category,20)
 
-                if (attr == "description") {
-
-                    $(this).text(description_trunc);
-                } else if (attr == "category") {
-                    $(this).text(category_trunc);
-                } else if (attr == "name") {
-                    $(this).text(name_trunc);   
-                } else if (attr == "total_value") {
-                    $(this).text('$'+ numberWithCommas(item.total_value));
-                } else if (attr == "current_investment") {
-                    $(this).text('$'+ numberWithCommas(item.current_investment));
-                } else if (attr == "current_investment_percent") {
-                    $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
-                
-                } else if (attr == "counter") {
-                    var a_html= `<td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>`
-                    $(this).html(a_html);
-               
-                } else if (attr == "public") {
-                    var public= ''
-                   
-                    if (item.public){
-                        public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
-                    }else{
-                        public= "<i class='bi-square'></i>"
-                    }
-                    var a_html= `<td  class="modelData" name="pubic">${public}</td>`
-                    $(this).html(a_html);
-                
-                }   
-
-
-              
-                
-            });
-        }  
-        $('body').on("submit",".model-form-edit",function(e){
-              e.preventDefault();
-              var data = new FormData(this);
-              var formData
-              var form = $(this);
-              //console.log('before ajax')
-              var url=form.attr('data-url')
-              $.ajax({
-                  url: form.attr('data-url'),
-                  data : data,
-                  type: form.attr('method'),
-                  dataType: 'json',
-                  processData:false,
-                  contentType: false,
-                  success: function(data){
-                      //console.log('its mot get here', data)
-                      if(data.model){
-                          //console.log(data.model)
-                          $('#modal-usermodel').modal('hide');
-                          $('.close-modal').click()
-                          updateTable(data.model);
-                          if (data.model.current_investment){
-                            $('#current_investment').html(`${numberWithCommas(data.model.current_investment)}`);
-                          }
-                          if (data.model.current_investment_percent){
-                              $('#current_investment_percent').html(`${parseFloat(data.model.current_investment_percent)}%`);
-                          }
-                          if (data.model.investors_count){
-                            $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
-                          }
-
-                        
-
-                        
-
-                          
-                      } else {
-                          $('.public_toggle_form-errors').html('');
-                          if (data.error) {
-                              var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date']//,
-                              //console.log('before throwing error:',form.attr('data-url'),)
-                             
-                              for (let p=0; p < form_vars.length; p++ ){
-                                    let name_var = form_vars[p]
-                                    let error_content =''
-                                    if (data.error[name_var]){
-                                            // Find a better method here
-                                            if (data['error'][name_var][0]=='This field is required.'){
-                                                error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
-                                            }else {
-                                                error_content= data['error'][name_var][0] 
-                                            }
-                                            
-                                            a_html = `<div class='alert alert-danger alert dismissable'>
-                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span></button>${error_content}
-                                                    </div> ` ;
-                                            $('.public_toggle_form-errors').append(a_html)
-                                    }
-                              }
-                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
-                              window.setTimeout(function() {
-                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $(".public_toggle_form-errors").html('');
-                                  });
-                              }, 4000);
-                          //-----------------------
-                          } else  {
-                              // Data locked:  No edit allowed
-                              $('.public_toggle_form-errors').html('');
-                              a_html = 	`<div class='alert alert-danger alert dismissable'>
-                              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span></button>${data['locked']}
-                              </div> ` ;
-                              $('.public_toggle_form-errors').append(a_html)
-                              $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
-
-                              window.setTimeout(function() {
-                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                      $(".public_toggle_form-errors").html('');
-                                  });
-                                  }, 4000);
-                          } 
-                      //LAST ELSE--------------------------------------                
-                      }
-                  //END SUCCESS
-                  }
-              // END AJAX
-              })
-              return false;
-          })
-       
-      
-        $('body').on('click', '.a_page_nav', function (event) {
-            // preventing default actions
-            event.preventDefault();
-            var page_no = $(this).attr('href');
-            // ajax call
-            loadPageAjax(page_no)
-        });
-        function updatePaging2(data){
-            var has_previous=''
-            //console.log(data)
-            if (data.has_previous){
-                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
-            
-            }       
-            var has_next= ''          
-            if (data.has_next){
-                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
-                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
-                    `; 
-            }       
-            a_html=`
-            <div id= "page_section" class="pagination">
-                <ul class="pagination newpagination">
-                    ${has_previous}            
-                    <span class="current" style="margin-left:5px" >
-                        Page ${ data.current_page } of ${ data.last }.
-                    </span>                   
-                    ${has_next}
-                </ul>
-                </div>`
-                $("#page_section").html(a_html)
-          }
-
-        function append_html(counter,val,page_no){
-            //loading the page #
-            //console.log (val)
-            var js_date_created = new Date(val.date_created)
-            js_date_created= getDateTime_(js_date_created)
-            //console.log('2. time: ', js_date_created.getTime())
-            var name_trunc =truncChar(val.name,12)
-            var description_trunc =truncChar(val.description,20)
-            var category_trunc =truncChar(val.category,20)
-
-            var public= ''
-            if (val.public){
-                public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
-            }else{
-                public= "<i class='bi-square'></i>"
-            }
-
-
-
-            if (val.incoming_investors !=0){               
-                counter_html=`<a href="/tr/i-view/${val.id}/" class="iconClass-primary" data-toggle="tooltip"  title='You have ${val.incoming_investors} new Investor(s)'>
-                        <i  style="color:orange" class="fas fa-envelope"></i>
-                        <span class="counter counter-lg">${val.incoming_investors}</span>
-                    </a>`
-            }else{
-                counter_html= ''
-            }
-
-           
-                                           
-
-
-            a_html=`
-            <tr id="item-${val.id}">
-                <td class="modelData" name="counter">${counter}</td>
-                <td class="modelData" name="name" >${name_trunc}</td>
-                <td class="modelData" name="description" >${description_trunc}</td>
-                <td class="modelData" name="category" >${category_trunc}</td>
-                <td class="modelData" name="total_value" >${numberWithCommas(val.total_value)}</td>
-                <td class="modelData" name="current_investment" >${numberWithCommas(val.current_investment)}</td>
-                <td class="modelData" name="current_investment_percent" >${parseFloat(val.current_investment_percent).toFixed(1)}%</td>  
-                <td class="modelData" name="investors_count" >${numberWithCommas(val.investors_count)}</td>                      
-                <td class="modelData" name="date_created" >${js_date_created}</td>
-                <td class="modelData" name="public" >${public}</td>
-                <td class="text-right modelAction modelData" name="action">
-                   
-                    <a href="/tr/i-edit/${val.id}"
-                        style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                        title='Manage Business'><i class="fas fa-wrench"></i>
-                    </a>
-                    <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${val.id}/" 
-                        data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                        title='Quick Edit'><i  class="fas fa-edit"></i>
-                    </a>
-                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                        data-object-name="${val.name}"  data-item-id="${val.id}" 
-                        data-delete-url="/tr/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                        title='Delete'> <i class="fas fa-trash"></i> 
-                    </a>
-                    ${counter_html}
-                </td>
-            </tr>` ;
-            return a_html
-        }
-        function loadPageAjax(page_no){
-
-
-            var data
-            if (bus_status) {
-                data = {    
-                        page_no : page_no,
-                        bus_status : bus_status, 
-                        csrfmiddlewaretoken: csrftoken,
-                    }
-            }else {
-                data = {    
-                        page_no : page_no,
-                        csrfmiddlewaretoken: csrftoken,
-                    }
-            }
-            $.ajax({
-                    type: "POST",
-                    // define url name
-                    url: display_business_ajax_url, 
-                    data :data,
-                    // handle a successful response
-                    success: function (response) {
-                        $('#userbusiness-table-tbody').html('')
-                        updatePaging2(response.data)
-                        if (response.data.per_table){
-                            per_table=response.data.per_table
-                        }
-                        var base_counter =(parseInt(page_no)-1)*per_table
-                        var counter=base_counter
-
-                      
-                        
-                        $.each(response.data.results, function(i, val) {
-                            counter=  counter +1
-                            a_html=append_html(counter,val,page_no)                           
-                            // add each model on every line
-                            $('#userbusiness-table-tbody').append(a_html)
-                        });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
-                        
-                });
-                //add_model_class()
-          }
-         
-          var status= '{{status}}'
-          check_business_status(status)
-          function check_business_status(status){
-                if (status != 'all') {
-                    //console.log(`---------->${status}`)
-                    $('#li_current_status').css('display','block')
+                var public= ''
+                if (item.public){
+                    public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
                 }else{
-                    //console.log(`---------->${status}`)
-                    $('#li_current_status').css('display','none')
+                    public= "<i class='bi-square'></i>"
                 }
-          }
-          function update_total_results(total){
-                html=`Total [${total}]`
-                $('#total_items').html(html)
-          }
-          $('body').on('click', '.filter-status', function (e) {
-                e.preventDefault();  
-                var clicked_id = $(this).attr('id')
-                var url = $(this).attr('data-url');
-                console.log('url', url)
-                var myclass =$('.filter-status')
-                bus_status =$(this).attr('id')
-                $('#li_current_status').css('display','block')
-                $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
-                check_business_status(clicked_id)
-                $.each(myclass, function(i, val) {
-                    let loop_id= $(this).attr('id')
-                    if (clicked_id == loop_id){
-                        $(this).removeClass('bg-warning')
-                        $(this).addClass('bg-light')
+            
+                a_html =`
+                    <tr id="item-${item.id}" class="edit-mode" >
+                        <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
+                        <td class="modelData" name="name" >${name_trunc}</td>
+                        <td class="modelData" name="description" >${description_trunc}</td>
+                        <td class="modelData" name="category" >${category_trunc}</td>
+                        <td class="modelData" name="total_value" >$${numberWithCommas(item.total_value)}</td>
+                        <td class="modelData" name="current_investment" >$${numberWithCommas(current_investment)}</td>
+                        <td class="modelData" name="current_investment_percent" >${current_investment_percent}%</td>
+                        
+                        
+                        <td class="modelData" name="investors_count" >${numberWithCommas(item.investors_count)}</td>
+                        
+                            
+                        <td class="modelData" name="date_created" >${js_date_created}</td>
+
+                        <td class="modelData" name="public" >${public}</td>
+
+                        <td class="text-right modelAction modelData" name="action">
+                        
+                            <a href="/tr/i-edit/${item.id}"
+                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                title='Manage Business'><i class="fas fa-wrench"></i>
+                            </a>
+
+                                <!-- EDIT MODEL -->
+                            <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
+                                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                title='Quick Edit'><i  class="fas fa-edit"></i>
+                            </a>
+                                
+                            <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                data-object-name="${item.name }"  data-item-id="${item.id}" 
+                                data-delete-url="/tr/delete_investment_ajax/${item.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                title='Delete' > <i class="fas fa-trash"></i> 
+                            </a>
+
+                            
+                            </td>
+                        
+                    </tr>
+                    `
+                // $("#userbusiness-table-tbody").append(a_html) 
+                // $("#userbusiness-table-tbody").fadeIn()
+                    $("#userbusiness-table-tbody").append(
+                        $(a_html)
+                        .hide()
+                        .fadeIn('fast', function(){ 
+                                console.log('Added ele')
+                                //$(".log").text('Fade In Transition Complete');
+                            })
+                    );
+                
+                }
+        
+            function updateTable(item){
+                //after edit update the table
+                $("#userbusiness-table-tbody #item-" + item.id).children(".modelData").each(function() {
                     
-                    }else {
-                        $(this).addClass('bg-warning')
-                        $(this).removeClass('bg-light')
-                    }
+                    
+                    var td=$(`#item-${item.id}`).addClass('edit-mode')
+                    
+                    //console.log(item.name)
+                    var attr = $(this).attr("name");
+                    var name_trunc =truncChar(item.name,12)
+                    var description_trunc =truncChar(item.description,20)
+                    var category_trunc =truncChar(item.category,20)
+
+                    if (attr == "description") {
+
+                        $(this).text(description_trunc);
+                    } else if (attr == "category") {
+                        $(this).text(category_trunc);
+                    } else if (attr == "name") {
+                        $(this).text(name_trunc);   
+                    } else if (attr == "total_value") {
+                        $(this).text('$'+ numberWithCommas(item.total_value));
+                    } else if (attr == "current_investment") {
+                        $(this).text('$'+ numberWithCommas(item.current_investment));
+                    } else if (attr == "current_investment_percent") {
+                        $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
+                    
+                    } else if (attr == "counter") {
+                        var a_html= `<td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>`
+                        $(this).html(a_html);
+                
+                    } else if (attr == "public") {
+                        var public= ''
+                    
+                        if (item.public){
+                            public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                        }else{
+                            public= "<i class='bi-square'></i>"
+                        }
+                        var a_html= `<td  class="modelData" name="pubic">${public}</td>`
+                        $(this).html(a_html);
+                    
+                    }   
+
+
+                
+                    
                 });
-         
+            }  
+            $('body').on("submit",".model-form-edit",function(e){
+                e.preventDefault();
+                var data = new FormData(this);
+                var formData
+                var form = $(this);
+                //console.log('before ajax')
+                var url=form.attr('data-url')
+                $.ajax({
+                    url: form.attr('data-url'),
+                    data : data,
+                    type: form.attr('method'),
+                    dataType: 'json',
+                    processData:false,
+                    contentType: false,
+                    success: function(data){
+                        //console.log('its mot get here', data)
+                        if(data.model){
+                            //console.log(data.model)
+                            $('#modal-usermodel').modal('hide');
+                            $('.close-modal').click()
+                            updateTable(data.model);
+                            if (data.model.current_investment){
+                                $('#current_investment').html(`${numberWithCommas(data.model.current_investment)}`);
+                            }
+                            if (data.model.current_investment_percent){
+                                $('#current_investment_percent').html(`${parseFloat(data.model.current_investment_percent)}%`);
+                            }
+                            if (data.model.investors_count){
+                                $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
+                            }
+
+                            
+
+                            
+
+                            
+                        } else {
+                            $('.public_toggle_form-errors').html('');
+                            if (data.error) {
+                                var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date']//,
+                                //console.log('before throwing error:',form.attr('data-url'),)
+                                
+                                for (let p=0; p < form_vars.length; p++ ){
+                                        let name_var = form_vars[p]
+                                        let error_content =''
+                                        if (data.error[name_var]){
+                                                // Find a better method here
+                                                if (data['error'][name_var][0]=='This field is required.'){
+                                                    error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+                                                }else {
+                                                    error_content= data['error'][name_var][0] 
+                                                }
+                                                
+                                                a_html = `<div class='alert alert-danger alert dismissable'>
+                                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span></button>${error_content}
+                                                        </div> ` ;
+                                                $('.public_toggle_form-errors').append(a_html)
+                                        }
+                                }
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                }, 4000);
+                            //-----------------------
+                            } else  {
+                                // Data locked:  No edit allowed
+                                $('.public_toggle_form-errors').html('');
+                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>${data['locked']}
+                                </div> ` ;
+                                $('.public_toggle_form-errors').append(a_html)
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+                            } 
+                        //LAST ELSE--------------------------------------                
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
+        
+        
+            $('body').on('click', '.a_page_nav', function (event) {
+                // preventing default actions
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                loadPageAjax(page_no)
+            });
+            function updatePaging2(data){
+                var has_previous=''
+                //console.log(data)
+                if (data.has_previous){
+                    has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+                
+                }       
+                var has_next= ''          
+                if (data.has_next){
+                    has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                        `; 
+                }       
+                a_html=`
+                <div id= "page_section" class="pagination">
+                    <ul class="pagination newpagination">
+                        ${has_previous}            
+                        <span class="current" style="margin-left:5px" >
+                            Page ${ data.current_page } of ${ data.last }.
+                        </span>                   
+                        ${has_next}
+                    </ul>
+                    </div>`
+                    $("#page_section").html(a_html)
+            }
+
+            function append_html(counter,val,page_no){
+                //loading the page #
+                //console.log (val)
+                var js_date_created = new Date(val.date_created)
+                js_date_created= getDateTime_(js_date_created)
+                //console.log('2. time: ', js_date_created.getTime())
+                var name_trunc =truncChar(val.name,12)
+                var description_trunc =truncChar(val.description,20)
+                var category_trunc =truncChar(val.category,20)
+
+                var public= ''
+                if (val.public){
+                    public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                }else{
+                    public= "<i class='bi-square'></i>"
+                }
+
+
+
+                if (val.incoming_investors !=0){               
+                    counter_html=`<a href="/tr/i-view/${val.id}/" class="iconClass-primary" data-toggle="tooltip"  title='You have ${val.incoming_investors} new Investor(s)'>
+                            <i  style="color:orange" class="fas fa-envelope"></i>
+                            <span class="counter counter-lg">${val.incoming_investors}</span>
+                        </a>`
+                }else{
+                    counter_html= ''
+                }
+
+            
+                                            
+
+
+                a_html=`
+                <tr id="item-${val.id}">
+                    <td class="modelData" name="counter">${counter}</td>
+                    <td class="modelData" name="name" >${name_trunc}</td>
+                    <td class="modelData" name="description" >${description_trunc}</td>
+                    <td class="modelData" name="category" >${category_trunc}</td>
+                    <td class="modelData" name="total_value" >${numberWithCommas(val.total_value)}</td>
+                    <td class="modelData" name="current_investment" >${numberWithCommas(val.current_investment)}</td>
+                    <td class="modelData" name="current_investment_percent" >${parseFloat(val.current_investment_percent).toFixed(1)}%</td>  
+                    <td class="modelData" name="investors_count" >${numberWithCommas(val.investors_count)}</td>                      
+                    <td class="modelData" name="date_created" >${js_date_created}</td>
+                    <td class="modelData" name="public" >${public}</td>
+                    <td class="text-right modelAction modelData" name="action">
+                    
+                        <a href="/tr/i-edit/${val.id}"
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Manage Business'><i class="fas fa-wrench"></i>
+                        </a>
+                        <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${val.id}/" 
+                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title='Quick Edit'><i  class="fas fa-edit"></i>
+                        </a>
+                        <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                            data-object-name="${val.name}"  data-item-id="${val.id}" 
+                            data-delete-url="/tr/delete_investment_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                            title='Delete'> <i class="fas fa-trash"></i> 
+                        </a>
+                        ${counter_html}
+                    </td>
+                </tr>` ;
+                return a_html
+            }
+            function loadPageAjax(page_no){
+                //console.log('url',display_business_ajax_url )
+                //console.log('page_no',page_no )
+                var data
+                if (bus_status) {
+                    data = {    
+                            page_no : page_no,
+                            bus_status : bus_status, 
+                            csrfmiddlewaretoken: csrftoken,
+                        }
+                }else {
+                    data = {    
+                            page_no : page_no,
+                            csrfmiddlewaretoken: csrftoken,
+                        }
+                }
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_business_ajax_url, 
+                        data :data,
+                        // handle a successful response
+                        success: function (response) {
+                            $('#userbusiness-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+
+                        
+                            
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#userbusiness-table-tbody').append(a_html)
+                            });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'userbusiness-table-tbody',10)
+                               
+                           
+               
+                            
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                            
+                    });
+                    //add_model_class()
+            }
+            
+            var status= '{{status}}'
+            check_business_status(status)
+            function check_business_status(status){
+                    if (status != 'all') {
+                        //console.log(`---------->${status}`)
+                        $('#li_current_status').css('display','block')
+                    }else{
+                        //console.log(`---------->${status}`)
+                        $('#li_current_status').css('display','none')
+                    }
+            }
+            function update_total_results(total){
+                    html=`Total [${total}]`
+                    $('#total_items').html(html)
+            }
+            function append_no_records_found(total, tbody_id, colspan){
+                if (total == 0) {
+                    no_record_html=`<tr id="item-1">  <td colspan='${colspan}'> No Records Found <td>
+                                  </tr>` ;
+                    $(`#${tbody_id}`).append(no_record_html)
+                }
+            }
+            $('body').on('click', '.filter-status', function (e) {
+                    e.preventDefault(); 
+                    var clicked_id = $(this).attr('id')
+                    var myclass =$('.filter-status')
+                    bus_status =$(this).attr('id')
+                    var search_val = $('#search').val().toLowerCase();
+                    search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                    if (search_val.length == 0 ){
+                        display_business_ajax_url = `{% url 'user_business_load_status_ajax' 12345 %}`.replace(/12345/, bus_status.toString()); 
+                    } else{
+                        display_business_ajax_url = `{% url 'business_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, bus_status.toString()).replace(/6789/, search_val.toString()); 
+                    }
+                    var url =display_business_ajax_url 
+                    $('#li_current_status').css('display','block')
+                    $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+                    check_business_status(clicked_id)
+                    $.each(myclass, function(i, val) {
+                        let loop_id= $(this).attr('id')
+                        if (clicked_id == loop_id){
+                            $(this).removeClass('bg-warning')
+                            $(this).addClass('bg-light')
+                        }else {
+                            $(this).addClass('bg-warning')
+                            $(this).removeClass('bg-light')
+                        }
+                    });            
+                    // click first page
+                    page_no=1
+                    // ajax call
+                    $.ajax({
+                            type: "POST",
+                            // define url name
+                            url: url, 
+                            data : {    
+                                page_no : page_no, 
+                                status:clicked_id,
+                                csrfmiddlewaretoken: csrftoken,
+                            },
+                            // handle a successful response
+                            success: function (response) {
+                                $('#userbusiness-table-tbody').html('')
+                                updatePaging2(response.data)
+                                if (response.data.per_table){
+                                    per_table=response.data.per_table
+                                }
+                                var base_counter =(parseInt(page_no)-1)*per_table
+                                var counter=base_counter
+                                update_total_results(response.data.totalrecords)
+                                $.each(response.data.results, function(i, val) {
+                                    counter=  counter +1
+                                    a_html=append_html(counter,val,page_no)                           
+                                    // add each model on every line
+                                    $('#userbusiness-table-tbody').append(a_html)
+                                });
+                                //Append Zero Record Annotation
+                                append_no_records_found(response.data.totalrecords,'userbusiness-table-tbody',10)
+                               
+                            
+
+                                },
+                                error: function () {
+                                    alert('Error Occured');
+                                }
+                        }); 
+            
+            });
+            
+            $("body").on("keyup", "#search", function(){
+
+                var search_val = $(this).val().toLowerCase();
+                search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                if (search_val.length == 0 ){
+                    //tag
+                    display_business_ajax_url = `{% url 'user_business_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
+                } else{
+                    display_business_ajax_url = `{% url 'business_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, status.toString()).replace(/6789/, search_val.toString()); 
+                }
                 // click first page
                 page_no=1
                 // ajax call
                 $.ajax({
                         type: "POST",
                         // define url name
-                        url: url, 
+                        url: display_business_ajax_url, 
                         data : {    
                             page_no : page_no, 
-                            status:clicked_id,
+                            status:status,
                             csrfmiddlewaretoken: csrftoken,
                         },
                         // handle a successful response
@@ -1032,13 +1118,25 @@
                                 // add each model on every line
                                 $('#userbusiness-table-tbody').append(a_html)
                             });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'userbusiness-table-tbody',10)
+                               
+                           
                             },
                             error: function () {
                                 alert('Error Occured');
                             }
-                    }); 
+                        }); 
+            
           
           });
- 
-</script>
+   
+    </script>
+{% endblock %}
+
+<!---------------------- CUSTOM SEARCH ------------------>
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+
 {% endblock %}

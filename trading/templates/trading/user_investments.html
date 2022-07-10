@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Personal Investments</title>
+    <title>My Investments</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -40,9 +40,10 @@
                             data-toggle="tooltip" data-placement="bottom" title='Explore Investments'><i class="fas fa-balance-scale"></i></a></li>
                       
                               
+                     
                         <li class="breadcrumb-item" >
-                            <label id="total_projects_searched" class ="badge rounded-pill bg-light text-dark" >Personal Investments [{{total}}]</label>
-                        </li>
+                            <label id="total_items"  class ="badge rounded-pill bg-light text-dark">Total [{{total}}]</label>
+                        </li> 
                         <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
                             <a id='current_status' href="{% url 'user_investments' %}"
                                 data-toggle="tooltip" data-placement="bottom" 
@@ -190,6 +191,7 @@
 
 {% endblock %} 
 {% block scripts %}
+<script src="{% static 'mentor/assets/js/search.js' %}"></script>
 <script>
     function truncChar(str,length){
     var myTruncatedString = str.substring(0,length-1);              
@@ -218,10 +220,25 @@
                 }
                 return cookieValue;
             }
-  
+    function append_no_records_found(total, tbody_id, colspan){
+        if (total == 0) {
+            no_record_html=`<tr id="item-1">  <td colspan='${colspan}'> No Records Found <td>
+                            </tr>` ;
+            $(`#${tbody_id}`).append(no_record_html)
+        }
+    }
     var csrftoken = getToken('csrftoken');
-    var display_myinvestement_ajax_url= "{% url 'display_myinvestment_ajax' %}" 
-    var app_status
+    var display_ajax_url= "{% url 'display_myinvestment_ajax' %}" 
+    var app_status='{{status}}'
+
+     //first timme
+    var display_ajax_url
+    var status= '{{status}}'
+    
+    if (status){ 
+                            
+        display_ajax_url = `{% url 'user_investments_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
+    }
     
     $(document).ready(function (){ 
         $("#investments a:first").addClass( "active") 
@@ -416,11 +433,11 @@
         $.ajax({
                 type: "POST",
                 // define url name
-                url: display_myinvestement_ajax_url, 
+                url: display_ajax_url, 
                 data :data,
                 // handle a successful response
                 success: function (response) {
-                    console.log('url', display_myinvestement_ajax_url)
+                    //console.log('url', display_ajax_url)
                     $('#userinvestment-table-tbody').html('')
                     updatePaging2(response.data)
                     if (response.data.per_table){
@@ -434,6 +451,9 @@
                         // add each model on every line
                         $('#userinvestment-table-tbody').append(a_html)
                     });
+                     //Append Zero Record Annotation
+                     append_no_records_found(response.data.totalrecords,'userinvestment-table-tbody',8)
+                               
                     },
                     error: function () {
                         alert('Error Occured');
@@ -442,31 +462,47 @@
             });
             //add_model_class()
         }
+    function update_total_results(total){
+            html=`Total [${total}]`
+            $('#total_items').html(html)
+        }    
     $('body').on('click', '.filter-status', function (e) {
-                e.preventDefault();  
-                var clicked_id = $(this).attr('id')
-                var url = $(this).attr('data-url');
-                var myclass =$('.filter-status')
-                app_status =$(this).attr('id')
-                $('#li_current_status').css('display','block')
-                $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
-              
-                $.each(myclass, function(i, val) {
-                    let loop_id= $(this).attr('id')
-                    if (clicked_id == loop_id){
-                        $(this).removeClass('bg-warning')
-                        $(this).addClass('bg-light')
-                    
-                    }else {
-                        $(this).addClass('bg-warning')
-                        $(this).removeClass('bg-light')
-                    }
-                });
-         
-                // click first page
-                page_no=1
-                // ajax call
-                $.ajax({
+                
+            e.preventDefault(); 
+            var clicked_id = $(this).attr('id')
+            var myclass =$('.filter-status')
+            app_status =$(this).attr('id')
+            var search_val = $('#search').val().toLowerCase();
+            search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+            
+        
+            if (search_val.length == 0 ){
+                //tag
+                display_ajax_url = `{% url 'user_investments_load_status_ajax' 12345 %}`.replace(/12345/, app_status.toString()); 
+            } else{
+                display_ajax_url = `{% url 'user_investments_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, app_status.toString()).replace(/6789/, search_val.toString()); 
+            }
+            var url =display_ajax_url
+
+            $('#li_current_status').css('display','block')
+            $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+            
+            $.each(myclass, function(i, val) {
+                let loop_id= $(this).attr('id')
+                if (clicked_id == loop_id){
+                    $(this).removeClass('bg-warning')
+                    $(this).addClass('bg-light')
+                
+                }else {
+                    $(this).addClass('bg-warning')
+                    $(this).removeClass('bg-light')
+                }
+            });
+        
+            // click first page
+            page_no=1
+            // ajax call
+            $.ajax({
                         type: "POST",
                         // define url name
                         url: url, 
@@ -483,13 +519,17 @@
                             }
                             var base_counter =(parseInt(page_no)-1)*per_page
                             var counter=base_counter
+                            update_total_results(response.data.totalrecords)
                             $.each(response.data.results, function(i, val) {
                                 counter=  counter +1
-                                console.log('url', url)
+                                //console.log('url', url)
                                 a_html=append_html(counter,val,page_no)                           
                                 // add each model on every line
                                 $('#userinvestment-table-tbody').append(a_html)
                             });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'userinvestment-table-tbody',8)
+                   
                             },
                             error: function () {
                                 alert('Error Occured');
@@ -497,6 +537,63 @@
                     }); 
           
           });
-      
+    $("body").on("keyup", "#search", function(){
+
+        var search_val = $(this).val().toLowerCase();
+        search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+        if (search_val.length == 0 ){
+            //tag
+            display_ajax_url = `{% url 'user_investments_load_status_ajax' 12345 %}`.replace(/12345/, app_status.toString()); 
+        } else{
+            display_ajax_url = `{% url 'user_investments_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, app_status.toString()).replace(/6789/, search_val.toString()); 
+        }
+        // click first page
+        page_no=1
+        // ajax call
+        $.ajax({
+            type: "POST",
+            // define url name
+            url: display_ajax_url, 
+            data : {    
+                page_no : page_no, 
+                csrfmiddlewaretoken: csrftoken,
+            },
+            // handle a successful response
+            success: function (response) {
+                $('#userinvestment-table-tbody').html('')
+                updatePaging2(response.data)
+                if (response.data.per_page){
+                    per_page=response.data.per_page
+                }
+                var base_counter =(parseInt(page_no)-1)*per_page
+                var counter=base_counter
+                update_total_results(response.data.totalrecords)
+                $.each(response.data.results, function(i, val) {
+                    counter=  counter +1
+                    //console.log('url', display_ajax_url)
+                    a_html=append_html(counter,val,page_no)                           
+                    // add each model on every line
+                    $('#userinvestment-table-tbody').append(a_html)
+                });
+                //Append Zero Record Annotation
+                append_no_records_found(response.data.totalrecords,'userinvestment-table-tbody',8)
+                   
+                },
+                error: function () {
+                    alert('Error Occured');
+                }
+        }); 
+            
+
+});
+
 </script>
 {% endblock %}
+
+<!---------------------- CUSTOM SEARCH ------------------>
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+
+{% endblock %}
+

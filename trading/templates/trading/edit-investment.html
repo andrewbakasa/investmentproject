@@ -145,7 +145,8 @@
             
 
             $(document).on('shown.bs.modal','.modal',function(e){
-            //var form_id= $(this).find('form').attr('id')
+                var form_id= $(this).find('form').attr('id')
+                console.log('form_id',form_id )
                 var form_para= $(this).find('form')
                 var modal_wide= form_para.hasClass('modal-wide')
                 if(modal_wide){
@@ -192,7 +193,7 @@
                     //console.log("this", btn)
                    
                     var modal_wide= btn.hasClass('modal-wide')
-                    //console.log("invest-edit>>>>>:", modal_wide, tittle )
+                    console.log("invest-edit>>>>>:", modal_wide, tittle )
                     if(tittle == 'Edit Data' || tittle == 'Edit Equity'){ 
                         //console.log("tittle", tittle)
                         //console.log('modal_wide',tittle)

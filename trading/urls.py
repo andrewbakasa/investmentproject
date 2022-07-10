@@ -35,14 +35,17 @@ urlpatterns = [
     path('u/i/load_status/<str:status>', views.get_user_investments_load_status, name="user_investments_load_status"),
 
     path('u/i/load_status_ajax/<str:status>', views.get_user_investments_load_status_ajax, name="user_investments_load_status_ajax"),
-
+    path('user_investments_search/<str:status>/<str:slug>/search/tags/', views.user_investments_search_and_tags_ajax,{'search_type': 1}, name='user_investments_search_and_tags_ajax'), 
+ 
     path('u/b/0/', views.get_user_businesses,{'type': 'all'}, name="user_businesses"),
     path('u/b/1/', views.get_user_businesses,{'type': 'open'}, name="user_businesses_open"),
     path('u/b/2/', views.get_user_businesses,{'type': 'closed'}, name="user_businesses_closed"),
     path('u/b/', views.get_user_businesses,{'type': 'unread'}, name="user_businesses_unread"),
 
     path('u/b/load_status_ajax/<str:status>', views.get_user_businesses_load_status_ajax, name="user_business_load_status_ajax"),
-
+     
+    path('business_search/<str:status>/<str:slug>/search/tags/', views.business_search_and_tags_ajax,{'search_type': 1}, name='business_search_and_tags_ajax'), 
+    path('business_search/<str:status>/tags/', views.business_search_and_tags_ajax,{'search_type': 0}, name='business_tags_ajax'), 
 
     path('u_investment_jax/', views.create_userinvestment_ajax, name="create_userinvestment_ajax"),
     path('u_investor_jax/', views.create_userinvestor_ajax, name="create_userinvestor_ajax"),

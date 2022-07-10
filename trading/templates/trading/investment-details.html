@@ -78,7 +78,7 @@
     <!-- Modal: modalAdd New Investment -->
     <div class="modal fade" id="modal_add_new_investor" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true" style="overflow-y: auto !important">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <!--Header-->
                 <div class="modal-header">
@@ -136,7 +136,7 @@
                 var form_para= $(this)
                     tittle=btn.attr('title')
                     var modal_wide= btn.hasClass('modal-wide')
-                    //console.log('Check......', modal_wide, url, tittle)
+                    console.log('Check......', modal_wide, url, tittle)
                     if(tittle == 'Edit Equity' || tittle == 'Edit Investment Pledge'){
                         //console.log('modal_wide',tittle)
                         $('#dynamic-div').addClass('modal-lg')
@@ -533,11 +533,13 @@
             })
         
 
+          
            
             
             $(document).on('shown.bs.modal','.modal',function(e){  
                
-                
+                // var form_id= $(this).find('form').attr('id')
+                // console.log('form_id',form_id )
                 if (user_is_owner ==true) {
                     if (is_user_investor ==true ){
                         $('.myModalLabel').html('Edit Investment Equity')
