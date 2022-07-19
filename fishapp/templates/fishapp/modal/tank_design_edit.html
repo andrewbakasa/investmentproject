@@ -8,14 +8,14 @@
 
 
 <div class="modal-header">
-    <h4 class="modal-title myModalLabel">Edit Tankdesignparameters [{{usermodel| truncatechars:15}}]</h4>
+    <h4 class="modal-title myModalLabel">Edit Tank Design Parameters [{{usermodel| truncatechars:15}}]</h4>
     <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
       <span aria-hidden="true">×</span>
     </button>       
 </div>
 
 <div class="modal-body">
-    <form id='form-tankdesignparameters' class="model-form-edit model-tankdesignparameters-edit form-horizontal" 
+    <form id='form-tankdesignparameters' class="model-form-edit model-tankdesignparameters-edit form-horizontal modal-wide" 
       enctype="multipart/form-data" method="post" data-url="{% url 'update_model_tankdesignparameters_ajax' tankdesignparameters_form.instance.id %}">
       {% csrf_token %}
       

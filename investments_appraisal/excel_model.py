@@ -4536,7 +4536,7 @@ class ExcelReport():
                     title =parameter_
 
                 
-                data.append(["",  title, df.iloc[i]['gradient'],  
+                data.append([i+1,  title, df.iloc[i]['gradient'],  
                                    df.iloc[i]['x_npv_0'],direction_symbol, pos_neg_symbol, comments]) 
                 
                

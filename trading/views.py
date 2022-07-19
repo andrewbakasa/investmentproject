@@ -677,7 +677,7 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
             
             
             data={}	
-            data["per_page"]=pertable
+            data["per_table"]=pertable
             data["page_no"]=1
             data["num_of_pages"]=num_of_pages
             data["totalrecords"]=totalrecords

@@ -8,14 +8,14 @@
 
 
 <div class="modal-header">
-    <h4 class="modal-title myModalLabel">Edit Feedlotdesignparameters [{{usermodel| truncatechars:15}}]</h4>
+    <h4 class="modal-title myModalLabel">Edit Feedlot Design Parameters [{{usermodel| truncatechars:15}}]</h4>
     <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
       <span aria-hidden="true">×</span>
     </button>       
 </div>
 
 <div class="modal-body">
-    <form id='form-feedlotdesignparameters' class="model-form-edit model-feedlotdesignparameters-edit form-horizontal" 
+    <form id='form-feedlotdesignparameters' class="model-form-edit model-feedlotdesignparameters-edit form-horizontal modal-wide" 
       enctype="multipart/form-data" method="post" data-url="{% url 'update_model_feedlotdesignparameters_ajax' feedlotdesignparameters_form.instance.id %}">
       {% csrf_token %}
       

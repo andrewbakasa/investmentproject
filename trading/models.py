@@ -159,6 +159,12 @@ class Investment(models.Model):
 
         return False
     
+    def userIsInvestor_2(self, user):       
+        qs = self.investor_set.filter(user=user).first()
+        if qs:
+            return True, qs
+
+        return False, _
 
     def userIsOwnerAttr(self, user):  
         if self.creater == user :

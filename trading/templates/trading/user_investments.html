@@ -437,7 +437,7 @@
                 data :data,
                 // handle a successful response
                 success: function (response) {
-                    //console.log('url', display_ajax_url)
+                    console.log('url', display_ajax_url)
                     $('#userinvestment-table-tbody').html('')
                     updatePaging2(response.data)
                     if (response.data.per_table){

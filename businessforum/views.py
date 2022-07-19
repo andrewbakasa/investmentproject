@@ -8,6 +8,7 @@ from django.http import Http404, HttpResponseNotFound, JsonResponse
 from django.core.paginator import Paginator
 
 from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, InvestorStatusUpdate, UserInvestmentForm, UserInvestmentFormUpdate
+from trading.models import Investor
 from .models import *
 from django.db.models.expressions import F
 from django.contrib.auth.decorators import login_required 
@@ -60,6 +61,8 @@ def investment_blogs(request,id):
         "total": blogsqueryset.count(),
         "user": request.user,
         'investment': investment,
+        #"is_user_investor": is_user_investor,
+        "is_user_record_owner": True if investment.creater == request.user else False,
     }
     return render(request, 'businessforum/blog.html', context)
 
@@ -90,13 +93,19 @@ class PostListView(ListView):
         # i am investment owner or i have investment in the business
         investment = get_object_or_404(Investment, pk=self.kwargs.get('id'))
 
-        investor= investment.userIsInvestor(self.request.user)
+        is_investor, record= investment.userIsInvestor_2(self.request.user)
         business_owner=investment.userIsOwner(self.request.user)
-        if investor or business_owner:
+
+        if is_investor and not business_owner:
+            #investor cannot be allowed to view blogs
+            if not (record.application_status =='accepted'):
+                raise Http404("You have no rights over this page")
+          
+        if is_investor or business_owner:
             investmentblog, created=InvestmentBlog.objects.get_or_create(investment=investment)
             return BlogItem.objects.filter(Q(investmentblog =investmentblog)).order_by('-date_posted')
         
-        raise Http404("Your no rights over this page")
+        raise Http404("You have no rights over this page")
        
     
     def get_context_data(self, **kwargs):
@@ -105,7 +114,26 @@ class PostListView(ListView):
         investment = get_object_or_404(Investment,pk=id)
         context["investment"] = investment
         context["investment_id"] = id
+        context["is_user_record_owner"] =  True if investment.creater == self.request.user else False
         return context
+    
+    def test_func(self):
+        # i am investment owner or i have investment in the business
+        investment = get_object_or_404(Investment, pk=self.kwargs.get('id'))
+
+        is_investor, qs = investment.userIsInvestor_2(self.request.user)
+        business_owner=investment.userIsOwner(self.request.user)
+        
+        print(is_investor, qs )
+        if is_investor and not business_owner:
+            #investor cannot be allowed to view blogs
+            if not (qs.application_status =='accepted'):
+                return False
+           #otherwise accepted
+            return True
+        elif business_owner:
+            return True
+        return False
 class UserPostListView(ListView):
     model = BlogItem
     template_name = 'businessforum/user_posts.html'  #<app>/<model>_<viewtype>.html
@@ -128,11 +156,24 @@ class UserPostListView(ListView):
             else:# nothing in db
                 self.request.session['perpage_blogs']= 3      
 
+        
+        
         perpage_blogs=self.request.session['perpage_blogs']
         self.paginate_by =perpage_blogs
 
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         investment = get_object_or_404(Investment, pk=self.kwargs.get('id'))
+        
+        is_investor, record= investment.userIsInvestor_2(self.request.user)
+        business_owner=investment.userIsOwner(self.request.user)
+
+        if is_investor and not business_owner:
+            #investor cannot be allowed to view blogs
+            if not (record.application_status =='accepted'):
+                raise Http404("You have no rights over this page")
+          
+
+       
         investmentblog, created=InvestmentBlog.objects.get_or_create(investment=investment)
         return BlogItem.objects.filter(Q(author=user), Q(investmentblog =investmentblog)).order_by('-date_posted')
 
@@ -142,6 +183,7 @@ class UserPostListView(ListView):
         investment = get_object_or_404(Investment,pk=id)
         context["investment"] = investment
         context["investment_id"] = id
+        context["is_user_record_owner"] =  True if investment.creater == self.request.user else False
         return context
 class PostDetailView(DetailView):
     model = BlogItem
@@ -155,8 +197,20 @@ class PostDetailView(DetailView):
 
         id=investmentblog.investment.id
         investment = get_object_or_404(Investment,pk=id)
+
+
+      
+        is_investor, record= investment.userIsInvestor_2(self.request.user)
+        business_owner=investment.userIsOwner(self.request.user)
+
+        if is_investor and not business_owner:
+            #investor cannot be allowed to view blogs
+            if not (record.application_status =='accepted'):
+                raise Http404("You have no rights over this page")
+          
         context["investment"] = investment
         context["investment_id"] = id
+        context["is_user_record_owner"] =  True if investment.creater == self.request.user else False
         return context
 class PostCreateView(LoginRequiredMixin,CreateView):
     model = BlogItem
@@ -173,6 +227,7 @@ class PostCreateView(LoginRequiredMixin,CreateView):
         context["investment"] = investment
         context["investment_id"] = id
         context["form"] = form
+        context["is_user_record_owner"] =  True if investment.creater == self.request.user else False
         return render(request, self.template_name, context)
        
 

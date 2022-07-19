@@ -37,9 +37,15 @@
                             data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
                         
                          
-                        <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
-                                    data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
-                              
+                        {% if is_user_record_owner %}
+                            <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
+                                data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
+                        {% else %}
+                            <li class="breadcrumb-item" ><a href="{% url 'investment-details' investment_id %}" class ="badge rounded-pill bg-success" 
+                                data-toggle="tooltip" data-placement="bottom" title='View Investment'><i class="fas fa-dollar-sign"></i></a></li>
+                   
+                      
+                        {% endif %}           
                         <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
                         
                         <li class="breadcrumb-item"><a href="{% url 'blog-create' investment_id%}" class ="badge rounded-pill bg-success">{% trans 'New Post' %}</a></li>

@@ -113,8 +113,9 @@
                  beforeSend: function(){
                     var form_para= $(this)
                     tittle=btn.attr('title')
+                    console.log('Title', tittle)
                    //var modal_wide= btn.hasClass('modal-wide')
-                   if(tittle == 'Edit Model'){
+                   if(tittle == 'Edit Model' || tittle == 'Edit Tank Parameters'){
                         //console.log('modal_wide',tittle)
                         $('#dynamic-div').addClass('modal-lg')
                     }else{
