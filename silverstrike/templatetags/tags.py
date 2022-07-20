@@ -49,15 +49,32 @@ def UserIsInvestorStake(model, user):
 def userhasNewInvestorsMethod(user):
     #All investors who are investing in investments i created 
     queryset = Investor.objects.filter(Q(investment__creater=user),Q(application_status='pending'))#
-    #print(queryset,queryset.count()) 
     if queryset.count() > 0 :     
         return 'mymessages'
 
     return 'mymessages_na'
 
 @register.simple_tag
+def useracceptedAsInvestorMethod(user):
+    #All investments i have been accepted 
+    queryset = Investor.objects.filter(Q(user=user),Q(application_status='accepted'))#
+    
+    if queryset.count() > 0 :     
+        return 'mymessages2'
+
+    return 'mymessages2_na'
+
+
+@register.simple_tag
 def userNewInvestorsCountMethod(user):
     queryset = Investor.objects.filter(Q(investment__creater=user),Q(application_status='pending'))#
+    #print(queryset,queryset.count()) 
+    return queryset.count()
+
+
+@register.simple_tag
+def useracceptedInvestmentsCountMethod(user):
+    queryset = Investor.objects.filter(Q(user=user),Q(application_status='accepted'))#
     #print(queryset,queryset.count()) 
     return queryset.count()
 

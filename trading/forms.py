@@ -278,7 +278,7 @@ class InvestorStatusUpdate(forms.ModelForm):
         application_status = self.cleaned_data['application_status']
         #db_var = self.application_status
         #should not change placeholder of pending...
-        if application_status =='pending':
+        if application_status =='pending' or application_status =='engagement':
             if self.initial_arguments:
                 if self.initial_arguments.user:
                     user = self.initial_arguments.user

@@ -10,7 +10,7 @@ import pandas as pd
 #switch here
 from beefapp.beef_bus_model import BeefBusinessReport
 from beefapp.models import FeedlotDesignParameters
-from common.data_utils import create_downloads_instance
+from common.data_utils import create_downloads_instance, create_user_model_downloads_instance
 from common.utils import get_current_user_groups
 from investments_appraisal.models import *
 from django.contrib.auth.decorators import login_required 
@@ -240,6 +240,8 @@ def get_model_spreadsheets(request, model_id):
    
     #add counter downloads
     create_downloads_instance(request, 'beef')
+    #user download
+    create_user_model_downloads_instance(request, model_id)
     #get the spread sheet
     spread_Sht= breport.spreadsheet(request)
 

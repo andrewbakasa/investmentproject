@@ -95,7 +95,7 @@
                                             <td class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
                                             <td class="modelData" name="category" >{{item.cat_name}}</td>
                                             
-                                            <td class="modelData" name="email" > {% if item.application_status == "accepted" %} {{item.email}} {% else %} N/A {%endif%}</td>
+                                            <td class="modelData" name="email" > {% if item.application_status == "engagement" %} {{item.email}} {% else %} N/A {%endif%}</td>
                                             <td class="modelData" name="application_status" >{{ item.application_status }}</td>
                                             <td class="text-right modelAction modelData" name="action">
                                                 <a href="{% url 'investment-details' item.iid %}"
@@ -104,12 +104,21 @@
                                                 </a>
                                                 
                                                 <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                                data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
-                                                data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                                title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
+                                                    data-object-name="{{ item.inv_name }}"  data-item-id="{{item.id}}" 
+                                                    data-delete-url="{% url 'delete_investor_ajax' item.id  1 %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                                    title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
                                                 </a>
 
                                                 {% if item.application_status == "accepted" %} 
+                                                    <a class="ajax_engage"  href="#" data-url="{% url 'user_engage_investor' item.iid %}" 
+                                                        data-target="#modal-edit-product-div" style="color:inherit" 
+                                                        data-toggle="tooltip" data-placement="bottom" 
+                                                        title='Click to Engage. You were accepted {{ item.time_since_status_updated }}'><i class="fas fa-handshake"></i>
+                                                    </a> 
+
+                                                {%endif%}
+
+                                                {% if item.application_status == "engagement" %} 
                                                     <a href="{% url 'investment-blogs' item.iid %}" class ="iconClass-primary"
                                                         style="color:goldenrod" data-toggle="tooltip" data-placement="bottom" 
                                                         title='Business Forum [{{ item.blogs_count}}]'><i class="fas fa-comment-alt"></i>
@@ -333,6 +342,74 @@
         // ajax call
         loadPageAjax(page_no)
     });
+
+    $('body').on('click', '.ajax_engage', function (event) {
+        // preventing default actions
+        // console.log('Start here............')
+        event.preventDefault();
+        var href = $(this).attr('href');
+        var url = $(this).attr('data-url')
+        // ajax call
+        engageAjax(url)
+    });
+    function remove_messages(response){
+        $('.my_messages2_li[mymessages2]').each( function (){
+            ahtml =`<a href="{% url 'user_investments_accepted' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have been accepted in ${response.data.accepted} investment(s)'>
+                    <i  style="color:lightgreen" class="fas fa-handshake"></i>
+                    <span class="counter counter-lg" style="top:4px ;">${response.data.accepted} </span>
+                </a>`
+            $(this).html(ahtml) 
+            if (response.data.accepted == 0) {
+                $(this).remove()
+            } else {
+                $(this).css({ "display":"block"})   
+            }
+            
+           
+        })  
+    }
+    function engageAjax(href){
+        // click first page
+        page_no=1
+        var data
+        data = { 
+                csrfmiddlewaretoken: csrftoken,
+            }
+      
+        //console.log(app_status,)
+        $.ajax({
+                type: "POST",
+                url: href, 
+                data :data,
+                // handle a successful response
+                success: function (response) {
+                    remove_messages(response)  
+                    $('#userinvestment-table-tbody').html('')
+                    updatePaging2(response.data)
+                    if (response.data.per_table){
+                        per_table=response.data.per_table
+                    }
+                    var base_counter =(parseInt(page_no)-1)*per_table
+                    var counter=base_counter
+                    $.each(response.data.results, function(i, val) {
+                        counter=  counter +1
+                        a_html=append_html(counter,val,page_no)                           
+                        // add each model on every line
+                        $('#userinvestment-table-tbody').append(a_html)
+                    });
+                     //Append Zero Record Annotation
+                     append_no_records_found(response.data.totalrecords,'userinvestment-table-tbody',8)
+                    },
+                    error: function () {
+                        alert('Error Occured');
+                    }
+                    
+            });
+            //add_model_class()
+        }
+ 
+
+    
     function updatePaging2(data){
         var has_previous=''
         //console.log(data)
@@ -363,7 +440,17 @@
     function append_html(counter,val,page_no){
         //console.log(counter,page_no, val)
         var owner_details =''
+        
         if (val.application_status == "accepted"){
+            engage= `<a class="ajax_engage"  href="#" data-url="/tr/u/i/engage_ajax/${val.iid}/" 
+                data-target="#modal-edit-product-div" style="color:inherit" 
+                data-toggle="tooltip" data-placement="bottom" 
+                title='Click to Engage. You were accepted ${val.time_since_status_updated}'><i class="fas fa-handshake"></i></a>` 
+           
+        }else{
+            engage=""
+        }
+        if (val.application_status == "engagement"){
             owner_details= val.email
             span=``
             if (val.blogs_count != 0){
@@ -408,6 +495,7 @@
                         data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
                         title='Cancel Investment Application' > <i class="fas fa-trash"></i> 
                     </a>
+                    ${engage}
                     ${business_forum_connection}
                 </td>
 
@@ -416,6 +504,8 @@
     }
     function loadPageAjax(page_no){
         //var app_status ='{{status}}'
+        //console.log('url',display_ajax_url )
+        //console.log('PageNo: ', page_no)
         var data
         if (app_status) {
             data = {    
@@ -437,8 +527,9 @@
                 data :data,
                 // handle a successful response
                 success: function (response) {
-                    console.log('url', display_ajax_url)
+                    //console.log('url', display_ajax_url)
                     $('#userinvestment-table-tbody').html('')
+                    //console.log('3...',  response.data)
                     updatePaging2(response.data)
                     if (response.data.per_table){
                         per_table=response.data.per_table
@@ -514,10 +605,12 @@
                         success: function (response) {
                             $('#userinvestment-table-tbody').html('')
                             updatePaging2(response.data)
-                            if (response.data.per_page){
-                                per_page=response.data.per_page
+                            // console.log('arg.', app_status)
+                            // console.log('1...',  response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
                             }
-                            var base_counter =(parseInt(page_no)-1)*per_page
+                            var base_counter =(parseInt(page_no)-1)*per_table
                             var counter=base_counter
                             update_total_results(response.data.totalrecords)
                             $.each(response.data.results, function(i, val) {
@@ -562,15 +655,17 @@
             success: function (response) {
                 $('#userinvestment-table-tbody').html('')
                 updatePaging2(response.data)
-                if (response.data.per_page){
-                    per_page=response.data.per_page
+                // console.log('url', display_ajax_url)
+                // console.log('2...',  response.data)
+                if (response.data.per_table){
+                    per_table=response.data.per_table
                 }
-                var base_counter =(parseInt(page_no)-1)*per_page
+                var base_counter =(parseInt(page_no)-1)*per_table
                 var counter=base_counter
                 update_total_results(response.data.totalrecords)
                 $.each(response.data.results, function(i, val) {
                     counter=  counter +1
-                    //console.log('url', display_ajax_url)
+                    
                     a_html=append_html(counter,val,page_no)                           
                     // add each model on every line
                     $('#userinvestment-table-tbody').append(a_html)

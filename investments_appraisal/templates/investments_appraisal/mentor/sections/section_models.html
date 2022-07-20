@@ -77,9 +77,16 @@
                               </div>
                             
                               <p class="modelModelType modelData" name="date_created" >Date Created: {{model.date_created | date:'D d F Y H:m:s'}}</p>
-                          
-                              <p name="description" >{{model.model_type.description}}</p>
-            
+                              <div class="trainer d-flex justify-content-between align-items-center">
+                                  <div class="trainer-rank d-flex align-items-center">
+                                    <p name="description" >{{model.model_type.description}} 
+                                    </p>
+                                  </div>
+                                  <div class="trainer-rank d-flex align-items-center">
+                                      <i class="bx bx-download"></i>&nbsp;{{model.hits}}
+                                  </div>
+                              </div>
+                            
                               <p class="text-right modelAction modelData" name="action">
                                 <!-- SHOW MODEL -->
                                 <a href="{% url 'select_model_mentor' model.id %}"

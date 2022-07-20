@@ -41,6 +41,12 @@ urlpatterns = [
     path('u/b/1/', views.get_user_businesses,{'type': 'open'}, name="user_businesses_open"),
     path('u/b/2/', views.get_user_businesses,{'type': 'closed'}, name="user_businesses_closed"),
     path('u/b/', views.get_user_businesses,{'type': 'unread'}, name="user_businesses_unread"),
+    
+    
+    path('u/i/0/', views.get_user_investments_load_status,{'status': 'accepted'}, name="user_investments_accepted"),
+
+    path('u/i/engage_ajax/<int:id>/', views.get_accepted_investors_after_engagement_ajax, name="user_engage_investor"),
+  
 
     path('u/b/load_status_ajax/<str:status>', views.get_user_businesses_load_status_ajax, name="user_business_load_status_ajax"),
      

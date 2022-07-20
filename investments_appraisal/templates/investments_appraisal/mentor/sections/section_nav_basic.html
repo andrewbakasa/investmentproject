@@ -46,10 +46,17 @@
         {% if request.user.is_authenticated %}
                <!-- Dispaly or hide LI -->
               <!-- If else statement cant be fiigured out yet -->
-              <li {% userhasNewInvestorsMethod request.user %} class="my_messages_li">
+              <li {% userhasNewInvestorsMethod request.user %} class="my_messages_li" style="display:none">
                 <a href="{% url 'user_businesses_unread' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have {% userNewInvestorsCountMethod request.user %} new Investor(s)'>
                     <i  style="color:orange" class="fas fa-envelope"></i>
                     <span class="counter counter-lg" style="top:4px ;">{% userNewInvestorsCountMethod request.user %} </span>
+                </a>
+              </li>
+
+              <li {% useracceptedAsInvestorMethod request.user %} class="my_messages2_li" style="display:none">
+                <a href="{% url 'user_investments_accepted' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have been accepted in {% useracceptedInvestmentsCountMethod request.user %} investment(s)'>
+                    <i  style="color:lightgreen" class="fas fa-handshake"></i>
+                    <span class="counter counter-lg" style="top:4px ;">{% useracceptedInvestmentsCountMethod request.user %} </span>
                 </a>
               </li>
         {% endif %}

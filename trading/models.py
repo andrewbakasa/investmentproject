@@ -10,7 +10,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 #from common.models import User
 from django.utils.translation import gettext_lazy as _
-from datetime import date, timedelta
+from datetime import date, timedelta 
+from django.utils import timezone
 # from store.models import Currency
 from django.contrib.postgres.fields import ArrayField
 import pandas as pd
@@ -261,8 +262,8 @@ class InvestmentDetails(models.Model):
   
 class Investor(models.Model):
     APLLICATION_STATUS_CHOICE = (("pending", "pending"), ("recieved", "recieved"), 
-                               ("verification", "verification"), ("engagement", "engagement"),
-                               ("accepted", "accepted"), ("rejected", "rejected") )
+                               ("verification", "verification"),("accepted", "accepted"),
+                                ("engagement", "engagement"),   ("rejected", "rejected") )
     investment = models.ForeignKey(Investment, on_delete=models.SET_NULL, null=True) 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, verbose_name='Keywords')
@@ -270,7 +271,8 @@ class Investor(models.Model):
     #postiv float
     value= models.PositiveBigIntegerField(default= 0, verbose_name='Funds Pledge')
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-
+    
+    date_status_changed =models.DateTimeField(default=timezone.now())
     application_status = models.CharField(
         choices=APLLICATION_STATUS_CHOICE, max_length=64, default="pending"
     )
@@ -280,6 +282,27 @@ class Investor(models.Model):
     def __str__(self):
         return self.name 
     
+    @property
+    def time_since_status_updated(self):
+        return self.get_time(self.date_status_changed)
+    
+
+    def get_time(self,date_in):        
+        time_since= timezone.now()- date_in #.split('+')[0]
+        if time_since.days>0:
+            return str(time_since.days) + str(' days ago')
+        elif time_since.days == 0:
+            hours = time_since.seconds/3600           
+            if hours > 1:
+                return str(math.ceil(hours))+ str(' hours ago')
+            else:
+                minutes = time_since.seconds/60
+                if minutes > 1:
+                    return str(math.ceil(minutes)) + str(' minutes ago')
+                else:
+                    return str(time_since.seconds) + str(' seconds ago')
+        
+        return "Bad Timing"
     
     @property
     def deleted_df(self):
@@ -335,13 +358,19 @@ class Investor(models.Model):
         #select only for current user
         #print('#############################################33')
         #print(df.columns)
-        df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))    
+        df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))
+        df['time_since_status_updated'] = df['date_status_changed'].apply(lambda x: self.get_date_status_changed(x))     
+         
         return df #[~df['id'].isna()]
 
     def get_blogs_count(self, id):
         investment_obj= get_object_or_404(Investment, pk=id)
         cnt=investment_obj.blogs_count
         return cnt
+    
+    def get_date_status_changed(self, date_in):
+        return self.get_time(date_in)
+       
 
 
   
@@ -400,7 +429,10 @@ class Investor(models.Model):
         #select only for current user
         #print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
         #print(df.columns)
-        df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))    
+
+        df['blogs_count'] = df['iid'].apply(lambda x: self.get_blogs_count(x))
+        df['date_status_changed']= pd.to_datetime(df['date_status_changed'])
+        df['time_since_status_updated'] = df['date_status_changed'].apply(lambda x: self.get_date_status_changed(x))     
         return df#[~df['id'].isna()]
 
 class Enterprenuer(models.Model):

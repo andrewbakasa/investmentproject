@@ -21,11 +21,13 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Q
 
+ 
+from django.utils import timezone
 
 @login_required(login_url="account_login")
 def get_user_businesses(request, type):
     BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"] 
-    current_time = datetime.datetime.now()
+    current_time =timezone.now()# datetime.datetime.now()
       
 
     if type =="unread":
@@ -77,7 +79,7 @@ def get_user_businesses_load_status(request, status):
     
     
     BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"]
-    current_time = datetime.datetime.now() 
+    current_time = timezone.now()#datetime.datetime.now() 
     if status =="unread":
         queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
     elif status =="closed": 
@@ -127,7 +129,7 @@ def get_user_businesses_load_status(request, status):
     return render(request, 'trading/user_businesses.html', context)
 
 def business_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
-    current_time = datetime.datetime.now()
+    current_time =timezone.now()#datetime.datetime.now()
     if request.method == 'POST':
         if search_type == 1:
             if status =="unread":
@@ -239,7 +241,7 @@ def business_search_and_tags_ajax(request,status, slug, search_type, *args, **kw
     
 
 def investments_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     if request.method == 'POST':
         if search_type == 1:
             if status =="unread":
@@ -353,7 +355,7 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
             BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"]
-            current_time = datetime.datetime.now() 
+            current_time = timezone.now()#datetime.datetime.now() 
            
             if status =="unread":
                 queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
@@ -475,11 +477,9 @@ def view_investors(request, id):
 @login_required(login_url="account_login")
 def get_user_investments_load_status(request, status):
     #this method is redundant: verify my assertion
-    APLLICATION_STATUS_CHOICE = ["pending", "recieved",
-                            "verification","engagement",
-                             "accepted","rejected","all"]  
+    APLLICATION_STATUS_CHOICE = ["pending", "recieved", "verification",  "accepted","engagement","rejected","all"]  
     queryset = Investor.objects.filter(Q(user=request.user)).first()  
-    #print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw')
+  
     if status=='all':
         status=None
     df=queryset.trading_df_status(status)
@@ -537,9 +537,7 @@ def user_investments_search_and_tags_ajax(request,status, slug, search_type, *ar
   
     if request.method == 'POST':
         if request.is_ajax():
-            APLLICATION_STATUS_CHOICE = ["pending", "recieved",
-                            "verification","engagement",
-                                "accepted","rejected","all"]  
+            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
             if status=='all':
                 status=None
@@ -578,15 +576,17 @@ def user_investments_search_and_tags_ajax(request,status, slug, search_type, *ar
             page_range = obj_paginator.page_range
 
             
-            #page_no = request.POST.get('page_no', None) 
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
             num_of_pages= int(obj_paginator.num_pages)
             totalrecords= int(obj_paginator.count)
-            current_page = obj_paginator.get_page(1)    
+            current_page = obj_paginator.get_page(page_no)    
             
             
             data={}	
-            data["per_page"]=pertable
-            data["page_no"]=1
+            data["per_table"]=pertable
+            data["page_no"]=page_no
             data["num_of_pages"]=num_of_pages
             data["totalrecords"]=totalrecords
                 #data["has_previous"]=False
@@ -627,17 +627,28 @@ def user_investments_search_and_tags_ajax(request,status, slug, search_type, *ar
         
     else:
         return JsonResponse({'error': True, 'data': "Request not ajax"})  
-def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
-    #print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+
+def get_accepted_investors_after_engagement_ajax(request,  id, *args, **kwargs):
+   
     if request.method == 'POST':
         if request.is_ajax():
-            APLLICATION_STATUS_CHOICE = ["pending", "recieved",
-                            "verification","engagement",
-                                "accepted","rejected","all"]  
+            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
+           
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
-            if status=='all':
-                status=None 
-            df=queryset.trading_df_status(status)
+           
+            #change selected accepted investor into engagement
+            obj=Investor.objects.filter(user=request.user, investment__pk=id)
+            obj= obj.first()
+            if obj:
+                obj.application_status= 'engagement'
+                obj.date_status_changed= timezone.now()#datetime.datetime.now() 
+
+                obj.save()
+
+            df=queryset.trading_df_status('accepted')
+            #aaaaaaaaaaaaaaaaaa
+            #print(df.columns)
+            #print(df)
             sum_total=0
             aver_val=0
             if len(df)>0 :
@@ -670,15 +681,24 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
             page_range = obj_paginator.page_range
 
             
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
+           
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+          
+            
             #page_no = request.POST.get('page_no', None) 
             num_of_pages= int(obj_paginator.num_pages)
             totalrecords= int(obj_paginator.count)
-            current_page = obj_paginator.get_page(1)    
+            current_page = obj_paginator.get_page(page_no)    
             
             
             data={}	
             data["per_table"]=pertable
-            data["page_no"]=1
+            data["page_no"]=page_no
             data["num_of_pages"]=num_of_pages
             data["totalrecords"]=totalrecords
                 #data["has_previous"]=False
@@ -687,8 +707,10 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
                 data["first"]=1 
                 data["previous_page_number"]=current_page.previous_page_number() 
             
-            data["current_page"]=current_page.number     
-            
+            data["current_page"]=current_page.number 
+            queryset = Investor.objects.filter(Q(user=request.user),Q(application_status='accepted'))#    
+            data["accepted"]=queryset.count() 
+
             #data["has_next"]=False
             if current_page.has_next():
                 data["has_next"]=True  
@@ -713,6 +735,109 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
                 results.append(item_object)
                 
             data["results"]=results
+
+           
+   
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
+
+def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
+    #print('743:',status)
+    if request.method == 'POST':
+        if request.is_ajax():
+            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
+            queryset = Investor.objects.filter(Q(user=request.user)).first() 
+            if status=='all':
+                status=None 
+            df=queryset.trading_df_status(status)
+            #print(df)
+            sum_total=0
+            aver_val=0
+            if len(df)>0 :
+                df['id'] = pd.to_numeric(df.id)
+        
+                sum_total = df['myinvest'].sum()
+                aver_val = df['myinvest'].mean()
+
+            dict_,colms= dataframe_to_list_dict(df,True)
+            #print(1, colms, dict_)
+            if not ('pertable' in request.session):
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            else:
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            pertable=request.session['pertable']
+        
+
+            #print(colms)
+            obj_paginator = Paginator(dict_, pertable)
+            first_page = obj_paginator.page(1).object_list
+            page_range = obj_paginator.page_range
+
+            
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
+           
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+          
+            
+            #page_no = request.POST.get('page_no', None) 
+            num_of_pages= int(obj_paginator.num_pages)
+            totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+            data={}	
+            data["per_table"]=pertable
+            data["page_no"]=page_no
+            data["num_of_pages"]=num_of_pages
+            data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+        
+
+            
+            if int(1)>int(num_of_pages):			
+                data["results"]=[]
+                return JsonResponse({"data":data})
+            results=[]											 
+            for i in obj_paginator.page(page_no).object_list:	
+                item_object = {}
+                for col_ in colms:
+                    item_object[col_]=i[col_] 
+                #----get the investment id----
+                investment_id = i['iid']
+                investment_obj= get_object_or_404(Investment, pk=investment_id)
+                item_object['blogs_count']=investment_obj.blogs_count             
+                results.append(item_object)
+                
+            data["results"]=results
             return JsonResponse({"data":data})
         else:
             return JsonResponse({'error': True, 'data': 'errors'})  
@@ -721,9 +846,7 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 @login_required(login_url="account_login")
 def get_user_investments(request):
-    APLLICATION_STATUS_CHOICE = ["pending", "recieved",
-                            "verification","engagement",
-                             "accepted","rejected","all"]
+    APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
     queryset = Investor.objects.filter(user=request.user).first()  
     
     df=queryset.trading_df
@@ -795,7 +918,7 @@ def update_investment_likes_ajax(request,  id, *args, **kwargs):
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 
 def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **kwargs):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     if request.method == 'POST':
         if search_type == 1:
             modelsdata= Investment.objects.filter(Q(closing_date__gte=current_time),Q(public=True), Q(tags__in=tag_id), Q(description__icontains=slug))
@@ -881,7 +1004,7 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
 
 
 def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     if request.method == 'POST':
         #description= request.POST['description']
         if search_type=='tags':
@@ -968,7 +1091,7 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
         return JsonResponse({"data":data})
 
 def display_investment_ajax(request):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     models= Investment.objects.filter(Q(closing_date__gte=current_time),Q(public=True))#.order_by('-date')
 
 
@@ -1127,6 +1250,7 @@ def investor_details(request,id, investment_id):
     investor_obj = get_object_or_404(Investor,pk=id, investment=investment_obj)
     if investor_obj.application_status =='pending':
         investor_obj.application_status ='recieved'
+        investor_obj.date_status_changed=timezone.now()# datetime.datetime.now()
         investor_obj.save()
         changed_to_recieved=True
         messages.success(request, "Application changed from pending to recieved")
@@ -1198,7 +1322,7 @@ def edit_investment(request,id):
 
 @login_required
 def home(request):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     models= Investment.objects.filter(Q(closing_date__gte=current_time), Q(public=True))
     if not ('perpage' in request.session):
         #print('session[perpage] on set')
@@ -1246,7 +1370,7 @@ def investment_load_tags_search_string(request, tagname, search_str):
     # replicate
     #print(tagname, search_str) 
     tags= Tag.objects.filter(name=tagname)
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     models= Investment.objects.filter(Q(closing_date__gte=current_time),Q(public=True), Q(tags__in=tags), Q(description__icontains=search_str))
 
     if not ('perpage' in request.session):
@@ -1288,7 +1412,7 @@ def investment_load_tags_search_string(request, tagname, search_str):
     return render(request, 'trading/trading.html', context)
 @login_required
 def investment_load_tags(request, tag_id):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     models= Investment.objects.filter(Q(tags__in=tag_id), Q(public=True), Q(closing_date__gte=current_time))
     tag= get_object_or_404(Tag,pk=tag_id)
     if not ('perpage' in request.session):
@@ -1923,7 +2047,7 @@ def add_model_investment_paragraph_ajax(request, id, *args, **kwargs):
 
 
 def display_business_ajax(request):
-    current_time = datetime.datetime.now()
+    current_time = timezone.now()#datetime.datetime.now()
     if request.method == 'POST':
         bus_status = request.POST.get('bus_status', None)
         if bus_status == None:
@@ -2104,14 +2228,20 @@ def update_investorStatus_ajax(request, id, *args, **kwargs):
     investor_obj = get_object_or_404(Investor,pk=id)
     #investment_obj = get_object_or_404(Investment,pk=investment_id)
     #userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
-
+    
 
     if request.method == 'POST':
         if request.is_ajax():
             form = InvestorStatusUpdate(request.POST or None,instance=investor_obj)
+            #change date here
             #form.instance.user =request.user
             if form.is_valid():
+                investor_obj.date_status_changed= timezone.now()#datetime.datetime.now()
+                #correct here also
+                investor_obj.save()
+                #print('form:', form)
                 form.save()
+                
                
             else:
                 errors = form.errors
@@ -2121,8 +2251,10 @@ def update_investorStatus_ajax(request, id, *args, **kwargs):
             latest = Investor.objects.latest('id').id
             record = Investor.objects.get(pk=latest)
             item_object = model_to_dict(record)
+            queryset = Investor.objects.filter(Q(user=request.user),Q(application_status='accepted'))#    
+           
             #print (item_object)
-            return JsonResponse({'error': False, 'data': item_object})
+            return JsonResponse({'error': False, 'data': item_object,'accepted': queryset.count() })
         else:
             return JsonResponse({'error': True, 'data': "Request not ajax"})
   

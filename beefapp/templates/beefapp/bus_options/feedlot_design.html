@@ -7,80 +7,95 @@
         <h4 class="box-title" style="color:blue">Feedlot Design Parameters</h4>
         <div class="box-description view-section" name='my_feedlotdesignparameters_section'>
             {%if feedlotdesignparameters_record %}
-                <!-- Edit/Change -->
-                <div class="table-responsive">
-                    <table id="feedlotdesignparametersTable" class="table table-striped" >
-                        <thead>
-                        </thead>
-                        
-                        <tbody id="feedlotdesignparameters-table-tbody">
-                            <tr id="feedlotdesignparameters-length" >
-                                <th scope="row">Length</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData" name="length" >{{feedlotdesignparameters_record.length| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-                            <tr id="feedlotdesignparameters-width" >
-                                <th scope="row">Width</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="width">{{feedlotdesignparameters_record.width| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-                           
-                            <!-- <tr id="feedlotdesignparameters-pen_area" >
-                                <th scope="row">Pen area</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData" name="pen_area" >{{feedlotdesignparameters_record.pen_area| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr> -->
-                            <tr id="feedlotdesignparameters-sqm_per_cattle" >
-                                <th scope="row">SQM per each cattle</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="sqm_per_cattle">{{feedlotdesignparameters_record.sqm_per_cattle| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-                            <tr id="feedlotdesignparameters-total_cattle_per_pen_per_cycle" >
-                                <th scope="row">Total cattle per pen per cycle</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="total_cattle_per_pen_per_cycle">{{feedlotdesignparameters_record.total_cattle_per_pen_per_cycle| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
-                            <tr id="feedlotdesignparameters-num_of_months_per_cycle" >
-                                <th scope="row"># of months per cycle</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="num_of_months_per_cycle">{{feedlotdesignparameters_record.num_of_months_per_cycle| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-                            <!-- <tr id="feedlotdesignparameters-cattle_per_pen_per_year" >
-                                <th scope="row">Annual Cattle Output per pen </th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="cattle_per_pen_per_year">{{feedlotdesignparameters_record.cattle_per_pen_per_year| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr> -->
-                            <tr id="feedlotdesignparameters-num_of_feedlots" >
-                                <th scope="row"># of feedlots</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="num_of_feedlots">{{feedlotdesignparameters_record.num_of_feedlots| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
-
-                            <tr id="feedlotdesignparameters-construction_cost_per_pen" >
-                                <th scope="row">Unit Pen Construction Cost</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="construction_cost_per_pen">{{feedlotdesignparameters_record.construction_cost_per_pen| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
-
-                            <tr id="feedlotdesignparameters-machinery_cost_per_pen" >
-                                <th scope="row">Unit Pen Machinery Cost</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="machinery_cost_per_pen">{{feedlotdesignparameters_record.machinery_cost_per_pen| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
-                            <tr id="feedlotdesignparameters-building_cost_per_sqm" >
-                                <th scope="row">Building cost per sqm (of Total Land)</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="building_cost_per_sqm">{{feedlotdesignparameters_record.building_cost_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
-
-                            <tr id="feedlotdesignparameters-total_land_sqm" >
-                                <th scope="row">Total land (sqm)</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="total_land_sqm">{{feedlotdesignparameters_record.total_land_sqm| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
-                            <tr id="feedlotdesignparameters-cost_of_land_per_sqm" >
-                                <th scope="row">Land cost per sqm</th>
-                                <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="cost_of_land_per_sqm">{{feedlotdesignparameters_record.cost_of_land_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
-                            </tr>
-
+                
+          
+               <!-- Edit/Change -->
+                <div class="table-responsive row">
+                    <div style="flex: 50%;">
+                        <table id="feedlotdesignparametersTableA" class="table table-striped" >
+                            <thead>
+                            </thead>
                             
-                        </tbody>
-                    </table>
+                            <tbody id="feedlotdesignparameters-table-tbodyA">
+                                <tr id="feedlotdesignparameters-length" >
+                                    <th scope="row">Length</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData" name="length" >{{feedlotdesignparameters_record.length| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+                                <tr id="feedlotdesignparameters-width" >
+                                    <th scope="row">Width</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="width">{{feedlotdesignparameters_record.width| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+                            
+                                <!-- <tr id="feedlotdesignparameters-pen_area" >
+                                    <th scope="row">Pen area</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData" name="pen_area" >{{feedlotdesignparameters_record.pen_area| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr> -->
+                                <tr id="feedlotdesignparameters-sqm_per_cattle" >
+                                    <th scope="row">SQM per each cattle</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="sqm_per_cattle">{{feedlotdesignparameters_record.sqm_per_cattle| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+                                <tr id="feedlotdesignparameters-total_cattle_per_pen_per_cycle" >
+                                    <th scope="row">Total cattle per pen per cycle</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="total_cattle_per_pen_per_cycle">{{feedlotdesignparameters_record.total_cattle_per_pen_per_cycle| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+
+                                <tr id="feedlotdesignparameters-num_of_months_per_cycle" >
+                                    <th scope="row"># of months per cycle</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="num_of_months_per_cycle">{{feedlotdesignparameters_record.num_of_months_per_cycle| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+                                <!-- <tr id="feedlotdesignparameters-cattle_per_pen_per_year" >
+                                    <th scope="row">Annual Cattle Output per pen </th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="cattle_per_pen_per_year">{{feedlotdesignparameters_record.cattle_per_pen_per_year| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr> -->
+                                <tr id="feedlotdesignparameters-num_of_feedlots" >
+                                    <th scope="row"># of feedlots</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="num_of_feedlots">{{feedlotdesignparameters_record.num_of_feedlots| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="flex: 50%;">
+                        <table id="feedlotdesignparametersTableB" class="table table-striped" >
+                            <thead>
+                            </thead>
+                            
+                            <tbody id="feedlotdesignparameters-table-tbodyB">
+
+                                <tr id="feedlotdesignparameters-construction_cost_per_pen" >
+                                    <th scope="row">Unit Pen Construction Cost</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="construction_cost_per_pen">{{feedlotdesignparameters_record.construction_cost_per_pen| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+
+
+                                <tr id="feedlotdesignparameters-machinery_cost_per_pen" >
+                                    <th scope="row">Unit Pen Machinery Cost</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="machinery_cost_per_pen">{{feedlotdesignparameters_record.machinery_cost_per_pen| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+
+                                <tr id="feedlotdesignparameters-building_cost_per_sqm" >
+                                    <th scope="row">Building cost per sqm (of Total Land)</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="building_cost_per_sqm">{{feedlotdesignparameters_record.building_cost_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+
+
+                                <tr id="feedlotdesignparameters-total_land_sqm" >
+                                    <th scope="row">Total land (sqm)</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="total_land_sqm">{{feedlotdesignparameters_record.total_land_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+
+                                <tr id="feedlotdesignparameters-cost_of_land_per_sqm" >
+                                    <th scope="row">Land cost per sqm</th>
+                                    <td class="feedlotdesignparametersAction feedlotdesignparametersData"  name="cost_of_land_per_sqm">{{feedlotdesignparameters_record.cost_of_land_per_sqm| floatformat:-1 |intcomma}}</td>                                                    
+                                </tr>
+
+                                
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
               
                  <!-- EDIT MODEL -->
                 <a class="model-edit show-form-update" href="#" data-url="{% url 'update_model_feedlotdesignparameters_ajax' feedlotdesignparameters_record.id %}" 

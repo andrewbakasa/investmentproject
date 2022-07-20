@@ -130,23 +130,32 @@
     <!-- GOD IS GOOD ALL THE TIME -->
     <script>
 
-    // $('.my_messages_li[mymessages]').each( function (){
-    //         $(this).addClass('advanced') 
-    // })
-    // display:none and remove ele
     
+    // display:none and remove ele
     $(document).ready(function (){ 
-        // $("#index").removeClass( "active")
         $("#index a").addClass( "active")
-        
         $('.my_messages_li[mymessages_na]').each( function (){
-            console.log('here....')
             $(this).css(
                 { "display":"none",
-                // "title":"", 
                 }
             ).remove()          
-        })  
+        })
+        $('.my_messages_li[mymessages').each( function (){
+            $(this).css({ "display":"block"})         
+        })
+        
+        $('.my_messages2_li[mymessages2_na]').each( function (){
+            $(this).css(
+                { "display":"none",
+                }
+            ).remove()          
+        })
+
+        $('.my_messages2_li[mymessages2').each( function (){
+            $(this).css({ "display":"block"})         
+        })
+        
+        
        
         function getToken(name) {
                 let cookieValue = null;

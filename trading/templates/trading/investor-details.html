@@ -449,13 +449,28 @@
             })
             
 
-             
+        function remove_messages(response){
+            if (response.accepted){
+                $('.my_messages2_li[mymessages2]').each( function (){
+                    ahtml =`<a href="{% url 'user_investments_accepted' %}" class="iconClass-primary" data-toggle="tooltip"  title='You have been accepted in ${response.accepted} investment(s)'>
+                            <i  style="color:lightgreen" class="fas fa-handshake"></i>
+                            <span class="counter counter-lg" style="top:4px ;">${response.accepted} </span>
+                        </a>`
+                    $(this).html(ahtml) 
+                    if (response.accepted == 0) {
+                        $(this).remove()
+                    } else {
+                        $(this).css({ "display":"block"})   
+                    }                
+                })
+            }  
+        }       
       $('body').on("submit",".investor-status-update",function(e){
               e.preventDefault();
               var data = new FormData(this);
               var formData
               var form = $(this);
-            
+              console.log('url',form.attr('data-url') )
               var url=form.attr('data-url')
               $.ajax({
                   url: form.attr('data-url'),
@@ -465,6 +480,7 @@
                   processData:false,
                   contentType: false,
                   success: function(data){
+                       remove_messages(data) 
                       if(data.error == false){
                          //console.log('Success...', data)
                         $('.public_toggle_form-errors').html('');

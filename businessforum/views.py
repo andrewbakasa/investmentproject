@@ -98,7 +98,7 @@ class PostListView(ListView):
 
         if is_investor and not business_owner:
             #investor cannot be allowed to view blogs
-            if not (record.application_status =='accepted'):
+            if not (record.application_status =='engagement'):
                 raise Http404("You have no rights over this page")
           
         if is_investor or business_owner:
@@ -127,7 +127,7 @@ class PostListView(ListView):
         print(is_investor, qs )
         if is_investor and not business_owner:
             #investor cannot be allowed to view blogs
-            if not (qs.application_status =='accepted'):
+            if not (qs.application_status =='engagement'):
                 return False
            #otherwise accepted
             return True
@@ -169,7 +169,7 @@ class UserPostListView(ListView):
 
         if is_investor and not business_owner:
             #investor cannot be allowed to view blogs
-            if not (record.application_status =='accepted'):
+            if not (record.application_status =='engagement'):
                 raise Http404("You have no rights over this page")
           
 
@@ -205,7 +205,7 @@ class PostDetailView(DetailView):
 
         if is_investor and not business_owner:
             #investor cannot be allowed to view blogs
-            if not (record.application_status =='accepted'):
+            if not (record.application_status =='engagement'):
                 raise Http404("You have no rights over this page")
           
         context["investment"] = investment

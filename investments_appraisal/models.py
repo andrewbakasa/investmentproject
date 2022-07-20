@@ -245,6 +245,7 @@ class UserModel(models.Model):
     npv_bin_size= models.IntegerField(default=10)
     design_complete =models.BooleanField(default=False)
     total_params= models.IntegerField(default=0, verbose_name="Simulation Params")
+    hits = models.IntegerField(default=0)# downloads
 
     class Meta:
         ordering = ['-last_modified','-date_created']
