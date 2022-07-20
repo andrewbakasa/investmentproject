@@ -6,7 +6,7 @@ import math
 
 import numpy as np
 import pandas as pd
-from common.data_utils import create_downloads_instance
+from common.data_utils import create_downloads_instance, create_user_model_downloads_instance
 from common.utils import get_current_user_groups
 from fishapp.fish_bus_model import FishBusinessReport
 from fishapp.models import TankDesignParameters
@@ -256,7 +256,7 @@ def get_model_spreadsheets(request, model_id):
     
     #add counter downloads
     create_downloads_instance(request, 'fish')
-    
+    create_user_model_downloads_instance(request, model_id)
     #get the spread sheet
     spread_Sht= breport.spreadsheet(request)
 
