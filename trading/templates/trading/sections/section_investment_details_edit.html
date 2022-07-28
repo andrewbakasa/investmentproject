@@ -108,12 +108,20 @@
               <a id="breadcrumb_changeto_edit" class="model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
               data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                 {% if is_user_record_owner %} title='Edit Equity'{% else %} title='Edit Investment Pledge'{% endif %}><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
-            </a>     
+            </a> 
+              <!-- {{investor_id}} -->
+              <a id="delete_cancel_investment" href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                data-object-name="{{ model.name }}"  data-item-id="{{model.id}}" 
+                data-delete-url="{% url 'delete_investor_ajax' investor_id  1 %}" data-invest-value ="{% userInvestorValueMethod model request.user %}" style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                title='Cancel Investment Application' > <i class="fas fa-cut"></i> 
+            </a>      
           {%else %}
                 <a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
                 {% if is_user_record_owner %} title='Add New Equity' {% else %} title='Add New Investment' {% endif %}><h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>
                 </a>
           {% endif%}
+         
+          
 
           <p id="user_stake">{% UserIsInvestorStake model request.user %} %</p>
         </div>

@@ -59,13 +59,13 @@
                                 {% for item in comments  %}
                                 <tr id="comment-{{item.id}}" >
                                     <td>{{forloop.counter}}</td>
-                                    <td class="modelData" name="name" >{{item.name}}</td>
-                                    <td class="modelData" name="email" >{{item.email}}</td>
-                                    <td class="modelData" name="subject" >{{item.subject}}</td>
-                                    <td class="modelData" name="message" >{{item.message}}</td>
+                                    <td class="modelData" name="name" >{{item.name|truncatechars:20}}</td>
+                                    <td class="modelData" name="email" >{{item.email|truncatechars:20}}</td>
+                                    <td class="modelData" name="subject" >{{item.subject|truncatechars:25}}</td>
+                                    <td class="modelData" name="message" >{{item.message|truncatechars:25}}</td>
                                     <td class="modelData" name="date_created" >{{item.date_created }}</td>
                                     <td class="text-right modelAction modelData" name="action">
-                                        <a href="#"
+                                        <a href="{% url 'comment' item.id %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                             title='View Message'><i class="fas fa-eye"></i>
                                         </a>

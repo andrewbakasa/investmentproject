@@ -19,7 +19,9 @@ def call_method(obj, method_name, *args):
 def userIsOwnerAttrMethod(model, user):
     return model.userIsOwnerAttr(user)
 
-
+@register.simple_tag
+def userInvestorRejectedMethod(model, user):
+    return model.userIsInvestorRejectedAttr(user)
 
 @register.simple_tag
 def userInvestorMethod(model, user):

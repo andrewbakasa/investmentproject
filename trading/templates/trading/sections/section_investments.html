@@ -44,6 +44,7 @@
                         <img src ="{% static 'mentor/assets/img/projects/'|add:model.category.uniqueid|add:'.jpg' %}" class="img-fluid" alt="">
                         
                         
+                       
                         
                         <a href="{% url 'edit-investment' model.id %}" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
                           <span {% userIsOwnerAttrMethod model request.user %} class="myspan">Enterprenuer</span>
@@ -68,25 +69,28 @@
                               data-toggle="tooltip" data-placement="bottom"  title='View Investment'  
                               class ="badge rounded-pill bg-warning">{{model.name|truncatechars:25}}</a></h3>
 
-                            <a href="#"  data-toggle="modal" data-target="#confirmdelete" {% userInvestorMethod model request.user %} class="mydeleteclass iconClass"
-                              data-object-name="{{ model.name }}"  data-item-id="div-{{model.id}}" data-invest-value ="{% userInvestorValueMethod model request.user %}"
-                              data-delete-url="{% url 'delete_investor_this_user_ajax' model.id  %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                              title='Cancel Investment Application' > <i class="fas fa-cut"></i><span class="counter counter-lg">{% userInvestorPercentMethod model request.user %}</span>
-                              <!-- badge rounded-pill bg-light text-dark  -->
-                            </a>
-
                             
-                            {{model.description|truncatechars:100}}
+                              <small>{{model.description|truncatechars:100}}</small>
+                              &nbsp;&nbsp;
+                              <a href="#"  data-toggle="modal" data-target="#confirmdelete" {% userInvestorMethod model request.user %} class="mydeleteclass iconClass"
+                                data-object-name="{{ model.name }}"  data-item-id="div-{{model.id}}" data-invest-value ="{% userInvestorValueMethod model request.user %}"
+                                data-delete-url="{% url 'delete_investor_this_user_ajax' model.id  %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                title='Cancel Investment Application' ><small><i class="fas fa-cut"></i><span class="counter counter-lg">{% userInvestorPercentMethod model request.user %}</span></small>
+                                <!-- badge rounded-pill bg-light text-dark  -->
+                              </a>
+                             
                           </p>
                           <div class="trainer d-flex justify-content-between align-items-center">
                             <div class="trainer-rank d-flex align-items-center">
                               <i class="bx bx-download"></i>&nbsp;{{model.views}}
+                            
+                          
                             </div>
                             <div class="trainer-rank d-flex align-items-center">
                                 <a class="model-likes" href="#" data-url="{% url 'update_investment_likes' model.id %}" 
                                   style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                   title='Like'><i class="bx bx-heart"></i>&nbsp;{{model.likes}}
-                                </a>
+                                </a> 
                             </div>
                           </div>
                         </div>

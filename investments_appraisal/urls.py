@@ -28,6 +28,8 @@ urlpatterns = [
     path('contact/', views.general_page.contact, name="contact"),
     path('commingsoon/', views.general_page.commingsoon, name="commingsoon"),
     path('u/comments/', views.general_page.get_users_comments, name="ucomments"),
+    path('u/c/<int:id>/', views.general_page.get_comment, name="comment"), 
+   
     path('u/last_login/', views.general_page.get_users_last_login, name="ulogin"),
     path('get_users_last_login_ajax/', views.general_page.get_users_last_login_ajax, name="get_users_last_login_ajax"),
   

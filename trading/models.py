@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import datetime
 import math
 from os import access
+
 from unicodedata import category
 
 from django.core.files.storage import FileSystemStorage
@@ -181,17 +182,28 @@ class Investment(models.Model):
     def userIsInvestorStatement(self, user):       
         qs = self.investor_set.filter(user=user).first()
         if qs:
-            return 'I am an Investor'
+            return 'I am an Investor [' + qs.application_status  +']'
 
         return 'I am NOT an Investor'
 
     def userIsInvestorAttr(self, user):       
         qs = self.investor_set.filter(user=user).first()
         if qs:
-            return 'myinvestment'
+            #print(qs.application_status)
+            # + recieved or pending, etc
+            return 'myinvestment ' + str(qs.application_status)
 
         return 'myinvestment_na'
     
+    def userIsInvestorRejectedAttr(self, user):       
+        qs = self.investor_set.filter(user=user).first()
+        if qs:
+            #print(qs.application_status)
+            # + recieved or pending, etc
+            if qs.application_status =='rejected':
+                return 'rejected ' #+ str(qs.application_status)
+
+        return 'rejected_na'
     def userInvestorValue(self, user):       
         qs = self.investor_set.filter(user=user).first()
         if qs:
@@ -287,7 +299,9 @@ class Investor(models.Model):
         return self.get_time(self.date_status_changed)
     
 
-    def get_time(self,date_in):        
+    def get_time(self,date_in): 
+        if date_in ==None:
+            date_in  = timezone.now()    
         time_since= timezone.now()- date_in #.split('+')[0]
         if time_since.days>0:
             return str(time_since.days) + str(' days ago')

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import datetime
+import math
 from os import access
 
 from django.core.files.storage import FileSystemStorage
@@ -10,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from datetime import date
 # from store.models import Currency
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 
 def get_curr_year():
     current_year = datetime.datetime.now().year
@@ -93,7 +95,28 @@ class ContactUs(models.Model):
 
     def __str__(self):
         return self.subject 
+    
+    @property
+    def time_since_created(self):
+        return self.get_time(self.date_created)
+    
 
+    def get_time(self,date_in):        
+        time_since= timezone.now()- date_in #.split('+')[0]
+        if time_since.days>0:
+            return str(time_since.days) + str(' days ago')
+        elif time_since.days == 0:
+            hours = time_since.seconds/3600           
+            if hours > 1:
+                return str(math.ceil(hours))+ str(' hours ago')
+            else:
+                minutes = time_since.seconds/60
+                if minutes > 1:
+                    return str(math.ceil(minutes)) + str(' minutes ago')
+                else:
+                    return str(time_since.seconds) + str(' seconds ago')
+        
+        return "Bad Timing"
 class Company(models.Model):
 	name = models.CharField(max_length=200, null=True )
 	street = models.CharField(max_length=500, null=True, blank=True)

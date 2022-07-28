@@ -6,7 +6,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-   <title>Investment Details</title>
+   <title>{{model.name|truncatechars:50}}</title>
 {% endblock %}
 
 
@@ -50,7 +50,7 @@
     <!-- EDIT DISPLAY HOLDER -->
     
     <div class="modal fade" id="modal-usermodel">
-        <div id='dynamic-div' class="modal-dialog">
+        <div id='dynamic-div' class="modal-dialog modal-lg">
             <div class="modal-content"></div>
         </div>
     </div> 
@@ -121,9 +121,46 @@
         $(document).ready(function (){ 
             $("#investments a:first").addClass( "active") 
             $("#investors a:first").addClass( "active") 
-            $("#iamaninvestor a:first").addClass( "active")             
+            $("#iamaninvestor a:first").addClass( "active")
+
+            rejected_investment()
             
-           //------LOAD THE FORM ON MODAL DIV----------
+            function truncChar(str,length){
+              var myTruncatedString = str.substring(0,length-1);              
+              if (str.length > myTruncatedString.length){
+                return myTruncatedString + "..."
+              }
+              return myTruncatedString
+          }
+           function rejected_investment(){
+                // display:none and remove ele
+                $('.investment-rejected[rejected]').each( function (){
+                    // $(this).css(
+                    //     { "display":"none",
+                    //         // "title":"", 
+                    //     }
+                    // ).remove() 
+                    $(this).prop({"disabled": true,"title":"Your application have been rejected", });
+                        
+                })
+           }
+            
+           
+            $('#confirmdelete').on('show.bs.modal', function(e) {
+                var name = $(e.relatedTarget).data('object-name');
+                var url = $(e.relatedTarget).data('delete-url');
+                var item_id = $(e.relatedTarget).data('item-id');
+                var user_invest_value = $(e.relatedTarget).data('invest-value');
+            
+
+                //console.log(item_id)
+                var name =truncChar(name,25)
+                $('#confirmdelete .modal-body').html("Are you sure you want to <b>withdraw</b> $" + numberWithCommas(user_invest_value) + " your <b>investment</b> in <i>[" + name + "]</i>?");
+                $('#confirmdelete .modal-footer input').attr('data-url', url);
+                $('#confirmdelete .modal-footer input').attr('item-id', item_id);
+            });
+           
+            //------LOAD THE FORM ON MODAL DIV----------
            $('body').on('click', '.show-form-update', function(e){
               e.stopPropagation() 
               var btn = $(this);// fix button  delay
@@ -218,7 +255,16 @@
                                     title='${pledge_title}'><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
                                 </a>`
 
-                           $('#breadcrumb_changeto_edit').html(a_html)
+                        //$("#breadcrumb_changeto_edit").removeAttr("data-url");
+                        $("#breadcrumb_changeto_edit").addClass("model-edit show-form-update");
+                        $("#breadcrumb_changeto_edit").attr({
+                            "title" : pledge_title,
+                            "href" : '#',
+                            "data-toggle" : "tooltip",
+                            "data-url" : `/tr/update_investor/${data.model.investor_id}/` 
+                        });
+ 
+                        $('#breadcrumb_changeto_edit').html(`<h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>`)
                              
 
                       } else {
@@ -359,7 +405,65 @@
               return false;
           })
         
-
+          $('body').on('click', '.delete-button', function (e) {
+            e.preventDefault();
+            var tr_id =$('#delete-button').attr('item-id')
+            row = $('#'+ tr_id.trim());
+           
+            var formData = {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            };
+            $.ajax({
+                type: 'POST',      
+                url:   $('#delete-button').attr('data-url'), 
+                encode: true,
+                contentType: 'application/x-www-form-urlencoded',
+                crossDomain: false,
+                dataType: 'json',
+                data: formData,     // our data object
+                success: function (response) {
+                    $('.close-modal').click() 
+                    console.log('url' ,  $('#delete-button').attr('data-url'))  
+                    console.log('STAKE:>>>>' , response)                  
+                   
+                    var title= ''
+                    if (user_is_owner ==true) {
+                        title='Add New Equity'
+                    }else {
+                        title='Add New Investment'
+                    }
+                    a_html=`<a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
+                            ${title}><h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>
+                            </a>`
+                    //$('#breadcrumb_changeto_edit').empty()
+                    $("#breadcrumb_changeto_edit").removeAttr("data-url");
+                    $("#breadcrumb_changeto_edit").removeClass("model-edit show-form-update");
+                    $("#breadcrumb_changeto_edit").attr("data-target","#modal_add_new_investor");
+                    $("#breadcrumb_changeto_edit").attr("title",title);
+                    $("#breadcrumb_changeto_edit").attr({
+                        "data-target" : "#modal_add_new_investor",
+                        "title" : title,
+                        "data-toggle" : 'modal'
+                    });
+                
+                    $('#breadcrumb_changeto_edit').html(`<h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>`)//.contents(a_html)//.html(a_html)
+                    //$('#breadcrumb_changeto_edit').
+                    $('#user_stake').html(`0%`);
+                    $('#delete_cancel_investment').remove();
+                    // console.log('before....',response.data.model.current_investment_percent)
+                    // if (response.data.model.current_investment_percent){
+                    //     console.log('inside....')
+                    $('#current_investment').html(`${parseFloat(response.data.model.current_investment_percent).toFixed(1)} %`);
+                    // }
+                    
+                 
+                },
+                error: function (exception) {
+                    alert('Exeption:' + exception);
+                }
+            });
+        });
+  
           //ADD MODEL FORM
           $('body').on("submit",".investment-form-add",function(e){
               e.preventDefault();            
@@ -537,9 +641,6 @@
            
             
             $(document).on('shown.bs.modal','.modal',function(e){  
-               
-                // var form_id= $(this).find('form').attr('id')
-                // console.log('form_id',form_id )
                 if (user_is_owner ==true) {
                     if (is_user_investor ==true ){
                         $('.myModalLabel').html('Edit Investment Equity')
@@ -547,9 +648,6 @@
                         $('.myModalLabel').html('Add Investment Equity')
                     }   
                 }
-                // console.log('user_is_owner',user_is_owner)
-                // console.log('is_user_investor',is_user_investor)
-            
             })
             
             $('body').on("change","#id_value",function(e){

@@ -1643,7 +1643,7 @@ Add a dark border to the very last row to signify the end of the table */
 }
 .iconClass span{
   position: absolute;
-  top: -11px; 
+  top: -7px; 
   right: -15px;
   font-size: 11px;
   font-family: "Poppins", sans-serif;
@@ -1707,4 +1707,22 @@ Add a dark border to the very last row to signify the end of the table */
   }
   
 
+  .projects .accepted {
+    border-width: 2px;
+    border-style:dotted;
+    border-color: green;
+    /* border-right-color: #050116;
+    border-bottom-color: #2ecc71;
+    border-left-color: #3498db; */
+  }
+  .projects .engagement {
+    border-width: 2px;
+    border-style:dotted;
+    border-color: yellow;
+  }
 
+  .projects .rejected {
+    border-width: 2px;
+    border-style:dotted;
+    border-color: red
+  }

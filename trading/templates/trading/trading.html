@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Investments</title>
+    <title>Explore Investments</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -140,14 +140,14 @@
               var delete_my_investment = ''
               if (val.userIsInvestor ==true) {
                   eye_style='style="color:blue"'
-                  ready_attr='myinvestment'
+                  ready_attr='myinvestment ' + val.application_status
                   model_class_added= 'model-complete'
                   inlinestyle="style ='background-color:beige';"
 
                   delete_my_investment= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" ${ready_attr} class="mydeleteclass iconClass"
                       data-object-name="${val.name}"  data-item-id="div-${val.id}" data-invest-value ="${val.user_investment_value}"
                       data-delete-url="/tr/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                      title='Cancel Investment Application' > <i class="fas fa-cut"></i><span class="counter counter-lg">${val.user_investment_percent}</span> 
+                      title='Cancel Investment Application' > <small><i class="fas fa-cut"></i><span class="counter counter-lg">${val.user_investment_percent}</span> </small>
                     </a>`
               
                     
@@ -215,9 +215,9 @@
                     <h3><a href="/tr/i-details/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment' 
                       class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
                     
+                    
+                    <small>${descript_trunc}</small> &nbsp;&nbsp;
                     ${delete_my_investment}
-
-                    ${descript_trunc}
                     <div class="trainer d-flex justify-content-between align-items-center">
                       <div class="trainer-rank d-flex align-items-center">
                         <i class="bx bx-download"></i>&nbsp;${val.views}
@@ -249,7 +249,7 @@
               var delete_my_investment = ''
               if (val.userIsInvestor == true) {
                   eye_style='style="color:blue"'
-                  ready_attr='myinvestment'
+                  ready_attr='myinvestment ' + val.application_status
                   model_class_added= 'model-complete'
                   inlinestyle="style ='background-color:beige';"
                   
@@ -280,7 +280,7 @@
                     delete_my_investment= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" ${ready_attr} class="mydeleteclass iconClass"
                       data-object-name="${val.name}"  data-item-id="div-${val.id}" data-invest-value ="${val.user_investment_value}"
                       data-delete-url="/tr/delete_investor_this_user_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                      title='Cancel Investment Application' > <i class="fas fa-cut"></i> <span class="counter counter-lg">${val.user_investment_percent}</span>
+                      title='Cancel Investment Application' ><small><i class="fas fa-cut"></i> <span class="counter counter-lg">${val.user_investment_percent}</span></small>
                     </a>`
                   
               }else{                  
@@ -318,8 +318,9 @@
                   <div class="project-content">
                     <h3><a href="/tr/i-details/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment'  
                       class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
+                    
+                    <small>${descript_trunc}</small> &nbsp;&nbsp;
                     ${delete_my_investment}
-                    ${descript_trunc}
                     <div class="trainer d-flex justify-content-between align-items-center">
                       <div class="trainer-rank d-flex align-items-center">
                         <i class="bx bx-download"></i>&nbsp;${val.views}
@@ -339,6 +340,8 @@
 }
 
           function set_my_portifolio(){
+
+              
           
                // display:none and remove ele
               $('.mydeleteclass[myinvestment_na]').each( function (){
@@ -382,6 +385,24 @@
             $('.project-item[myinvestment]').each( function (){
                     $(this).addClass('model-complete')
                     $(this).css("background-color","beige")
+
+                    
+                    if (this.hasAttribute('accepted')){
+                     // $(this).css({"background-color":"lightgreen",})
+                      $(this).removeClass('rejected')
+                      $(this).removeClass('engagement')
+                      $(this).addClass('accepted')
+                    }else if (this.hasAttribute('engagement')){
+                      //$(this).css({"background-color":"yellowgreen",})
+                      $(this).removeClass('rejected')
+                      $(this).removeClass('accepted')
+                      $(this).addClass('engagement')
+                    }else if (this.hasAttribute('rejected')){
+                     // $(this).css({"background-color":"red",})
+                     $(this).removeClass('accepted')
+                     $(this).removeClass('engagement')
+                      $(this).addClass('rejected')
+                    }
                    /*  //css prop chaining....
                     $(this).css(
                       { "background-color":"beige",
@@ -549,6 +570,7 @@
                               $('#project_div').append(a_html)
                               
                           });
+                          set_model_complete()
                           },
                           error: function () {
                               alert('Error Occured');

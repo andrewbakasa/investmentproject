@@ -117,6 +117,8 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models.expressions import F
 
+from trading.models import Investment, InvestmentCategory
+
 
 
 
@@ -131,6 +133,18 @@ def get_users_comments(request):
     }
 
     return render(request, 'investments_appraisal/user_comments.html', context)
+
+@admin_only
+def get_comment(request, id):
+    model = get_object_or_404(ContactUs, pk=id)
+    context = {
+        "model": model,
+        "dashboard_page": "active",
+    }
+
+    return render(request, 'investments_appraisal/comment.html', context)
+
+
 
 
 @login_required(login_url="account_login")
@@ -519,6 +533,44 @@ class UserBusinessModelCreate(LoginRequiredMixin, generic.edit.CreateView):
 #Any one can access
 def index(request):
 	#1. Projects Count
+	projects_qs= Investment.objects.all()
+	if projects_qs:
+		projects_count=projects_qs.count()
+	else:
+		projects_count=0
+	
+	#2. Models Count
+	models_qs= InvestmentCategory.objects.all()
+	if models_qs:
+		models_count=models_qs.count()
+	else:
+		models_count=0
+
+	
+	#3. Downloads
+	downloads_qs= Downloads.objects.all()
+	if downloads_qs:
+		downloads_count=downloads_qs.count()
+	else:
+		downloads_count=0
+	
+	popular_projects= Investment.objects.order_by('-views')[:3]
+
+	context = {
+		'popular_projects':popular_projects,
+		'title' : 'Home',
+		'models_count' : models_count,
+		'projects_count' : projects_count,
+		'downloads_count' : downloads_count,
+	}
+	
+
+	return render(request, 'investments_appraisal/mentor/index.html', context)
+
+
+#Any one can access
+def index_original(request):
+	#1. Projects Count
 	projects_qs= ModelCategory.objects.all()
 	if projects_qs:
 		projects_count=projects_qs.count()
@@ -552,7 +604,6 @@ def index(request):
 	
 
 	return render(request, 'investments_appraisal/mentor/index.html', context)
-
 
 @login_required(login_url="account_login")
 def user_models(request):

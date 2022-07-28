@@ -985,7 +985,11 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
                 item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
                 item_object['date_created']=f'{i.date_created.ctime()}'
                 item_object['uniqueid']=i.category.uniqueid
-                item_object['userIsInvestor']=i.userIsInvestor(request.user)
+                True_or_False, record=i.userIsInvestor_2(request.user)
+                item_object['userIsInvestor']=True_or_False
+                if True_or_False ==True:
+                    item_object['application_status']=record.application_status
+
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
                 item_object['user_investment_percent']=i.userInvestorPercent(request.user)
@@ -1074,7 +1078,12 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
                 item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
                 item_object['date_created']=f'{i.date_created.ctime()}'
                 item_object['uniqueid']=i.category.uniqueid
-                item_object['userIsInvestor']=i.userIsInvestor(request.user)
+                
+                True_or_False, record=i.userIsInvestor_2(request.user)
+                item_object['userIsInvestor']=True_or_False
+                if True_or_False ==True:
+                    item_object['application_status']=record.application_status
+
                 item_object['userIsOwner']=i.userIsOwner(request.user)
                 item_object['user_investment_value']=i.userInvestorValue(request.user)
                 item_object['user_investment_percent']=i.userInvestorPercent(request.user)
@@ -1169,7 +1178,10 @@ def display_investment_ajax(request):
             item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
             item_object['date_created']=f'{i.date_created.ctime()}'
             item_object['uniqueid']=i.category.uniqueid
-            item_object['userIsInvestor']=i.userIsInvestor(request.user)
+            True_or_False, record=i.userIsInvestor_2(request.user)
+            item_object['userIsInvestor']=True_or_False
+            if True_or_False ==True:
+                item_object['application_status']=record.application_status
             item_object['userIsOwner']=i.userIsOwner(request.user)
             item_object['user_investment_value']=i.userInvestorValue(request.user)
             item_object['user_investment_percent']=i.userInvestorPercent(request.user)
@@ -1253,7 +1265,7 @@ def investor_details(request,id, investment_id):
         investor_obj.date_status_changed=timezone.now()# datetime.datetime.now()
         investor_obj.save()
         changed_to_recieved=True
-        messages.success(request, "Application changed from pending to recieved")
+        messages.success(request, "Application state as been changed from pending to recieved")
   
     userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
 
@@ -1272,9 +1284,9 @@ def investor_details(request,id, investment_id):
        
 @login_required
 def edit_investment(request,id):
-    
+    #editing limited to owner of the investment only....
    
-    #limit
+    #throws an error if user is invalid.....
     investmet_obj = get_object_or_404(Investment,pk=id, creater=request.user)
     id =investmet_obj.id
     is_user_investor=False
@@ -1748,7 +1760,10 @@ def delete_investor_this_user_ajax(request, investment_id, *args, **kwargs):
             item_object['date_created']=f'new Date("{i.date_created.ctime()}")'
             item_object['date_created']=f'{i.date_created.ctime()}'
             item_object['uniqueid']=i.category.uniqueid
-            item_object['userIsInvestor']=i.userIsInvestor(request.user)
+            True_or_False, record=i.userIsInvestor_2(request.user)
+            item_object['userIsInvestor']=True_or_False
+            if True_or_False ==True:
+                item_object['application_status']=record.application_status
             item_object['userIsOwner']=i.userIsOwner(request.user)
             item_object['current_investment_percent']=i.current_investment_percent
             item_object['blogs_count']=i.blogs_count
@@ -1783,10 +1798,15 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
         if request.is_ajax():
             
             model_ = get_object_or_404(Investor, pk=id)
-
-            model_.delete()
+            invest_id= model_.investment.id
+            
+  
+        
+          
             item_object = model_to_dict(model_)
-
+            model_.delete()
+            item_instance = get_object_or_404(Investment,pk=invest_id)
+           
             total_pages= get_total_pages_dict(request)
             data= {}
             data['total_pages']=total_pages
@@ -1806,6 +1826,11 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
                 aver_val = df['myinvest'].mean()
             item_object['total_sum']=int(sum_total)
             item_object['average']=round(aver_val,2)
+            item_object['investor_id']=id
+            item_object['current_investment']=item_instance.current_investment
+            item_object['user_investment_percent']=item_instance.userInvestorPercent(request.user)
+            item_object['current_investment_percent']=item_instance.current_investment_percent            
+            
 
             #print('>>>>>>>>', item_object)
             data['model']=item_object
