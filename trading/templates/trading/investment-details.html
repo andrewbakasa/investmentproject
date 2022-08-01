@@ -124,14 +124,27 @@
             $("#iamaninvestor a:first").addClass( "active")
 
             rejected_investment()
+
+            $('.my_blogs_li[blogs_na]').each( function (){
+                  $(this).css(
+                      { "display":"none",
+                      }
+                  ).remove()          
+              })
+
+              $('.my_blogs_li[blogs').each( function (){
+                  console.log('...caught u')
+                  $(this).css({ "display":"block"})         
+              })
             
             function truncChar(str,length){
-              var myTruncatedString = str.substring(0,length-1);              
-              if (str.length > myTruncatedString.length){
-                return myTruncatedString + "..."
-              }
-              return myTruncatedString
-          }
+                var myTruncatedString = str.substring(0,length-1);              
+                if (str.length > myTruncatedString.length){
+                    return myTruncatedString + "..."
+                }
+                return myTruncatedString
+            }
+
            function rejected_investment(){
                 // display:none and remove ele
                 $('.investment-rejected[rejected]').each( function (){

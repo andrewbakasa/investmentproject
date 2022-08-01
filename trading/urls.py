@@ -35,6 +35,8 @@ urlpatterns = [
     path('u/i/load_status/<str:status>', views.get_user_investments_load_status, name="user_investments_load_status"),
 
     path('u/i/load_status_ajax/<str:status>', views.get_user_investments_load_status_ajax, name="user_investments_load_status_ajax"),
+    
+    path('u/i/orphaned_ajax/', views.get_user_investments_orphaned_ajax, name="user_investments_orphaned_ajax"),
     path('user_investments_search/<str:status>/<str:slug>/search/tags/', views.user_investments_search_and_tags_ajax,{'search_type': 1}, name='user_investments_search_and_tags_ajax'), 
  
     path('u/b/0/', views.get_user_businesses,{'type': 'all'}, name="user_businesses"),

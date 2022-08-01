@@ -6,7 +6,9 @@ from investments_appraisal.models import ModelCategory, UserModel, UserPreferenc
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 
-from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, InvestorStatusUpdate, UserInvestmentForm, UserInvestmentFormUpdate
+from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, \
+    InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, \
+    InvestorStatusUpdate, InvestorStatusUpdateAjax, UserInvestmentForm, UserInvestmentFormUpdate
 from .models import *
 from django.db.models.expressions import F
 from django.contrib.auth.decorators import login_required 
@@ -18,7 +20,7 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt
 
-
+from django.db.models.aggregates import Avg, Count, Max, Sum
 from django.db.models import Q
 
  
@@ -38,7 +40,14 @@ def get_user_businesses(request, type):
         queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
     else:
        queryset = Investment.objects.filter(creater=request.user)
-  
+    
+    total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+    sum_value=total_avg['sum']
+    avg_value=total_avg['avg']
+    if sum_value==None:
+        sum_value=0
+    if avg_value==None:
+        avg_value=0  
     form = UserInvestmentForm(initial={'creater': request.user})
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -69,7 +78,9 @@ def get_user_businesses(request, type):
         "user": request.user,
         'form': form,
          'status': type,
-        "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE
+        "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
+        "total_sum": sum_value,
+        "average": round(avg_value,2)
     }
     return render(request, 'trading/user_businesses.html', context)
 
@@ -90,7 +101,13 @@ def get_user_businesses_load_status(request, status):
         #all
         queryset = Investment.objects.filter(Q(creater=request.user))
 
-
+    total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+    sum_value=total_avg['sum']
+    avg_value=total_avg['avg']
+    if sum_value==None:
+        sum_value=0
+    if avg_value==None:
+        avg_value=0  
     form = UserInvestmentForm(initial={'creater': request.user})
     
     if not ('pertable' in request.session):
@@ -123,7 +140,9 @@ def get_user_businesses_load_status(request, status):
         "models": first_page,
         'search_status':True,
         'status':status,
-        'BUSINESS_STATUS_CHOICE': BUSINESS_STATUS_CHOICE
+        'BUSINESS_STATUS_CHOICE': BUSINESS_STATUS_CHOICE,
+        "total_sum": sum_value,
+        "average": round(avg_value,2)
     }
 
     return render(request, 'trading/user_businesses.html', context)
@@ -151,6 +170,13 @@ def business_search_and_tags_ajax(request,status, slug, search_type, *args, **kw
             else:
                 #allll
                 queryset = Investment.objects.filter(Q(creater=request.user))
+        total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+        sum_value=total_avg['sum']
+        avg_value=total_avg['avg']
+        if sum_value==None:
+            sum_value=0
+        if avg_value==None:
+            avg_value=0 
 
         if not ('pertable' in request.session):
             obj= UserPreference.objects.filter(user=request.user).first()
@@ -235,6 +261,8 @@ def business_search_and_tags_ajax(request,status, slug, search_type, *args, **kw
         
             
         data["results"]=results
+        data["total_sum"]=float(sum_value)
+        data["average"]=float(round(avg_value,2))
         return JsonResponse({"data":data})
     else:
         return JsonResponse({'error': True, 'data': 'errors'})  
@@ -263,6 +291,14 @@ def investments_search_and_tags_ajax(request,status, slug, search_type, *args, *
             else:
                 #allll
                 queryset = Investment.objects.filter(Q(creater=request.user))
+        
+        total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+        sum_value=total_avg['sum']
+        avg_value=total_avg['avg']
+        if sum_value==None:
+            sum_value=0
+        if avg_value==None:
+            avg_value=0 
 
         if not ('pertable' in request.session):
             obj= UserPreference.objects.filter(user=request.user).first()
@@ -347,6 +383,8 @@ def investments_search_and_tags_ajax(request,status, slug, search_type, *args, *
         
             
         data["results"]=results
+        data["total_sum"]=float(sum_value)
+        data["average"]=float(round(avg_value,2))
         return JsonResponse({"data":data})
     else:
         return JsonResponse({'error': True, 'data': 'errors'})  
@@ -367,7 +405,15 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
                 #allll
                 queryset = Investment.objects.filter(Q(creater=request.user))
 
-            
+            total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+            sum_value=total_avg['sum']
+            avg_value=total_avg['avg']
+            if sum_value==None:
+                sum_value=0
+            if avg_value==None:
+                avg_value=0    
+            #print(total_avg,sum_value,avg_value)
+
             if not ('pertable' in request.session):
                 obj= UserPreference.objects.filter(user=request.user).first()
                 if obj:
@@ -450,6 +496,8 @@ def get_user_businesses_load_status_ajax(request,  status, *args, **kwargs):
             
                 
             data["results"]=results
+            data["total_sum"]=float(sum_value)
+            data["average"]=float(round(avg_value,2))
             return JsonResponse({"data":data})
         else:
             return JsonResponse({'error': True, 'data': 'errors'})  
@@ -477,7 +525,7 @@ def view_investors(request, id):
 @login_required(login_url="account_login")
 def get_user_investments_load_status(request, status):
     #this method is redundant: verify my assertion
-    APLLICATION_STATUS_CHOICE = ["pending", "recieved", "verification",  "accepted","engagement","rejected","all"]  
+    APLLICATION_STATUS_CHOICE = ["pending", "recieved", "verification",  "accepted","engagement","rejected","all", "orphaned"]  
     queryset = Investor.objects.filter(Q(user=request.user)).first()  
   
     if status=='all':
@@ -621,6 +669,8 @@ def user_investments_search_and_tags_ajax(request,status, slug, search_type, *ar
                 results.append(item_object)
                 
             data["results"]=results
+            data["total_sum"]=float(sum_total)
+            data["average"]=float(round(aver_val,2))
             return JsonResponse({"data":data})
         else:
             return JsonResponse({'error': True, 'data': 'errors'})  
@@ -633,7 +683,8 @@ def get_accepted_investors_after_engagement_ajax(request,  id, *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
             APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
-           
+            #queryset = Investor.objects.filter(Q(user=request.user),Q(investment__id__isnull=True)).first() 
+         
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
            
             #change selected accepted investor into engagement
@@ -745,12 +796,14 @@ def get_accepted_investors_after_engagement_ajax(request,  id, *args, **kwargs):
     else:
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 
+
 def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
     #print('743:',status)
     if request.method == 'POST':
         if request.is_ajax():
-            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
+            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all" "orphaned"]  
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
+           
             if status=='all':
                 status=None 
             df=queryset.trading_df_status(status)
@@ -838,6 +891,99 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
                 results.append(item_object)
                 
             data["results"]=results
+            data["total_sum"]=float(sum_total)
+            data["average"]=float(round(aver_val,2))
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
+
+def get_user_investments_orphaned_ajax(request, *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax():
+            modeldata = Investor.objects.filter(Q(user=request.user),Q(investment__id__isnull=True)) 
+            # avg_value= modeldata.aggregate(Avg('value'))['value__avg']
+            # sum_value=modeldata.aggregate(models.Sum('value'))['value__sum']
+            total_avg= modeldata.aggregate(sum=Sum('value'), avg=Avg('value'))
+            sum_value=total_avg['sum']
+            avg_value=total_avg['avg']
+            if sum_value==None:
+                sum_value=0
+            if avg_value==None:
+                avg_value=0  
+            #print(total_avg['sum'],total_avg['avg'] )
+            if not ('pertable' in request.session):
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            else:
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            pertable=request.session['pertable']
+        
+
+            #print(colms)
+            obj_paginator = Paginator(modeldata, pertable)
+            first_page = obj_paginator.page(1).object_list
+            page_range = obj_paginator.page_range
+
+            
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
+           
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+            num_of_pages= int(obj_paginator.num_pages)
+            totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+            data={}	
+            data["per_table"]=pertable
+            data["page_no"]=page_no
+            data["num_of_pages"]=num_of_pages
+            data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+            
+            if int(num_of_pages)==0:			
+                data["results"]=[]
+                return JsonResponse({"data":data})
+            results=[]	
+            # total_sum= 0
+            # count =	0									 
+            for i in obj_paginator.page(page_no).object_list:
+                item_object = model_to_dict(i)
+                # total_sum += item_object['value']
+                # count +=1
+                #print(total_sum)
+                results.append(item_object)
+                
+            data["results"]=results
+            data["total_sum"]=float(sum_value)
+            data["average"]=float(round(avg_value,2))
+
             return JsonResponse({"data":data})
         else:
             return JsonResponse({'error': True, 'data': 'errors'})  
@@ -846,7 +992,7 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 @login_required(login_url="account_login")
 def get_user_investments(request):
-    APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
+    APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all", "orphaned"]  
     queryset = Investor.objects.filter(user=request.user).first()  
     
     df=queryset.trading_df
@@ -924,6 +1070,10 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
             modelsdata= Investment.objects.filter(Q(closing_date__gte=current_time),Q(public=True), Q(tags__in=tag_id), Q(description__icontains=slug))
         else:
             modelsdata= Investment.objects.filter(Q(closing_date__gte=current_time), Q(public=True),Q(tags__in=tag_id))
+        
+        # total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+        # sum_value=total_avg['sum']
+        # avg_value=total_avg['avg']
 
         if not ('perpage' in request.session):
             if request.user.is_authenticated:
@@ -1269,9 +1419,7 @@ def investor_details(request,id, investment_id):
   
     userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
 
-    form = InvestorStatusUpdate(instance=investor_obj) 
-
-    #form = InvestorStatusUpdate(initial={'user': request.user, 'investment': investmet_obj})
+    form = InvestorStatusUpdate(instance=investor_obj,user=request.user)
 
     context = {
         'model':investor_obj,
@@ -1798,14 +1946,16 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
         if request.is_ajax():
             
             model_ = get_object_or_404(Investor, pk=id)
-            invest_id= model_.investment.id
-            
-  
-        
+            invest_id =None
+            if model_.investment:
+                invest_id= model_.investment.id
           
             item_object = model_to_dict(model_)
             model_.delete()
-            item_instance = get_object_or_404(Investment,pk=invest_id)
+            
+            item_instance =None
+            if invest_id:
+                item_instance = get_object_or_404(Investment,pk=invest_id)
            
             total_pages= get_total_pages_dict(request)
             data= {}
@@ -1827,9 +1977,10 @@ def delete_investor_ajax(request, id, page_no, *args, **kwargs):
             item_object['total_sum']=int(sum_total)
             item_object['average']=round(aver_val,2)
             item_object['investor_id']=id
-            item_object['current_investment']=item_instance.current_investment
-            item_object['user_investment_percent']=item_instance.userInvestorPercent(request.user)
-            item_object['current_investment_percent']=item_instance.current_investment_percent            
+            if item_instance:
+                item_object['current_investment']=item_instance.current_investment
+                item_object['user_investment_percent']=item_instance.userInvestorPercent(request.user)
+                item_object['current_investment_percent']=item_instance.current_investment_percent            
             
 
             #print('>>>>>>>>', item_object)
@@ -2251,20 +2402,15 @@ def display_myinvestment_ajax(request):
 @login_required(login_url="account_login")
 def update_investorStatus_ajax(request, id, *args, **kwargs):
     investor_obj = get_object_or_404(Investor,pk=id)
-    #investment_obj = get_object_or_404(Investment,pk=investment_id)
-    #userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
-    
 
     if request.method == 'POST':
         if request.is_ajax():
-            form = InvestorStatusUpdate(request.POST or None,instance=investor_obj)
-            #change date here
-            #form.instance.user =request.user
+            form = InvestorStatusUpdateAjax(data=request.POST or None,instance=investor_obj)#, user=request.user)
+           
             if form.is_valid():
                 investor_obj.date_status_changed= timezone.now()#datetime.datetime.now()
                 #correct here also
                 investor_obj.save()
-                #print('form:', form)
                 form.save()
                 
                

@@ -264,29 +264,80 @@ class InvestmentROIFormUpdate(forms.ModelForm):
         fields = ['investment','roi',]
 
 class InvestorStatusUpdate(forms.ModelForm):
-    initial_arguments = None  
-    def __init__(self, *args, **kwargs):
+    AC = [('recieved', 'recieved'), ('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
+    
+    # if engaged.... can only reject....
+    def get_allowed_choices(self, state):
+        allowed_status =[]
+        if state=='pending':
+            allowed_status= [('recieved', 'recieved'), ('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
+        elif state=='recieved':
+            allowed_status= [('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
+        
+        elif state=='verification':
+            allowed_status= [('accepted', 'accepted'), ('rejected', 'rejected')]
+       
+        elif state=='accepted' or state=='engagement':
+            allowed_status= [('rejected', 'rejected')]
+        
+        elif state=='rejected':
+            allowed_status= [('accepted', 'accepted')]
+      
+        return allowed_status
+
+    def check_value_in_list(self, list_ , test_val):
+        for item in list_:
+            if item[0]==test_val:
+                return True
+        return False
+    def __init__(self, user=None, *args, **kwargs):
         super(InvestorStatusUpdate,self).__init__(*args, **kwargs)
-        print(kwargs)
-        self.initial_arguments= kwargs.get('instance', None)
-         
+        if not user==None:
+            #LIMIT OPTIONS IF NOT SUPERUSER
+            #ENGAGEMENT is handshake between two people: investor and enterprenuer
+            #PENDING is for anything not seen yet...
+            if not user.is_superuser:
+                if self.instance:
+                    allowed_choices= self.get_allowed_choices(self.instance.application_status)#[choice for choice in self.AC]
+                    if self.check_value_in_list(allowed_choices,self.instance.application_status)==False:
+                        allowed_choices.append((self.instance.application_status,self.instance.application_status))
+                   
+                    self.fields['application_status'].choices = allowed_choices
+                else:
+                    self.fields['application_status'].choices = self.AC
+            else:
+                #super user
+                pass
+               
+        else:
+            #Default
+            if self.instance:
+                # allowed_choices= [
+                #         choice for choice in self.AC
+                #         #if choice[0] != self.instance.application_status #exclude selected
+                #     ]
+                allowed_choices= self.get_allowed_choices(self.instance.application_status)
+                #include current chpoice if not already there
+                if self.check_value_in_list(allowed_choices,self.instance.application_status)==False:
+                    allowed_choices.append((self.instance.application_status,self.instance.application_status))
+
+                self.fields['application_status'].choices = allowed_choices
+            else:
+                self.fields['application_status'].choices = self.AC
+
     class Meta:
         model = Investor
         fields = ['application_status']
 
-    def clean_application_status(self): 
-        application_status = self.cleaned_data['application_status']
-        #db_var = self.application_status
-        #should not change placeholder of pending...
-        if application_status =='pending' or application_status =='engagement':
-            if self.initial_arguments:
-                if self.initial_arguments.user:
-                    user = self.initial_arguments.user
-                    #superuser is allowed
-                    if not user.is_superuser:
-                       raise ValidationError(_(f'This operation is not allowed'))  
-                   
-        return application_status
+class InvestorStatusUpdateAjax(forms.ModelForm):
+     
+  
+          
+    class Meta:
+        model = Investor
+        fields = ['application_status']
+
+
 
 
 

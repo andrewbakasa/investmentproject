@@ -403,6 +403,7 @@ class Investor(models.Model):
         categories_df = pd.DataFrame(InvestmentCategory.objects.all().values()) 
 
         df = pd.DataFrame(columns =['iid','retain_id'])
+        # what happenes to childless investor.... deleted investments..............
         if investments_df.shape[0]>0 and investors_df.shape[0] > 0 : 
             investments_df['investment_id'] = investments_df['id']
             # mwrge

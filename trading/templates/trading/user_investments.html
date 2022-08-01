@@ -64,11 +64,20 @@
                                     <div class="col-lg-8">
                                         Application Status:
                                         {% for tag in APLLICATION_STATUS_CHOICE %}
-                                            <a id={{tag}} {% if status == tag %} class="filter-status badge rounded-pill bg-light text-dark" {% else %}class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_investments_load_status_ajax' tag %}" 
+                                            {%if tag == 'orphaned' %}
+                                            <a id={{tag}} {% if status == tag %} class="filter-tags filter-status-orphaned badge rounded-pill bg-light text-dark" {% else %}class="filter-status-orphaned badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_investments_orphaned_ajax'  %}" 
                                                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                                 title='Filter'>{{tag}}
-                                            </a>     
+                                            </a>  
+                                            {%else%}
+                                                <a id={{tag}} {% if status == tag %} class="filter-tags filter-status badge rounded-pill bg-light text-dark" {% else %}class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  href="#" data-url="{% url 'user_investments_load_status_ajax' tag %}" 
+                                                    data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                    title='Filter'>{{tag}}
+                                                </a>
+                                            {% endif %}     
                                         {% endfor %}
+                                        
+                                         
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -409,7 +418,11 @@
         }
  
 
-    
+    function update_totals(data) {
+        ahtml =`<b>Personal Investments: Total</b>:$${numberWithCommas(data['total_sum'])} <b>Aver</b>:$${numberWithCommas(data['average'])}`
+        $('#personal_totals').html(ahtml)
+      
+    }
     function updatePaging2(data){
         var has_previous=''
         //console.log(data)
@@ -502,6 +515,28 @@
             </tr>` ;
         return a_html
     }
+    function append_orphaned_html(counter,val,page_no){      
+        a_html=`
+            <tr id="item-${val.id}" >
+                <td>${counter}</td>
+                <td colspan='3' style='text-align:center'>Investment project no longer exists </td>
+                <td class="modelData" name="myinvest" >$${numberWithCommas(val.value)}</td>
+                <td colspan='2' style='text-align:center' >N/A</td>
+                <td class="modelData" name="application_status" >${val.application_status}</td>
+                <td class="text-right modelAction modelData" name="action">
+                                           
+                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                        data-object-name="N/A"  data-item-id="${val.id}" 
+                        data-delete-url="/tr/delete_investor_ajax/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        title='Remove Orphaned Investment Application' > <i class="fas fa-trash"></i> 
+                    </a>
+                  
+                </td>
+
+            </tr>` ;
+        return a_html
+    }
+  
     function loadPageAjax(page_no){
         //var app_status ='{{status}}'
         //console.log('url',display_ajax_url )
@@ -538,7 +573,12 @@
                     var counter=base_counter
                     $.each(response.data.results, function(i, val) {
                         counter=  counter +1
-                        a_html=append_html(counter,val,page_no)                           
+                        if (display_ajax_url ==  "{% url 'user_investments_orphaned_ajax' %}"){
+                            a_html=append_orphaned_html(counter,val,page_no) 
+                        }else {
+                            a_html=append_html(counter,val,page_no)      
+                        }
+                                                 
                         // add each model on every line
                         $('#userinvestment-table-tbody').append(a_html)
                     });
@@ -562,6 +602,7 @@
             e.preventDefault(); 
             var clicked_id = $(this).attr('id')
             var myclass =$('.filter-status')
+            var myclass2 =$('.filter-status-orphaned')
             app_status =$(this).attr('id')
             var search_val = $('#search').val().toLowerCase();
             search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
@@ -589,6 +630,18 @@
                     $(this).removeClass('bg-light')
                 }
             });
+
+            $.each(myclass2, function(i, val) {
+                let loop_id= $(this).attr('id')
+                if (clicked_id == loop_id){
+                    $(this).removeClass('bg-warning')
+                    $(this).addClass('bg-light')
+                
+                }else {
+                    $(this).addClass('bg-warning')
+                    $(this).removeClass('bg-light')
+                }
+            });
         
             // click first page
             page_no=1
@@ -605,8 +658,11 @@
                         success: function (response) {
                             $('#userinvestment-table-tbody').html('')
                             updatePaging2(response.data)
+                            update_totals(response.data)
                             // console.log('arg.', app_status)
-                            // console.log('1...',  response.data)
+                            //console.log('2...',  response.data)
+                           
+                            
                             if (response.data.per_table){
                                 per_table=response.data.per_table
                             }
@@ -630,6 +686,85 @@
                     }); 
           
           });
+    
+    $('body').on('click', '.filter-status-orphaned', function (e) {
+                
+                e.preventDefault(); 
+                var clicked_id = $(this).attr('id')
+                var myclass =$('.filter-status')
+                var myclass2 =$('.filter-status-orphaned')
+                app_status =$(this).attr('id')
+                var url = $(this).attr('data-url')
+                display_ajax_url=url
+                $('#li_current_status').css('display','block')
+                $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+                
+                $.each(myclass, function(i, val) {
+                    let loop_id= $(this).attr('id')
+                    if (clicked_id == loop_id){
+                        $(this).removeClass('bg-warning')
+                        $(this).addClass('bg-light')
+                    
+                    }else {
+                        $(this).addClass('bg-warning')
+                        $(this).removeClass('bg-light')
+                    }
+                });
+
+                $.each(myclass2, function(i, val) {
+                    let loop_id= $(this).attr('id')
+                    if (clicked_id == loop_id){
+                        $(this).removeClass('bg-warning')
+                        $(this).addClass('bg-light')
+                    
+                    }else {
+                        $(this).addClass('bg-warning')
+                        $(this).removeClass('bg-light')
+                    }
+                });
+            
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                            type: "POST",
+                            // define url name
+                            url: url, 
+                            data : {    
+                                page_no : page_no, 
+                                csrfmiddlewaretoken: csrftoken,
+                            },
+                            // handle a successful response
+                            success: function (response) {
+                                $('#userinvestment-table-tbody').html('')
+                                updatePaging2(response.data)
+                                update_totals(response.data)
+                                 //console.log('arg.', app_status)
+                                //console.log('1...',  response.data)
+                                if (response.data.per_table){
+                                    per_table=response.data.per_table
+                                }
+                                var base_counter =(parseInt(page_no)-1)*per_table
+                                var counter=base_counter
+                                update_total_results(response.data.totalrecords)
+                                $.each(response.data.results, function(i, val) {
+                                    counter=  counter +1
+                                    //console.log('url', url)
+                                    a_html=append_orphaned_html(counter,val,page_no)                           
+                                    // add each model on every line
+                                    $('#userinvestment-table-tbody').append(a_html)
+                                });
+                                //Append Zero Record Annotation
+                                append_no_records_found(response.data.totalrecords,'userinvestment-table-tbody',8)
+                       
+                                },
+                                error: function () {
+                                    alert('Error Occured');
+                                }
+                        }); 
+              
+              });
+      
     $("body").on("keyup", "#search", function(){
 
         var search_val = $(this).val().toLowerCase();
@@ -654,9 +789,11 @@
             // handle a successful response
             success: function (response) {
                 $('#userinvestment-table-tbody').html('')
+                //console.log('url', display_ajax_url)
+                //console.log('2...',  response.data)
                 updatePaging2(response.data)
-                // console.log('url', display_ajax_url)
-                // console.log('2...',  response.data)
+                update_totals(response.data)
+                
                 if (response.data.per_table){
                     per_table=response.data.per_table
                 }

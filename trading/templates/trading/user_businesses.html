@@ -65,7 +65,7 @@
                     <div class="box">
                         <div class="box-body">
                             {%if first_page %}
-                            <h4 style="text-align:center;">My Businesses</h4>
+                            <h4 style="text-align:center;" id="personal_totals"> <b>My Businesses: Total</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
                             <hr>
                             <div class="row">
                                 <div class="col-lg-8">
@@ -121,7 +121,7 @@
 
                                         <td class="modelData" name="public" >
                                             {% if item.public %}<i style='color:blue;' class="bi bi-check-circle"></i>
-                                            {% else %} <i class="bi-square"></i>{% endif %}
+                                            {% else %} <i class="bi-square"></i>{% endif %} {{item.views}}
                                         </td>
                                        
                                         <td class="text-right modelAction modelData" name="action">
@@ -287,8 +287,8 @@
         })
     </script>
     <script>
-        var bus_status
-        
+       
+        var bus_status='{{status}}'
 
         
         function truncChar(str,length){
@@ -551,11 +551,11 @@
             
                 var public= ''
                 var page_no = 1//dummy;
-                //console.log(item)
+                console.log(item)
                 if (item.public){
-                    public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${item.views}`
                 }else{
-                    public= "<i class='bi-square'></i>"
+                    public= `<i class='bi-square'></i> ${item.views}`
                 }
             
                 a_html =`<h4 style="text-align:center;">My Businesses</h4>
@@ -626,7 +626,7 @@
                 $(".box-body").append(a_html)
             }
             function appendTable(item){  
-                //console.log(item) 
+                console.log(item) 
                 var js_date_created = new Date(item.date_created) 
                 js_date_created= getDateTime_(js_date_created)
                 var current_investment_percent=parseFloat(item.current_investment_percent).toFixed(1)
@@ -637,9 +637,9 @@
 
                 var public= ''
                 if (item.public){
-                    public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${item.views}`
                 }else{
-                    public= "<i class='bi-square'></i>"
+                    public= `<i class='bi-square'></i> ${item.views}`
                 }
             
                 a_html =`
@@ -704,7 +704,7 @@
                     
                     var td=$(`#item-${item.id}`).addClass('edit-mode')
                     
-                    //console.log(item.name)
+                    console.log(item)
                     var attr = $(this).attr("name");
                     var name_trunc =truncChar(item.name,12)
                     var description_trunc =truncChar(item.description,20)
@@ -732,9 +732,9 @@
                         var public= ''
                     
                         if (item.public){
-                            public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                            public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${item.views}`
                         }else{
-                            public= "<i class='bi-square'></i>"
+                            public= `<i class='bi-square'></i>${item.views}`
                         }
                         var a_html= `<td  class="modelData" name="pubic">${public}</td>`
                         $(this).html(a_html);
@@ -846,6 +846,11 @@
                 // ajax call
                 loadPageAjax(page_no)
             });
+            function update_totals(data) {
+                ahtml =`<b>My Businesses: Total</b>:$${numberWithCommas(data['total_sum'])} <b>Aver</b>:$${numberWithCommas(data['average'])}`
+                $('#personal_totals').html(ahtml)
+            
+            }
             function updatePaging2(data){
                 var has_previous=''
                 //console.log(data)
@@ -885,9 +890,9 @@
 
                 var public= ''
                 if (val.public){
-                    public= "<i style='color:blue;' class='bi bi-check-circle'></i>"
+                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${val.views}`
                 }else{
-                    public= "<i class='bi-square'></i>"
+                    public= `<i class='bi-square'></i> ${val.views}`
                 }
 
 
@@ -1056,6 +1061,7 @@
                             success: function (response) {
                                 $('#userbusiness-table-tbody').html('')
                                 updatePaging2(response.data)
+                                update_totals(response.data)
                                 if (response.data.per_table){
                                     per_table=response.data.per_table
                                 }
@@ -1087,9 +1093,9 @@
                 search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
                 if (search_val.length == 0 ){
                     //tag
-                    display_business_ajax_url = `{% url 'user_business_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
+                    display_business_ajax_url = `{% url 'user_business_load_status_ajax' 12345 %}`.replace(/12345/, bus_status.toString()); 
                 } else{
-                    display_business_ajax_url = `{% url 'business_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, status.toString()).replace(/6789/, search_val.toString()); 
+                    display_business_ajax_url = `{% url 'business_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, bus_status.toString()).replace(/6789/, search_val.toString()); 
                 }
                 // click first page
                 page_no=1
@@ -1107,6 +1113,7 @@
                         success: function (response) {
                             $('#userbusiness-table-tbody').html('')
                             updatePaging2(response.data)
+                            update_totals(response.data)
                             if (response.data.per_table){
                                 per_table=response.data.per_table
                             }

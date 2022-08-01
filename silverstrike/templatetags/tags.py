@@ -58,14 +58,29 @@ def userhasNewInvestorsMethod(user):
 
 @register.simple_tag
 def useracceptedAsInvestorMethod(user):
-    #All investments i have been accepted 
-    queryset = Investor.objects.filter(Q(user=user),Q(application_status='accepted'))#
+    #All investments i have been accepted...
+    #removes deleted investments 
+    queryset = Investor.objects.filter(Q(user=user),Q(application_status='accepted'), Q(investment__isnull= False))#
     
     if queryset.count() > 0 :     
         return 'mymessages2'
 
     return 'mymessages2_na'
 
+
+@register.simple_tag
+def userInvestorEngagedMethod(model, user):
+    is_investor, record= model.userIsInvestor_2(user)
+    print('.............')
+    print(is_investor, record)
+    if is_investor:
+        print(record.application_status)
+            #investor cannot be allowed to view blogs
+        if record.application_status =='engagement':
+            print('inside......')
+            return 'blogs'
+
+    return 'blogs_na'
 
 @register.simple_tag
 def userNewInvestorsCountMethod(user):
