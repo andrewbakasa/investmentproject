@@ -69,6 +69,9 @@ urlpatterns = [
     path('add_model_investment_paragraph_ajax/<int:id>/', views.add_model_investment_paragraph_ajax, name="add_model_investment_paragraph_ajax"),
   
   
-    path('investor/status/<int:id>/', views.update_investorStatus_ajax,  name='update_investorStatus_ajax'),  
-
+    path('investor/status/<int:id>/', views.update_investorStatus_ajax,  name='update_investorStatus_ajax'), 
+    path('investor/list/<int:pk>/', views.download_investor_list,  name='download-investor-list'), 
+    path('u/i/r/', views.dbUpdateInvestorsRecieved, name="db_update_investors_recieved"),
+    
+ 
 ]

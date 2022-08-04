@@ -851,9 +851,9 @@ section {
 }
 .umodels .umodel-item {
   box-sizing: content-box;
-  padding: 30px 30px 30px 30px;
-  margin: 30px 15px;
-  min-height: 200px;
+  padding: 15px 15px 1515px 30px;
+  margin: 15px 7px;
+  min-height: 150px;
   border: 1px solid #eef0ef;
   position: relative;
   background: #fff;

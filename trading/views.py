@@ -1,14 +1,17 @@
-
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+
 from common.decorators import admin_only
 from django.contrib import messages
 from investments_appraisal.models import ModelCategory, UserModel, UserPreference, UserProfile
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-
+from trading.db_update import updateInvestorApplicationState
+from django.urls import reverse
 from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, \
     InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, \
     InvestorStatusUpdate, InvestorStatusUpdateAjax, UserInvestmentForm, UserInvestmentFormUpdate
+from trading.reports import get_excel_investor_list
 from .models import *
 from django.db.models.expressions import F
 from django.contrib.auth.decorators import login_required 
@@ -514,7 +517,8 @@ def view_investors(request, id):
         "models": queryset,
         "total": queryset.count(),
         "user": request.user,
-        'investment':investmet_obj
+        'investment':investmet_obj,
+         'user_doc_name': investmet_obj.name
         #'form': form,
     }
 
@@ -525,7 +529,7 @@ def view_investors(request, id):
 @login_required(login_url="account_login")
 def get_user_investments_load_status(request, status):
     #this method is redundant: verify my assertion
-    APLLICATION_STATUS_CHOICE = ["pending", "recieved", "verification",  "accepted","engagement","rejected","all", "orphaned"]  
+    APLLICATION_STATUS_CHOICE = ["pending", "verification",  "accepted","engagement","rejected","all", "orphaned"]  
     queryset = Investor.objects.filter(Q(user=request.user)).first()  
   
     if status=='all':
@@ -585,7 +589,7 @@ def user_investments_search_and_tags_ajax(request,status, slug, search_type, *ar
   
     if request.method == 'POST':
         if request.is_ajax():
-            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
+            APLLICATION_STATUS_CHOICE = ["pending", "verification","accepted","engagement", "rejected","all"]  
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
             if status=='all':
                 status=None
@@ -682,7 +686,7 @@ def get_accepted_investors_after_engagement_ajax(request,  id, *args, **kwargs):
    
     if request.method == 'POST':
         if request.is_ajax():
-            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all"]  
+            APLLICATION_STATUS_CHOICE = ["pending",  "verification","accepted","engagement", "rejected","all"]  
             #queryset = Investor.objects.filter(Q(user=request.user),Q(investment__id__isnull=True)).first() 
          
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
@@ -801,7 +805,7 @@ def get_user_investments_load_status_ajax(request,  status, *args, **kwargs):
     #print('743:',status)
     if request.method == 'POST':
         if request.is_ajax():
-            APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all" "orphaned"]  
+            APLLICATION_STATUS_CHOICE = ["pending", "verification","accepted","engagement", "rejected","all" "orphaned"]  
             queryset = Investor.objects.filter(Q(user=request.user)).first() 
            
             if status=='all':
@@ -992,7 +996,7 @@ def get_user_investments_orphaned_ajax(request, *args, **kwargs):
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 @login_required(login_url="account_login")
 def get_user_investments(request):
-    APLLICATION_STATUS_CHOICE = ["pending", "recieved",   "verification","accepted","engagement", "rejected","all", "orphaned"]  
+    APLLICATION_STATUS_CHOICE = ["pending", "verification","accepted","engagement", "rejected","all", "orphaned"]  
     queryset = Investor.objects.filter(user=request.user).first()  
     
     df=queryset.trading_df
@@ -1411,11 +1415,11 @@ def investor_details(request,id, investment_id):
     #only investors of current investments
     investor_obj = get_object_or_404(Investor,pk=id, investment=investment_obj)
     if investor_obj.application_status =='pending':
-        investor_obj.application_status ='recieved'
+        investor_obj.application_status ='verification'
         investor_obj.date_status_changed=timezone.now()# datetime.datetime.now()
         investor_obj.save()
-        changed_to_recieved=True
-        messages.success(request, "Application state as been changed from pending to recieved")
+        changed_to_verification=True
+        messages.success(request, "Application state as been changed from pending to verification")
   
     userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
 
@@ -2431,4 +2435,13 @@ def update_investorStatus_ajax(request, id, *args, **kwargs):
   
     else:
         return JsonResponse({'error': True, 'data': "Request not ajax"})
-  
+
+
+def download_investor_list(request, pk):
+   return get_excel_investor_list(request, pk)
+
+
+@admin_only
+def dbUpdateInvestorsRecieved(request):
+    updateInvestorApplicationState(request)
+    return HttpResponseRedirect(reverse('trading_home', args=())) 

@@ -26,6 +26,7 @@
 <section style= 'padding: 5px 0;' id="projects" class="projects">  
     <div class="container box-element" data-aos="fade-up">
        <!-- ======= Breadcrumbs ======= -->
+       <input id="user_doc_name" type="hidden" value='{{user_doc_name}}'>
         <div class="row">
             <ol class="breadcrumb" >
                 <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
@@ -58,7 +59,7 @@
                         <hr>
                         <a href="#" class ="filter-status badge rounded-pill bg-warning text-dark">Analytics</a>
                         <a href="#" class="filter-status badge rounded-pill bg-warning text-dark ">Rank Your Investors</a>
-                        <a href="#" class="filter-status badge rounded-pill bg-light text-dark">Accepted : {{investment.accepted_investment_percent |intcomma}}%</a>
+                        <a href="#" class="filter-status badge rounded-pill bg-light text-dark">Engaged : {{investment.engaged_investment_percent |intcomma}}%</a>
                         <a href="#" class="filter-status badge rounded-pill bg-light text-dark">All : {{investment.current_investment_percent |intcomma}}%</a>
                         
                         <a href="#" 
@@ -66,7 +67,11 @@
                                                             class="filter-status badge rounded-pill bg-light text-dark" {%endif%}  >
                             {{investment.time_to_close_attr}} 
                         </a>
-                    
+                        <a href="#" id="run-excel" class ="download-investors-excel badge rounded-pill bg-light text-dark"  data-url="{% url 'download-investor-list' investment.id %}"
+                           data-toggle="tooltip" data-placement="bottom" title='Download as Excel'><i class="run-excel fas fa-file-excel"></i>
+                        </a>
+                     
+              
                         
                         <div class="table-responsive">
                             <table id="userBusinessTable" class="table table-striped">
@@ -97,16 +102,7 @@
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                             title='View Investor Info'><i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="#"
-                                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                            title='Chat'><i class="fa fa-file-audio"></i>
-                                        </a>
-                                  
-                                        <!--<a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                          data-object-name="{{ item.name }}"  data-item-id="{{item.id}}" 
-                                          data-delete-url="#"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Decline Investor' > <i class="fastrash "></i> 
-                                        </a>-->
+                                       
                                       </td>
                                    
                                 </tr>
@@ -221,6 +217,12 @@
         $('#confirmdelete .modal-footer input').attr('data-url', url);
         $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
     });
+
+    function truncChar2(str,length){
+            var myTruncatedString = str.substring(0,length-1);              
+           
+            return myTruncatedString
+        }  
 
     $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
@@ -496,6 +498,69 @@
               return false;
           })
        
-    
+       
+          $('body').on('click', '.download-investors-excel', function(){
+        
+                $('#run-excel').prop('disabled', true);
+                $('.run-excel').css('color', 'red');
+                //$('#run-excel').css('display', 'none');
+                var btn = $(this);// fix button  delay
+                var url =  btn.attr("data-url")
+                
+                $.ajax({
+                    type: 'GET',
+                        cache: false,
+                        url: url,                        
+                        xhrFields: {
+                            // make sure the response knows we're expecting a binary type in return.
+                            // this is important, without it the excel file is marked corrupted.
+                            responseType: 'arraybuffer'
+                        }
+                            
+                }).done(function (data, status, xmlHeaderRequest) {
+                            //console.log(data)
+                            //console.log(status)
+                            //console.log(xmlHeaderRequest)
+                            var downloadLink = document.createElement('a');
+                            var blob = new Blob([data],
+                                {
+                                    type: xmlHeaderRequest.getResponseHeader('Content-Type')
+                                });
+                            var url = window.URL || window.webkitURL;
+                            var downloadUrl = url.createObjectURL(blob);
+                            var now_ =new Date()
+                            var get_month = now_.getMonth()+ 1
+                            var fileName = truncChar2($('#user_doc_name').val(),25)  + "_"+  now_.getFullYear() + "_" + get_month  + "_"+ now_.getDate()  + "_"+ now_.getHours()  + "_"+  now_.getMinutes() + "_"+  now_.getSeconds()//'{{user_doc_name}}';
+
+                            if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                                window.navigator.msSaveBlob(blob, fileName);
+                            } else {
+                                if (fileName) {
+                                    if (typeof downloadLink.download === 'undefined') {
+                                        window.location = downloadUrl;
+                                    } else {
+                                        downloadLink.href = downloadUrl;
+                                        downloadLink.download = fileName;
+                                        document.body.appendChild(downloadLink);
+                                        downloadLink.click();
+                                    }
+                                } else {
+                                    window.location = downloadUrl;
+                                }
+
+                                setTimeout(function () {
+                                    url.revokeObjectURL(downloadUrl);
+                                   
+                                },100);
+                            }
+
+                           
+                            window.setTimeout(function() {
+                                $('#run-excel').prop('disabled', false);
+                                $('.run-excel').css('color', 'green');
+                                //$('#run-excel').css('display', 'block');
+                                  }, 4000);
+                        });
+            });
 </script>
 {% endblock %}

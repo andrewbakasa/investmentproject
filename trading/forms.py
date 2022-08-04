@@ -264,16 +264,14 @@ class InvestmentROIFormUpdate(forms.ModelForm):
         fields = ['investment','roi',]
 
 class InvestorStatusUpdate(forms.ModelForm):
-    AC = [('recieved', 'recieved'), ('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
+    AC = [('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
     
     # if engaged.... can only reject....
     def get_allowed_choices(self, state):
         allowed_status =[]
         if state=='pending':
-            allowed_status= [('recieved', 'recieved'), ('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
-        elif state=='recieved':
             allowed_status= [('verification', 'verification'),('accepted', 'accepted'), ('rejected', 'rejected')]
-        
+         
         elif state=='verification':
             allowed_status= [('accepted', 'accepted'), ('rejected', 'rejected')]
        

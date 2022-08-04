@@ -115,9 +115,9 @@ class Investment(models.Model):
         return total
     
     @property
-    def accepted_investment(self):
+    def engaged_investment(self):
         total = 0
-        acc_investments = self.investor_set.filter(Q(application_status ="accepted"))
+        acc_investments = self.investor_set.filter(Q(application_status ="engagement"))
 
         for investment in acc_investments:
             total += investment.value 
@@ -140,9 +140,9 @@ class Investment(models.Model):
         return str(min(max(percent,0),100))
    
     @property
-    def accepted_investment_percent(self):
+    def engaged_investment_percent(self):
         percent = 0
-        curr = self.accepted_investment
+        curr = self.engaged_investment
         if self.total_value !=0:
             percent= curr*100/self.total_value 
         
@@ -273,8 +273,7 @@ class InvestmentDetails(models.Model):
         return str(self.investment) 
   
 class Investor(models.Model):
-    APLLICATION_STATUS_CHOICE = (("pending", "pending"), ("recieved", "recieved"), 
-                               ("verification", "verification"),("accepted", "accepted"),
+    APLLICATION_STATUS_CHOICE = (("pending", "pending"), ("verification", "verification"),("accepted", "accepted"),
                                 ("engagement", "engagement"),   ("rejected", "rejected") )
     investment = models.ForeignKey(Investment, on_delete=models.SET_NULL, null=True) 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

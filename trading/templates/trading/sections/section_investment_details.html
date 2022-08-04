@@ -64,14 +64,14 @@
               </div>
 
               <div class="col-lg-2">
-                  Views: {{model.views}}
+                  Views: {{model.views| shrink_num}}
               </div>
 
               <div class="col-lg-2">
                   Likes:
                   <a class="model-likes" href="#" data-url="{% url 'update_investment_likes' model.id %}" 
                     style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                    title='Like'><i class="bx bx-heart"></i>&nbsp;{{model.likes}}
+                    title='Like'><i class="bx bx-heart"></i>&nbsp;{{model.likes| shrink_num}}
                   </a>
               </div>
           </div>

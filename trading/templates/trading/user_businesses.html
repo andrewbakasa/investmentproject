@@ -91,15 +91,15 @@
                                     <thead class="thead-dark">
                                         <th style="width: 2%" >#</th>    
                                         <th style="width: 12%" >Name</th>
-                                        <th style="width: 17%" >description</th>
+                                        <th style="width: 16%" >description</th>
                                         <th style="width: 8%" >category</th>
                                         <th style="width: 7%" >Value</th>
                                         <th style="width: 7%" >Current</th>
                                         <th style="width: 3%" >%</th>
                                         <th style="width: 8%" >Investors</th>
-                                        <th style="width: 20%" >Date Created</th>
-                                        <th style="width: 4%" >Public</th>
-                                        <th style="width: 12%" class="text-right">Actions</th>
+                                        <th style="width: 19%" >Date Created</th>
+                                        <th style="width: 7%" >Public</th>
+                                        <th style="width: 11%" class="text-right">Actions</th>
                                     </thead>
                                     <tbody id="userbusiness-table-tbody">
                                     {% for item in first_page  %}
@@ -121,7 +121,7 @@
 
                                         <td class="modelData" name="public" >
                                             {% if item.public %}<i style='color:blue;' class="bi bi-check-circle"></i>
-                                            {% else %} <i class="bi-square"></i>{% endif %} {{item.views}}
+                                            {% else %} <i class="bi-square"></i>{% endif %} {{ item.views | shrink_num}}
                                         </td>
                                        
                                         <td class="text-right modelAction modelData" name="action">
@@ -287,6 +287,47 @@
         })
     </script>
     <script>
+
+
+    function nFormatter(num, digits) {
+        digits=1
+        const lookup = [
+            { value: 1, symbol: "" },
+            { value: 1e3, symbol: "k" },
+            { value: 1e6, symbol: "M" },
+            { value: 1e9, symbol: "G" },
+            { value: 1e12, symbol: "T" },
+            { value: 1e15, symbol: "P" },
+            { value: 1e18, symbol: "E" }
+        ];
+        const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+        var item = lookup.slice().reverse().find(function(item) {
+            return num >= item.value;
+        });
+        return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+    }
+
+   
+
+    /*
+    * Tests
+    */
+   /*  const tests = [
+    { num: 0, digits: 1 },
+    { num: 12, digits: 1 },
+    { num: 1234, digits: 1 },
+    { num: 100000000, digits: 1 },
+    { num: 299792458, digits: 1 },
+    { num: 759878, digits: 1 },
+    { num: 759878, digits: 0 },
+    { num: 123, digits: 1 },
+    { num: 123.456, digits: 1 },
+    { num: 123.456, digits: 2 },
+    { num: 123.456, digits: 4 }
+    ];
+    tests.forEach(function(test) {
+    console.log("nFormatter(" + test.num + ", " + test.digits + ") = " + nFormatter(test.num, test.digits));
+    }); */
        
         var bus_status='{{status}}'
 
@@ -548,14 +589,14 @@
                 var name_trunc =truncChar(item.name,12)
                 var description_trunc =truncChar(item.description,20)
                 var category_trunc =truncChar(item.category,20)
-            
+               
                 var public= ''
                 var page_no = 1//dummy;
                 console.log(item)
                 if (item.public){
-                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${item.views}`
+                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(item.views,0)}`
                 }else{
-                    public= `<i class='bi-square'></i> ${item.views}`
+                    public= `<i class='bi-square'></i> ${nFormatter(item.views,0)}`
                 }
             
                 a_html =`<h4 style="text-align:center;">My Businesses</h4>
@@ -637,9 +678,9 @@
 
                 var public= ''
                 if (item.public){
-                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${item.views}`
+                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(item.views,0)}`
                 }else{
-                    public= `<i class='bi-square'></i> ${item.views}`
+                    public= `<i class='bi-square'></i> ${nFormatter(item.views,0)}`
                 }
             
                 a_html =`
@@ -732,9 +773,9 @@
                         var public= ''
                     
                         if (item.public){
-                            public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${item.views}`
+                            public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(item.views,0)}`
                         }else{
-                            public= `<i class='bi-square'></i>${item.views}`
+                            public= `<i class='bi-square'></i>${nFormatter(item.views,0)}`
                         }
                         var a_html= `<td  class="modelData" name="pubic">${public}</td>`
                         $(this).html(a_html);
@@ -890,9 +931,9 @@
 
                 var public= ''
                 if (val.public){
-                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${val.views}`
+                    public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(val.views,0)}`
                 }else{
-                    public= `<i class='bi-square'></i> ${val.views}`
+                    public= `<i class='bi-square'></i> ${nFormatter(val.views,0)}`
                 }
 
 

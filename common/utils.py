@@ -55,5 +55,9 @@ def long_time(x):
 		return x.strftime('%r') # 16:10  datetime.datetime.strftime(x, '%r')#
 	return x 
 
-
+def thousand_sep(num):
+	#return ("{:,}".format(num))    # For Python ≥2.7
+	return (f'{num:,}')          # For Python ≥3.6
+	
+    
 
