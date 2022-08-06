@@ -1,6 +1,6 @@
 from django.urls import include, path
 from django.views.generic import TemplateView
-
+from trading import api
 
 from django.urls import path
 from . import views
@@ -72,6 +72,11 @@ urlpatterns = [
     path('investor/status/<int:id>/', views.update_investorStatus_ajax,  name='update_investorStatus_ajax'), 
     path('investor/list/<int:pk>/', views.download_investor_list,  name='download-investor-list'), 
     path('u/i/r/', views.dbUpdateInvestorsRecieved, name="db_update_investors_recieved"),
+
+
+    path('investment_dashboard/<str:pk>/', views.investment_dashboard, name="investment_dashboard"),
     
- 
+  # api
+     path('api/get_project_output_by_rolling_week/<dstart>/<dend>/',
+         api.get_project_output_by_rolling_week, name='get_project_output_by_rolling_week'),
 ]

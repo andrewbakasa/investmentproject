@@ -228,7 +228,8 @@
                                 
                                     <div ${ready_attr} class="project-content ${model_class_added}">
                                         <div class="d-flex justify-content-between align-items-center mb-3"  name="link">
-                                            <h3><a href="/select_model_mentor/${val.id}/"  class ="badge rounded-pill bg-warning" >${truncChar(val.name,15)}</a></h3>
+                                            <h3><a href="/select_model_mentor/${val.id}/"  class ="badge rounded-pill bg-warning" 
+                                                data-toggle="tooltip" data-placement="bottom"     title='View Model'>${truncChar(val.name,20)}</a></h3>
                                  
                                             <p class="price">${val.currency}</p>
                                         </div> 
@@ -501,7 +502,7 @@
                 //console.log(this)
                 var attr = $(this).attr("name");
                 if (attr == "link") {
-                    $(this).find('a').text(truncChar(item.name,15));
+                    $(this).find('a').text(truncChar(item.name,20));
                     $(this).find('p').text(item.currency);
                     
                 } else if (attr == "description") {

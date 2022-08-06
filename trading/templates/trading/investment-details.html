@@ -153,7 +153,7 @@
                     //         // "title":"", 
                     //     }
                     // ).remove() 
-                    $(this).prop({"disabled": true,"title":"Your application have been rejected", });
+                    $(this).prop({"disabled": true,"title":"This service is revoked from you for this operation.", });
                         
                 })
            }
@@ -243,20 +243,20 @@
                           $('.a_page_nav:first-child').trigger('click');
                           //----------------------------------
                           if (data.model.current_investment){
-                              $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
+                              $('#current_investment').html(`<small>${parseFloat(data.model.current_investment_percent).toFixed(1)} %</small>`);
                           }
 
                           if (data.model.user_investor){
-                              $('#user_investor').html(`${data.model.user_investor}`);
+                              $('#user_investor').html(`<small>${data.model.user_investor}</small>`);
                           }
 
 
                           if (data.model.current_investment){
-                              $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
+                              $('#current_investment_value').html(`<small>${data.model.current_investment} of ${data.model.total_value}</small>`);
                           }
 
                           if (data.model.user_stake){
-                              $('#user_stake').html(`${data.model.user_stake.toFixed(1)}%`);
+                              $('#user_stake').html(`<small>${data.model.user_stake.toFixed(1)}%</small>`);
                           }
                          
                           var pledge_title ="Edit Investment Pledge"
@@ -353,18 +353,18 @@
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           if (data.model.current_investment){
-                            $('#current_investment').html(`${cur_round} %`);
+                            $('#current_investment').html(`<small>${cur_round} %</small>`);
                           }
                           if (data.model.current_investment){
-                              $('#current_investment_value').html(`${data.model.current_investment} of ${data.model.total_value}`);
+                              $('#current_investment_value').html(`<small>${data.model.current_investment} of ${data.model.total_value}</small>`);
                           }
 
                           if (data.model.user_stake){
-                              $('#user_stake').html(`${data.model.user_stake.toFixed(1)}%`);
+                              $('#user_stake').html(`<small>${data.model.user_stake.toFixed(1)}%</small>`);
                           }
 
                           if (data.model.user_investor){
-                              $('#user_investor').html(`${data.model.user_investor}`);
+                              $('#user_investor').html(`<small>${data.model.user_investor}</small>`);
                           }
                         
 

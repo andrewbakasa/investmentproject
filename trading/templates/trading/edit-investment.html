@@ -269,35 +269,35 @@
                                                       
                               var js_closing_date = new Date(data.model.closing_date) 
                               //console.log('getshortDate_:', getshortDate_(js_closing_date))  
-                              $('#closing_date').html(`${getshortDate_(js_closing_date)}`);
+                              $('#closing_date').html(`<small>${getshortDate_(js_closing_date)}</small>`);
                           }
 
                        
                           if (data.model.closed_status){ 
                                 $('#closing_date_header').css({color:'red'}) 
-                                $('#closing_date_header').html(`Closed on`);
+                                $('#closing_date_header').html(`<small>Closed on</small>`);
                                 
                             }else {
                                 $('#closing_date_header').css({color:'green'})          
-                                $('#closing_date_header').html(`Closing Date`);
+                                $('#closing_date_header').html(`<small>Closing Date</small>`);
                           }
 
                           
                           if (data.model.current_investment){
-                              $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
+                              $('#current_investment_value').html(`<small>$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}</small>`);
                           }
 
                           if (data.model.user_stake){
-                              $('#user_stake').html(`${data.model.user_stake.toFixed(1)}%`);
+                              $('#user_stake').html(`<small>${data.model.user_stake.toFixed(1)}%</small>`);
                           }
                           
                           if (data.model.investors_count){
-                              $('#investors_count').html(`${data.model.investors_count}`);
+                              $('#investors_count').html(`<small>${data.model.investors_count}</small>`);
                           }
 
                           a_html=`<a class="model-edit show-form-update" href="#" data-url="/tr/update_investor/${data.model.investor_id}/" 
                                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                    title='Edit Equity'><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
+                                    title='Edit Equity'><h5><small>of which My Stake </small><i  style="color:green"  class="fas fa-edit"></i></h5>
                                 </a>`
 
                            $('#breadcrumb_changeto_edit').html(a_html)
@@ -372,19 +372,17 @@
                       //console.log('pass back from url:',form.attr('data-url'))
                       //console.log('data:',data.model)
                       if(data.model){
-                          
                           //updateTable(data.model);
-                          //hide the form after editing
-                        
+                          //hide the form after editing                        
                           $('#modal-usermodel').modal('hide');
                           $('.close-modal').click()
                           if (data.model.current_investment_percent){
-                            $('#current_investment').html(`${parseFloat(data.model.current_investment_percent).toFixed(1)} %`);
+                            $('#current_investment').html(`<small>${parseFloat(data.model.current_investment_percent).toFixed(1)} %</small>`);
                           }
 
                           if (data.model.closing_date){
                               var js_closing_date = new Date(data.model.closing_date)
-                              $('#closing_date').html(`${getshortDate_(js_closing_date)}`);
+                              $('#closing_date').html(`<small>${getshortDate_(js_closing_date)}</small>`);
                           }
 
                           if (data.model.closed_status){ 
@@ -397,14 +395,14 @@
                           }
 
                           if (data.model.current_investment){
-                              $('#current_investment_value').html(`$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}`);
+                              $('#current_investment_value').html(`<small>$${numberWithCommas(data.model.current_investment)} of $${numberWithCommas(data.model.total_value)}</small>`);
                           }
 
                           if (data.model.user_stake){
-                              $('#user_stake').html(`${data.model.user_stake.toFixed(1)}%`);
+                              $('#user_stake').html(`<small>${data.model.user_stake.toFixed(1)}%</small>`);
                           }
                           if (data.model.investors_count){
-                            $('#investors_count').html(`${data.model.investors_count}`);
+                            $('#investors_count').html(`<small>${data.model.investors_count}</small>`);
                           }
                           var name_trunc =truncChar(data.model.name,25)
                           var header_text= `${name_trunc} valued @ $${numberWithCommas(data.model.total_value)} </h3>`
@@ -487,7 +485,7 @@
                         title='Add New Investment'
                     }
                     a_html=`<a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
-                            ${title}><h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>
+                            ${title}><h5><small>of which My Stake</small> <i style="color:red"  class="fas fa-plus"></i></h5>
                             </a>`
                     //$('#breadcrumb_changeto_edit').empty()
                     $("#breadcrumb_changeto_edit").removeAttr("data-url");
@@ -500,7 +498,7 @@
                         "data-toggle" : 'modal'
                     });
                 
-                    $('#breadcrumb_changeto_edit').html(`<h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>`)//.contents(a_html)//.html(a_html)
+                    $('#breadcrumb_changeto_edit').html(`<h5><small>of which My Stake </small><i style="color:red"  class="fas fa-plus"></i></h5>`)//.contents(a_html)//.html(a_html)
                     //$('#breadcrumb_changeto_edit').
                     $('#user_stake').html(`0%`);
                     $('#delete_cancel_investment').remove();

@@ -71,13 +71,13 @@ def useracceptedAsInvestorMethod(user):
 @register.simple_tag
 def userInvestorEngagedMethod(model, user):
     is_investor, record= model.userIsInvestor_2(user)
-    print('.............')
-    print(is_investor, record)
+    #print('.............')
+    #print(is_investor, record)
     if is_investor:
-        print(record.application_status)
+        #print(record.application_status)
             #investor cannot be allowed to view blogs
         if record.application_status =='engagement':
-            print('inside......')
+            #print('inside......')
             return 'blogs'
 
     return 'blogs_na'

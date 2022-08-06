@@ -503,10 +503,7 @@
         
                 $('#run-excel').prop('disabled', true);
                 $('.run-excel').css('color', 'red');
-                //$('#run-excel').css('display', 'none');
-                var btn = $(this);// fix button  delay
-                var url =  btn.attr("data-url")
-                
+                var url =  $(this).attr("data-url")
                 $.ajax({
                     type: 'GET',
                         cache: false,
@@ -518,9 +515,9 @@
                         }
                             
                 }).done(function (data, status, xmlHeaderRequest) {
-                            //console.log(data)
-                            //console.log(status)
-                            //console.log(xmlHeaderRequest)
+                            // console.log(data)
+                            // console.log(status)
+                            // console.log(xmlHeaderRequest)
                             var downloadLink = document.createElement('a');
                             var blob = new Blob([data],
                                 {
@@ -530,7 +527,9 @@
                             var downloadUrl = url.createObjectURL(blob);
                             var now_ =new Date()
                             var get_month = now_.getMonth()+ 1
-                            var fileName = truncChar2($('#user_doc_name').val(),25)  + "_"+  now_.getFullYear() + "_" + get_month  + "_"+ now_.getDate()  + "_"+ now_.getHours()  + "_"+  now_.getMinutes() + "_"+  now_.getSeconds()//'{{user_doc_name}}';
+                            var fileName = truncChar2($('#user_doc_name').val(),25)  + "_"+  now_.getFullYear() + "_" + 
+                                           get_month  + "_"+ now_.getDate()  + "_"+ now_.getHours()  + "_"+ 
+                                           now_.getMinutes() + "_"+  now_.getSeconds()//'{{user_doc_name}}';
 
                             if (typeof window.navigator.msSaveBlob !== 'undefined') {
                                 window.navigator.msSaveBlob(blob, fileName);
@@ -553,13 +552,11 @@
                                    
                                 },100);
                             }
-
-                           
+                            //delay resetting
                             window.setTimeout(function() {
                                 $('#run-excel').prop('disabled', false);
                                 $('.run-excel').css('color', 'green');
-                                //$('#run-excel').css('display', 'block');
-                                  }, 4000);
+                            }, 4000);
                         });
             });
 </script>

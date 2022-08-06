@@ -61,7 +61,28 @@ class Investment(models.Model):
     def __str__(self):
         return self.name 
     
+    @property
+    def date_first_output(self):
+        qs = Investor.objects.filter(Q(investment__id =self.pk)).order_by("date_created").first()
+        #print(qs)
+        if qs:
+            return qs.date_created
+        return date.today()
     
+    @property
+    def kpi_output_qs(self):
+        qs = Investor.objects.filter(Q(investment__id =self.pk)).order_by("-date_created","-date_status_changed")
+        return qs
+
+    @property
+    def kpi_output_qs_released(self):
+        qs = Investor.objects.filter(Q(investment__id =self.pk),Q(application_status ="engagement")).order_by("-date_created","-date_status_changed")
+        return qs
+    
+    @property
+    def kpi_output_qs_wip(self):
+        qs = Investor.objects.filter(Q(investment__id =self.pk), Q(application_status__in=["pending", "verification","accepted"])).order_by("date_created","date_status_changed")
+        return qs
     @property
     def time_to_close_attr(self):
         if self.closing_date > datetime.date.today():
@@ -202,7 +223,18 @@ class Investment(models.Model):
             # + recieved or pending, etc
             if qs.application_status =='rejected':
                 return 'rejected ' #+ str(qs.application_status)
-
+           
+            else:
+                #print(f'isclosed?? :: {qs.investment.closed_status}')
+                if qs.investment.closed_status:
+                    #if investment is closed dont allow editing also
+                    return 'rejected '
+        else:
+            #not an investor
+            #check if clossed investment
+            if self.closed_status:
+                #if investment is closed dont allow editing also
+                return 'rejected '
         return 'rejected_na'
     def userInvestorValue(self, user):       
         qs = self.investor_set.filter(user=user).first()

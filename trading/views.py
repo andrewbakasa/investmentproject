@@ -1,11 +1,14 @@
+import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-
+from dateutil.relativedelta import relativedelta
 from common.decorators import admin_only
 from django.contrib import messages
+from common.utils import last_day_of_month
 from investments_appraisal.models import ModelCategory, UserModel, UserPreference, UserProfile
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from trading.db_filter import get_project_outputs_monthly
 from trading.db_update import updateInvestorApplicationState
 from django.urls import reverse
 from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, \
@@ -2445,3 +2448,74 @@ def download_investor_list(request, pk):
 def dbUpdateInvestorsRecieved(request):
     updateInvestorApplicationState(request)
     return HttpResponseRedirect(reverse('trading_home', args=())) 
+
+
+# Display a specific invoice
+@login_required(login_url="account_login")
+def investment_dashboard(request, pk):
+    project = get_object_or_404(Investment, pk=pk)
+    completed=30#project.kpi_perfomance
+    wip=2#project.kpi_wip
+    project_target =30# project.kpi_target
+    outstanding= project_target - completed
+    month_expected_output=10 #project.expected_output_curr_month
+    context = {        
+        'project' : project,
+        'wip':wip,
+        'completed':completed,
+        'perfomance':completed *100/project_target if project_target !=0 else 0,
+        'outstanding':outstanding,
+         'month_expected_output':month_expected_output
+        
+    }
+    #-----project model require an id-----------
+    dummy_project= model_to_dict(project)
+   
+    dummy_project['due_date']= None# date cannot be serialised
+    dummy_project['value']= None # decimal cannot be serialised
+    request.session['project']= dummy_project
+    #---------------------------
+
+     
+    #--last month
+    first_day_this_month = date.today().replace(day=1)
+    last_day_of_this_month = last_day_of_month(first_day_this_month)
+    
+    previous_last = first_day_this_month - timedelta(days=1)
+    previous_first = previous_last.replace(day=1)
+    context['last_month'] = previous_first
+
+    date_first_output = project.date_first_output
+    print(date_first_output)
+    context['today'] = date.today()        
+    context['minus_3_months'] = date.today() - relativedelta(months=3)
+    context['minus_6_months'] = date.today() - relativedelta(months=6)
+    context['minus_12_months'] = date.today() - relativedelta(years=1) 
+    context['minus_full_period'] = date_first_output      
+    start_of_week=date.today() - timedelta(days=date.today().weekday())
+    context['first_day_of_week'] =start_of_week
+    context['last_day_of_week'] =start_of_week + timedelta(days=6)
+    context['first_day_of_month'] = date.today().replace(day=1)
+    context['last_day_of_month'] = last_day_of_month(date.today())
+    #---locomotives
+    get_project_outputs_monthly(request, first_day_this_month, last_day_of_this_month, context)
+    #import json
+    
+    #context['minus_full_period'] =""
+    #options_list = get_userprefs_graph_options(request)#[1,3]
+    print(type(date_first_output))
+    print(type(date_first_output.date()))
+    dt = date_first_output.replace(tzinfo=None)
+    context['minus_full_period'] =json.dumps(dt.date(), default=str)
+    #context['minus_full_period'] = date_first_output.isoformat()#json_serial(date_first_output)
+    #context['json_userprefs_graph_options'] =options_json
+    print(context)
+    return render(request, 'trading/investment_dashboard.html', context)
+from datetime import date, datetime
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))

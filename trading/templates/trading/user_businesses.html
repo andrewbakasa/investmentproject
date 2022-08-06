@@ -91,8 +91,8 @@
                                     <thead class="thead-dark">
                                         <th style="width: 2%" >#</th>    
                                         <th style="width: 12%" >Name</th>
-                                        <th style="width: 16%" >description</th>
-                                        <th style="width: 8%" >category</th>
+                                        <th style="width: 16%" >Description</th>
+                                        <th style="width: 8%" >Category</th>
                                         <th style="width: 7%" >Value</th>
                                         <th style="width: 7%" >Current</th>
                                         <th style="width: 3%" >%</th>
@@ -129,6 +129,10 @@
                                             <a href="{% url 'edit-investment' item.id %}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                                 title='Manage Business'><i class="fas fa-wrench"></i>
+                                            </a>
+
+                                            <a  href="{% url 'investment_dashboard' item.id %}" 
+                                            data-toggle="tooltip" data-placement="bottom" title="View Dashboard"><i class="fa fa-eye"></i>
                                             </a>
                                     
                                             <!-- EDIT MODEL -->

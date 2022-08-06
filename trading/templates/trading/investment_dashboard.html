@@ -1,0 +1,756 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Invest Name Dashboard</title>
+{% endblock %}
+
+
+{% block stylesheets %}
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
+
+
+<!-- < -->
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+
+
+
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+    <!-- End Breadcrumbs -->
+    <!---Removed padding from 70px-- 0px-->
+    <section style= 'padding: 5px 0;' id="projects" class="projects">  
+        <div class="container box-element" data-aos="fade-up">
+            <!-- ======= Breadcrumbs ======= -->
+            
+            <div class="row">
+                <ol class="breadcrumb" >
+                    <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                        data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                  
+                    <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success" 
+                        data-toggle="tooltip" data-placement="bottom" title='Explore Investments'><i class="fas fa-balance-scale"></i></a></li>
+                
+                    <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
+                  
+                    <li class="breadcrumb-item active">
+                        <a href="#"   data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_business"
+                        title='Pitch New Business' class ="badge rounded-pill bg-success"><i  class="fas fa-plus"></i>
+                        </a>
+                    </li> 
+                    <li class="breadcrumb-item" >
+                        <label id="total_items"  class ="badge rounded-pill bg-light text-dark">Total [{{total}}]</label>
+                    </li> 
+                    <li id='li_current_status' class="breadcrumb-item" style="display:none ;">
+                        <a id='current_status' href="{% url 'user_businesses' %}"
+                            data-toggle="tooltip" data-placement="bottom" 
+                            title='Remove Status' class ="badge rounded-pill bg-success"><i>[{{status}}]</i> <span aria-hidden="true">×</span>
+                        </a> 
+                    </li> 
+                </ol>        
+            </div>
+            
+            <div class="row">
+              <div class="col-md-3">
+                <div class="small-box bg-green">
+                  <div class="inner">
+                    <h4>{% trans 'Completed' %}</h4>
+                    <h3>{{ completed|floatformat:'-2'|intcomma}} ({{perfomance|floatformat:'-2'|intcomma}} %)</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="small-box bg-yellow">
+                  <div class="inner">
+                    <h4>{% trans 'WIP' %}</h4>
+                    <h3>{{ wip|floatformat:'-2'|intcomma }}</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="small-box bg-red">
+                  <div class="inner">
+                    <h4>{% trans 'Outstanding ' %}</h4>
+                    <h3>{{ outstanding|floatformat:'-2'|intcomma }}</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="small-box bg-blue">
+                  <div class="inner">
+                    <h4>{% trans 'This Month Expectation' %}</h4>
+                    <h3>{{ month_expected_output|floatformat:'-2'|intcomma }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-md-push-8">
+                  {% if overdue_transactions %}
+                  <div class="alert alert-danger">
+                    <b>{% trans 'You have recurrences that are overdue!' %}</b>
+                  </div>
+                  {% endif %}
+                  <div class="box">
+                      <div class="box-content">
+                        <table class="table">
+                          <tr><th></th><th>{{ today|date:"F" }}</th><th>{{ last_month|date:"F" }}</th></tr>
+                          <!-- RELEASES -->
+                          <tr>
+                              <th>{% trans 'Outputs' %}</th>
+                          
+                              <td>
+                                <a href="#" data-toggle="modal" data-target="#modal_show_releases_current" 
+                                data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Project Outputs' >{{ releases|intcomma }}</a>
+                              </td>
+                              <td>                  
+                                <a href="#" data-toggle="modal" data-target="#modal_show_releases_previous" 
+                                data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Project Outputs'>{{ previous_releases|intcomma }}</a>
+                              </td>
+                            
+                          </tr>
+                          <!-- ADMISSIONS -->
+                          <tr>
+                            <th>{% trans 'Admissions' %}</th>
+                        
+                            <td>
+                              <a href="#" data-toggle="modal" data-target="#modal_show_admissions_current" 
+                              data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Assest Admission' >{{ admissions|intcomma }}</a>
+                            </td>
+                            <td>                  
+                              <a href="#" data-toggle="modal" data-target="#modal_show_admissions_previous" 
+                              data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Assest Admission'>{{ previous_admissions|intcomma }}</a>
+                            </td>
+                          
+                        </tr>
+                        <tr>
+                          <th>{% trans 'Difference' %}</th><td{% if difference < 0 %} class="text-red"{% endif %}>{{ difference|intcomma }}</td><td{% if previous_difference < 0 %} class="text-red"{% endif %}>{{ previous_difference|intcomma }}</td>
+                        </tr>
+                        <tr>
+                          <th>{% trans 'WIP' %}</th>
+                            <td>                  
+                              <a href="#" data-toggle="modal" data-target="#modal_show_wip" 
+                              data-toggle="tooltip" data-placement="bottom" title='Show {{ today|date:"F" }} Assest WIP'>{{ total_underrepairs|intcomma }}</a>
+                            </td>
+                            <td class="text-red"></td>
+                        </tr>
+                        
+            
+                        </table>
+                      </div>
+                  </div>
+                  <div class="box">
+                      <div class="box-header">
+                        <h3 class="box-title">{% trans 'Project Analytics' %}</h3>
+                      </div>
+                      <div class="box-body">
+                        <table class="table">
+                          <tr>
+                            <th>{% trans 'KPI' %}</th>
+                            <th>{% trans 'Target' %}</th>
+                            <th>{% trans 'Actual' %}</th>
+                          </tr>
+                        {% for kpi in dict_kpi %}
+                          <tr>
+                            <td><a href="#">{{ kpi.name }}</a></td>
+                            <td >{{ kpi.target|floatformat:'-2'|intcomma }}</td>
+                            <td id="{{ kpi.id }}" {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>{{ kpi.actual|floatformat:'-2'|intcomma }}</td>
+                            
+                          </tr>
+                        {% endfor %}
+                        </table>
+                      </div>
+                  </div>
+                  <div class="box">
+                    <div class="box-header">
+                      <h3 class="box-title">{% trans 'Resources Procurement' %}</h3>
+                    </div>
+                    <div class="box-body">
+                      <table class="table">
+                        <tr>
+                          <th>{% trans 'KPI' %}</th>
+                          <th>{% trans 'Target' %}</th>
+                          <th>{% trans 'Actual' %}</th>
+                          <th>{% trans '%' %}</th>
+                        </tr>
+                      {% for kpi in dict_procurement %}
+                        <tr>
+                          <td><a href="#">{{ kpi.name }}</a></td>
+                          <td >{{ kpi.target|floatformat:'-0'|intcomma }}</td>
+                          <td {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>{{ kpi.actual|floatformat:'-0'|intcomma }}</td>
+                          <td {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>{{ kpi.percent|floatformat:'-0'|intcomma }}</td>
+                          
+                        </tr>
+                      {% endfor %}
+                      </table>
+                    </div>
+                </div>
+              </div>
+              <div class="col-md-8 col-md-pull-4">
+                  <div class="box">
+                    <div class="box-header">
+                        <div class="row text-center">
+                          <!-- <button id="toggle">show/hide all</button> -->
+                          <button id="entireperiod" class="btn btn-s btn-default range-chooser">{% trans 'Full Period' %}</button>            
+                          <button id="6month" class="btn btn-s btn-default range-chooser">{% trans 'Last 6 month' %}</button>
+                          <button id="3month" class="btn btn-s btn-default range-chooser">{% trans 'Last 3 Months' %}</button>
+                          <button id="currentMonth" class="btn btn-s btn-default range-chooser">{% trans 'Current Month' %}</button>
+                          <button id="currentWeek" class="btn btn-s btn-default range-chooser">{% trans 'Current Week' %}</button>
+                        
+                        </div>
+                    </div>
+                </div>
+      
+                  <div class="box">      
+                    <div class="box-header">
+                      <h3 class="box-title">{% trans 'Project Outputs' %}</h3>
+                    </div>
+                    <div class="box-body">
+                      <canvas id="myreleasesChart" width="450" height="250"></canvas>
+                    </div>
+                  </div>
+                
+                
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="box">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">{% trans 'Recent Activities' %}</h3>
+                  </div>
+                  <div class="box-body">
+                    <table class="table table-striped">
+                      <tr>
+                        <th>{% trans 'Title' %}</th>
+                        <th class="hidden-xs">{% trans 'Type' %}</th>
+                        <th>{% trans 'Date' %}</th>
+                        <th>{% trans 'Values' %}</th>
+                        <th class="hidden-xs">{% trans 'Dept' %}</th>
+                        <th class="hidden-xs">{% trans 'Sect' %}</th>
+                        <th class="hidden-xs">{% trans 'Category' %}</th>
+                      </tr>
+                      {% for transaction in transactions %}
+                      <tr>
+                        <td><a href="{{ transaction.get_absolute_url }}">{{ transaction.title }}</a></td>
+                        <td class="hidden-xs">{{ transaction.transaction.get_transaction_type_str }}</td>
+                        <td>{{ transaction.date|date:'d.m.Y' }}</td>
+                        <td class="text-{% if transaction.is_deposit %}green{% elif transaction.is_withdraw %}red{% endif %}">{% if transaction.is_transfer %}{{ transaction.amount|negate|intcomma }}{% else %}{{ transaction.amount|intcomma }}{% endif %}</td>
+                        <td class="hidden-xs"><a href="{{ transaction.account.get_absolute_url }}">{{ transaction.account }}</a></td>
+                        <td class="hidden-xs">{% if not transaction.is_system %}<a href="{{ transaction.opposing_account.get_absolute_url }}">{{ transaction.opposing_account }}</a>{% endif %}</td>
+                        <td class="hidden-xs">
+                          {% if transaction.category %}
+                          <a href="{{ transaction.category.get_absolute_url }}">{{ transaction.category }}</a>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+      
+            <!-- modal Output Current -->
+            <div class="modal fade" id="modal_show_releases_current" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-10" style="border-radius: 10px;">
+                    <!--Header-->
+                    <div class="modal-header">
+                        <div class="row ">
+                          <div class="pull-left">
+                            <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Outputs {{ today|date:"F" }} {{ today|date:"Y" }}
+                            </h4>
+                            
+                          </div>
+                          
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <!--Body-->
+                    <div class="modal-body">
+                      {% if releases_outputs %}
+                        <table class="table">
+                            <tr>
+                              <th>Asset #</th>
+                              <th>Release Date</th>
+                              <th>Description</th>
+                              <th>Repair time</th>
+                            </tr>
+                            {% for item in releases_outputs %}
+                            <tr>
+                              <td >{{item.name }}</td>
+                              <td >{{item.date|date:'D d F Y'}}</td>
+                              <td >{{item.text }}</td>
+                              <td >{{item.downtime }}</td>
+                            </tr>
+                            {%endfor%}
+                        </table>
+                      {%else%} 
+                      <p>No Releases</p> 
+                      {% endif %}
+                      
+                    </div>
+                    <!--Footer-->
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                            type="reset">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+      
+            <!-- modal Outputs Previous -->
+            <div class="modal fade" id="modal_show_releases_previous" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content rounded-10" style="border-radius: 10px;">
+                      <!--Header-->
+                      <div class="modal-header">
+                          <div class="row ">
+                            <div class="pull-left">
+                              <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Outputs {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                              </h4>
+                              
+                              
+                            </div>
+                          
+                          </div>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                          </button>
+                      </div>
+                      <!--Body-->
+                      <div class="modal-body" >
+                        {% if previous_releases_outputs %}
+                          <table class="table">
+                              <tr>
+                                <th>Asset #</th>
+                                <th>Release Date</th>
+                                <th>Description</th>
+                                <th>Repair time</th>
+                              </tr>
+                              {% for item in previous_releases_outputs %}
+                              <tr>
+                                <td class ={{item.rank}}>{{item.name }}</td>
+                                <td class ={{item.rank}}>{{item.date |date:'D d F Y'}}</td>
+                                <td class ={{item.rank}}>{{item.text }}</td>
+                                <td class ={{item.rank}}>{{item.downtime }}</td>
+                              </tr>
+                              {%endfor%}
+                          </table>
+                          {% else %}
+                          <p>No Releases</p>
+                          {%  endif %}
+                        
+                      </div>
+                      <!--Footer-->
+                      <div class="modal-footer">
+                          <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                              type="reset">Close
+                          </button>
+                      </div>
+      
+                  </div>
+              </div>
+            </div>
+      
+            <!-- modal Admission Current -->
+            <div class="modal fade" id="modal_show_admissions_current" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-10" style="border-radius: 10px;">
+                    <!--Header-->
+                    <div class="modal-header">
+                        <div class="row ">
+                          <div class="pull-left">
+                            <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Admissions {{ today|date:"F" }} {{ today|date:"Y" }}
+                            </h4>
+                          
+                          </div>
+                          
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <!--Body-->
+                    <div class="modal-body">
+                      {% if assets_admission %}
+                        <table class="table">
+                            <tr>
+                              <th>Asset #</th>
+                              <th>Admission Date</th>
+                              <th>Release Date</th>
+                              <th>Description</th>
+                            </tr>
+                            {% for item in assets_admission %}
+                            <tr>
+                              <td >{{item.name }}</td>
+                              <td >{{item.date|date:'D d F Y'}}</td>
+                              <td class ={{item.rank}}>{{item.date2 |date:'D d F Y'}}</td>
+                              <td >{{item.text }}</td>
+                            </tr>
+                            {%endfor%}
+                        </table>
+                      {%else%} 
+                      <p>No Releases</p> 
+                      {% endif %}
+                    
+                    </div>
+                    <!--Footer-->
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                            type="reset">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+      
+            <!-- modal Admission Previous -->
+            <div class="modal fade" id="modal_show_admissions_previous" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content rounded-10" style="border-radius: 10px;">
+                      <!--Header-->
+                      <div class="modal-header">
+                          <div class="row ">
+                            <div class="pull-left">
+                              <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Admissions {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                              </h4>
+                            
+                              
+                            </div>
+                          
+                          </div>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                          </button>
+                      </div>
+                      <!--Body-->
+                      <div class="modal-body" >
+                        {% if previous_assets_admission %}
+                          <table class="table">
+                              <tr>
+                                <th>Asset #</th>
+                                <th>Admission Date</th>
+                                <th>Release Date</th>
+                                <th>Description</th>
+                              </tr>
+                              {% for item in previous_assets_admission %}
+                              <tr>
+                                <td class ={{item.rank}}>{{item.name }}</td>
+                                <td class ={{item.rank}}>{{item.date |date:'D d F Y'}}</td>
+                                <td class ={{item.rank}}>{{item.date2 |date:'D d F Y'}}</td>
+                                <td class ={{item.rank}}>{{item.text }}</td>
+                              </tr>
+                              {%endfor%}
+                          </table>
+                          {% else %}
+                          <p>No Releases</p>
+                          {%  endif %}
+                      
+                      </div>
+                      <!--Footer-->
+                      <div class="modal-footer">
+                          <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                              type="reset">Close
+                          </button>
+                      </div>
+      
+                  </div>
+              </div>
+            </div> 
+      
+            <!-- modal WIP -->
+            <div class="modal fade" id="modal_show_wip" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content rounded-10" style="border-radius: 10px;">
+                      <!--Header-->
+                      <div class="modal-header">
+                          <div class="row ">
+                            <div class="pull-left">
+                              <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;" > WIP {{ today|date:"F" }} {{ today|date:"Y" }}
+                              </h4>
+                            
+                              
+                            </div>
+                          
+                          </div>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                          </button>
+                      </div>
+                      <!--Body-->
+                      <div class="modal-body" >
+                        {% if outputs_wip %}
+                          <table class="table">
+                              <tr>
+                                <th>Asset #</th>
+                                <th>Admitted Date</th>
+                                <th>Exp Rel Date</th>
+                                <th>Description</th>
+                              </tr>
+                              {% for item in outputs_wip %}
+                              <tr>
+                                <td class ={{item.rank}}>{{item.name }}</td>
+                                <td class ={{item.rank}}>{{item.date |date:'D d F Y'}}</td>
+                                <td class ={{item.rank}}>{{item.date2 |date:'D d F Y'}}</td>
+                                <td class ={{item.rank}}>{{item.text }}</td>
+                              </tr>
+                              {%endfor%}
+                          </table>
+                          {% else %}
+                          <p>No Releases</p>
+                          {%  endif %}
+                      
+                      </div>
+                      <!--Footer-->
+                      <div class="modal-footer">
+                          <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                              type="reset">Close
+                          </button>
+                      </div>
+      
+                  </div>
+              </div>
+            </div> 
+
+
+
+        </div>
+      </section><!-- End User Section -->
+    
+  </main><!-- End #main -->
+  
+  {%endblock%}
+
+
+
+
+{% block scripts %}
+ <script src="{% static 'vendor/js/Chart.bundle.min.js' %}"></script>
+ <script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+  </script>
+ <script type="text/javascript">
+
+
+ var colors =
+   ['#357ca5',
+    '#008d4c',
+    '#db8b0b',
+    '#ca195a',
+    '#555299',
+    '#4285f4',
+    '#db4437',
+    '#f4b400',
+    '#0f9d58',
+    '#ab47bc',
+    '#00acc1',
+    '#ff7043',
+    '#9e9d24',
+    '#5c6bc0',
+    '#f06292',
+    '#00796b',
+    '#c2185b'
+ ];
+ //var balanceChart = null;
+ var releasesChart = null;
+ 
+ 
+ var drawReleases = function(res) {
+  var ctx = document.getElementById("myreleasesChart").getContext('2d');
+  var dp = res.last_14day_dp
+  console.log(dp)
+  $('#desired_rate').html(dp)
+  var data = {
+      labels: res.labels,
+      datasets: []
+  };
+  for (var i = 0; i < res.dataset.length; i++) {
+    var dataset = {
+      label: res.dataset[i].name,
+      fill: false,
+      pointRadius: 2,
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      data: res.dataset[i].data
+    };
+    data.datasets.push(dataset);
+  }
+  releasesChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+          tooltips: {
+            mode: 'index',
+            position: 'nearest',
+            intersect: false,
+            caretPadding: 5
+          },
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+              }]
+          }
+      }
+  });
+};
+
+var updatereleasesChart = function(chartData) {
+  releasesChart.data.labels = chartData.labels;
+  for (var i = 0; i < chartData.dataset.length; i++) {
+    releasesChart.data.datasets[i].data = chartData.dataset[i].data;
+
+  }
+  releasesChart.update();
+};
+
+
+var one_week = 0;
+var one_month = 1;
+var three_months = 2;
+var six_months = 3;
+var full_period = 4;
+var releasesChartData = new Array(4);
+
+//set focus with time delay
+setTimeout(function () {
+ $('#entireperiod').focus();
+}, 100);   
+// initialize- First Graph
+$.getJSON("{% url 'get_project_output_by_rolling_week' minus_full_period today %}", {}, function(res, status) {
+  drawReleases(res);
+  releasesChartData[full_period] = res;
+  set_user_pref_on_start()
+});
+
+function set_user_pref_on_start(){
+  // This method initialise user specific pref when page loads 
+    var iter=0
+    var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
+    //console.log('user pref:',user_pref_array)
+    releasesChart.data.datasets.forEach(function(ds) {
+      iter +=1
+      //chech if iter is not i user_pref      
+      if (!user_pref_array.includes(iter)){
+          // hide all other except [user prefs]
+          ds.hidden = true
+          //console.log('{label,state}', ds.label, ds.hidden)
+          // console.log('{label,state}', ds.data.label, ds.data.hidden)
+      }     
+      
+    });
+    releasesChart.update();
+}   
+
+// $("#toggle").click(function() {
+//   releasesChart.data.datasets.forEach(function(ds) {
+//     ds.hidden = !ds.hidden;
+//     }
+//   });
+//   releasesChart.update();
+// });
+// update charts
+$('#entireperiod').click(function() {
+    if (releasesChartData[full_period] == null) {
+      $.getJSON("{% url 'get_project_output_by_rolling_week' minus_full_period today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[full_period] = res;
+      });
+    } else {
+     
+        updatereleasesChart(releasesChartData[full_period]);
+    }
+ 
+  
+});
+
+ // update charts
+$('#6month').click(function() {
+    if (releasesChartData[six_months] == null) {
+      $.getJSON("{% url 'get_project_output_by_rolling_week' minus_6_months today %}", {}, function(res, status) {
+        updatereleasesChart(res);
+        releasesChartData[six_months] = res;
+      });
+    } else {
+        
+        updatereleasesChart(releasesChartData[six_months]);
+    }
+  
+});
+
+
+
+$('#3month').click(function() {
+    if (releasesChartData[three_months] == null) {
+      $.getJSON("{% url 'get_project_output_by_rolling_week' minus_3_months today %}", {}, function(res, status) {
+       
+        updatereleasesChart(res);
+        releasesChartData[three_months] = res;
+      });
+    } else {
+      
+      updatereleasesChart(releasesChartData[three_months]);
+    }
+ 
+});
+
+
+
+$('#currentMonth').click(function() {
+  if (releasesChartData[one_month] == null) {
+    $.getJSON("{% url 'get_project_output_by_rolling_week' first_day_of_month last_day_of_month %}", {}, function(res, status) {
+      
+      updatereleasesChart(res);
+      releasesChartData[one_month] = res;
+    });
+  } else {
+   
+    updatereleasesChart(releasesChartData[one_month]);
+  }
+});
+
+
+$('#currentWeek').click(function() {
+  if (releasesChartData[one_week] == null) {
+    $.getJSON("{% url 'get_project_output_by_rolling_week' first_day_of_week last_day_of_week %}", {}, function(res, status) {
+      
+      updatereleasesChart(res);
+      releasesChartData[one_week] = res;
+    });
+  } else {
+    
+    updatereleasesChart(releasesChartData[one_week]);
+  }
+  
+  
+});
+  
+ 
+</script>
+{% endblock %}

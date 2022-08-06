@@ -87,15 +87,15 @@
         </div> -->
 
         <div class="project-info d-flex justify-content-between align-items-center">
-          <h5>Sector</h5>
-          <p>{{model.category}}</p>
+          <h5><small>Sector</small></h5>
+          <p><small>{{model.category}}</small></p>
         </div>
 
         
 
         <div class="project-info d-flex justify-content-between align-items-center">
-          <h5>Current Investment</h5>
-          <p id="current_investment">{{model.current_investment_percent | floatformat:-1 | intcomma}} %</p>
+          <h5><small>Current Investment</small></h5>
+          <p id="current_investment"><small>{{model.current_investment_percent | floatformat:-1 | intcomma}} %</small></p>
         </div>
 
         <div class="project-info d-flex justify-content-between align-items-center">
@@ -104,17 +104,17 @@
             
               <a  {%  userInvestorRejectedMethod model request.user %} id="breadcrumb_changeto_edit" class="investment-rejected model-edit show-form-update" href="#" data-url="{% url 'update_investor' investor_id %}" 
               data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                {% if is_user_record_owner %} title='Edit Equity'{% else %} title='Edit Investment Pledge'{% endif %}><h5>of which My Stake <i  style="color:green"  class="fas fa-edit"></i></h5>
+                {% if is_user_record_owner %} title='Edit Equity'{% else %} title='Edit Investment Pledge'{% endif %}><h5><small>of which My Stake</small> <i  style="color:green"  class="fas fa-edit"></i></h5>
              </a> 
                <!-- {{investor_id}} -->
               <a  {%  userInvestorRejectedMethod model request.user %} id="delete_cancel_investment" class="investment-rejected" href="#"  data-toggle="modal" data-target="#confirmdelete" 
                 data-object-name="{{ model.name }}"  data-item-id="{{model.id}}" 
                 data-delete-url="{% url 'delete_investor_ajax' investor_id  1 %}" data-invest-value ="{% userInvestorValueMethod model request.user %}" style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                title='Cancel Investment Application' > <i class="fas fa-cut"></i> 
+                title='Cancel Investment Application' > <small><i class="fas fa-cut"></i> </small>
             </a>   
           {%else %}
-                <a id="breadcrumb_changeto_edit" href="#" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
-                {% if is_user_record_owner %} title='Add New Equity' {% else %} title='Add New Investment' {% endif %}><h5>of which My Stake <i style="color:red"  class="fas fa-plus"></i></h5>
+                <a {%  userInvestorRejectedMethod model request.user %} id="breadcrumb_changeto_edit" href="#" class="investment-rejected" style="color:inherit" data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_investor"
+                {% if is_user_record_owner %} title='Add New Equity' {% else %} title='Add New Investment' {% endif %}><h5><small>of which My Stake </small><i style="color:red"  class="fas fa-plus"></i></h5>
                 </a>
           {% endif%}
          
@@ -124,22 +124,22 @@
 
 
 
-          <p id="user_stake">{% UserIsInvestorStake model request.user %} %</p>
+          <p id="user_stake"><small>{% UserIsInvestorStake model request.user %} %</small></p>
         </div>
 
 
         <div class="project-info d-flex justify-content-between align-items-center">            
-            <h5>Investor?</h5>
-            <p id="user_investor"> {% UserIsInvestorStatement model request.user %}</p>
+            <h5><small>Investor?</small></h5>
+            <p id="user_investor"><small>{% UserIsInvestorStatement model request.user %}</small></p>
         </div>
 
         <div class="project-info d-flex justify-content-between align-items-center">            
           <h5 id="closing_date_header" 
            {% if model.closed_status %} style="color:red" {%else%} style="color:green"{%endif%}>
-            {% if model.closed_status %} Closed on {%else%} Closing Date{%endif%}
+           <small>{% if model.closed_status %} Closed on {%else%} Closing Date{%endif%}</small>
           </h5>
        
-          <p id="closing_date"> {{ model.closing_date }}</p>
+          <p id="closing_date"><small> {{ model.closing_date }}</small></p>
       </div>
         
           
