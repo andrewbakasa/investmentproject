@@ -19,9 +19,9 @@ def get_project_output_by_rolling_week(request,dstart, dend):
 
     
     #queryset = Project.objects.all()#filter(company__in=item_sbu)
-    project_obj = request.session['project']
+    project_id = request.session['project_id']
     #print(project_obj)
-    project = get_object_or_404(Investment, pk=project_obj['id'])
+    project = get_object_or_404(Investment, pk=project_id)
     qs=project.kpi_output_qs_released
 
     
@@ -174,8 +174,8 @@ def get_data_points(df,
         df_fail.loc[:,'date_created']=pd.to_datetime(df_fail.loc[:,'date_created'])
         date_filter = (df_fail.date_created >= str(d1)) & (df_fail['date_created'] < str(d2))
         df2 = df_fail[date_filter]
-       
-        balance= len(df2) # reset every datapoint
+        #print(df.columns)
+        balance=float(df2['value'].sum()) #len(df2) # reset every datapoint
         data_dates.append(d1)
         data_points.append(balance)
         #---------

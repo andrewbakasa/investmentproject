@@ -21,6 +21,22 @@ from django.contrib.sessions.models import Session
 from common.get_current_user import get_username
 from investments_appraisal.middlewares import get_request
 from django.db.models import Q
+
+class ProjectOuputGraphPreference(models.Model):
+    user = models.OneToOneField(User, on_delete= models.CASCADE)
+    last_modified = models.DateTimeField(auto_now=True)
+    g1 = models.BooleanField(default=True, verbose_name='G1: 7 day rolling average')
+    g2 = models.BooleanField(default=True, verbose_name='G2: 14 day average')
+    g3 = models.BooleanField(default=False, verbose_name='G3: 30 day average')
+    g4 = models.BooleanField(default=False, verbose_name='G4: 60 day average')
+    g5 = models.BooleanField(default=False, verbose_name='G5: 120 day average') 
+    g6 = models.BooleanField(default=False, verbose_name='G6: >120 day average')
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        ordering = ['last_modified',] 
+
 class InvestmentCategory(models.Model):
     name = models.CharField(max_length=60, unique=True)
     description = models.TextField()
@@ -53,6 +69,7 @@ class Investment(models.Model):
     tags = models.ManyToManyField(Tag, null=True, blank =True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)    
     closing_date = models.DateField(default=datetime.date.today() + timedelta(days=60), null=True)
+    weekly_output_target= models.IntegerField(default=0, verbose_name='Weekly Inflows Target')
     
     public= models.BooleanField(default=True)
     class Meta:

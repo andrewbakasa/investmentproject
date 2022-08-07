@@ -1,4 +1,5 @@
 import json
+from datetime import date, datetime
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from dateutil.relativedelta import relativedelta
@@ -13,7 +14,7 @@ from trading.db_update import updateInvestorApplicationState
 from django.urls import reverse
 from trading.forms import InvestmentROIForm, InvestmentShareholdingForm, \
     InvestmentStrategyForm, InvestmentSummaryForm, InvestorForm, InvestorFormUpdate, \
-    InvestorStatusUpdate, InvestorStatusUpdateAjax, UserInvestmentForm, UserInvestmentFormUpdate
+    InvestorStatusUpdate, InvestorStatusUpdateAjax, ProjectOuputGraphPreferenceForm, UserInvestmentForm, UserInvestmentFormUpdate
 from trading.reports import get_excel_investor_list
 from .models import *
 from django.db.models.expressions import F
@@ -31,6 +32,11 @@ from django.db.models import Q
 
  
 from django.utils import timezone
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.views import generic
 
 @login_required(login_url="account_login")
 def get_user_businesses(request, type):
@@ -2453,19 +2459,20 @@ def dbUpdateInvestorsRecieved(request):
 # Display a specific invoice
 @login_required(login_url="account_login")
 def investment_dashboard(request, pk):
-    project = get_object_or_404(Investment, pk=pk)
-    completed=30#project.kpi_perfomance
-    wip=2#project.kpi_wip
-    project_target =30# project.kpi_target
-    outstanding= project_target - completed
-    month_expected_output=10 #project.expected_output_curr_month
+    project = get_object_or_404(Investment, pk=pk, creater=request.user)
+    engaged=project.engaged_investment
+    #wip=project.engaged_investment
+    project_target =project.total_value
+    outstanding= project_target - engaged
+    #use interpolation, momentum, AI. ML
+    
     context = {        
         'project' : project,
-        'wip':wip,
-        'completed':completed,
-        'perfomance':completed *100/project_target if project_target !=0 else 0,
+        #'wip':wip,
+        'engaged':engaged,
+        'perfomance':engaged *100/project_target if project_target !=0 else 0,
         'outstanding':outstanding,
-         'month_expected_output':month_expected_output
+        #'month_expected_output':month_expected_output
         
     }
     #-----project model require an id-----------
@@ -2473,7 +2480,7 @@ def investment_dashboard(request, pk):
    
     dummy_project['due_date']= None# date cannot be serialised
     dummy_project['value']= None # decimal cannot be serialised
-    request.session['project']= dummy_project
+    request.session['project_id']= project.id#dummy_project
     #---------------------------
 
      
@@ -2486,7 +2493,7 @@ def investment_dashboard(request, pk):
     context['last_month'] = previous_first
 
     date_first_output = project.date_first_output
-    print(date_first_output)
+    #print(date_first_output)
     context['today'] = date.today()        
     context['minus_3_months'] = date.today() - relativedelta(months=3)
     context['minus_6_months'] = date.today() - relativedelta(months=6)
@@ -2501,18 +2508,86 @@ def investment_dashboard(request, pk):
     get_project_outputs_monthly(request, first_day_this_month, last_day_of_this_month, context)
     #import json
     
-    #context['minus_full_period'] =""
-    #options_list = get_userprefs_graph_options(request)#[1,3]
-    print(type(date_first_output))
-    print(type(date_first_output.date()))
-    dt = date_first_output.replace(tzinfo=None)
-    context['minus_full_period'] =json.dumps(dt.date(), default=str)
+   
+    if isinstance(date_first_output,datetime.datetime):
+        dt = date_first_output.replace(tzinfo=None)
+        context['minus_full_period'] =dt.date()#json.dumps(dt.date(), default=str)
+    else:
+        context['minus_full_period'] =date_first_output
     #context['minus_full_period'] = date_first_output.isoformat()#json_serial(date_first_output)
-    #context['json_userprefs_graph_options'] =options_json
-    print(context)
+    
+    #use better prediction method
+    if 'previous_releases' in context and 'releases' in context:
+        context['month_expected_output']=(context['previous_releases']+ context['releases'])/2 #project.expected_output_curr_month
+    else:
+        context['month_expected_output']=0
+    options_list = get_userprefs_graph_options(request)#[1,3]
+    options_json = json.dumps(options_list)
+    context['json_userprefs_graph_options'] =options_json
+    
     return render(request, 'trading/investment_dashboard.html', context)
-from datetime import date, datetime
 
+def get_userprefs_graph_options(request):
+    pref, created = ProjectOuputGraphPreference.objects.get_or_create(user=request.user)
+    options_list=[]
+    list_ =[pref.g1,pref.g2,pref.g3,pref.g4,pref.g5,pref.g6]
+    #print('object attributes >>>>>>', dir(pref))
+    #print('__dict__...', pref.__dict__.keys())
+    fields= pref.__dict__.keys()
+    restricted_fields= ['_state', 'id', 'user_id', 'last_modified']
+    #list_2 =[pref.x for x in fields]
+    #print(list_2)
+    
+    for i in range(len(list_)):
+        if list_[i]==True:
+            options_list.append(i+1)
+    return options_list
+class ProjectOuputGraphPreferenceCreate(LoginRequiredMixin, generic.edit.CreateView):
+    model = ProjectOuputGraphPreference
+    
+    template_name = 'trading/project_output_pref.html'
+    success_url = reverse_lazy('trading_home')
+    form_class = ProjectOuputGraphPreferenceForm
+    
+    # def get_form_kwargs(self):
+    #     kwargs = super().get_form_kwargs()
+    #     kwargs.update({'user': self.request.user})
+    #     return kwargs
+
+    def get_form_class(self):
+        return ProjectOuputGraphPreferenceForm
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectOuputGraphPreferenceCreate, self).get_context_data(**kwargs)
+        context['menu'] = 'prefer'
+        context['submenu'] = "prefer" #self.type
+        context['project_id'] = self.request.session['project_id']
+        return context
+        
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+def update_project_graph_pref(request):
+    pref, created = ProjectOuputGraphPreference.objects.get_or_create(user=request.user)
+    #print(pref)
+    if request.method == 'POST':
+        form = ProjectOuputGraphPreferenceForm(request.POST or None,instance=pref)
+        form.instance.user =request.user
+        if form.is_valid():
+            form.save()
+            project_id = request.session['project_id']
+            #print(type(project_id),project_id)
+            id=str(project_id)
+            return HttpResponseRedirect(reverse('investment_dashboard',args=(id,))) 
+    else:
+        form = ProjectOuputGraphPreferenceForm(instance=pref)
+        context ={}
+        context['form']=form
+        context['project_id'] = request.session['project_id']
+        return render(request, 'trading/project_output_pref.html', context)
+
+#defunct also
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
 

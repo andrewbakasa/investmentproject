@@ -9,6 +9,11 @@ from .models import *
 
 from django.db.models import Q
 
+class ProjectOuputGraphPreferenceForm(forms.ModelForm):
+    class Meta:
+        model = ProjectOuputGraphPreference
+        fields = ['g1', 'g2', 'g3','g4', 'g5', 'g6']
+  
 
 class InvestorFormUpdate(forms.ModelForm):
     motivation = forms.CharField(
@@ -99,7 +104,7 @@ class UserInvestmentForm(forms.ModelForm):
     
     class Meta:
         model = Investment
-        fields = ['name','description','category', 'total_value','creater', 'tags', 'public', 'closing_date' ]
+        fields = ['name','description','category', 'total_value','creater', 'tags', 'public', 'closing_date' ,'weekly_output_target']
        
     def clean_total_value(self):
         total_value = self.cleaned_data['total_value']
@@ -138,7 +143,7 @@ class UserInvestmentFormUpdate(forms.ModelForm):
 
     class Meta:
         model = Investment
-        fields = ['name','description','category', 'total_value', 'tags', 'public', 'closing_date']
+        fields = ['name','description','category', 'total_value', 'tags', 'public', 'closing_date','weekly_output_target']
   
 
     def clean_total_value(self):

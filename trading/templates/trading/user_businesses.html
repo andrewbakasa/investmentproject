@@ -646,6 +646,11 @@
                                                 title='Manage Business'><i class="fas fa-wrench"></i>
                                             </a>
 
+                                            <a  href="/tr/i/db/${item.id}" 
+                                                data-toggle="tooltip" data-placement="bottom" title="View Dashboard">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+
                                                 <!-- EDIT MODEL -->
                                             <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                                                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -711,7 +716,10 @@
                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                 title='Manage Business'><i class="fas fa-wrench"></i>
                             </a>
-
+                            <a  href="/tr/i/db/${item.id}" 
+                                data-toggle="tooltip" data-placement="bottom" title="View Dashboard">
+                                <i class="fa fa-eye"></i>
+                            </a>
                                 <!-- EDIT MODEL -->
                             <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
                                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -830,7 +838,8 @@
                         } else {
                             $('.public_toggle_form-errors').html('');
                             if (data.error) {
-                                var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date']//,
+                             
+                                var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date','weekly_output_target']//,
                                 //console.log('before throwing error:',form.attr('data-url'),)
                                 
                                 for (let p=0; p < form_vars.length; p++ ){
@@ -972,6 +981,10 @@
                         <a href="/tr/i-edit/${val.id}"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Manage Business'><i class="fas fa-wrench"></i>
+                        </a>
+                        <a  href="/tr/i/db/${val.id}" 
+                            data-toggle="tooltip" data-placement="bottom" title="View Dashboard">
+                            <i class="fa fa-eye"></i>
                         </a>
                         <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${val.id}/" 
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 

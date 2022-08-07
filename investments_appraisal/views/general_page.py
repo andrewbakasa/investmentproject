@@ -116,8 +116,9 @@ from investments_appraisal.forms import  ContactUsForm, FinancingForm, Macroecon
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models.expressions import F
+from trading.forms import ProjectOuputGraphPreferenceForm
 
-from trading.models import Investment, InvestmentCategory
+from trading.models import Investment, InvestmentCategory, ProjectOuputGraphPreference
 
 
 
@@ -2707,6 +2708,39 @@ def update_user_pref_ajax(request,  *args, **kwargs):
 		context['form']=form
 		return render(request, 'investments_appraisal/mentor/user_settings.html', context)
 
+
+
+@login_required(login_url="account_login")
+def update_user_graph_pref_ajax(request,  *args, **kwargs):
+	pref, created = ProjectOuputGraphPreference.objects.get_or_create(user=request.user)
+	if request.method == 'POST':
+		if request.is_ajax():
+			form = ProjectOuputGraphPreferenceForm(request.POST or None,instance=pref)
+			form.instance.user =request.user
+			if form.is_valid():
+				form.save()
+				obj= ProjectOuputGraphPreference.objects.filter(user=request.user).first()
+				# if obj:
+				# 	request.session['perpage']=obj.perpage
+			else:
+				errors = form.errors
+				#print('error:' , errors)
+				return JsonResponse({'error': True, 'data': errors})  
+			
+			latest = UserPreference.objects.latest('id').id
+			record = UserPreference.objects.get(pk=latest)
+			item_object = model_to_dict(record)
+			#print (item_object)
+			return JsonResponse({'error': False, 'data': item_object})
+		else:
+			return JsonResponse({'error': True, 'data': "Request not ajax"})
+	else:
+		form = ProjectOuputGraphPreferenceForm(instance=pref)
+		context ={}
+		context['form']=form
+		return render(request, 'investments_appraisal/mentor/user_settings.html', context)
+
+
 def upload_form_user_pref(request):
 	pref, created = UserPreference.objects.get_or_create(user=request.user)
 	form = UserPreferenceForm(instance=pref)
@@ -2730,6 +2764,15 @@ def upload_form_user_profile(request):
 	if pref:
 		if pref.perpage_blogs or pref.perpage or pref.pertable:
 			pref_record=True
+	
+	graph_pref_record= False
+	graph_pref, _ = ProjectOuputGraphPreference.objects.get_or_create(user=request.user)
+	graph_pref_form = ProjectOuputGraphPreferenceForm(instance=graph_pref)
+	
+	if graph_pref:
+		if graph_pref.g1 or graph_pref.g2 or graph_pref.g3 or graph_pref.g4 or graph_pref.g5 or graph_pref.g6:
+			graph_pref_record=True
+
 	#userobj = get_object_or_404(User,user=request.user)
 	user_extra_details_form = UserForm(instance=request.user)
 	user_extra_details_record= False
@@ -2745,7 +2788,8 @@ def upload_form_user_profile(request):
 		'user_extra_details_record':user_extra_details_record,
 		'pref_form':pref_form,
 		'user_pref_record':pref_record,
-		'user_extra_details_form':user_extra_details_form,
+		'user_graph_pref_record':graph_pref_record,
+		'user_graph_pref_form':graph_pref_form,
 	}
 	
 	return render(request, 'investments_appraisal/mentor/user_profile.html', context)

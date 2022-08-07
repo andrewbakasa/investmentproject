@@ -1,3 +1,4 @@
+import math
 from django import template
 
 from trading.models import Investment, Investor
@@ -112,13 +113,24 @@ def shrink_num(value):
     123579  > 123,6K
     1234567 > 1,2M
     """
-    value = str(value)
+    value =str(value)
+    value2 = value.split('.')[0]
+    #print(type(value2),value2,"isdigit", value2.isdigit(),len(value2.split('-'))>1 )
+    #strip negative number
+    # if len(value2.split('-'))>1:
+    #     value2= value2#value.split('-')[1]
 
-    if value.isdigit():
-        value_int = int(value)
-        if value_int >= 1000000:
-            value = "%.1f%s" % (value_int/1000000.00, 'M')
+    if value2.isdigit() or len(value2.split('-'))>1:
+        #print("digit", value)
+        value_int = int(value2)
+        if abs(value_int) >= 1000000000:
+            value2 = "%.1f%s" % (value_int/1000000.00, 'B')
+            return value2
+        elif abs(value_int) >= 1000000:
+            value2 = "%.1f%s" % (value_int/1000000.00, 'M')
+            return value2
         else:
-            if value_int >= 1000:
-                value = "%.1f%s" % (value_int/1000.0, 'k')
+            if abs(value_int) >= 1000:
+                value2 = "%.1f%s" % (value_int/1000.0, 'k')
+                return value2
     return value

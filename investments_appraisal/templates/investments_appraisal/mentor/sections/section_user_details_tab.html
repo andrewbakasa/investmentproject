@@ -40,7 +40,7 @@
                   </li> -->
 
                   <li id='depreciation_tab' class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab-4">{% if depreciation_record %}<i class="bi bi-check-circle"></i> {%endif %} Business Details</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-4">{% if user_graph_pref_record %}<i class="bi bi-check-circle"></i> {%endif %} User Graph Pref</a>
                   </li>
 
                   <li id='taxes_tab' class="nav-item">
@@ -77,7 +77,7 @@
 
                 <div class="tab-pane" id="tab-4">
                   <!-- ======= Contact Section ======= -->
-                    {% include 'investments_appraisal/mentor/sections/comming.html' %}
+                    {% include 'investments_appraisal/mentor/sections/section_user_graph_pref.html' %}
 
                 </div>
 

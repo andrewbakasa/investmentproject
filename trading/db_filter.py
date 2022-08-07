@@ -1,5 +1,6 @@
 
 
+import json
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
@@ -54,12 +55,12 @@ def weeks_between(start_date, end_date):
 def get_project_outputs_monthly(request, dstart, dend, context):
 
     outstanding= context['outstanding']
-    project_obj = request.session['project']
-    project = get_object_or_404(Investment, pk=project_obj['id'])
-    throughput_target=10# float(project.throughput_target)
+    project_id = request.session['project_id']
+    project = get_object_or_404(Investment, pk=project_id)#['id'])
+    #throughput_target=10# float(project.throughput_target)
     # project budget
     budget_= float(project.total_value)
-    
+    throughput_target=budget_
     #---ending date
     due_date= project.closing_date
     
@@ -71,31 +72,21 @@ def get_project_outputs_monthly(request, dstart, dend, context):
     #material:no_po, not_funded, funded
     #material_funding_dict= project.material_items_count_dict
 
-    weekly_output_target= 11#float(project.weekly_output_target)
+    weekly_output_target= float(project.weekly_output_target)
     qs=project.kpi_output_qs
-
-    
+    qs_engaged=project.kpi_output_qs_released
+    qs_wip=project.kpi_output_qs_wip
     output_df = pd.DataFrame(qs.values())
-    # cat_df = pd.DataFrame(OutputCategory.objects.all().values())
-    # if output_df.shape[0] > 0  and cat_df.shape[0] > 0:
-    #     cat_df['category_id'] = cat_df['id']
-    #     output_df = pd.merge(output_df, cat_df, on='category_id',how="left").drop(['id_y', 'category_id',
-    #                 'date_created_x','date_created_y','last_modified_x', 'last_modified_y',
-    #                  'locked_x','locked_y' ], axis=1).rename(
-    #                 {'title': 'category','description': 'cat_description','id_x': 'id'}, axis=1)
-    # else:
-    #     output_df['category']= 'NA'
-    
-    # print("ALL")
-    # print(output_df)
+    output_wip_df = pd.DataFrame(qs_wip.values())
+    output_engaged_df= pd.DataFrame(qs_engaged.values())
     if output_df.shape[0]> 0 : 
       
         output_df['date_status_changed'] = pd.to_datetime(output_df['date_status_changed'])
         output_df['date_created'] = pd.to_datetime(output_df['date_created'])       
-        ave_throughput = 11#throughput_get_mean(output_df)
+        ave_throughput = context['engaged']# 11#throughput_get_mean(output_df)
         
         #--------------------GET AVERAGE Weekly Output--------------------
-        total_releases=context['completed'] if context['completed'] else 0
+        total_releases=context['engaged'] if context['engaged'] else 0
         date_1 =context['minus_full_period'] if context['minus_full_period'] else 0
         date_2 = timezone.now()
 
@@ -106,15 +97,16 @@ def get_project_outputs_monthly(request, dstart, dend, context):
         ave_weekly_output=total_releases/num_of_weeks if num_of_weeks !=0 else 0
         ave_weekly_output = '{:.2f}'.format(ave_weekly_output)
         #------------------------------------------------
-        outputs_wip, total_underrepairs=underrepairs(output_df)
+        outputs_wip, total_underrepairs=underrepairs(output_wip_df)
+        #print(total_underrepairs)
         context['outputs_wip'] = outputs_wip
-        context['total_underrepairs'] = total_underrepairs
+        context['wip'] = total_underrepairs
 
         #print(outputs_wip)
         # 1-------------------
-        assets_admission, total_admissions_this_month= admissions(output_df,dstart,dend)
+        assets_admission, total_admissions_this_month= admissions(output_wip_df,dstart,dend)
         #2------------------------------
-        releases_outputs, total_rel_this_month= outputs_releases(output_df,dstart,dend)       
+        releases_outputs, total_rel_this_month= outputs_releases(output_engaged_df,dstart,dend)       
       
         context['admissions'] = total_admissions_this_month
         context['assets_admission'] = assets_admission
@@ -124,15 +116,16 @@ def get_project_outputs_monthly(request, dstart, dend, context):
 
 
         #--------last month ADMISSIONS & OUTPUTS...............................
+        #dt = dstart.replace(tzinfo=None)
         previous_last = dstart - timedelta(days=1)
         previous_first = previous_last.replace(day=1)        
        
        
         # 3-------------------
-        previous_assets_admission, total_admissions_last_month= admissions(output_df,previous_first,previous_last)
+        previous_assets_admission, total_admissions_last_month= admissions(output_wip_df,previous_first,previous_last)
       
         #4------------------------------
-        previous_releases_outputs, total_rel_last_month= outputs_releases(output_df,previous_first,previous_last)
+        previous_releases_outputs, total_rel_last_month= outputs_releases(output_engaged_df,previous_first,previous_last)
          
         # context['outputs_wip'] = outputs_wip
         context['previous_admissions'] = total_admissions_last_month
@@ -214,7 +207,7 @@ def get_kpi_dict(throughput_target,ave_throughput,
 
     
     dict_ ={}
-    dict_['name']= 'Throughput'
+    dict_['name']= 'Required Funds'
     dict_['target']= throughput_target#float(7)
     dict_['actual']= ave_throughput
     
@@ -227,7 +220,7 @@ def get_kpi_dict(throughput_target,ave_throughput,
 
     dict_ ={}
     dict_['id']= 'weekly_out_put'
-    dict_['name']= 'Weekly Output'
+    dict_['name']= 'Weekly Inflows'
     dict_['target']= weekly_output_target #float(10)
     dict_['actual']= ave_weekly_output
     dict_['actualPercent']= float(dict_['actual'])/ float(dict_['target']) if  dict_['target'] !=0 else 1
@@ -248,7 +241,7 @@ def get_kpi_dict(throughput_target,ave_throughput,
 
     
     dict_['id']= 'desired_rate'
-    dict_['name']= f'Desired production rate @time left({days_left}days)'
+    dict_['name']= f'Desired inflow rate @time left({days_left}days)'
     dict_['target']= float(production_rate_desired) #float(10)
     dict_['actual']= ave_weekly_output
     dict_['actualPercent']= float(dict_['actual'])/ float(dict_['target']) if  dict_['target'] !=0 else 1
@@ -277,84 +270,91 @@ def throughput_get_mean(df):
 
     return ave_throughput
 
-def underrepairs(df):
-    return [],0
-    output_df =df.copy()
-    mask_under_repair = (output_df['rel_date'].isna())
-
-    df_urepair= output_df[mask_under_repair].sort_values(by =['exp_rel_date','admission_date'])
-    
+def underrepairs(df): 
     outputs_wip =[]
-    total = len(df_urepair)
-    for i in range(len(df_urepair)):
-        x={}
+    total=0
+    if df.shape[0]> 0 : 
+        output_df =df.copy()
+        #print(df)
+        output_df['date_created'] = pd.to_datetime(output_df['date_created'])
+        df_urepair= output_df.sort_values(by=['date_created'],ascending=False)
         
-        x['name']=df_urepair.iloc[i,:]['id_num']
-        date_ = df_urepair.iloc[i,:]['admission_date']
-        if not (date_==date_):
-            date_= 'No given'
-        x['date'] = date_
-        exp_rel_date_ = df_urepair.iloc[i,:]['exp_rel_date']
-        if not (exp_rel_date_==exp_rel_date_):
-            exp_rel_date_= 'No given'
-        x['date2'] = exp_rel_date_
-        x['text'] = df_urepair.iloc[i,:]['category']
+       
+        total = float(df_urepair['value'].sum())
+
+    
+    # for i in range(len(df_urepair)):
+    #     x={}
         
-        outputs_wip.append(x)
+    #     x['name']=df_urepair.iloc[i,:]['id_num']
+    #     date_ = df_urepair.iloc[i,:]['admission_date']
+    #     if not (date_==date_):
+    #         date_= 'No given'
+    #     x['date'] = date_
+    #     exp_rel_date_ = df_urepair.iloc[i,:]['exp_rel_date']
+    #     if not (exp_rel_date_==exp_rel_date_):
+    #         exp_rel_date_= 'No given'
+    #     x['date2'] = exp_rel_date_
+    #     x['text'] = df_urepair.iloc[i,:]['category']
+        
+    #     outputs_wip.append(x)
     return outputs_wip, total
 
 
 def admissions(df,dstart, dend):
-    return [], 0
-    output_df =df.copy()
     
-    date_filter =(output_df['admission_date'] >= str(dstart)) & (output_df['admission_date'] <= str(dend))
-    df_admit = output_df[date_filter].sort_values(by =['admission_date'],ascending=False) 
-    df_admit['admission_date'] = pd.to_datetime(df_admit['admission_date'])
-
-    total_admissions = len(df_admit)
-
     assets_admission =[]
-    #print(1,df_admit)
-    for i in range(len(df_admit)):
-        x={}
-        x['name']=df_admit.iloc[i,:]['id_num']
-        x['date'] = df_admit.iloc[i,:]['admission_date']
-       
-        rel_date_ = df_admit.iloc[i,:]['rel_date']
-        if not (rel_date_==rel_date_):
-            rel_date_= 'No Released Yet'
-        x['date2'] = rel_date_
-        x['text'] = df_admit.iloc[i,:]['category']
-        assets_admission.append(x)    
+    total_admissions=0
+    if df.shape[0]> 0 : 
+        output_df =df.copy()
+        #print(df)
+        output_df['date_created'] = pd.to_datetime(output_df['date_created'])
+        date_filter =(output_df['date_created'] >= str(dstart)) & (output_df['date_created'] <= str(dend))
+        df_admit = output_df[date_filter].sort_values(by =['date_created'],ascending=False) 
+        df_admit['date_created'] = pd.to_datetime(df_admit['date_created'])
+
+        total_admissions = float(df_admit['value'].sum())
+        assets_admission =[]
+
+        # #print(1,df_admit)
+        # for i in range(len(df_admit)):
+        #     x={}
+        #     x['name']=df_admit.iloc[i,:]['id_num']
+        #     x['date'] = df_admit.iloc[i,:]['admission_date']
+        
+        #     rel_date_ = df_admit.iloc[i,:]['rel_date']
+        #     if not (rel_date_==rel_date_):
+        #         rel_date_= 'No Released Yet'
+        #     x['date2'] = rel_date_
+        #     x['text'] = df_admit.iloc[i,:]['category']
+        #     assets_admission.append(x)    
    
     return  assets_admission, total_admissions
 
 def outputs_releases(df,dstart, dend):
-    return [], 0
-    output_df =df.copy()
-    #print(output_df)
-    output_df['rel_date'] = pd.to_datetime(output_df['rel_date'])
-    date_filter =(output_df['rel_date'] >= str(dstart)) & (output_df['rel_date'] <=  str(dend))
-    df_rel = output_df[date_filter].sort_values(by=['rel_date'],ascending=False)
-    
-    if len(df_rel)>0:
-        #only calculate this paramater after checking leng (otherwise it produce NAT val on empty pandas)    
-        df_rel['downtime'] =  (output_df['rel_date']- output_df['admission_date']).dt.days
-        df_rel['downtime'].fillna(0,inplace=True)
-
-    total_rel = len(df_rel)
-    
-    
     releases_outputs =[]
-    for i in range(len(df_rel)):
-        x={}
-        x['name']=df_rel.iloc[i,:]['id_num']
-        x['date']=df_rel.iloc[i,:]['rel_date']
-        x['text'] = df_rel.iloc[i,:]['category']
-        x['downtime'] = df_rel.iloc[i,:]['downtime']
+    total_rel=0
+    if df.shape[0]> 0 :
+        output_df =df.copy()
+        #print(output_df)
+        output_df['date_created'] = pd.to_datetime(output_df['date_created'])
+        date_filter =(output_df['date_created'] >= str(dstart)) & (output_df['date_created'] <=  str(dend))
+        df_rel = output_df[date_filter].sort_values(by=['date_created'],ascending=False)
         
-        releases_outputs.append(x) 
+    
+    
+        total_rel = float(df_rel['value'].sum())
+        
+        
+        releases_outputs =[]
+    # for i in range(len(df_rel)):
+    #     x={}
+    #     x['name']=df_rel.iloc[i,:]['id_num']
+    #     x['date']=df_rel.iloc[i,:]['rel_date']
+    #     x['text'] = df_rel.iloc[i,:]['category']
+    #     x['downtime'] = df_rel.iloc[i,:]['downtime']
+        
+    #     releases_outputs.append(x) 
     
    
     return  releases_outputs, total_rel

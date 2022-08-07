@@ -26,20 +26,25 @@ def get_excel_investor_list(request, pk):
     obj_invest =get_object_or_404(Investment, pk=pk)
     investors_df = pd.DataFrame(Investor.objects.filter(Q(investment__id=pk)).values())
     users_df = pd.DataFrame(User.objects.all().values())
-    users_df['user_id'] = users_df['id']    
+    df = pd.DataFrame(columns =['Title', 'Motivation Statement', 'Amt Pledged', 'Created',
+                                'Status Changed', 'Status', 'Investor username', 'Investor F-Name',
+                                'Investor L-Name', 'Investor email', 'pending', 'verification',
+                                'accepted', 'engagement', 'rejected'])  
     # merge
-    df =pd.merge(investors_df, users_df, on='user_id',how="left").drop([
-                 'id_x', 'id_y' , 'investment_id', 'user_id', 'password', 
-                  'last_login', 'is_superuser',  'is_staff', 'is_active',  'date_joined'
-                ], axis=1).rename( {'name':'Title', 'first_name': 'Investor F-Name',
-                        'email':'Investor email', 'last_name': 'Investor L-Name',
-                        'username':'Investor username', 'value': 'Amt Pledged',
-                        'application_status':'Status', 'motivation': 'Motivation Statement',
-                        'date_created':'Created', 'date_status_changed': 'Status Changed'  }, 
-                axis=1)   
-    for i in ['pending','verification', 'accepted', 'engagement','rejected']:
-        df[i]=df.apply(lambda x : get_column_state(x['Amt Pledged'], x['Status'], i), axis=1)     
-   
+    if users_df.shape[0]>0 and investors_df.shape[0]>0:
+        users_df['user_id'] = users_df['id']
+        df =pd.merge(investors_df, users_df, on='user_id',how="left").drop([
+                    'id_x', 'id_y' , 'investment_id', 'user_id', 'password', 
+                    'last_login', 'is_superuser',  'is_staff', 'is_active',  'date_joined'
+                    ], axis=1).rename( {'name':'Title', 'first_name': 'Investor F-Name',
+                            'email':'Investor email', 'last_name': 'Investor L-Name',
+                            'username':'Investor username', 'value': 'Amt Pledged',
+                            'application_status':'Status', 'motivation': 'Motivation Statement',
+                            'date_created':'Created', 'date_status_changed': 'Status Changed'  }, 
+                    axis=1)   
+        for i in ['pending','verification', 'accepted', 'engagement','rejected']:
+            df[i]=df.apply(lambda x : get_column_state(x['Amt Pledged'], x['Status'], i), axis=1)     
+    #print(df.columns)
     wb = Workbook()
     #--------------------------------Failures-------------------------------------------------------------
     ws = wb.worksheets[0]

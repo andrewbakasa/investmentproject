@@ -74,9 +74,18 @@ urlpatterns = [
     path('u/i/r/', views.dbUpdateInvestorsRecieved, name="db_update_investors_recieved"),
 
 
-    path('investment_dashboard/<str:pk>/', views.investment_dashboard, name="investment_dashboard"),
+    path('i/db/<str:pk>/', views.investment_dashboard, name="investment_dashboard"),
     
   # api
      path('api/get_project_output_by_rolling_week/<dstart>/<dend>/',
          api.get_project_output_by_rolling_week, name='get_project_output_by_rolling_week'),
+
+   # new records
+   path('entry/create/graph_pref/',
+         views.ProjectOuputGraphPreferenceCreate.as_view(),  name='graph_pref'),
+
+       # new records
+   path('u/g/pref/',
+         views.update_project_graph_pref,  name='update_project_graph_pref'),
+         
 ]

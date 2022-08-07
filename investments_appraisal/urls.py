@@ -121,6 +121,9 @@ urlpatterns = [
 
     path('update/user_pref/ajax/',
         views.general_page.update_user_pref_ajax,  name='update_user_pref_ajax'),
+    
+     path('update/user_graph_pref/ajax/',
+        views.general_page.update_user_graph_pref_ajax,  name='update_user_graph_pref_ajax'),
 
     path('update/user_profile/ajax/',
         views.general_page.update_user_profile_ajax,  name='update_user_profile_ajax'),
