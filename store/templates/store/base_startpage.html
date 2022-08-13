@@ -1,0 +1,183 @@
+
+{% extends 'store/base.html' %}
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+{% load tags %}
+{% load humanize %}
+{% load account %}
+
+{% block content_custom_menu_navbar %}
+<ul class="nav navbar-nav">
+              
+  <li>
+    <a href="{% url 'store' %}" data-toggle="tooltip" data-placement="bottom" title="e-Store">
+      <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+     </a>
+     
+  </li>
+  <li>
+    <a href="#" data-toggle="tooltip" data-placement="bottom" title="CRM" >
+      <i class="fa fa-sitemap"></i></a>
+  </li>
+
+  <li>
+    <a href="{% url 'contracts_home' %}" data-toggle="tooltip" data-placement="bottom" title="Contracts">
+      <i class="fa fa-database"></i></a>
+  </li>
+
+  <li>
+    <a href="{% url 'tenders_home' %}" data-toggle="tooltip" data-placement="bottom" title="Tender">
+      <i class="fa fa-tasks"></i></a>
+  </li>
+  
+  <li>
+    <a href="{% url 'salesplan_home' %}" data-toggle="tooltip" data-placement="bottom" title="Strategic Plan">
+      <i class="fa fa-binoculars"></i>
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'hcm_home' %}" data-toggle="tooltip" data-placement="bottom" title="HCM" >
+      <i class="fa fa-users"></i></a>
+  </li>
+  
+  
+  
+
+  
+
+  <li>
+    <a href="{% url 'store' %}" data-toggle="tooltip" data-placement="bottom" title="e-Store">
+      <i class="fa fa-line-chart"></i></a>
+  </li>
+
+  <li>
+    <a href="{% url 'clients_home' %}" data-toggle="tooltip" data-placement="bottom" title="My Profile">
+      <i class="fa fa-book"></i></a>
+  </li>
+
+  <li>
+    <a href="{% url 'mm_start_page' %}" data-toggle="tooltip" data-placement="bottom" title="Project Management">
+      <i class="fa fa-book"></i></a>
+  </li>
+ 
+
+  <li class="dropdown user user-menu">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <i class="fa fa-user" aria-hidden="true"></i>
+      <span class="hidden-xs">{% user_display user %}</span>
+    </a>
+    <ul class="dropdown-menu">
+      <li class="user-header" id="navbar-user">
+        <p>
+        {% if request.user.first_name %}
+        {{ request.user.first_name }} {{ request.user.last_name }}
+        {% else %}
+        {% user_display user %}
+        {% endif %}
+        </p>
+      </li>
+      <li class="user-footer">
+        <div class="pull-left">
+          <a href="{% url 'profile' %}" class="btn btn-default btn-flat">{% trans 'Profile' %}</a>
+        </div>
+        <div class="pull-right">
+          <a href="{% url 'account_logout' %}" class="btn btn-default btn-flat">{% trans 'Sign out' %}</a>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ul>
+{% endblock %}
+
+
+{% block content_sidebar %}
+<ul class="sidebar-menu" data-widget="tree">
+  <li class="header">{% trans 'MAIN NAVIGATION' %}</li>
+  <li {% if menu == "home" %}class="active"{% endif %}>
+    <a href="{% url 'store' %}">
+      <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+      <span>{% trans 'e-Store' %}</span>
+    </a>
+  </li>
+
+  <li{% if menu == "budgets" %} class="active"{% endif%}>
+    <a href="#">
+      <i class="fa fa-sitemap" aria-hidden="true"></i>
+      <span>{% trans 'CRM' %}</span>
+    </a>
+  </li>
+
+  <li{% if menu == "recurrences" %} class="active"{% endif %}>
+    <a href="{% url 'contracts_home' %}"><i class="fa fa-database"></i>
+      <span>{% trans 'Contracts' %}</span>
+    </a>
+  </li>
+  <li{% if menu == "categories" %} class="active"{% endif%}>
+    <a href="{% url 'tenders_home' %}">
+      <i class="fa fa-tasks" aria-hidden="true"></i>
+      <span>{% trans 'Tenders' %}</span>
+    </a>
+  </li>
+
+  <li{% if menu == "charts" %} class="active"{% endif %}>
+    <a href="{% url 'salesplan_home' %}">
+      <i class="fa fa-binoculars" aria-hidden="true"></i>
+      <span>{% trans 'Strategic Plans' %}</span>
+    </a>
+    </li>
+  <li{% if menu == "accounts" %} class="active"{% endif %}>
+      <a href="{% url 'hcm_home' %}">
+        <i class="fa fa-users"></i>
+        <span>{% trans 'HCM' %}</span>
+      </a>
+  </li>
+  
+  
+  
+  <li{% if menu == "reports" %} class="active"{% endif %}>
+    <a href="{% url 'store' %}">
+      <i class="fa fa-line-chart" aria-hidden="true"></i>
+      <span>{% trans 'Finance' %}</span>
+    </a>
+  </li>
+ 
+  
+  
+    
+    
+    <li{% if menu == "charts" %} class="active"{% endif %}>
+      <a href="{% url 'locomotive_home' %}">
+        <i class="fa fa-train" aria-hidden="true"></i>
+        <span>{% trans 'Locomotives' %}</span>
+      </a>
+    </li> 
+
+    <li{% if menu == "charts" %} class="active"{% endif %}>
+      <a href="{% url 'clients_home' %}">
+        <i class="fa fa-user-o" aria-hidden="true"></i>
+        <span>{% trans 'My Profile' %}</span>
+      </a>
+    </li> 
+
+    <li{% if menu == "charts" %} class="active"{% endif %}>
+      <a href="{% url 'mm_start_page' %}">
+        <i class="fa fa-user-o" aria-hidden="true"></i>
+        <span>{% trans 'Project Management' %}</span>
+      </a>
+    </li> 
+   
+    
+   {% if admin_key %}
+  
+   
+    <li{% if menu == "charts" %} class="active"{% endif %}>
+      <a href="#">
+        <i class="fa fa-folder" aria-hidden="true"></i>
+        <span>{% trans 'Operations' %}</span>
+      </a>
+    </li>
+    {%endif %}
+    
+</ul>
+{% endblock %}

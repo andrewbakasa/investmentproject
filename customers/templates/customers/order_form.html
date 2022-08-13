@@ -1,0 +1,40 @@
+{% extends 'customers/customer_main.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'vendor/css/daterangepicker.css' %}">
+{% endblock %}
+
+{% block content_header %}
+    <h1>{{ account.name }}
+        <small>Order Form</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'customers_home' %}">{% trans 'Home' %}</a></li>
+        <li><a href="{% url 'customers_home' %}">{% trans 'Customers' %}</a></li>
+        <li class="active">{{ account }}</li>
+    </ol>
+{% endblock %}
+{% block content %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-body">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                  
+                        {{form}}
+                    
+                    <input type="submit" name="Submit">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

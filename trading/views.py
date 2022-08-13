@@ -96,68 +96,6 @@ def get_user_businesses(request, type):
     }
     return render(request, 'trading/user_businesses.html', context)
 
-@login_required(login_url="account_login")
-def get_user_businesses_load_status(request, status):
-    # this looks redudant
-    
-    
-    BUSINESS_STATUS_CHOICE = ["unread","open","closed","all"]
-    current_time = timezone.now()#datetime.datetime.now() 
-    if status =="unread":
-        queryset = Investment.objects.filter(Q(creater=request.user),Q(investor__application_status='pending') )
-    elif status =="closed": 
-        queryset = Investment.objects.filter(Q(creater=request.user),Q(closing_date__lt=current_time) )
-    elif status =="open":
-        queryset = Investment.objects.filter(Q(creater=request.user), Q(closing_date__gte=current_time))
-    else:
-        #all
-        queryset = Investment.objects.filter(Q(creater=request.user))
-
-    total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
-    sum_value=total_avg['sum']
-    avg_value=total_avg['avg']
-    if sum_value==None:
-        sum_value=0
-    if avg_value==None:
-        avg_value=0  
-    form = UserInvestmentForm(initial={'creater': request.user})
-    
-    if not ('pertable' in request.session):
-        obj= UserPreference.objects.filter(user=request.user).first()
-        if obj:
-            request.session['pertable']=obj.pertable
-        else:# nothing in db
-            request.session['pertable']= 10
-    else:
-        obj= UserPreference.objects.filter(user=request.user).first()
-        if obj:
-            request.session['pertable']=obj.pertable
-        else:# nothing in db
-            request.session['pertable']= 10
-    pertable=request.session['pertable']
-    obj_paginator = Paginator(queryset, pertable)
-    first_page = obj_paginator.page(1).object_list
-    current_page = obj_paginator.get_page(1)
-    page_range = obj_paginator.page_range
-
-    context = {
-        'obj_paginator':obj_paginator,
-        'first_page':first_page,
-        'current_page':current_page,
-        'page_range':page_range,
-        "user": request.user,
-        "total": queryset.count(),
-        "user": request.user,
-        'form': form,
-        "models": first_page,
-        'search_status':True,
-        'status':status,
-        'BUSINESS_STATUS_CHOICE': BUSINESS_STATUS_CHOICE,
-        "total_sum": sum_value,
-        "average": round(avg_value,2)
-    }
-
-    return render(request, 'trading/user_businesses.html', context)
 
 def business_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
     current_time =timezone.now()#datetime.datetime.now()
@@ -1095,9 +1033,9 @@ def investment_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **
                 if obj:
                     request.session['perpage']=obj.perpage
                 else:# nothing in db
-                    request.session['perpage']= 3
+                    request.session['perpage']= 6
             else:
-                request.session['perpage']= 3
+                request.session['perpage']= 6
 
         per_page=request.session['perpage']
 
@@ -1188,9 +1126,9 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
                 if obj:
                     request.session['perpage']=obj.perpage
                 else:# nothing in db
-                    request.session['perpage']= 3
+                    request.session['perpage']= 6
             else:
-                request.session['perpage']= 3
+                request.session['perpage']= 6
 
         per_page=request.session['perpage']
 
@@ -1274,7 +1212,7 @@ def display_investment_ajax(request):
             #print('userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
     else:
         #print('2. session[perpage] is...')
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -1282,7 +1220,7 @@ def display_investment_ajax(request):
             #print('2.userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
         #print('2. session[perpage] =', request.session['perpage'])
 
 
@@ -1504,7 +1442,7 @@ def home(request):
             #print('userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
     else:
         #print('2. session[perpage] is...')
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -1512,7 +1450,7 @@ def home(request):
             #print('2.userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
         #print('2. session[perpage] =', request.session['perpage'])
 
 
@@ -1553,7 +1491,7 @@ def investment_load_tags_search_string(request, tagname, search_str):
             #print('userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
     else:
         #print('2. session[perpage] is...')
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -1561,7 +1499,7 @@ def investment_load_tags_search_string(request, tagname, search_str):
             #print('2.userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
         #print('2. session[perpage] =', request.session['perpage'])
 
 
@@ -1595,7 +1533,7 @@ def investment_load_tags(request, tag_id):
             #print('userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
     else:
         #print('2. session[perpage] is...')
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -1603,7 +1541,7 @@ def investment_load_tags(request, tag_id):
             #print('2.userpref found')
             request.session['perpage']=obj.perpage
         else:# nothing in db
-            request.session['perpage']= 3
+            request.session['perpage']= 6
         #print('2. session[perpage] =', request.session['perpage'])
 
 
@@ -2463,7 +2401,7 @@ def investment_dashboard(request, pk):
     engaged=project.engaged_investment
     #wip=project.engaged_investment
     project_target =project.total_value
-    outstanding= project_target - engaged
+    outstanding= max(project_target - engaged,0)
     #use interpolation, momentum, AI. ML
     
     context = {        

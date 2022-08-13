@@ -851,9 +851,9 @@ section {
 }
 .umodels .umodel-item {
   box-sizing: content-box;
-  padding: 15px 15px 1515px 30px;
-  margin: 15px 7px;
-  min-height: 150px;
+  padding: 30px 30px 30px 30px;
+  margin: 30px 15px;
+  min-height: 200px;
   border: 1px solid #eef0ef;
   position: relative;
   background: #fff;
@@ -1726,3 +1726,42 @@ Add a dark border to the very last row to signify the end of the table */
     border-style:dotted;
     border-color: red
   }
+
+
+
+
+.mybuttons {
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.mybuttons:last-child {
+    text-align: right;
+}
+
+
+.btn9-group button {
+  background-color: #d3d3d3; /* Green background */
+  border: 1px solid gray; /* Green border */
+  color: black; /* White text */
+  padding: 10px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  float: left; /* Float the buttons side by side */
+}
+
+.btn9-group button:not(:last-child) {
+  border-right: none; /* Prevent double borders */
+}
+
+/* Clear floats (clearfix hack) */
+.btn9-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Add a background color on hover */
+.btn9-group button:hover {
+  background-color:gray;
+}

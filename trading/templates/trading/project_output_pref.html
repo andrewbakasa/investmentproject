@@ -30,12 +30,12 @@
                   <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
                     data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
            
-                  <li  class="breadcrumb-item">
-                    <a  href="{% url 'investment_dashboard' project_id %}"  data-toggle="tooltip" data-placement="bottom" title="View Dashboard"><i class="fas fa-binoculars"></i>
+                  <li  class="breadcrumb-item"><a  href="{% url 'investment_dashboard' project_id %}"  class ="badge rounded-pill bg-success" 
+                    data-toggle="tooltip" data-placement="bottom" title="View Statitics"><i class="fas fa-binoculars"></i>
                       </a>
                   </li>
-                  <li class="breadcrumb-item" ><a href="{% url 'upload_form_user_profile' %}" data-toggle="tooltip" data-placement="bottom" title="User Profile Settings"
-                       class ="badge rounded-pill bg-light text-dark">{% trans 'My Profile' %}</a></li>
+                  <li class="breadcrumb-item" ><a href="{% url 'upload_form_user_profile' %}" class ="badge rounded-pill bg-success"
+                    data-toggle="tooltip" data-placement="bottom" title="User Profile Settings"><i class="fas fa-users"></i></a></li>
                
                   <li class="breadcrumb-item" >
                     <label id="total_projects_searched">Update Graph Preference</label>

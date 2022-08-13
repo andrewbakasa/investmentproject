@@ -1,0 +1,115 @@
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+
+
+
+
+{% block content_header %}
+<h1>Home
+  <small>Customers</small>
+</h1>
+<ol class="breadcrumb">
+  <li class="active">Home</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+{% include 'customers/status.html' %}
+
+    <div class="row">
+        <div class="col-md-5">
+          <div class="box">
+            <div class="box-header with-border">
+              <a href="{% url 'customers_list' %}">
+                Customers
+            </a>
+            </div>
+            <div class="box-body">
+              <table class="table table-striped">
+                <tr>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                 
+                </tr>
+                
+    
+                {% for customer in customers %}
+                <tr>
+                   
+                    <td>
+                      <a href="{% url 'cust' customer.id %}">
+                         {{customer.name}}
+                      </a>
+                    </td>
+                    <td>
+                      {{customer.email}} 
+                    </td>
+                    <td>
+                        {{customer.phone}}
+                    </td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="box">
+              <div class="box-header with-border">
+                <h3 class="box-title">LAST 5 </h3>
+                <a href="{% url 'orders_list' %}">
+                  ORDERS
+                </a>
+              </div>
+
+             
+              <div class="box-body">
+                <table class="table table-striped">
+                  <tr>
+                        <th>Transcation #</th>
+                        <th>Customer</th>
+                        <th>Date Ordered</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
+                  </tr>
+                  
+                 
+
+                  {% for order in orders %}
+                    <tr>
+                        <td>
+                          {{order.transaction_id}}
+                        </td>
+                        <td>
+                            {{order.customer}}
+                        </td>
+                        <td>
+                            {{order.date_ordered}}
+                        </td>
+                        <td>
+                            {{order.complete}}
+                        </td>
+                        <td class="text-right">
+                         
+                            <a class="btn btn-sm btn-primary" href="{% url 'order' order.id %}">View</a>
+                        </td>
+                      
+                    </tr>
+                    {% endfor %}
+                </table>
+              </div>
+            </div>
+         </div>
+    
+      </div>
+
+{% endblock content %}
+
+
+

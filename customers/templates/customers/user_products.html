@@ -1,0 +1,1176 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Products Registration</title>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
+
+
+<!-- < -->
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+  
+   <!-- ======= Projects Section ======= -->  
+   {% include 'customers/sections/sections_user_products.html' %} 
+   
+
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+
+
+{% block modal_divs %}
+    <!-- EDIT DISPLAY HOLDER -->
+    <div class="modal fade" id="modal-product">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
+     <!-- Delete confirmation modal -->
+     <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal: modalAdd New Product -->
+    <div class="modal fade" id="modal_add_new_product" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" style="overflow-y: auto !important">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog  modal-lg" role="document">
+            <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header">
+                    <h4 class="modal-title myModalLabel">Add Your Product</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <!--Body-->
+                <div class="modal-body">
+
+                    {% include 'customers/user_product_modal.html' %}
+            
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+    <script src="{% static 'basic_ui/js/custom-dates.js' %}"></script>
+  
+    <script>
+        $(function() {
+        $('.date-input').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        orientation: 'bottom'
+        
+        });
+        
+        $('.date-input').attr('autocomplete', 'off');
+        })
+    </script>
+    <script>
+
+
+    function nFormatter(num, digits) {
+        digits=1
+        const lookup = [
+            { value: 1, symbol: "" },
+            { value: 1e3, symbol: "k" },
+            { value: 1e6, symbol: "M" },
+            { value: 1e9, symbol: "G" },
+            { value: 1e12, symbol: "T" },
+            { value: 1e15, symbol: "P" },
+            { value: 1e18, symbol: "E" }
+        ];
+        const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+        var item = lookup.slice().reverse().find(function(item) {
+            return num >= item.value;
+        });
+        return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+    }
+
+   
+
+    /*
+    * Tests
+    */
+   /*  const tests = [
+    { num: 0, digits: 1 },
+    { num: 12, digits: 1 },
+    { num: 1234, digits: 1 },
+    { num: 100000000, digits: 1 },
+    { num: 299792458, digits: 1 },
+    { num: 759878, digits: 1 },
+    { num: 759878, digits: 0 },
+    { num: 123, digits: 1 },
+    { num: 123.456, digits: 1 },
+    { num: 123.456, digits: 2 },
+    { num: 123.456, digits: 4 }
+    ];
+    tests.forEach(function(test) {
+    console.log("nFormatter(" + test.num + ", " + test.digits + ") = " + nFormatter(test.num, test.digits));
+    }); */
+       
+        
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length-1);              
+            if (str.length > myTruncatedString.length){
+            return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        }
+        function numberWithCommas(x) {
+                    var parts = x.toString().split(".");
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return parts.join(".");
+                }
+        function getToken(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+        var csrftoken = getToken('csrftoken');
+      
+        //first timme
+        var display_userproduct_ajax_url= "{% url 'display_userproduct_ajax' %}" 
+       
+        
+       
+                               
+        display_userproduct_ajax_url = `{% url 'userproducts_load_status_ajax' %}`; 
+      
+        function sentenceCase(input){
+        
+            if (input.length >0){
+                if (input.length > 1){
+                    // at least teo letter
+                    var first =input.slice(0, 1).toUpperCase()
+                    var trail =first + input.slice(1, input.length)
+                    return trail
+                }else {
+                    // one leer
+                    var first =input.slice(0, 0).toUpperCase()
+                    return first
+                }
+            
+            }
+            return input
+        
+        }
+        $(document).ready(function (){ 
+            $("#investments a:first").addClass( "active") 
+            $("#enterprenuer a:first").addClass( "active") 
+            $("#registerbusiness a:first").addClass( "active") 
+
+            
+        })
+        $('#confirmdelete').on('show.bs.modal', function(e) {
+            var name = $(e.relatedTarget).data('object-name');
+            var url = $(e.relatedTarget).data('delete-url');
+            var comment_id = $(e.relatedTarget).data('item-id');
+        
+            var name =truncChar(name,25)
+            $('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b> <i>" + name + "</i>?");
+    
+            $('#confirmdelete .modal-footer input').attr('data-url', url);
+            $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
+        });
+
+            $('body').on('click', '.delete-button', function (e) {
+                e.preventDefault();
+                var tr_id =$('#delete-button').attr('item-id')
+                row = $('#product-'+ tr_id.trim());
+                var formData = {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                };
+                $.ajax({
+                    type: 'POST',      
+                    url:   $('#delete-button').attr('data-url'), 
+                    encode: true,
+                    contentType: 'application/x-www-form-urlencoded',
+                    crossDomain: false,
+                    dataType: 'json',
+                    data: formData,     // our data object
+                    success: function (data) {
+                        $('.close-modal').click()               
+                        row.fadeOut(1000, function () {
+                            //remove the row deleted
+                            $(this).remove();
+                            // if deleted page make the page disappear, point to prev page
+                            //page-1
+                            if (data.data.total_pages < data.data.deleted_page){                     
+                                var index= parseInt(data.data.total_pages)-1
+                                window.setTimeout(function() {
+                                    $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                                }, 1000);
+                            }else{
+                                // if item on the current page get to zero
+                                // point to page-1
+                                var total = $('#product-table-tbody').children().length
+                                if (total == 0){
+                                    //refresh the current pages
+                                    var index= parseInt(data.data.deleted_page)-1
+                                    if (index<1){
+                                        // if deleteting first page  then scroll all into first page
+                                        index=1
+                                    } 
+                                    
+                                    loadPageAjax(index)
+                                }
+
+                            }
+                            
+                        
+                        });
+                        // if deleting page one and there are more pages behind.... push al those pages
+                    
+                    },
+                    error: function (exception) {
+                        alert('Exeption:' + exception);
+                    }
+                });
+            });
+            $('body').on('click', '.close-modal', function (e) {
+                $('#modal-product').modal('hide'); 
+            })
+            //------LOAD THE FORM ON MODAL DIV----------
+            $('body').on('click', '.show-form-update', function(e){
+                e.stopPropagation() 
+                var btn = $(this);// fix button  delay
+                console.log('url',btn.attr("data-url"))
+                $.ajax({
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType:'json',
+                beforeSend: function(){
+                    $('#modal-product').modal('show');
+                },
+                success: function(data){
+                    $('#modal-product .modal-content').html(data.html_form);
+                }
+                });
+            })
+            //EDIT  MODEL
+            //ADD MODEL FORM
+            $('body').on("submit",".model-form-add",function(e){
+                e.preventDefault();            
+                var data = new FormData(this);
+                var formData
+                var form = $(this);
+                console.log(form.attr('data-url'))
+                $.ajax({
+                    url: form.attr('data-url'),
+                    //data: form.serialize(),
+                    data : data,
+                    type: form.attr('method'),
+                    dataType: 'json',
+                    processData:false,
+                    contentType: false,
+                    success: function(data){ 
+                        //console.log('added data' ,data.model)
+                        if(data.model){
+                            //console.log(data.model)
+                            var item_exist= $("#product-table-tbody").length
+                            if (item_exist>0){
+                                appendTable(data.model)
+                            }else {
+                                //
+                                addTable(data.model)                            
+                            }
+                            
+                            $('.close-modal').click()
+                            if (data.total_pages){
+                                updatePaging(data.total_pages)
+                            }
+                        } else {
+                            // ADDITION NOT SUCCESSFUL
+                            $('.public_toggle_form-errors').html('');
+                            if (data['error']) {
+                                //console.log('1. ERROR::::', data['error'])
+                                var form_vars=['__all__','name','description','division', 'categories', 'image']
+                                for (let p=0; p < form_vars.length; p++ ){
+                                        let name_var = form_vars[p]
+                                        //console.log('2. inside loop::::', data['error'][name_var], name_var)
+                                        if (data['error'][name_var]){
+                                                //console.log('3. inside::::', data['error'][name_var][0], name_var)
+                                                // Find a better method here
+                                                if (data['error'][name_var][0]=='This field is required.'){
+                                                    error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+                                                
+                                                }else {
+                                                    error_content= data['error'][name_var][0] 
+                                                }
+                                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span></button>${error_content}
+                                                            </div> ` ;
+                                                $('.public_toggle_form-errors').append(a_html)
+                                        }
+                                }
+                                //console.log('Out.......')
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+                                //-----------------------
+                            } else  {
+                                // Data locked:  No edit allowed
+                                $('.public_toggle_form-errors').html('');
+                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>${data['locked']}
+                                </div> ` ;
+                                $('.public_toggle_form-errors').append(a_html)
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
+
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+
+                            } 
+                        //LAST ELSE--------------------------------------                
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
+
+            function addTable(item){
+            
+                //console.log(item) 
+                var js_date_created = new Date(item.date_created) 
+                js_date_created= getDateTime_(js_date_created)
+                //console.log('1. time: ', js_date_created.getTime())
+               
+                var name_trunc =truncChar(item.name,12)
+                var description_trunc =truncChar(item.description,20)
+                var category_trunc =truncChar(item.category,20)
+               
+                
+                var page_no = 1//dummy;
+                console.log(item)
+                
+            
+                a_html =`<h4 style="text-align:center;">Registered Products</h4>
+                        <hr>
+                        <div class="table-responsive">
+                            <table id="userBusinessTable" class="table table-striped">
+                                <thead class="thead-dark">
+                                    <th style="width: 2%" >#</th>    
+                                    <th style="width: 13%" >Name</th>
+                                    <th style="width: 20%" >description</th>
+                                    <th style="width: 8%" >category</th>
+                                    <th style="width: 7%" >Value</th>
+                                    <th style="width: 7%" >Current</th>
+                                    <th style="width: 3%" >%</th>
+                                    <th style="width: 8%" >Investors</th>
+                                    <th style="width: 20%" >Date Created</th>
+                                    <th style="width: 4%" >Public</th>
+                                    <th style="width: 8%" class="text-right">Actions</th>
+                                </thead>
+                                <tbody id="product-table-tbody">
+                                
+                                    <tr id="item-${item.id}" class='edit-mode'>
+                                        <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
+                                        <td class="productCategories productData" name="categories">${category_trunc}</td>
+                                        <td class="productName productData" name="name">${name_trunc}</td>
+                                        <td class="productDescription productData" name="description">${description_trunc}</td>
+                                        <td class="productImage productData" name="image">${item.image}</td> 
+                                        <td class="productPrice productData" name="price">${numberWithCommas(item.price)}</td>
+
+                                        <td class="text-right modelAction modelData" name="action">
+                                        
+                                            <a href="/tr/i/e/${item.id}"
+                                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Manage Business'><i class="fas fa-wrench"></i>
+                                            </a>
+
+                                            <a  href="/tr/i/s/${item.id}" 
+                                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title="View Statitics"><i class="fas fa-binoculars"></i>
+                                            </a>
+
+                                                <!-- EDIT MODEL -->
+                                            <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
+                                                data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Quick Edit'><i  class="fas fa-edit"></i>
+                                            </a>
+                                                
+                                            <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                                data-object-name="${item.name }"  data-item-id="${item.id}" 
+                                                data-delete-url="/tr/delete_investment_ajax/${item.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                                title='Delete' > <i class="fas fa-trash"></i> 
+                                            </a>
+
+                                            
+                                            </td>
+                                        
+                                    </tr>
+                                
+                                </tbody>
+                            </table>
+                        
+                        </div>`
+            //append Table and attache first item 
+                $(".box-body").append(a_html)
+            }
+            function appendTable(val){  
+                console.log(val) 
+                var js_date_created = new Date(val.date_created) 
+                js_date_created= getDateTime_(js_date_created)
+                
+                var name_trunc =truncChar(val.name,12)
+                var description_trunc =truncChar(val.description,20)
+                var category_trunc =truncChar(val.categories,20)
+
+             
+            
+                edit_html= ""
+                if (!val.locked){                
+                    edit_html= `<a class="product-edit show-form-update" href="#" data-url="/cus/product_update/${val.id}/" 
+                    data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='Update'><i class="fa fa-edit"></i>
+                    </a>`
+                }
+                                    
+                delete_html= ""                     
+                if (!val.locked){ 
+                    delete_html= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                        data-object-name="${val.name}"  data-item-id="${val.id}" 
+                        data-delete-url="/cus/delete_product/${val.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        title='Delete'> <i class="fas fa-trash"></i> 
+                        </a> `
+                }
+                                     
+                unlock_html='' 
+                lock_html=''                    
+                if  (val.locked){
+                    unlock_html=`<a class="product-unlock" href="#" data-url="/cus/unlock_product/${val.id}/" 
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='lock'><i class="fa fa-lock"></i>
+                    </a>  `
+                }else{
+                    lock_html=`<a class="product-lock" href="#" data-url="/cus/lock_product/${val.id}/" 
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='unlock'><i class="fa fa-unlock"></i>
+                    </a>`
+                }
+            
+                 
+          
+                counter= '' 
+                a_html=`
+                <tr id="item-${val.id}">
+                    <td class="modelData " name="counter"> ${counter}</td>
+                    <td class="productCategories productData" name="categories">${category_trunc}</td>
+                    <td class="productName productData" name="name">${name_trunc}</td>
+                    <td class="productDescription productData" name="description">${description_trunc}</td>
+                    <td class="productImage productData" name="image">${val.image}</td> 
+                    <td class="productPrice productData" name="price">${numberWithCommas(val.price)}</td>
+                    <td class="text-right modelAction modelData" name="action">
+                    
+                        <a href="/cus/product_detail${product.id}/"
+                        style="color:inherit"><i class="fa fa-eye"></i>
+                        </a>                    
+                        ${edit_html}                
+                        ${delete_html}               
+                        ${unlock_html} 
+                        ${lock_html} 
+                    </td>
+                </tr>` ;
+
+                // $("#product-table-tbody").append(a_html) 
+                // $("#product-table-tbody").fadeIn()
+                    $("#product-table-tbody").append(
+                        $(a_html)
+                        .hide()
+                        .fadeIn('fast', function(){ 
+                                //console.log('Added ele')
+                                //$(".log").text('Fade In Transition Complete');
+                            })
+                    );
+                
+                }
+        
+            function updateTable(item){
+                //after edit update the table
+                $("#product-table-tbody #item-" + item.id).children(".modelData").each(function() {
+                    
+                    
+                    var td=$(`#item-${item.id}`).addClass('edit-mode')
+                    
+                    console.log(item)
+                    var attr = $(this).attr("name");
+                    var name_trunc =truncChar(item.name,12)
+                    var description_trunc =truncChar(item.description,20)
+                    var category_trunc =truncChar(item.category,20)
+
+                    if (attr == "description") {
+
+                        $(this).text(description_trunc);
+                    } else if (attr == "category") {
+                        $(this).text(category_trunc);
+                    } else if (attr == "name") {
+                        $(this).text(name_trunc);   
+                    } else if (attr == "total_value") {
+                        $(this).text('$'+ numberWithCommas(item.total_value));
+                    } else if (attr == "current_investment") {
+                        $(this).text('$'+ numberWithCommas(item.current_investment));
+                    } else if (attr == "current_investment_percent") {
+                        $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
+                    
+                    } else if (attr == "counter") {
+                        var a_html= `<td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>`
+                        $(this).html(a_html);
+                
+                    } else if (attr == "public") {
+                        var public= ''
+                    
+                        if (item.public){
+                            public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(item.views,0)}`
+                        }else{
+                            public= `<i class='bi-square'></i>${nFormatter(item.views,0)}`
+                        }
+                        var a_html= `<td  class="modelData" name="pubic">${public}</td>`
+                        $(this).html(a_html);
+                    
+                    }   
+
+
+                
+                    
+                });
+            }  
+            $('body').on("submit",".model-form-edit",function(e){
+                e.preventDefault();
+                var data = new FormData(this);
+                var formData
+                var form = $(this);
+                //console.log('before ajax')
+                var url=form.attr('data-url')
+                $.ajax({
+                    url: form.attr('data-url'),
+                    data : data,
+                    type: form.attr('method'),
+                    dataType: 'json',
+                    processData:false,
+                    contentType: false,
+                    success: function(data){
+                        //console.log('its mot get here', data)
+                        if(data.model){
+                            //console.log(data.model)
+                            $('#modal-product').modal('hide');
+                            $('.close-modal').click()
+                            updateTable(data.model);
+                            if (data.model.current_investment){
+                                $('#current_investment').html(`${numberWithCommas(data.model.current_investment)}`);
+                            }
+                            if (data.model.current_investment_percent){
+                                $('#current_investment_percent').html(`${parseFloat(data.model.current_investment_percent)}%`);
+                            }
+                            if (data.model.investors_count){
+                                $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
+                            }
+
+                            
+
+                            
+
+                            
+                        } else {
+                            $('.public_toggle_form-errors').html('');
+                            if (data.error) {
+                             
+                                var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date','weekly_output_target']//,
+                                //console.log('before throwing error:',form.attr('data-url'),)
+                                
+                                for (let p=0; p < form_vars.length; p++ ){
+                                        let name_var = form_vars[p]
+                                        let error_content =''
+                                        if (data.error[name_var]){
+                                                // Find a better method here
+                                                if (data['error'][name_var][0]=='This field is required.'){
+                                                    error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+                                                }else {
+                                                    error_content= data['error'][name_var][0] 
+                                                }
+                                                
+                                                a_html = `<div class='alert alert-danger alert dismissable'>
+                                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span></button>${error_content}
+                                                        </div> ` ;
+                                                $('.public_toggle_form-errors').append(a_html)
+                                        }
+                                }
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                }, 4000);
+                            //-----------------------
+                            } else  {
+                                // Data locked:  No edit allowed
+                                $('.public_toggle_form-errors').html('');
+                                a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>${data['locked']}
+                                </div> ` ;
+                                $('.public_toggle_form-errors').append(a_html)
+                                $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
+
+                                window.setTimeout(function() {
+                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                        $(".public_toggle_form-errors").html('');
+                                    });
+                                    }, 4000);
+                            } 
+                        //LAST ELSE--------------------------------------                
+                        }
+                    //END SUCCESS
+                    }
+                // END AJAX
+                })
+                return false;
+            })
+        
+        
+            $('body').on('click', '.a_page_nav', function (event) {
+                // preventing default actions
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                loadPageAjax(page_no)
+            });
+            function update_totals(data) {
+                ahtml =`<b>Registered Products: Total</b>:$${numberWithCommas(data['total_sum'])} <b>Aver</b>:$${numberWithCommas(data['average'])}`
+                $('#personal_totals').html(ahtml)
+            
+            }
+            function updatePaging2(data){
+                var has_previous=''
+                //console.log(data)
+                if (data.has_previous){
+                    has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+                
+                }       
+                var has_next= ''          
+                if (data.has_next){
+                    has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                        `; 
+                }       
+                a_html=`
+                <div id= "page_section" class="pagination">
+                    <ul class="pagination newpagination">
+                        ${has_previous}            
+                        <span class="current" style="margin-left:5px" >
+                            Page ${ data.current_page } of ${ data.last }.
+                        </span>                   
+                        ${has_next}
+                    </ul>
+                    </div>`
+                    $("#page_section").html(a_html)
+            }
+
+            function append_html(counter,val,page_no){
+                //loading the page #
+                //console.log (val)
+                var js_date_created = new Date(val.date_created)
+                js_date_created= getDateTime_(js_date_created)
+                //console.log('2. time: ', js_date_created.getTime())
+                var name_trunc =truncChar(val.name,12)
+                var description_trunc =truncChar(val.description,20)
+                var category_trunc =val.categories
+
+                 
+                edit_html= ""
+                if (!val.locked){                
+                    edit_html= `<a class="product-edit show-form-update" href="#" data-url="/cus/product_update/${val.id}/" 
+                    data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='Update'><i class="fa fa-edit"></i>
+                    </a>`
+                }
+                                    
+                delete_html= ""                     
+                if (!val.locked){ 
+                    delete_html= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                        data-object-name="${val.name}"  data-item-id="${val.id}" 
+                        data-delete-url="/cus/delete_product/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                        title='Delete'> <i class="fas fa-trash"></i> 
+                        </a> `
+                }
+                                     
+                unlock_html='' 
+                lock_html=''                    
+                if  (val.locked){
+                    unlock_html=`<a class="product-unlock" href="#" data-url="/cus/unlock_product/${val.id}/" 
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='lock'><i class="fa fa-lock"></i>
+                    </a>  `
+                }else{
+                    lock_html=`<a class="product-lock" href="#" data-url="/cus/lock_product/${val.id}/" 
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='unlock'><i class="fa fa-unlock"></i>
+                    </a>`
+                }
+            
+                 
+          
+
+                a_html=`
+                <tr id="item-${val.id}">
+                    <td class="modelData " name="counter"> ${counter}</td>
+                    <td class="productCategories productData" name="categories">${category_trunc}</td>
+                    <td class="productName productData" name="name">${name_trunc}</td>
+                    <td class="productDescription productData" name="description">${description_trunc}</td>
+                    <td class="productImage productData" name="image">${val.image}</td> 
+                    <td class="productPrice productData" name="price">${numberWithCommas(val.price)}</td>
+                    <td class="text-right modelAction modelData" name="action">
+                    
+                        <a href="/cus/product_detail${val.id}/"
+                        style="color:inherit"><i class="fa fa-eye"></i>
+                        </a>                    
+                        ${edit_html}                
+                        ${delete_html}               
+                        ${unlock_html} 
+                        ${lock_html} 
+                    </td>
+                </tr>` ;
+                return a_html
+            }
+            function loadPageAjax(page_no){
+                //console.log('url',display_userproduct_ajax_url )
+                //console.log('PageNo: ', page_no)
+                //console.log('page_no',page_no )
+                var data
+               
+                data = {    
+                        page_no : page_no,
+                        csrfmiddlewaretoken: csrftoken,
+                    }
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_userproduct_ajax_url, 
+                        data :data,
+                        // handle a successful response
+                        success: function (response) {
+                            $('#product-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+
+                        
+                            
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#product-table-tbody').append(a_html)
+                            });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'product-table-tbody',6)
+                               
+                           
+               
+                            
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                            
+                    });
+                    //add_model_class()
+            }
+            
+           
+            function update_total_results(total){
+                    html=`Total [${total}]`
+                    $('#total_items').html(html)
+            }
+            function append_no_records_found(total, tbody_id, colspan){
+                if (total == 0) {
+                    no_record_html=`<tr id="item-1">  <td colspan='${colspan}'> No Records Found <td>
+                                  </tr>` ;
+                    $(`#${tbody_id}`).append(no_record_html)
+                }
+            }
+            $('body').on('click', '.filter-status', function (e) {
+                    e.preventDefault(); 
+                    var clicked_id = $(this).attr('id')
+                    var myclass =$('.filter-status')
+                    bus_status =$(this).attr('id')
+                    var search_val = $('#search').val().toLowerCase();
+                    search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                    if (search_val.length == 0 ){
+                        display_userproduct_ajax_url = `{% url 'userproducts_load_status_ajax' %}`; 
+                    } else{
+                        display_userproduct_ajax_url = `{% url 'user_product_search_and_tags_ajax' 6789 %}`.replace(/6789/, search_val.toString()); 
+                    }
+                    var url =display_userproduct_ajax_url 
+                    $('#li_current_status').css('display','block')
+                    $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+                    check_business_status(clicked_id)
+                    $.each(myclass, function(i, val) {
+                        let loop_id= $(this).attr('id')
+                        if (clicked_id == loop_id){
+                            $(this).removeClass('bg-warning')
+                            $(this).addClass('bg-light')
+                        }else {
+                            $(this).addClass('bg-warning')
+                            $(this).removeClass('bg-light')
+                        }
+                    });            
+                    // click first page
+                    page_no=1
+                    // ajax call
+                    $.ajax({
+                            type: "POST",
+                            // define url name
+                            url: url, 
+                            data : {    
+                                page_no : page_no, 
+                                status:clicked_id,
+                                csrfmiddlewaretoken: csrftoken,
+                            },
+                            // handle a successful response
+                            success: function (response) {
+                                $('#product-table-tbody').html('')
+                                updatePaging2(response.data)
+                                update_totals(response.data)
+                                if (response.data.per_table){
+                                    per_table=response.data.per_table
+                                }
+                                var base_counter =(parseInt(page_no)-1)*per_table
+                                var counter=base_counter
+                                update_total_results(response.data.totalrecords)
+                                $.each(response.data.results, function(i, val) {
+                                    counter=  counter +1
+                                    a_html=append_html(counter,val,page_no)                           
+                                    // add each model on every line
+                                    $('#product-table-tbody').append(a_html)
+                                });
+                                //Append Zero Record Annotation
+                                append_no_records_found(response.data.totalrecords,'product-table-tbody',6)
+                               
+                            
+
+                                },
+                                error: function () {
+                                    alert('Error Occured');
+                                }
+                        }); 
+            
+            });
+            
+            $("body").on("keyup", "#search", function(){
+
+                var search_val = $(this).val().toLowerCase();
+                search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                if (search_val.length == 0 ){
+                    //tag
+                    display_userproduct_ajax_url = `{% url 'userproducts_load_status_ajax' %}`; 
+                } else{
+                    display_userproduct_ajax_url = `{% url 'user_product_search_and_tags_ajax' 6789 %}`.replace(/6789/, search_val.toString()); 
+                }
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_userproduct_ajax_url, 
+                        data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
+                        },
+                        // handle a successful response
+                        success: function (response) {
+                            $('#product-table-tbody').html('')
+                            updatePaging2(response.data)
+                            update_totals(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+                            update_total_results(response.data.totalrecords)
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#product-table-tbody').append(a_html)
+                            });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'product-table-tbody',6)
+                               
+                           
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                        }); 
+            
+          
+          });
+            
+          function updateToProductTabel(product){
+        $("#productTable #product-" + product.id).children(".productData").each(function() {
+            var attr = $(this).attr("name");
+            if (attr == "name") {
+              $(this).text(product.name);
+            } else if (attr == "description") {
+              $(this).text(product.description);
+            } else if (attr == "price") {
+              $(this).text(product.price);
+            } else if (attr == "categories") {
+              $(this).text(product.categories);
+            } else if (attr == "image")  {
+              $(this).text(product.image);
+            }
+          });
+    }
+
+   
+
+ 
+      
+      //{// for each update url
+    $('body').on("submit",".product-form",function(e){
+      e.preventDefault();
+       // var form= $('#formid')[0];
+        // var formData = new FormData(form)
+        var data = new FormData(this);
+        var formData
+        var form = $(this);
+        //var data = formData()
+        console.log('why...',form.attr('data-url'))
+        $.ajax({
+            url: form.attr('data-url'),
+            //data: form.serialize(),
+            data : data,
+            type: form.attr('method'),
+            dataType: 'json',
+            processData:false,
+            contentType: false,
+            success: function(data){
+              if(data.product){
+                    // $('#productTable tbody').html(data.product_list);
+                    if (data) {
+                      updateToProductTabel(data.product);
+                    }
+                    $('#modal-product').modal('hide');
+              } else {
+                // $('#modal-product .modal-content').html(data.html_form)
+              }
+            }
+          })
+          return false;
+      })
+    
+
+    
+    $('body').on('click', '.product-lock',function(e){// for each update url
+        e.preventDefault(); // prevent navigation
+        var url = $(this).data('url'); // get the update form url
+        console.log("url:", url)
+        btn = e.target.id;      //get clicked button
+        row = $(this).closest('tr');
+       
+        var formData = {
+          'product_id': btn,
+          csrfmiddlewaretoken: csrftoken,
+          contentType: 'application/x-www-form-urlencoded',
+          encode: true,
+        };
+      
+        $.ajax({
+            type: 'POST', 
+            url: url,
+            data: formData,
+            dataType:  'json',
+            success: function(data) { // on success..
+              console.log("data", data)
+              updateLOCKInnerHTML(data.data)
+                
+            },
+            error: function(xhr, ajaxOptions, thrownError) { // on error..
+                
+            }
+        });
+        return false; 
+    });
+
+    function updateLOCKInnerHTML(val){
+        new_html = ` <a href="/cus/product_detail${val.id}/"
+                    style="color:inherit"><i class="fa fa-eye"></i>
+                  </a>
+                   
+                    <a class="product-unlock" href="#" data-url="/cus/unlock_product/${val.id}/" 
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='lock'><i class="fa fa-lock"></i>
+                    </a>   
+                `;
+        $("#productTable #product-" + val.id).children(".productData").each(function() {
+            var attr = $(this).attr("name");
+
+            if (attr == "action") {
+              $(this).html(new_html);
+            }
+          });
+    }
+
+    function updateUNLOCKInnerHTML(val){
+        
+        new_html = ` <a href="/cus/product_detail${val.id}/"
+                  style="color:inherit"><i class="fa fa-eye"></i>
+                  </a>
+
+                  <a class="product-edit show-form-update" href="#" data-url="/cus/product_update/${val.id}/" 
+                    data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='Update'><i class="fa fa-edit"></i>
+                  </a>
+
+                  <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                    data-object-name="${val.name}"  data-item-id="${val.id}" 
+                    data-delete-url="/cus/delete_product/${val.id}/1/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                    title='Delete'> <i class="fas fa-trash"></i> 
+                  </a> 
+               
+                  <a class="product-lock" href="#" data-url="/cus/lock_product/${val.id}/" 
+                    style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                    title='unlock'><i class="fa fa-unlock"></i>
+                    </a>
+                  
+                `;
+        $("#productTable #product-" + val.id).children(".productData").each(function() {
+            var attr = $(this).attr("name");
+
+            if (attr == "action") {
+              $(this).html(new_html);
+            }
+          });
+    }
+    $('body').on('click', '.close-modal', function (e) {
+        $('#modal-product').modal('hide'); 
+    })
+    $('body').on('click', '.product-unlock',function(e){// for each update url 
+        e.preventDefault(); // prevent navigation
+        var url = $(this).data('url'); // get the update form url
+        console.log("url:", url)
+        btn = e.target.id;      //get clicked button
+        row = $(this).closest('tr');
+       
+        var formData = {
+          'product_id': btn,
+          csrfmiddlewaretoken: csrftoken,
+          contentType: 'application/x-www-form-urlencoded',
+          encode: true,
+        };
+        // console.log("formData:", formData)
+        console.log('current row:', row)
+        $.ajax({
+            type: 'POST', 
+            url: url,
+            data: formData,
+            dataType:  'json',
+            success: function(data) { // on success..
+            console.log('UNLOCK DATA::', data.data)
+              updateUNLOCKInnerHTML(data.data)
+              // reload   until we fix the proplem----14 March 2021
+              // location.reload()
+            },
+            error: function(xhr, ajaxOptions, thrownError) { // on error..
+                
+            }
+        });
+        return false; 
+    });
+
+    $('body').on('click', '.close-modal', function (e) {
+        $('#modal-product').modal('hide'); 
+    })
+           
+    </script>
+{% endblock %}
+
+<!---------------------- CUSTOM SEARCH ------------------>
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+
+{% endblock %}

@@ -1,0 +1,135 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+{% load widget_tweaks %}
+{% load store_extras %}
+{% load page_and_filter %}
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+       
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success">{% trans 'Products' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'customers_home' %}" class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'customers_list' %}" class ="badge rounded-pill bg-success">{% trans 'Customers' %}</a></li>
+             
+       
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Category</label>
+              </li>  
+            </ol>
+          </div>
+
+     
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            
+            <div class="row">
+              <div class="col-md-12">
+                  <div class="box">
+                    <div class="box-header with-border">
+                     
+                    </div>
+                    <div class="box-body">
+                      <table class="table table-striped">
+                        <tr>
+                              <th>Transcation</th>
+                              <th>Customer</th>
+                              <th>Date Ordered</th>
+                              <th>Value</th>
+                              <th>Status</th>
+                              <th>Customer</th>
+                              <th class="text-right" >Actions</th>
+                        
+                        </tr>
+                        
+                      
+        
+                        {% for order in orders %}
+                              <tr>
+                                  <td>{{order.transaction_id}}</td>
+                                  <td>{{order.customer}}</td>
+                                  <td>{{order.date_ordered}}</td>
+                                  <td>{{order.currency.symbol}}{{order.total_price | intcomma}}</td>
+                                  <td>{{order.complete}}</td>
+                                  <td>
+                                    {% if order.customer %}
+                                      <a href="{% url 'cust' order.customer.id %}">
+                                          {{order.customer.name}}
+                                      </a>
+                                      {% endif  %}
+                                  </td>
+                                
+                                  <td class="text-right">
+                                    {% if order.customer %}
+                                    <a style="color:inherit" href="{% url 'order' order.id %}"><i class="fa fa-book"></i></a>
+                                    {% endif  %}
+                                    <a style="color:inherit" href="{% url 'delete_order' order.id %}"><i class="fa fa-trash"></i></a>
+                                  </td>
+                                 
+                              </tr>
+                          {% endfor %}
+                      </table>
+                    </div>
+                  </div>
+              </div>
+        
+          </div>
+          <!-- # for pagination...... -->
+          {% if is_paginated %}
+            <div class="box-footer text-center">
+            
+                <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <!-- href="{{ request.path }}?page={{ page_obj.previous_page_number}}" -->
+        
+                <li>
+                  <a href="{% my_url page_obj.previous_page_number 'page' request.GET.urlencode %}">
+                    <i class="force-parent-lh fa fa-chevron-left" aria-hidden="true"></i>
+                  </a>
+                
+                </li>
+                {% endif %}
+                <li>
+                  <select id= 'page_select' class="form-control">
+                    {% for _ in ''|center:page_obj.paginator.num_pages %}
+                    {% if forloop.counter == page_obj.number %}
+                    <option selected="">
+                      {{ page_obj.number }}
+                    </option>
+                    {% else %}
+                    <option>
+                      {{ forloop.counter }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                  </select>
+                </li>
+                {% if page_obj.has_next %}
+                  <!-- href="{{ request.path }}?page={{ page_obj.next_page_number }}" -->
+                  <li>
+                    <a href="{% my_url page_obj.next_page_number 'page' request.GET.urlencode %}">
+                      <i class="force-parent-lh fa fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                  </li>
+                {% endif %}
+                </ul>
+        
+              
+            </div>
+          {% endif %}
+          
+          </div>
+
+       
+    
+    </div>
+  
+</section><!-- End Projects Section -->
+

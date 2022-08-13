@@ -132,7 +132,8 @@
                                             </a>
 
                                             <a  href="{% url 'investment_dashboard' item.id %}" 
-                                            data-toggle="tooltip" data-placement="bottom" title="View Dashboard"><i class="fa fa-eye"></i>
+                                               style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                               title="View Statitics"><i class="fas fa-binoculars"></i>
                                             </a>
                                     
                                             <!-- EDIT MODEL -->
@@ -641,14 +642,14 @@
 
                                         <td class="text-right modelAction modelData" name="action">
                                         
-                                            <a href="/tr/i-edit/${item.id}"
+                                            <a href="/tr/i/e/${item.id}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                                 title='Manage Business'><i class="fas fa-wrench"></i>
                                             </a>
 
-                                            <a  href="/tr/i/db/${item.id}" 
-                                                data-toggle="tooltip" data-placement="bottom" title="View Dashboard">
-                                                <i class="fa fa-eye"></i>
+                                            <a  href="/tr/i/s/${item.id}" 
+                                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                                title="View Statitics"><i class="fas fa-binoculars"></i>
                                             </a>
 
                                                 <!-- EDIT MODEL -->
@@ -712,13 +713,13 @@
 
                         <td class="text-right modelAction modelData" name="action">
                         
-                            <a href="/tr/i-edit/${item.id}"
+                            <a href="/tr/i/e/${item.id}"
                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                 title='Manage Business'><i class="fas fa-wrench"></i>
                             </a>
-                            <a  href="/tr/i/db/${item.id}" 
-                                data-toggle="tooltip" data-placement="bottom" title="View Dashboard">
-                                <i class="fa fa-eye"></i>
+                            <a  href="/tr/i/s/${item.id}" 
+                                style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                title="View Statitics"><i class="fas fa-binoculars"></i>
                             </a>
                                 <!-- EDIT MODEL -->
                             <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${item.id}/" 
@@ -978,13 +979,13 @@
                     <td class="modelData" name="public" >${public}</td>
                     <td class="text-right modelAction modelData" name="action">
                     
-                        <a href="/tr/i-edit/${val.id}"
+                        <a href="/tr/i/e/${val.id}"
                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             title='Manage Business'><i class="fas fa-wrench"></i>
                         </a>
-                        <a  href="/tr/i/db/${val.id}" 
-                            data-toggle="tooltip" data-placement="bottom" title="View Dashboard">
-                            <i class="fa fa-eye"></i>
+                        <a  href="/tr/i/s/${val.id}" 
+                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            title="View Statitics"><i class="fas fa-binoculars"></i>
                         </a>
                         <a class="model-edit show-form-update" href="#" data-url="/tr/update_investment_ajax/${val.id}/" 
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 

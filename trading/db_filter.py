@@ -47,7 +47,12 @@ def exponent_rump_target(target,actual):
         x = target-actual
         u=10
         return math.exp(x/u)
-
+def standard_performance(target,actual):
+    
+    if actual <=target:
+        return actual/target if target !=0 else 0
+    else:
+        return 1
 def weeks_between(start_date, end_date):
     weeks = rrule.rrule(rrule.WEEKLY, dtstart=start_date, until=end_date)
     return weeks.count()
@@ -77,8 +82,8 @@ def get_project_outputs_monthly(request, dstart, dend, context):
     qs_engaged=project.kpi_output_qs_released
     qs_wip=project.kpi_output_qs_wip
     output_df = pd.DataFrame(qs.values())
-    output_wip_df = pd.DataFrame(qs_wip.values())
-    output_engaged_df= pd.DataFrame(qs_engaged.values())
+    output_wip_df = project.kpi_output_df_wip#pd.DataFrame(qs_wip.values())
+    output_engaged_df= project.kpi_output_df_released#pd.DataFrame(qs_engaged.values())
     if output_df.shape[0]> 0 : 
       
         output_df['date_status_changed'] = pd.to_datetime(output_df['date_status_changed'])
@@ -211,7 +216,7 @@ def get_kpi_dict(throughput_target,ave_throughput,
     dict_['target']= throughput_target#float(7)
     dict_['actual']= ave_throughput
     
-    percent_performance= exponent_rump_target(float(dict_['target']),float(dict_['actual']))
+    percent_performance= standard_performance(float(dict_['target']),float(dict_['actual']))
     dict_['actualPercent']= float(percent_performance)
     dict_['lessThan50Percent']= 0.5 > float(dict_['actualPercent'])
     dict_kpi.append(dict_)
@@ -271,6 +276,8 @@ def throughput_get_mean(df):
     return ave_throughput
 
 def underrepairs(df): 
+    #print(df.columns)
+    
     outputs_wip =[]
     total=0
     if df.shape[0]> 0 : 
@@ -316,18 +323,23 @@ def admissions(df,dstart, dend):
         total_admissions = float(df_admit['value'].sum())
         assets_admission =[]
 
-        # #print(1,df_admit)
-        # for i in range(len(df_admit)):
-        #     x={}
-        #     x['name']=df_admit.iloc[i,:]['id_num']
-        #     x['date'] = df_admit.iloc[i,:]['admission_date']
-        
-        #     rel_date_ = df_admit.iloc[i,:]['rel_date']
-        #     if not (rel_date_==rel_date_):
-        #         rel_date_= 'No Released Yet'
-        #     x['date2'] = rel_date_
-        #     x['text'] = df_admit.iloc[i,:]['category']
-        #     assets_admission.append(x)    
+        #print(df_admit.columns, df_admit) 
+    #     'iid', 'inv_name', 'summary', 'total_value', 'closing_date',
+    #    'weekly_output_target', 'public', 'id', 'name', 'value', 'date_created',
+    #    'date_status_changed', 'application_status', 'username', 'first_name',
+    #    'last_name', 'email', 'cat_name', 'cat_descript', 'uniqueid' 
+
+        for i in range(len(df_admit)):
+            x={}
+            x['name']=df_admit.iloc[i,:]['name']
+            x['date']=df_admit.iloc[i,:]['date_created']
+            x['username']=df_admit.iloc[i,:]['username']
+            x['email']=df_admit.iloc[i,:]['email']
+            x['text'] = df_admit.iloc[i,:]['application_status']
+            x['value'] = df_admit.iloc[i,:]['value']
+            
+          
+            assets_admission.append(x)    
    
     return  assets_admission, total_admissions
 
@@ -347,14 +359,18 @@ def outputs_releases(df,dstart, dend):
         
         
         releases_outputs =[]
-    # for i in range(len(df_rel)):
-    #     x={}
-    #     x['name']=df_rel.iloc[i,:]['id_num']
-    #     x['date']=df_rel.iloc[i,:]['rel_date']
-    #     x['text'] = df_rel.iloc[i,:]['category']
-    #     x['downtime'] = df_rel.iloc[i,:]['downtime']
-        
-    #     releases_outputs.append(x) 
+
+        #print(df_rel.columns, df_rel)    
+        for i in range(len(df_rel)):
+            x={}
+            x['name']=df_rel.iloc[i,:]['name']
+            x['date']=df_rel.iloc[i,:]['date_created']
+            x['username']=df_rel.iloc[i,:]['username']
+            x['email']=df_rel.iloc[i,:]['email']
+            x['text'] = df_rel.iloc[i,:]['application_status']
+            x['value'] = df_rel.iloc[i,:]['value']
+            
+            releases_outputs.append(x) 
     
    
     return  releases_outputs, total_rel

@@ -1,0 +1,159 @@
+
+
+{{% extends 'investments_appraisal/mentor/index.html' %}
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Projects</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+
+{% block content %}
+
+ 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+     
+  </div><!-- End Breadcrumbs -->
+
+ <!-- ======= Projects Section ======= -->  
+   {% include 'customers/sections/sections_orders_list.html' %} 
+  
+ 
+</main><!-- End #main -->
+{%endblock content%}
+
+{% block modal_divs %}
+  
+    
+    <div class="modal fade" id="modal-product">
+      <div id='dynamic-div' class="modal-dialog modal-lg">
+        <div class="modal-content"></div>
+      </div>
+    </div>
+
+{% endblock %} 
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  
+ 
+
+
+
+
+
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+
+{% endblock %}
+
+
+
+
+
+
+{% block scripts %}
+ <!-- Search Button JS -->
+ <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+
+<script>
+$(function() {
+  $('.date-input').datepicker({
+  autoclose: true,
+  format: 'yyyy-mm-dd',
+  orientation: 'bottom'
+
+  });
+ 
+  $('.date-input').attr('autocomplete', 'off');
+})
+</script>
+
+<script type="text/javascript">
+  $('#page_select').change(function() {
+    $( "select option:selected" ).each(function() {
+      // window.location.href = "{{ request.path }}?page=" + $(this).val();
+      var url= my_java_url($(this).val(),'page',"{{ request.GET.urlencode}}")
+      window.location.href = url;
+      
+    });
+  })
+  function retrieveWYSIWYG() {
+  var query = window.location.search.substring(1);
+  var parms = query.split('&');
+  for (var i=0; i<parms.length; i++) {
+    var pos = parms[i].indexOf('=');
+    if (pos > 0) {
+       var key = parms[i].substring(0,pos);
+       var val = parms[i].substring(pos+1);
+       qsParm[key] = val;
+    }
+  }
+}
+
+  function my_java_url(page_num, field_name, urlencode){
+    // Similary to template tags my_url {page_and_filter}
+    var srchURLArray = urlencode.split("&")
+    var tempArray = new Array()
+    var parameter_str= ""
+    for (var i =0; i < srchURLArray.length; i++) {
+      tempArray = srchURLArray[i].split("=")
+      var pos =  tempArray[0].indexOf(';');
+      // amp;date=107
+      if (pos > 0) {
+          var secondtempArray = new Array()
+          secondtempArray = tempArray[0].split(";")
+          // discard the amp(i dont know why it there)
+          if (secondtempArray[1]!==field_name) {
+               parameter_str = parameter_str + "&" + secondtempArray[1] + "=" + tempArray[1]
+          } 
+      }else {
+        // date=107
+        if (tempArray[0]!==field_name) {
+            parameter_str = parameter_str + "&" + tempArray[0] + "=" + tempArray[1]
+        } 
+      }
+     
+    }
+    return "{{ request.path }}?page=" + page_num + parameter_str
+  }
+
+  
+</script>
+
+<script type="text/javascript">
+  $('#clear_button').on('click', function() {
+    $('#id_date_ordered').val("");
+    $('#id_complete').val("");
+    $('#id_company').val("");
+    $('#id_currency').val("");
+    $('#id_start_date').val("");
+    $('#id_end_date').val("");
+  })  
+</script>
+
+{% endblock %}

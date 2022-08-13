@@ -1,0 +1,259 @@
+
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load page_and_filter %}
+{% load widget_tweaks %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'vendor/css/daterangepicker.css' %}">
+{% endblock %}
+
+{% block content_header %}
+    <h1> Order For 
+        <small>{{ customer.email }}</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'customers_home' %}">Home</a></li>
+        <li><a href="{% url 'customers_list' %}">{% trans 'Customers' %}</a></li>
+        {% if customer %}
+        <li><a href="{{ customer.get_absolute_url }}">Customer {{ customer.id }}</a></li>
+        <li class="active">{% trans 'View' %}</li>
+        
+        {% endif %}
+    </ol>
+{% endblock %}
+{% block content %}
+<div class="row">
+   
+    <div class="col-md-5">
+        <div class="box">
+           
+        <div class="box-body">
+            <h5>Customer:</h5>
+            <hr>
+            <a class="btn btn-outline-info btn-sm btn-block" href="{% url 'customer' customer.id %}"> Update Customer</a>
+            <a class="btn btn-outline-danger btn-sm btn-block" href="{% url 'new_order_customer' customer.id %}"> Place Order </a>
+           
+        </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="box">
+        <div class="box-body">
+            <h5>Contact Information</h5>
+            <hr>
+            <p>Email: {{customer.email}}</p>
+            <p>Phone: {{customer.phone}}</p>
+            <a href="{% url 'sendemail' %}">send email</a>
+        </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="box">
+            <div class="box-body">
+                <h5>Total Orders</h5>
+                <hr>
+                <h1 style="text-align: center; padding: 10px">{{order_count}}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">Orders:</h3>
+            <div class="row">
+                <div class="col">
+                    <div class="col-md-12">
+                        <!-- <form method="get">
+                            {{myFilter.form}}
+                            <button class="btn btn-primary" type="submit">Search</button>
+                            <button class="btn btn-primary" id="clear_button">Clear</button>
+                        </form> -->
+                        
+                        <form method="get" class="form-horizontal">
+                            <!-- {% csrf_token %} -->
+                                <div class="form-group">
+                               
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.complete.id_for_label }}">{{ myFilter.form.complete.label }}</label>
+                                  <div class="col-sm-3{% if myFilter.form.complete.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.complete|add_class:"form-control" }}
+                                    {% for error in myFilter.form.complete.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                          
+                               
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.company.id_for_label }}">{{ myFilter.form.company.label }}</label>
+                                  <div class="col-sm-3{% if myFilter.form.company.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.company|add_class:"form-control" }}
+                                    {% for error in myFilter.form.company.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                                
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.currency.id_for_label }}">{{ myFilter.form.currency.label }}</label>
+                                  <div class="col-sm-3{% if myFilter.form.currency.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.currency|add_class:"form-control" }}
+                                    {% for error in myFilter.form.currency.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                                  
+                                </div>
+                                
+                                <div class="form-group">
+                                  <label class="col-sm-2 control-label" for="{{ myFilter.form.start_date.id_for_label }}">Date Ordered GTE </label>
+                                  <div class="col-sm-2{% if myFilter.form.start_date.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.start_date|add_class:"form-control  date-input" }}
+                                    {% for error in myFilter.form.start_date.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                               
+                                  <label class="col-sm-2 control-label" for="{{ myFilter.form.end_date.id_for_label }}">Date Ordered LTE </label>
+                                  <div class="col-sm-2">
+                                    {{ myFilter.form.end_date|add_class:"form-control  date-input" }}
+                                    {% for error in myFilter.form.end_date.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                                  
+                                  <label class="col-sm-1 control-label" ></label>
+                                  <div class="col-sm-1">
+                                    <button class="btn btn-primary" type="submit">Search</button>
+                                  </div>
+                                  <label class="col-sm-1 control-label" ></label>
+                                  <div class="col-sm-1">
+                                    <button class="btn btn-default" id="clear_button">Clear</button>
+                                  </div>
+                                
+                                 
+                                </div>
+                                
+                              </form> 
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="box-body">
+            <table class="table table-striped">
+              <tr>
+                    <th>Transaction #</th>
+                    <th>customer</th>
+                    <th>Date Orderd</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+               
+              </tr>
+              
+              
+              {% for order in orders %}
+                    <tr>
+                        <td>{{order.transaction_id}}</td>
+                        <td>{{order.customer}}</td>
+                        <td>{{order.date_ordered}}</td>
+                        <td>{{order.currency.symbol}}{{order.total_price | intcomma}}</td>
+                        <td>{{order.complete}}</td>
+                        <td class="text-right">
+                           <a href="{% url 'order' order.id %}" style="color:inherit"><i class="fa fa-book"></i></a>
+                           <a href="{% url 'delete_order' order.id %}"  style="color:inherit"><i class="fa fa-trash"></i></a>
+                        </td>
+
+                       
+                    </tr>
+                {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+
+</div>
+ <!-- # for pagination...... -->
+ {% if is_paginated %}
+ <div class="box-footer text-center">
+ 
+     <ul class="pagination">
+     {% if page_obj.has_previous %}
+     <!-- href="{{ request.path }}?page={{ page_obj.previous_page_number}}" -->
+
+     <li>
+       <a href="{% my_url page_obj.previous_page_number 'page' request.GET.urlencode %}">
+         <i class="force-parent-lh fa fa-chevron-left" aria-hidden="true"></i>
+       </a>
+     
+     </li>
+     {% endif %}
+     <li>
+       <select id= 'page_select' class="form-control">
+         {% for _ in ''|center:page_obj.paginator.num_pages %}
+         {% if forloop.counter == page_obj.number %}
+         <option selected="">
+           {{ page_obj.number }}
+         </option>
+         {% else %}
+         <option>
+           {{ forloop.counter }}
+         </option>
+         {% endif %}
+         {% endfor %}
+       </select>
+     </li>
+     {% if page_obj.has_next %}
+       <!-- href="{{ request.path }}?page={{ page_obj.next_page_number }}" -->
+       <li>
+         <a href="{% my_url page_obj.next_page_number 'page' request.GET.urlencode %}">
+           <i class="force-parent-lh fa fa-chevron-right" aria-hidden="true"></i>
+         </a>
+       </li>
+     {% endif %}
+     </ul>
+
+   
+ </div>
+{% endif %}
+<!-- </div> -->
+{% endblock content %}
+
+{% block scripts %}
+  <script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+  <script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+  
+  <script>
+  $(function() {
+    $('.date-input').datepicker({
+    autoclose: true,
+    format: 'yyyy-mm-dd',
+    orientation: 'bottom'
+  
+    });
+   
+    $('.date-input').attr('autocomplete', 'off');
+  })
+  </script>
+  
+c
+  
+  <script type="text/javascript">
+    $('#clear_button').on('click', function() {
+      $('#id_date_ordered').val("");
+      $('#id_complete').val("");
+      $('#id_company').val("");
+      $('#id_currency').val("");
+      $('#id_start_date').val("");
+      $('#id_end_date').val("");
+    })  
+  </script>
+  
+  {% endblock %}  

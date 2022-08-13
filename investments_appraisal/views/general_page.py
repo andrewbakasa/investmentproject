@@ -187,7 +187,7 @@ def display_models(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 3
+			request.session['perpage']= 6
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -290,7 +290,7 @@ def display_models_ajax_filter(request,slug, *args, **kwargs):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 3
+			request.session['perpage']= 6
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -363,7 +363,7 @@ def display_models_ajax(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 3
+			request.session['perpage']= 6
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page
@@ -617,7 +617,7 @@ def user_models(request):
 		if obj:
 			request.session['perpage']=obj.perpage
 		else:# nothing in db
-			request.session['perpage']= 3
+			request.session['perpage']= 6
 	per_page=request.session['perpage']
 	# Paginator in a view function to paginate a queryset
 	# show 4 news per page

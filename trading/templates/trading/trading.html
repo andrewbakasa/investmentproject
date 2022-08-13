@@ -176,7 +176,7 @@
               }
 
               if (val.userIsOwner == true) {
-                  myportifolio= `<a href="/tr/i-edit/${val.id}/" 
+                  myportifolio= `<a href="/tr/i/e/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='Manage Business'>
                       <span class="advanced">Enterprenuer</span>
@@ -187,7 +187,7 @@
               }
              
               if (val.userIsInvestor == true) {
-                  myinvestment= `<a href="/tr/i-details/${val.id}/" 
+                  myinvestment= `<a href="/tr/i/d/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='View Investment'>
                       <span class="advanced2">Investor</span> 
@@ -230,7 +230,7 @@
 
                   
 
-                    <h3><a href="/tr/i-details/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment' 
+                    <h3><a href="/tr/i/d/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment' 
                       class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
                     
                     
@@ -278,7 +278,7 @@
               }
 
               if (val.userIsOwner ==true) {
-                  myportifolio= `<a href="/tr/i-edit/${val.id}/" 
+                  myportifolio= `<a href="/tr/i/e/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='Manage Business'>
                       <span class="advanced">Enterprenuer</span>
@@ -289,7 +289,7 @@
               }
              
               if (val.userIsInvestor ==true) {
-                  myinvestment= `<a href="/tr/i-details/${val.id}/" 
+                  myinvestment= `<a href="/tr/i/d/${val.id}/" 
                       data-toggle="tooltip" data-placement="bottom"  
                       title='View Investment'>
                       <span class="advanced2">Investor</span>
@@ -334,7 +334,7 @@
                   ${myportifolio} ${myinvestment}
                   ${doughnut_percent}               
                   <div class="project-content">
-                    <h3><a href="/tr/i-details/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment'  
+                    <h3><a href="/tr/i/d/${val.id}/" data-toggle="tooltip" data-placement="bottom"  title='View Investment'  
                       class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
                     
                     <small>${descript_trunc}</small> &nbsp;&nbsp;

@@ -1,0 +1,227 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+{% load widget_tweaks %}
+{% load store_extras %}
+
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+       
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success">{% trans 'Products' %}</a></li>
+    
+              <li class="breadcrumb-item" ><a href="{% url 'orders_list' %}" class ="badge rounded-pill bg-success">{% trans 'Orders' %}</a></li>
+    
+
+   
+
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Category</label>
+              </li>  
+            </ol>
+          </div>
+
+     
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            
+            <div class="box">
+              <div class="box-body">
+          
+                {% if order %}
+                <!-- Display order -->
+          
+                <!-- Customer information -->
+          
+                <form method="POST" action="{% url 'update_order' order.id %}" name="customer" class="form-horizontal">
+                  {% csrf_token %}
+                  <div class="panel panel-default">
+                    <div class="panel-heading">Customer</div>
+                    <div class="panel-body">
+                      <div class="form-group">
+                        <label class="col-sm-3 control-label">Customer:</label>
+                        <div class="col-sm-6">
+                          <p class="form-control-static"><a href="#">{{ order.customer }}</a></p>
+                        </div>
+                      </div>
+                      <!-- <div class="form-group">
+                        <label class="col-sm-3 control-label">Company:</label>
+                        <div class="col-sm-6">
+                          <p class="form-control-static">{{ order.company }}</p>
+                        </div>
+                      </div> -->
+                      <div class="form-group">
+                        <label class="col-sm-3 control-label">Transaction ID:</label>
+                        <div class="col-sm-6">
+                          <p class="form-control-static">{{ order.transaction_id }}</p>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-sm-3 control-label"> Date Ordered:</label>
+                        <div class="col-sm-6">
+                          <input type="text" class="form-control date-input" name="date_ordered" id="date_ordered" 
+                          value="{{ order.date_ordered|date:'SHORT_DATE_FORMAT' }}" {% if order.complete %}disabled{% endif %}>
+                        </div>
+                        
+                      </div>
+                      <!-- <div class="form-group">
+                        <label class="col-sm-3 control-label">Complete:</label>
+                        <div class="col-sm-6">
+                          <select name="complete" id="complete" class="form-control">
+                            <option value="True" {% if order.complete %}selected{% endif %}>Yes</option>
+                            <option value="False" {% if order.complete %}selected{% endif %}>No</option>
+                        
+                          <select>
+                        </div>
+                      </div> -->
+                      
+                      <div class="form-group">
+                        <label class="col-sm-3 control-label">Complete:</label>
+                        <div class="col-sm-6">
+                          <select class="form-control" id="complete" name="complete" >
+                              {% if order.complete %}
+                                <option value="False" >No</option>
+                                <option value="True"  selected>Yes</option>
+                              {% else %}
+                                <option value="False" selected >No</option>
+                                <option value="True"  >Yes</option>
+                              {% endif %}
+                          </select>
+                        </div>
+                      </div> 
+                    </div>
+                    <div class="panel-footer">
+                      <input type="submit" value="Save" class="btn btn-primary">
+                      {% if invoiced %}
+                       <a href="{% url 'make_invoice_from_order' order.id %}"  class="btn btn-default"> Update Invoice</a>
+                      {% else %}
+                        <a href="{% url 'make_invoice_from_order' order.id %}" class="btn btn-default">Create Invoice from Order</a>
+                       {% endif %}
+                      
+                      <a href="{% url 'print_order' order.id %}" target="_new" class="btn btn-default">Printable Order</a>
+                      <a href="{% url 'order_pdf_view' order.id %}" target="_blank" class="btn btn-default">View Pdf</a>
+                        <a href="{% url 'order_pdf_download' order.id  %}" class="btn btn-default">Download Pdf</a>
+                    </div>
+                  </div>
+                </form>
+          
+                <!-- END Customer information -->
+          
+                <!-- Order items -->
+          
+                <form action="#" method="post" class="form-inline">
+                  {% csrf_token %}
+                  <div class="panel panel-default">
+                    <div class="panel-heading">Order items</div>
+                    <table class="table table-hover" id="orderdata">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Item</th>
+                          <th scope="col">Description</th>
+                          <th scope="col">Cost</th>
+                          <th scope="col">Qty</th>
+                          <th scope="col">Total</th>
+                          <th scope="col" class="text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in order.orderitem_set.all %}
+                        <tr id="orderrow">
+                          <th scope="row">{{ item.id }} </th>
+                          <td>{{ item.product }}</td>
+                          <td>{{ item.product.description }}</td>
+                          <td>{{ item.order.currency.symbol}} {{ item.product.price| intcomma }}</td>
+                          <td>{{ item.quantity | intcomma }}</td>
+                          <td>{{item.order.currency.symbol}} {{ item.total| intcomma }}</td>
+                        
+                          <td class="text-right">
+                            <input type="button" class="delete-button btn btn-xs btn-danger" id="{{ order.id }}"
+                              name="delete-button" value="Delete" data-toggle="modal"
+                              data-target="#datamodel{{ order.id }}" data-id="{{ item.id }}" {% if order.complete %}disabled{% endif %}>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                   
+                    
+                    <div class="panel-footer text-right">
+                      <strong><p id = "order_total" name="order_total" >
+                      Order total: {{ order.currency.symbol}}{{ order.total_price| intcomma }}
+                    </p></strong></div>
+                  </div>
+                </form>
+          
+            
+               
+          
+                <!-- Delete confirmation modal -->
+                <div class="modal fade" id="confirmdelete" role="dialog">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title">Confirm</h4>
+                      </div>
+                      <div class="modal-body">
+          
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                        <a href="#" class="btn btn-danger">Yes</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+          
+          
+          
+          
+          
+                {% if confirm_update %}
+                <!-- Update success modal -->
+                <div class="modal fade" id="updateconfirm" role="dialog">
+                  <div class="modal-dialog">
+          
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-body">
+                      <h4>Changes saved!</h4>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="#" data-dismiss="modal" class="btn btn-primary">Ok</a>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+          
+                <!-- END delete confirmation modal -->
+                <!-- End success confirmation modal -->
+                {% endif %}
+          
+                <!-- End display Order -->
+          
+                {% else %}
+                <!-- Display order error -->
+          
+                <div class="alert alert-warning">Order number not found!</div>
+          
+                <!-- End display order error -->
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+       
+    
+    </div>
+  
+</section><!-- End Projects Section -->
+

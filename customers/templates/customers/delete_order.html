@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+{% block content_header %}
+    <h1>{{ account.name }}
+        <small>Delete</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'customers_home' %}">{% trans 'Home' %}</a></li>
+        <li><a href="{% url 'customers_home' %}">{% trans 'Customers' %}</a></li>
+        <li class="active">{{ account }}</li>
+    </ol>
+{% endblock %}
+{% block content %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-body">
+                <p>Are you sure you want to delete "{{item}}"?</p>
+                <form action="{% url 'delete_order' item.id %}" method="POST">
+                    {% csrf_token %}
+                    <a class="btn btn-sm btn-warning" href="{% url 'customers_home' %}">Cancel</a>
+                    <input class="btn btn-sm  btn-danger" type="submit" name="Confirm">
+                </form>
+            </div>
+        </div>
+       
+    </div>
+</div>
+
+
+
+{% endblock %}

@@ -9,10 +9,11 @@
 {% endblock %}
 
 
-{% block stylesheets %}
+{% block stylesheets %}    
+      
     <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
-
+    <link rel="stylesheet" href="/static/vendor/css/AdminLTE.min.css">
 
 <!-- < -->
 {% endblock %}
@@ -44,6 +45,10 @@
                     <li class="breadcrumb-item" ><a href="{% url 'trading_home' %}" class ="badge rounded-pill bg-success" 
                         data-toggle="tooltip" data-placement="bottom" title='Explore Investments'><i class="fas fa-balance-scale"></i></a></li>
                 
+                    <li class="breadcrumb-item" ><a href="{% url 'user_businesses' %}" class ="badge rounded-pill bg-success" 
+                          data-toggle="tooltip" data-placement="bottom" title='My Businesses'><i class="fas fa-industry"></i></a></li>
+                  
+                    
                     <li class="breadcrumb-item" ><a href="{% url 'fin_user_models' %}" class ="badge rounded-pill bg-success" 
                             data-toggle="tooltip" data-placement="bottom" title='Financial Models'><i class="fas fa-chart-line"></i></a></li>
                   
@@ -60,7 +65,7 @@
             <!-- ANNOTATION -->
             <h4>{{project.description}}</h4>
             <hr>
-            <div class="row">
+            <div class="row" >
                 <div class="col-md-3">
                   <div class="small-box bg-green">
                     <div class="inner">
@@ -96,94 +101,37 @@
             </div>
             <!-- LAYOUT -->
             <div class="row">
-                <!-- A -->
-                <div class="col-md-4 col-md-push-8">
-                  
-                    <div class="box">
-                        <div class="box-content">
-                          <table class="table">
-                            <tr><th></th><th>{{ today|date:"F" }}</th><th>{{ last_month|date:"F" }}</th></tr>
-                            <!-- RELEASES -->
-                            <tr>
-                                <th>{% trans 'Engaged' %}</th>
-                            
-                                <td>
-                                  <a href="#" data-toggle="modal" data-target="#modal_show_releases_current" 
-                                  data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Outputs' >${{ releases|shrink_num }}</a>
-                                </td>
-                                <td>                  
-                                  <a href="#" data-toggle="modal" data-target="#modal_show_releases_previous" 
-                                  data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Outputs'>${{ previous_releases|shrink_num}}</a>
-                                </td>
-                              
-                            </tr>
-                            <!-- ADMISSIONS -->
-                            <tr>
-                              <th>{% trans 'Verification' %}</th>
-                          
-                              <td>
-                                <a href="#" data-toggle="modal" data-target="#modal_show_admissions_current" 
-                                data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Assest Admission' >${{ admissions|shrink_num }}</a>
-                              </td>
-                              <td>                  
-                                <a href="#" data-toggle="modal" data-target="#modal_show_admissions_previous" 
-                                data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Assest Admission'>${{ previous_admissions|shrink_num }}</a>
-                              </td>
-                            
-                          </tr>
-                          <tr>
-                            <th>{% trans 'Difference' %}</th><td{% if difference < 0 %} class="text-red"{% endif %}>${{ difference|shrink_num }}</td><td{% if previous_difference < 0 %} class="text-red"{% endif %}>${{ previous_difference|shrink_num}}</td>
-                          </tr>
-                          
               
-                          </table>
-                        </div>
-                    </div>
-                    <div class="box">
-                        <div class="box-header">
-                          <h3 class="box-title">{% trans 'Investments Analytics' %}</h3>
-                        </div>
-                        <div class="box-body">
-                          <table class="table">
-                            <tr>
-                              <th>{% trans 'KPI' %}</th>
-                              <th>{% trans 'Target' %}</th>
-                              <th>{% trans 'Actual' %}</th>
-                            </tr>
-                          {% for kpi in dict_kpi %}
-                            <tr>
-                              <td><a href="#">{{ kpi.name }}</a></td>
-                              <td >${{ kpi.target|shrink_num }}</td>
-                              <td id="{{ kpi.id }}" {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>${{ kpi.actual|shrink_num }}</td>
-                              
-                            </tr>
-                          {% endfor %}
-                          </table>
-                        </div>
-                    </div>
-                    
-                </div>
                 <!-- B -->
-                <div class="col-md-8 col-md-pull-4">
-                    <div class="box">
+                <div class="col-md-8 col-md-pull-4" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
+                    <div class="box" >
                       <div class="box-header">
-                          <div class="row text-center">
+                          <!-- <div class="btn-group row text-center"> -->
                             <!-- <button id="toggle">show/hide all</button> -->
-                            <button id="entireperiod" class="btn btn-s btn-default col-lg-2"><small>{% trans 'Full Period' %}</small></button>  &nbsp; &nbsp;         
-                            <button id="6month" class="btn btn-s btn-default col-lg-2 range-chooser"><small>{% trans 'Last 6 month' %}</small></button>  &nbsp; &nbsp;
-                            <button id="3month" class="btn btn-s btn-default col-lg-2 range-chooser"><small>{% trans 'Last 3 Month' %}</small></button> &nbsp; &nbsp;
-                            <button id="currentMonth" class="btn btn-s btn-default col-lg-2 range-chooser"><small>{% trans 'Curr. Month' %}</small></button> &nbsp; &nbsp;
-                            <button id="currentWeek" class="btn btn-s btn-default col-lg-2 range-chooser"><small>{% trans 'Current Week' %}</small></button>
+                            <!-- &nbsp;&nbsp;
+                            <button id="entireperiod" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5"><small>{% trans 'Full Period' %}</small></button>  &nbsp; &nbsp;         
+                            <button id="6month" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Last 6 month' %}</small></button>  &nbsp; &nbsp;
+                            <button id="3month" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Last 3 Month' %}</small></button> &nbsp; &nbsp;
+                            <button id="currentMonth" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Curr. Month' %}</small></button> &nbsp; &nbsp;
+                            <button id="currentWeek" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Current Week' %}</small></button>
+                          
+                          </div> -->
+                          <div class="btn-group row" role="group"   aria-label="Basic example" style="text-align: left;white-space: nowrap;">
+                            <button id="entireperiod" class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Full Period' %}</small></button>          
+                            <button id="6month"       class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Last 6 months' %}</small></button> 
+                            <button id="3month"       class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Last 3 months' %}</small></button> 
+                            <button id="currentMonth" class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Current month' %}</small></button>
+                            <button id="currentWeek"  class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Current Week' %}</small></button>
                           
                           </div>
                       </div>
-                  </div>
+                    </div>
         
-                    <div class="box">      
+                    <div class="box" >      
                       <div class="box-header">
                         <h3 class="box-title">{% trans 'Investments Inflows' %}<a href="{% url 'update_project_graph_pref' %}"
-                        data-toggle="tooltip" data-placement="bottom" title='Set Graph Pref' 
-                        ><i class="fa fa-user fa-fw"></i></a></h3>
+                        data-toggle="tooltip" data-placement="bottom" title='Change Graph Preference' 
+                        >&nbsp;<i class="fas fa-user fa-fw"></i></a></h3>
                       </div>
                       <div class="box-body">
                         <canvas id="myreleasesChart" width="450" height="250"></canvas>
@@ -192,13 +140,371 @@
                   
                   
                 </div>
+
+                 <!-- A -->
+                 <div class="col-md-4 col-md-push-8">
+                  
+                  <div class="box" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;">
+                      <div class="box-content">
+                        <table class="table">
+                          <tr><th></th><th>{{ today|date:"F" }}</th><th>{{ last_month|date:"F" }}</th></tr>
+                          <!-- RELEASES -->
+                          <tr>
+                              <th>{% trans 'Engaged' %}</th>
+                          
+                              <td>
+                                <a href="#" data-toggle="modal" data-target="#modal_show_releases_current" 
+                                data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Engaged' >${{ releases|shrink_num }}</a>
+                              </td>
+                              <td>                  
+                                <a href="#" data-toggle="modal" data-target="#modal_show_releases_previous" 
+                                data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Engaged'>${{ previous_releases|shrink_num}}</a>
+                              </td>
+                            
+                          </tr>
+                          <!-- ADMISSIONS -->
+                          <tr>
+                            <th>{% trans 'Verification' %}</th>
+                        
+                            <td>
+                              <a href="#" data-toggle="modal" data-target="#modal_show_admissions_current" 
+                              data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Verification' >${{ admissions|shrink_num }}</a>
+                            </td>
+                            <td>                  
+                              <a href="#" data-toggle="modal" data-target="#modal_show_admissions_previous" 
+                              data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Verification'>${{ previous_admissions|shrink_num }}</a>
+                            </td>
+                          
+                        </tr>
+                        <tr>
+                          <th>{% trans 'Difference' %}</th><td{% if difference < 0 %} class="text-red"{% endif %}>${{ difference|shrink_num }}</td><td{% if previous_difference < 0 %} class="text-red"{% endif %}>${{ previous_difference|shrink_num}}</td>
+                        </tr>
+                        
+            
+                        </table>
+                      </div>
+                  </div>
+                  
+                  <div class="box" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;">
+                      <div class="box-header">
+                        <h3 class="box-title">{% trans 'Investments Analytics' %}</h3>
+                      </div>
+                      <div class="box-body">
+                        <table class="table">
+                          <tr>
+                            <th>{% trans 'KPI' %}</th>
+                            <th>{% trans 'Target' %}</th>
+                            <th>{% trans 'Actual' %}</th>
+                          </tr>
+                        {% for kpi in dict_kpi %}
+                          <tr>
+                            <td><a href="#">{{ kpi.name }}</a></td>
+                            <td >${{ kpi.target|shrink_num }}</td>
+                            <td id="{{ kpi.id }}" {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>${{ kpi.actual|shrink_num }}</td>
+                            
+                          </tr>
+                        {% endfor %}
+                        </table>
+                      </div>
+                  </div>
+                  
+              </div>
             </div>
 
         </div>
     </section><!-- End User Section -->
     
   </main><!-- End #main -->
-  
+   <!-- modal Engaged Current -->
+ <div class="modal fade" id="modal_show_releases_current" tabindex="-1" role="dialog"
+ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+ <div class="modal-dialog modal-lg" role="document">
+     <div class="modal-content rounded-10" style="border-radius: 10px;">
+         <!--Header-->
+         <div class="modal-header">
+             <div class="row ">
+               <div class="pull-left">
+                 <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Engaged {{ today|date:"F" }} {{ today|date:"Y" }}
+                 </h4>
+                
+               </div>
+               
+             </div>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">×</span>
+             </button>
+         </div>
+         <!--Body-->
+         <div class="modal-body">
+           {% if releases_outputs %}
+             <table class="table">
+                 <tr>
+                   <th>#</th>
+                   <th>User</th>
+                   <th>Email</th>
+                   <th>Application Date</th>
+                   <th>Status</th>
+                   <th>Value</th>
+                 </tr>
+                 {% for item in releases_outputs %}
+                 <tr>
+                   <td >{{forloop.counter }}</td>
+                   <td >{{item.username}}</td>
+                   <td >{{item.email }}</td>
+                   <td >{{item.date|date:'D d F Y'}}</td>
+                   <td >{{item.text }}</td>
+                   <td >${{item.value |shrink_num}}</td>
+                 </tr>
+                 {%endfor%}
+             </table>
+           {%else%} 
+           <p>No Investment Engaged</p> 
+           {% endif %}
+          
+         </div>
+         <!--Footer-->
+         <div class="modal-footer">
+             <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                 type="reset">Close
+             </button>
+         </div>
+     </div>
+ </div>
+ </div>
+
+ <!-- modal Engaged Previous -->
+ <div class="modal fade" id="modal_show_releases_previous" tabindex="-1" role="dialog"
+   aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+   <div class="modal-dialog modal-lg" role="document">
+       <div class="modal-content rounded-10" style="border-radius: 10px;">
+           <!--Header-->
+           <div class="modal-header">
+               <div class="row ">
+                 <div class="pull-left">
+                   <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Engaged {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                   </h4>
+                  
+                   
+                 </div>
+               
+               </div>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                   <span aria-hidden="true">×</span>
+               </button>
+           </div>
+           <!--Body-->
+           <div class="modal-body" >
+             {% if previous_releases_outputs %}
+               <table class="table">
+                   <tr>
+                      <th>#</th>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Application Date</th>
+                      <th>Status</th>
+                      <th>Value</th>
+                   </tr>
+                   {% for item in previous_releases_outputs %}
+                   <tr>
+                      <td >{{forloop.counter }}</td>
+                      <td >{{item.username}}</td>
+                      <td >{{item.email }}</td>
+                      <td >{{item.date|date:'D d F Y'}}</td>
+                      <td >{{item.text }}</td>
+                      <td >${{item.value |shrink_num}}</td>
+                   </tr>
+                   {%endfor%}
+               </table>
+               {% else %}
+               <p>No Investment Engaged</p>
+               {%  endif %}
+            
+           </div>
+           <!--Footer-->
+           <div class="modal-footer">
+               <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                   type="reset">Close
+               </button>
+           </div>
+
+       </div>
+   </div>
+ </div>
+
+<!-- modal Admission Current -->
+<div class="modal fade" id="modal_show_admissions_current" tabindex="-1" role="dialog"
+aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content rounded-10" style="border-radius: 10px;">
+        <!--Header-->
+        <div class="modal-header">
+            <div class="row ">
+              <div class="pull-left">
+                <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Verification {{ today|date:"F" }} {{ today|date:"Y" }}
+                </h4>
+               
+              </div>
+              
+            </div>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <!--Body-->
+        <div class="modal-body">
+          {% if assets_admission %}
+            <table class="table">
+                <tr>
+                  <th>#</th>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Application Date</th>
+                  <th>Status</th>
+                  <th>Value</th>
+                </tr>
+                {% for item in assets_admission %}
+                <tr>
+                   <td >{{forloop.counter }}</td> 
+                   <td >{{item.username}}</td>
+                   <td >{{item.email }}</td>
+                   <td >{{item.date|date:'D d F Y'}}</td>
+                   <td >{{item.text }}</td>
+                   <td >${{item.value |shrink_num}}</td>
+                </tr>
+                {%endfor%}
+            </table>
+          {%else%} 
+          <p>No Investment under Verification</p> 
+          {% endif %}
+         
+        </div>
+        <!--Footer-->
+        <div class="modal-footer">
+            <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                type="reset">Close
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- modal Admission Previous -->
+<div class="modal fade" id="modal_show_admissions_previous" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content rounded-10" style="border-radius: 10px;">
+          <!--Header-->
+          <div class="modal-header">
+              <div class="row ">
+                <div class="pull-left">
+                  <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;"> Verification {{ last_month|date:"F" }} {{ last_month|date:"Y" }}
+                  </h4>
+                 
+                  
+                </div>
+              
+              </div>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body" >
+            {% if previous_assets_admission %}
+              <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Application Date</th>
+                    <th>Status</th>
+                    <th>Value</th>
+                  </tr>
+                  {% for item in previous_assets_admission %}
+                  <tr>
+                    <td >{{forloop.counter }}</td>
+                    <td >{{item.username}}</td>
+                    <td >{{item.email }}</td>
+                    <td >{{item.date|date:'D d F Y'}}</td>
+                    <td >{{item.text }}</td>
+                    <td >${{item.value |shrink_num}}</td>
+                  </tr>
+                  {%endfor%}
+              </table>
+              {% else %}
+              <p>No Investment under Verification</p>
+              {%  endif %}
+           
+          </div>
+          <!--Footer-->
+          <div class="modal-footer">
+              <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                  type="reset">Close
+              </button>
+          </div>
+
+      </div>
+  </div>
+</div> 
+
+<!-- modal WIP -->
+<div class="modal fade" id="modal_show_wip" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content rounded-10" style="border-radius: 10px;">
+          <!--Header-->
+          <div class="modal-header">
+              <div class="row ">
+                <div class="pull-left">
+                  <h4 class="modal-title" id="myModalLabel" style="padding-left: 15px;" > WIP {{ today|date:"F" }} {{ today|date:"Y" }}
+                  </h4>
+                 
+                  
+                </div>
+              
+              </div>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+              </button>
+          </div>
+          <!--Body-->
+          <div class="modal-body" >
+            {% if outputs_wip %}
+              <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Application Date</th>
+                    <th>Status</th>
+                    <th>Value</th>
+                  </tr>
+                  {% for item in outputs_wip %}
+                  <tr>
+                    <td >{{forloop.counter }}</td>
+                    <td >{{item.username}}</td>
+                    <td >{{item.email }}</td>
+                    <td >{{item.date|date:'D d F Y'}}</td>
+                    <td >{{item.text }}</td>
+                    <td >${{item.value |shrink_num}}</td>
+                  </tr>
+                  {%endfor%}
+              </table>
+              {% else %}
+              <p>No Releases</p>
+              {%  endif %}
+           
+          </div>
+          <!--Footer-->
+          <div class="modal-footer">
+              <button class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                  type="reset">Close
+              </button>
+          </div>
+
+      </div>
+  </div>
+</div> 
   {%endblock%}
 
 
@@ -218,6 +524,7 @@ function numberWithCommas(x) {
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
     }
+    $('#entireperiod').addClass('bg-warning')   
  var colors =
    ['#357ca5',
     '#008d4c',
@@ -494,6 +801,20 @@ $('body').on('click', '.download-investors-excel', function(){
                     }, 4000);
                 });
     });
+$('body').on('click', '.btn-clicked', function (e) {
+  var myclass =$('.btn-clicked')
+  var clicked_id = $(this).attr('id')
+  $.each(myclass, function(i, val) {
+      let loop_id= $(this).attr('id')
+      if (clicked_id == loop_id){
+          $(this).addClass('bg-warning')
+          $(this).removeClass('bg-light')
+      }else {
+          $(this).removeClass('bg-warning')
+          $(this).addClass('bg-light')
+      }
+  }); 
 
+})
 </script>
 {% endblock %}

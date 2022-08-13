@@ -96,10 +96,68 @@ class Investment(models.Model):
         qs = Investor.objects.filter(Q(investment__id =self.pk),Q(application_status ="engagement")).order_by("-date_created","-date_status_changed")
         return qs
     
+    def investor_dataframe(self, investors_df):
+        #print('gettting')
+        
+        investments_df = pd.DataFrame(Investment.objects.all().values())       
+        users_df = pd.DataFrame(User.objects.all().values())
+        categories_df = pd.DataFrame(InvestmentCategory.objects.all().values()) 
+
+        df = pd.DataFrame(columns =['iid','retain_id'])
+        if investments_df.shape[0]>0 and investors_df.shape[0] > 0 : 
+            investments_df['investment_id'] = investments_df['id']
+            # mwrge
+          
+            df =pd.merge(investments_df, investors_df, on='investment_id',how="inner").drop([
+                        'likes','views','date_created_x','motivation'
+                        ,'investment_id'], axis=1).rename(
+                        {'name_y':'name_add','date_created_y':'date_created_add', 'id_x': 'iid','id_y': 'retain_id','description':'summary', 
+                        'name_x':'inv_name' }, axis=1)
+
+            if users_df.shape[0]>0:
+                users_df['user_id'] = users_df['id']
+                # merge
+                df =pd.merge(df, users_df, on='user_id',how="left").drop([
+                    'id',  'password', 'last_login', 'is_superuser',
+                    'is_staff', 'is_active',  'date_joined'
+                ], axis=1).rename(
+                            {}, axis=1)
+
+            if categories_df.shape[0]>0:
+                categories_df['category_id'] = categories_df['id']
+                # merge
+                df =pd.merge(df, categories_df, on='category_id',how="left").drop([
+                    'date_created', 'likes', 'hits', 'creater_id', 'category_id','id'
+                ], axis=1).rename(
+                            {'name_add': 'name', 'date_created_add':'date_created', 'description':'cat_descript','name':'cat_name', 'retain_id':'id'}, axis=1)
+
+        else:
+            return df#[~df['id'].isna()]
+        #select only for current user
+      
+       
+        return df #[~df['id'].isna()]
+
+
+    @property
+    def kpi_output_df_released(self):
+        investor_qs = self.kpi_output_qs_released
+        investors_df = pd.DataFrame(investor_qs.values())
+        df = self.investor_dataframe(investors_df)
+        return df 
+
     @property
     def kpi_output_qs_wip(self):
         qs = Investor.objects.filter(Q(investment__id =self.pk), Q(application_status__in=["pending", "verification","accepted"])).order_by("date_created","date_status_changed")
         return qs
+    
+    @property
+    def kpi_output_df_wip(self):
+        investor_qs = self.kpi_output_qs_wip
+        investors_df = pd.DataFrame(investor_qs.values())
+        df = self.investor_dataframe(investors_df)
+        return df 
+    
     @property
     def time_to_close_attr(self):
         if self.closing_date > datetime.date.today():

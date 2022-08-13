@@ -1,0 +1,98 @@
+{% extends 'store/main.html' %}
+
+{% load store_extras %}
+
+{% load widget_tweaks %}
+
+{% load static %}
+{% load humanize %}
+
+{% block stylesheets %}
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+
+<script>
+
+	$(document).ready(function() {
+		
+		
+	
+		
+	    
+	});	
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+      <div class="box-element container-fluid">
+          <div class="row">
+            {% for product in product_page_obj %}
+                <div class="col-lg-4">
+                    <!-- mode propert faile to find file -->
+                    {% if product.imageURL %}
+                    <img class="img-fluid thumbnail" src="{{product.imageURL}}">
+                    {% else %}
+                    <img class="img-fluid thumbnail" src="{% static 'images/placeholder.png' %}">
+                    {% endif %}
+                   
+                    <div class="box-element-product">
+                        <h6><strong>{{product.name}}</strong></h6>
+                        <hr>
+                        <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-primary add-btn update-cart">Add to Cart</button>
+                        <a class="btn btn-outline-success" href="{% url 'product_detail' product.id %}">View</a>
+                        <!-- product.price -->
+                        <h4 style="display: inline-block; float: right">${{product.price|floatformat:2| intcomma}}</h4>
+                    </div>
+                </div>
+                
+            {% endfor %}
+            
+                
+           
+          </div>
+
+          <div class="pagination nav justify-content-center">
+            <span class="step-links">
+                {% if product_page_obj.has_previous %}
+                    <a href="{% relative_url 1 'page' request.GET.urlencode %}">&laquo; first</a>
+                    <a href="{% relative_url product_page_obj.previous_page_number 'page' request.GET.urlencode %}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ product_page_obj.number }} of {{ product_page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if product_page_obj.has_next %}
+                    <a href="{% relative_url product_page_obj.next_page_number 'page' request.GET.urlencode %}">next</a>
+                    <a href="{% relative_url product_page_obj.paginator.num_pages 'page' request.GET.urlencode %}">last &raquo;</a>
+                {% endif %}
+            </span>
+          </div>
+      </div>
+      <br>
+{% endblock %}
+
+
+{% block productsearchform %}
+<form method="get" action=''>
+  <!-- {% csrf_token %} -->
+  <div class="form-inline my-2 my-lg-0">
+     {% render_field product_filter.form.name class="form-control"  placeholder="product name" %}
+   
+      <button style="margin-left: 10px;" type="submit" id="search-button" class="btn btn-outline-warning" >Search</button>
+     
+      <a style="margin-left: 10px;" class="btn btn-outline-warning" href="{% url 'cart' %}">Go to Cart</a>
+     
+  </div>
+  
+  </form>
+  
+{% endblock %}
+
+

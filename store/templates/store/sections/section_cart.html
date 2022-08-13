@@ -1,0 +1,92 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load store_extras %}
+
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+       
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-light text-dark">{% trans 'Products' %}</a></li>
+             
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Category</label>
+              </li>  
+            </ol>
+          </div>
+
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="box-element">
+                        <a class="btn btn-outline-dark" href="{% url 'store' %}">&#x2190; Continue Shopping</a>
+        
+                        <br>
+                        <br>
+        
+                        <table class="table">
+                            <tr>
+                                <th id="o_total_qnty"><h5>Items: <strong>{{order.total_quantity| intcomma}}</strong></h5></th>
+                                <!-- order.total_price -->
+                                <th id="o_total_price"><h5>Total: <strong>${{order.total_price|floatformat:2| intcomma}}</strong></h5></th>
+                                <th>
+                                    <a style="float: right; margin: 5px" class="btn btn-success" href="{% url 'checkout' %}"> Checkout</a>
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
+        
+                    <br>
+        
+                    <div class="box-element" id="cart-table">
+                            <div class="cart-row">
+                                <div style="flex:2"></div>
+                                <div style="flex:2"><strong>Item</strong></div>
+                                <div style="flex:1"><strong>Price</strong></div>
+                                <div style="flex:1"><strong>Quantity</strong></div>
+                                <div style="flex:1"><strong>Total</strong></div>
+                            </div>
+            
+                        {% for orderitem in orderitems %}
+                            <div class="cart-row" id="cart-item-{{orderitem.product.id}}">
+                                <div style="flex:2"><img class="row-image" src="{{orderitem.product.imageURL}}"></div>
+                                <div style="flex:2" name ='item'><p>{{orderitem.product.name}}</p></div>
+                                <!-- orderitem.product.price -->
+                                <div style="flex:1" name ='price'><p>${{orderitem.product.price|floatformat:2| intcomma}}</p></div>
+                                <div style="flex:1" name ='quantity'>
+                                    <p class="quantity" name ='number-part'>{{orderitem.quantity| intcomma}}</p>
+                                    <div class="quantity">
+                                        <img data-product="{{orderitem.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
+        
+                                        <img data-product="{{orderitem.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
+                                    </div>
+                                </div>
+                                <!-- orderitem.total -->
+                                <div style="flex:1" name ='total'><p>${{orderitem.total| intcomma}}</p></div>
+                            </div>
+                        {% endfor %}
+        
+                    </div>
+                    <br>
+                </div>
+            </div>
+          </div>
+
+       
+
+    </div>
+  
+</section><!-- End Projects Section -->
+
+
+
+
+
+
+

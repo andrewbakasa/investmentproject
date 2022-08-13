@@ -27,7 +27,10 @@
             <span class="counter counter-lg" style="color: red; top:-2px;">{{model.blogs_count}}</span> {% endif %}
           </a>
         </li>
-  
+        <li  class="breadcrumb-item"><a  href="{% url 'investment_dashboard' investment_id %}" class ="badge rounded-pill bg-success"  
+          data-toggle="tooltip" data-placement="bottom" title="View Statitics"><i class="fas fa-binoculars"></i>
+          </a>
+        </li>
          
         <li class="breadcrumb-item" >
             <!-- EDIT MODEL -->

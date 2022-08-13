@@ -1,0 +1,98 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+{% load widget_tweaks %}
+{% load store_extras %}
+
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+       
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-light text-dark">{% trans 'Store' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'products' %}" class ="badge rounded-pill bg-light text-dark">{% trans 'Products' %}</a></li>
+           
+              <li class="breadcrumb-item" ><a href="{% url 'product_new' %}" class ="badge rounded-pill bg-light text-dark">{% trans 'New Product' %}</a></li>
+         
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Edit/New</label>
+              </li>  
+            </ol>
+          </div>
+
+          
+
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="box">
+              <div class="box-header with-border">
+              <h3 class="box-title">{% trans 'Transaction Details' %}</h3>
+            </div>
+            <div class="box-body">
+                <form method="post" class="form-horizontal" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+                    <label class="col-sm-2 control-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                    <div class="col-sm-8">
+                      {{ form.name|add_class:"form-control" }}
+                      {% for error in form.name.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="form-group{% if form.price.errors %} has-error{% endif %}">
+                    <label class="col-sm-2 control-label" for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+                    <div class="col-sm-8">
+                      {{ form.price|add_class:"form-control" }}
+                      {% for error in form.price.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="form-group{% if form.categories.errors %} has-error{% endif %}">
+                    <label class="col-sm-2 control-label" for="{{ form.categories.id_for_label }}">{{ form.categories.label }}</label>
+                    <div class="col-sm-8">
+                      {{ form.categories|add_class:"form-control" }}
+                      {% for error in form.categories.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="form-group{% if form.description.errors %} has-error{% endif %}">
+                    <label class="col-sm-2 control-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                    <div class="col-sm-8">
+                      {{ form.description|add_class:"form-control" }}
+                      {% for error in form.description.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                 
+                  <div class="form-group{% if form.image.errors %} has-error{% endif %}">
+                    <label class="col-sm-2 control-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                    <div class="col-sm-8">
+                      {{ form.image|add_class:"form-control" }}
+                      {% for error in form.image.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  
+                  
+                  <button type="submit" class="btn btn-primary col-md-offset-2">{% if object %}{% trans 'Update' %}{% else %}{% trans 'Create' %}{% endif %}</button>
+                </form>
+            </div>
+            </div>
+          </div>
+
+       
+    
+    </div>
+  
+</section><!-- End Projects Section -->
+

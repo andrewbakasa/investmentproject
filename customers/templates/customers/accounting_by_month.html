@@ -1,0 +1,128 @@
+{% extends 'customers/customer_main.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+{% block content_header %}
+    <h1>Report
+		<small> Financial Statement</small>
+	</h1>
+	
+    <ol class="breadcrumb">
+        <li><a href="{% url 'customers_home' %}">{% trans 'Home' %}</a></li>
+        <li><a href="{% url 'orders_list' %}">{% trans 'Orders' %}</a></li>
+        <li class="active">{{ account }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+
+<div class="box">
+	<div class="box-body">
+	
+
+	{% if error_message %}
+	<div class="alert alert-danger">{{ error_message }}</div>
+	{% endif %}
+
+	{% if web_view %}
+	<!-- Button trigger modal-->
+		<div class="box-body">
+			<table class="table table-striped">
+			<tr>
+				{% for key, value in MonthlySalesplan.items %}
+					<th>{{key}} </th>
+				{% endfor %}
+			</tr>
+			
+			<tr>
+				{% for key, value in MonthlySalesplan.items  %}
+					<td>{{value}}</td>
+				{% endfor %}
+			</tr>	
+			
+			
+			<tr>
+				{% for key, value in MonthlyOrders.items  %}
+					<td>{{value}}</td>
+				{% endfor %}
+			</tr>
+			<tr>
+				{% for key, value in MonthlyPayments.items  %}
+					<td>{{value}}</td>
+				{% endfor %}
+			</tr>
+			<tr>
+				{% for key, value in MonthlyExpenses.items  %}
+					<td>{{value}}</td>
+				{% endfor %}
+			</tr>
+			<tr>
+				{% for key, value in MonthlyNetProfit.items  %}
+					<td>{{value}}</td>
+				{% endfor %}
+			</tr>
+			</table>
+			<p>
+				{% for value in Company_list  %}
+					{{value}} ;
+				{% endfor %}
+			</p>
+	  	</div>
+
+	{% else %}
+		<form action="{% url 'export_financial_statement' %}" method="POST" class="form-horizontal">
+			{% csrf_token %}
+			<div class="panel panel-default">
+				<div class="panel-heading">Choose a Company</div>
+				<div class="panel-body">
+					<!-- <div class="form-group">
+						<label class="control-label col-sm-2" for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
+						<div class="col-sm-9">{{ form.company|add_class:"form-control" }}</div>
+					  </div> -->
+
+					
+
+					  <div  data-toggle='buttons' overflow:auto >
+						{% for checkbox in form.company %}
+						<label >
+							{{checkbox.tag }} {{checkbox.choice_label}}
+						</label>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2" for="{{ form.export_type.id_for_label }}">{{ form.export_type.label }}</label>
+					<div class="col-sm-4">{{ form.export_type|add_class:"form-control" }}</div>
+				  </div>
+				<div class="panel-footer">
+					<input type="submit" value="View" class="btn btn-primary">
+				</div>
+			</div>
+		</form>
+
+	{% endif %}
+</div>
+</div>
+
+{% endblock %}
+{% block stylesheets %}
+<!-- overflow:auto'; in contain div -->
+	<style type="text/css">
+		.column-checkbox {
+			padding-top: 20px;
+			max-height:20px !important;
+		}
+		.column-checkbox .checkbox {
+			display:block;
+			/* float: left; */
+			width:25%;
+		}
+		.scrollbar-y{
+			overflow-y: scroll !important;
+			max-height:20px !important;
+		}
+		</style>
+{% endblock %}

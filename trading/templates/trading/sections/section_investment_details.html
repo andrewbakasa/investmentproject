@@ -21,15 +21,15 @@
         
        
         {% if is_user_record_owner %}
-        <li  class="breadcrumb-item">
-          <a href="{% url 'edit-investment' model.id %}" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'><i  class="fas fa-wrench"></i>
-          </a>
-         
-        </li> 
-        <li  class="breadcrumb-item">
-          <a  href="{% url 'investment_dashboard' model.id %}"  data-toggle="tooltip" data-placement="bottom" title="View Dashboard"><i class="fas fa-binoculars"></i>
+          <li  class="breadcrumb-item"><a href="{% url 'edit-investment' model.id %}" class ="badge rounded-pill bg-success"
+            data-toggle="tooltip" data-placement="bottom"  title='Manage Business'><i  class="fas fa-wrench"></i>
             </a>
-        </li>
+          
+          </li> 
+          <li  class="breadcrumb-item"><a  href="{% url 'investment_dashboard' model.id %}" class ="badge rounded-pill bg-success"  
+            data-toggle="tooltip" data-placement="bottom" title="View Statitics"><i class="fas fa-binoculars"></i>
+            </a>
+          </li>
         {% endif%}
 
         <li {% userInvestorEngagedMethod model request.user %} class="breadcrumb-item my_blogs_li" style="display:none">

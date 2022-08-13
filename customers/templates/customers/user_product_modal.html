@@ -1,0 +1,88 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+          <form class="model-form-add form-horizontal modal-wide" enctype="multipart/form-data" method="post" data-url="{% url 'create_userproduct_ajax' %}">
+              {% csrf_token %}
+           
+              <div class="modal-body">
+                <div class="form-group{% if form.created_by.errors %} has-error{% endif %}" style="display:none">
+                  <label class="col-sm-3 col-form-label" for="{{ form.created_by.id_for_label }}">{{ form.created_by.label }}</label>
+                
+                  {{ form.created_by|add_class:"form-control hidden" }}
+                  {% for error in form.created_by.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                </div>
+
+                  <div class="form-group row">
+                    <label class="col-sm-2 control-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                    <div class="col-sm-4">
+                      {{ form.name|add_class:"form-control" }}
+                      {% for error in form.name.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                
+                    <label class="col-sm-2 control-label" for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+                    <div class="col-sm-4">
+                      {{ form.price|add_class:"form-control" }}
+                      {% for error in form.price.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  </br>
+
+                  <div class="form-group row">
+                    <label class="col-sm-2 control-label" for="{{ form.categories.id_for_label }}">{{ form.categories.label }}</label>
+                    <div class="col-sm-10">
+                      {{ form.categories|add_class:"form-control" }}
+                      {% for error in form.categories.errors %}
+                      <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    </div>
+                  </br>
+                    <div class="form-group row">
+                      <label class="col-sm-2 control-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                      <div class="col-sm-10">
+                        {{ form.description|add_class:"form-control" }}
+                        {% for error in form.description.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </br>
+                    
+                    <div class="form-group row">
+                      <label class="col-sm-2 control-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                      <div class="col-sm-10">
+                        {{ form.image|add_class:"form-control" }}
+                        {% for error in form.image.errors %}
+                        <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+            </div>
+             
+              <!-- Throw Error Here -->
+              <div class="form-error2 public_toggle_form-errors form-group" style='display:none'>
+              </div>
+                <!--Footer-->
+              <div class="modal-footer">
+                  <button class="btn btn-outline-danger close-modal" data-dismiss="modal" aria-label="Close"
+                      type="reset">Close
+                  </button>
+                  <button class="btn btn-danger" type="submit">Save</button>
+               </div>
+
+              
+            </form>
+           
+
+
+

@@ -1,0 +1,199 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+{% load widget_tweaks %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'vendor/css/daterangepicker.css' %}">
+{% endblock %}
+
+{% block content_header %}
+    <h1>  
+        <small>Customers List</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'customers_home' %}">{% trans 'Home' %}</a></li>
+        <li><a href="{% url 'orders_list' %}">{% trans 'Orders' %}</a></li>
+        <li class="active">{{ account }}</li>
+    </ol>
+{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+          <div class="box-header with-border">
+            <h3 class="box-title">List:</h3>
+            <div class="row">
+                <div class="col">
+                    <div class="col-md-12">
+                        <!-- <form method="get">
+                            {{myFilter.form}}
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </form> -->
+
+                        
+                        <form method="get" class="form-horizontal">
+                            <!-- {% csrf_token %} -->
+                                <div class="form-group">
+                               
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.name.id_for_label }}">{{ myFilter.form.name.label }}</label>
+                                  <div class="col-sm-3{% if myFilter.form.name.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.name|add_class:"form-control" }}
+                                    {% for error in myFilter.form.name.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                          
+                               
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.address1.id_for_label }}">{{ myFilter.form.address1.label }}</label>
+                                  <div class="col-sm-3{% if myFilter.form.address1.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.address1|add_class:"form-control" }}
+                                    {% for error in myFilter.form.address1.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                                
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.city.id_for_label }}">{{ myFilter.form.city.label }} </label>
+                                  <div class="col-sm-3{% if myFilter.form.city.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.city|add_class:"form-control " }}
+                                    {% for error in myFilter.form.city.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                                  
+                                </div>
+                                
+                                <div class="form-group">
+                                 
+                                  
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.state.id_for_label }}">{{ myFilter.form.state.label }} </label>
+                                  <div class="col-sm-3{% if myFilter.form.state.errors %} has-error{% endif %}">
+                                    {{ myFilter.form.state|add_class:"form-control " }}
+                                    {% for error in myFilter.form.state.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                               
+
+
+                                  <label class="col-sm-1 control-label" for="{{ myFilter.form.zip.id_for_label }}">{{ myFilter.form.zip.label }} </label>
+                                  <div class="col-sm-2">
+                                    {{ myFilter.form.zip|add_class:"form-control  date-input" }}
+                                    {% for error in myFilter.form.zip.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                  </div>
+                                  
+                                  <label class="col-sm-1 control-label" ></label>
+                                  <div class="col-sm-1">
+                                    <button class="btn btn-primary" type="submit">Search</button>
+                                  </div>
+                                  <label class="col-sm-1 control-label" ></label>
+                                  <div class="col-sm-1">
+                                    <button class="btn btn-default" id="clear_button">Clear</button>
+                                  </div>
+                                
+                                 
+                                </div>
+                                
+                              </form> 
+    
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="box-body">
+            <table class="table table-striped">
+              <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Corporate Client</th>
+                    <th>Date Created</th>
+                    <th class="text-right">Actions</th>
+               
+              </tr>
+              
+  
+              {% for customer in customers %}
+                    <tr>
+                        <td>{{customer.name}}</td>
+                        <td>{{customer.email}}</td>
+                        <td>{{customer.phone}}</td>
+                        <td>{{customer.coporateclient}}</td>
+                        <td>{{customer.date_created}}</td>
+                        <td class="text-right">
+                            <a style="color:inherit" href="{% url 'cust' customer.id %}">
+                              <i class="fa fa-book"></i>
+                            </a>
+                            <a style="color:inherit"style="color:inherit" href="{% url 'delete_customer' customer.id %}"><i class="fa fa-trash"></i>
+
+                            </a>
+                          </td>
+                         
+                    </tr>
+                {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+
+</div>
+{% endblock content %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+  $('#page_select').change(function() {
+    $( "select option:selected" ).each(function() {
+      // window.location.href = "{{ request.path }}?page=" + $(this).val();
+      var url= my_java_url($(this).val(),'page',"{{ request.GET.urlencode}}")
+      window.location.href = url;
+      
+    });
+  })
+  
+  function my_java_url(page_num, field_name, urlencode){
+    // Similary to template tags my_url {page_and_filter}
+    var srchURLArray = urlencode.split("&")
+    var tempArray = new Array()
+    var parameter_str= ""
+    for (var i =0; i < srchURLArray.length; i++) {
+      tempArray = srchURLArray[i].split("=")
+      var pos =  tempArray[0].indexOf(';');
+      // amp;date=107
+      if (pos > 0) {
+          var secondtempArray = new Array()
+          secondtempArray = tempArray[0].split(";")
+          // discard the amp(i dont know why it there)
+          if (secondtempArray[1]!==field_name) {
+               parameter_str = parameter_str + "&" + secondtempArray[1] + "=" + tempArray[1]
+          } 
+      }else {
+        // date=107
+        if (tempArray[0]!==field_name) {
+            parameter_str = parameter_str + "&" + tempArray[0] + "=" + tempArray[1]
+        } 
+      }
+     
+    }
+    return "{{ request.path }}?page=" + page_num + parameter_str
+  }
+
+  
+</script>
+
+<script type="text/javascript">
+  $('#clear_button').on('click', function() {
+    $('#id_city').val("");
+    $('#id_address1').val("");
+    // $('#id_address2').val("");
+    $('#id_state').val("");
+    $('#id_zip').val("");
+    $('#id_name').val("");
+  })  
+</script>
+
+{% endblock %}

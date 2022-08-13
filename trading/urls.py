@@ -14,8 +14,8 @@ urlpatterns = [
     path('', views.home, name="trading_home"), 
     path('view/<int:model_id>/', views.project_details, name="view_trading"),
     path('investor-details/<int:id>/<int:investment_id>/', views.investor_details, name="investor-details"), 
-    path('i-details/<int:id>/', views.investment_details, name="investment-details"), 
-    path('i-edit/<int:id>/', views.edit_investment, name="edit-investment"), 
+    path('i/d/<int:id>/', views.investment_details, name="investment-details"), 
+    path('i/e/<int:id>/', views.edit_investment, name="edit-investment"), 
     path('i-view/<int:id>/', views.view_investors, name="view-investors"),
   
     path('display_investment_ajax/', views.display_investment_ajax, name="display_investment_ajax"),
@@ -74,7 +74,7 @@ urlpatterns = [
     path('u/i/r/', views.dbUpdateInvestorsRecieved, name="db_update_investors_recieved"),
 
 
-    path('i/db/<str:pk>/', views.investment_dashboard, name="investment_dashboard"),
+    path('i/s/<str:pk>/', views.investment_dashboard, name="investment_dashboard"),
     
   # api
      path('api/get_project_output_by_rolling_week/<dstart>/<dend>/',

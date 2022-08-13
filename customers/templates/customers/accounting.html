@@ -1,0 +1,139 @@
+{% extends 'customers/customer_main.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+
+{% block content_header %}
+    <h1>Web Report
+		{% if start and end %}
+		<small> Orders Accounting Report: {{ start|date:"SHORT_DATE_FORMAT" }} to {{ end|date:"SHORT_DATE_FORMAT" }}</small>
+		{% else %}
+		<small> Orders</small>
+		{% endif %}
+	</h1>
+	
+    <ol class="breadcrumb">
+        <li><a href="{% url 'customers_home' %}">{% trans 'Home' %}</a></li>
+        <li><a href="{% url 'orders_list' %}">{% trans 'Orders' %}</a></li>
+        <li class="active">{{ account }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+
+<div class="box">
+	<div class="box-body">
+	
+
+	{% if error_message %}
+	<div class="alert alert-danger">{{ error_message }}</div>
+	{% endif %}
+
+	{% if start and end %}
+	<!-- Button trigger modal-->
+	
+	<a href="{%url 'export_orders'%}">
+		<button type="button" class="btn btn-danger">
+			Export CV
+		</button>
+	  </a>
+	<a href="#">
+		<button type="button" class="btn">
+		  Export PDF
+		</button>
+	  </a>
+	<div class="panel panel-default">
+		<div class="panel-heading">Orders</div>
+		<table class="table table-hover">
+			<tr>
+				<th>Transaction N#</th>
+				<th>Customer</th>
+				<th>Date</th>
+				<th>Total</th>
+				<th class="text-right">Actions</th>
+			</tr>
+			{% for order in orders %}
+			<tr>
+				<td>{{ order.transaction_id }}</td>
+				<td>{{ order.customer }}</td>
+				<td>{{ order.date_ordered|date:"SHORT_DATE_FORMAT" }}</td>
+				<td>{{order.currency.symbol}} {{ order.total_price | intcomma}}</td>
+				<td class="text-right"><a href="{% url 'order' order.id %}" class="btn btn-xs btn-primary">View Order</a></td>
+			</tr>
+			{% endfor %}
+		</table>
+		
+		<div class="panel-footer text-right">
+			<strong>
+				
+				Total:
+
+				{% for key, value in currencyTotals.items %}
+		
+				  {{key}} {{value| intcomma}}
+				  
+		        {% endfor %}
+
+			</strong></div>
+		
+		
+		
+	</div>
+
+	
+	{% else %}
+		<form action="{% url 'orders_accounting' %}" method="POST" class="form-horizontal">
+			{% csrf_token %}
+			<div class="panel panel-default">
+				<div class="panel-heading">Choose a date range</div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-sm-3 control-label" for="start">Start:</label>
+						<div class="col-sm-6">
+							<div class="input-group" id="startdate">
+								<input type="text" class="form-control date-input" data-date-format="mm/dd/yyyy" placeholder="mm/dd/yyyy" id="start" name="start" value ={{date1}}>
+								<div class="input-group-addon"><span class="glyphicon glyphicon-th"></span></div>
+							</div>
+							
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label" for="start">End:</label>
+						<div class="col-sm-6">
+							<div class="input-group" id="enddate">
+								<input type="text" class="form-control date-input" data-date-format="mm/dd/yyyy" placeholder="mm/dd/yyyy" id="end" name="end" value ={{date2}}>
+								<div class="input-group-addon"><span class="glyphicon glyphicon-th"></span></div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				<div class="panel-footer">
+					<input type="submit" value="View" class="btn btn-primary">
+				</div>
+			</div>
+		</form>
+
+	{% endif %}
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+
+<script>
+$(function() {
+  $('.date-input').datepicker({
+  autoclose: true,
+  format: 'mm/dd/yyyy',
+  orientation: 'bottom'
+
+  });
+ 
+  $('.date-input').attr('autocomplete', 'off');
+})
+</script>
+{% endblock %}
