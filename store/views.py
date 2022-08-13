@@ -40,7 +40,7 @@ from django.views import generic
 from store import forms
 #from . import importers
 from . import models
-from rest_framework.authtoken.models import Token as AuthToken
+#from rest_framework.authtoken.models import Token as AuthToken
 #from common.utils import  get_invoice_total, get_expense_total
 from .models import Invoice, Company, Expense
 import pandas as pd
@@ -460,13 +460,13 @@ class ExportView(LoginRequiredMixin, generic.edit.FormView):
 class ImportView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'store/import.html'
 
-class ProfileView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'store/profile.html'
+# class ProfileView(LoginRequiredMixin, generic.TemplateView):
+#     template_name = 'store/profile.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(ProfileView, self).get_context_data()
-        context['token'], created = AuthToken.objects.get_or_create(user=self.request.user)
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super(ProfileView, self).get_context_data()
+#         context['token'], created = AuthToken.objects.get_or_create(user=self.request.user)
+#         return context
 
 
 

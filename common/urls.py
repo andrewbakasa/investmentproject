@@ -32,7 +32,7 @@ urlpatterns = [
     path("", landing_page, name="landing_page"),
     
     path("dashboard/", HomeView.as_view(), name="dashboard"),
-    path("profile/", ProfileView.as_view(), name="profile"),
+    # path("profile/", ProfileView.as_view(), name="profile"),
   
   
     # Document

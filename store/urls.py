@@ -2,8 +2,8 @@ from django.urls import  include, path
 
 from . import views
 from django.views.generic import TemplateView
-from rest_framework import routers
-from rest_framework.authtoken import views as drf_views
+#from rest_framework import routers
+#from rest_framework.authtoken import views as drf_views
 from store import api
 urlpatterns = [
     path('dashboard/', views.IndexViewStartPage.as_view(), name='index_startpage'),
