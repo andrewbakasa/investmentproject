@@ -1,6 +1,6 @@
 
 
-{{% extends 'investments_appraisal/mentor/index.html' %}
+{% extends 'investments_appraisal/mentor/index.html' %}
 
 {% load i18n %}
 {% load static %}
@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Projects</title>
+    <title>My Order</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -38,6 +38,10 @@
 </main><!-- End #main -->
 {%endblock content%}
 
+
+
+
+    
 {% block modal_divs %}
   
     
@@ -46,6 +50,28 @@
         <div class="modal-content"></div>
       </div>
     </div>
+
+	 <!-- Delete confirmation modal -->
+     <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %} 
 
@@ -57,149 +83,111 @@
   <div id="preloader"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   
- 
-
-
-
-
-
 {% block content_custom_menu_navbar %}
 <!-- ======= Header ======= -->
 {% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
 
 {% endblock %}
 
-
-
-
-
-
 {% block scripts %}
-<script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
-<script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+ <!-- Search Button JS -->
+ <script src="{% static 'mentor/assets/js/search.js' %}"></script>
 
-<script>
-$(function() {
-  $('.date-input').datepicker({
-  autoclose: true,
-  format: 'mm/dd/yyyy',
-  orientation: 'bottom'
+	
+	<script>
 
-  });
- 
-  $('.date-input').attr('autocomplete', 'off');
-})
-</script>
-<script>
-	$(document).ready(function(){
-		$("#updateconfirm").modal();
-		$('#invoicedate').datepicker({
-						todayBtn: "linked",
-						orientation: "bottom left",
-						autoclose: true
-		});
-	});
-</script>
-
-<script>
-	$(document).ready(function() {
-		$('#confirmdelete').on('show.bs.modal', function(e) {
-			var name = $(e.relatedTarget).data('object-name');
-			var url = $(e.relatedTarget).data('delete-url');
-			$('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
-			$('#confirmdelete .modal-footer a').attr('href', url);
-		});
-	});
-</script>
-
-<script>
-
-	$(document).ready(function() {
-		$('#add-button').on('click', function() {
-			var formData = {
-				'product_id': $('#product_id').val(),
-				'quantity': $('#quantity').val(),
-				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-				contentType: 'application/x-www-form-urlencoded',
-				encode: true,
-			};
-			$.ajax({
-				type: 'POST',
-				url:  'item/add/', 
-				data: formData,
-				dataType: 'json',
-			}).done(function (data) {
-				$(function () {
-					/**
-					* Update Order item
-					*/
-					// $('#addbook').modal('toggle').slideUp(500);
-					// $('#qty').val("");
-					// data.data['product']
-					const para = document.getElementById('order_total');
-					para.innerText=	'Order total: ' + data.data['currency_symbol'] +    data.data['order_total'] ;
-					$("#orderdata").append(
-						'<tr id="orderrow">' +
-						'<th scope="row">' + data.data['id'] + '</th>' +	
-						'<td>' + data.data['product_name'] + '</td>' +
-						'<td>' + data.data['product_description'] + '</td>' +
-						'<td>' + data.data['currency_symbol']  + data.data['price'] + '</td>' +
-						'<td>' + data.data['quantity'] + '</td>' +
-						'<td>' + data.data['currency_symbol']+ data.data['total'] + '</td>' +
-						'<td class="text-right">' + '<input type="button" class="delete-button btn btn-xs btn-danger"' + 'id="' + data.data['order_id'] + '"' + 'name="delete-button' + '" value="Delete"' + 'data-toggle="modal' + '"' + 'data-target="#datamodel' + data.data['order_id'] + '"' + 'data-id="' + data.data['id'] + '">' + '</td>' + '</tr>'
-					)
+		$(document).ready(function() {
 			
+			$('#confirmdelete').on('show.bs.modal', function(e) {
+				var name = $(e.relatedTarget).data('object-name');
+				var url = $(e.relatedTarget).data('delete-url');
+				var comment_id = $(e.relatedTarget).data('item-id');
+			
+				//var name =truncChar(name,25)
+				$('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b> Item <i>" + name + "</i>?");
+		
+				$('#confirmdelete .modal-footer input').attr('data-url', url);
+				$('#confirmdelete .modal-footer input').attr('item-id', comment_id);
+			});
+	
+			$('#add-button').on('click', function() {
+				var formData = {
+					'product_id': $('#product_id').val(),
+					'quantity': $('#quantity').val(),
+					csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+					contentType: 'application/x-www-form-urlencoded',
+					encode: true,
+				};
+				$.ajax({
+					type: 'POST',
+					url:  'item/add/', 
+					data: formData,
+					dataType: 'json',
+				}).done(function (data) {
+					$(function () {
+						/**
+						* Update Order item
+						*/
+						// $('#addbook').modal('toggle').slideUp(500);
+						// $('#qty').val("");
+						// data.data['product']
+						const para = document.getElementById('order_total');
+						para.innerText=	'Order total: ' + data.data['currency_symbol'] +    data.data['order_total'] ;
+						$("#orderdata").append(
+							'<tr id="orderrow">' +
+							'<th scope="row">' + data.data['id'] + '</th>' +	
+							'<td>' + data.data['product_name'] + '</td>' +
+							'<td>' + data.data['product_description'] + '</td>' +
+							'<td>' + data.data['currency_symbol']  + data.data['price'] + '</td>' +
+							'<td>' + data.data['quantity'] + '</td>' +
+							'<td>' + data.data['currency_symbol']+ data.data['total'] + '</td>' +
+							'<td class="text-right">' + '<input type="button" class="delete-button btn btn-xs btn-danger"' + 'id="' + data.data['order_id'] + '"' + 'name="delete-button' + '" value="Delete"' + 'data-toggle="modal' + '"' + 'data-target="#datamodel' + data.data['order_id'] + '"' + 'data-id="' + data.data['id'] + '">' + '</td>' + '</tr>'
+						)
+				
 
+					});
 				});
 			});
-		});
+			
+			/**
+			 * Delete Order Item
+			*/
+			$('body').on('click', '.delete-button', function (e) {
+					e.preventDefault();
+					var tr_id =$('#delete-button').attr('item-id')
+					row = $('#orderrow-'+ tr_id.trim());
+					//row = $(this).closest('tr');
+					
+					var formData = {
+						csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+					};
+					$.ajax({
+						type: 'POST',      
+						url:   $('#delete-button').attr('data-url'), 
+						encode: true,
+						contentType: 'application/x-www-form-urlencoded',
+						crossDomain: false,
+						dataType: 'json',
+						data: formData,     // our data object
+						success: function (data) {
+							$('.close-modal').click() 				
+							const para = document.getElementById('order_total');
+							para.innerText=	'Order total: ' +  data.data['currency_symbol']+  data.data['order_total'] ;
+							console.log(data)
+							row.fadeOut(1000, function () {
+								$(this).remove();
+							});
+						},
+						error: function (exception) {
+							alert('Exeption:' + exception);
+						}
+					});
+				});
+			
 		
-		/**
-    	 * Delete Order Item
-     	*/
-	 	$('body').on('click', '.delete-button', function (e) {
-			e.preventDefault();
-			row = $(this).closest('tr');
-			btn = e.target.id;      //get clicked button
-			console.log(btn)
-			itemid = $(e.target).data('id');
-			console.log(itemid)
-			del_id = $(this).attr(btn);
-			var formData = {
-				'orderid': btn,// un used 
-				'itemid': itemid,
-				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-			};
-        	$.ajax({
-            type: 'POST',       // define the type of HTTP verb we want to use (POST for our form)
-			// url: "/invoice/" + formData.invoiceid + "/item/" + formData.itemid + "/delete/",
-			// /invoice/ +id/ already in ags
-			url:  "item/" + formData.itemid + "/delete/", 
-            encode: true,
-            contentType: 'application/x-www-form-urlencoded',
-            crossDomain: false,
-            dataType: 'json',
-            data: formData,     // our data object
-            success: function (data) {
-                /**
-                 * Update book view
-                 */
-				// console.log('success', data);
-				const para = document.getElementById('order_total');
-				para.innerText=	'Order total: ' +  data.data['currency_symbol']+  data.data['order_total'] ;
-				
-                row.fadeOut(1000, function () {
-                    $(this).remove();
-                });
-            },
-            error: function (exception) {
-                alert('Exeption:' + exception);
-            }
-        });
-    	});
-	});	
+		});	
 
 
-</script>
+	</script>
 
 {% endblock %}

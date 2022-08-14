@@ -752,13 +752,13 @@ def update_item_ajax(request):
         action = request.POST.get('action', None)
         data={}
         if not (product_id == None or len(product_id)==0):
-            print('here......')
-            print(product_id)
+            #print('here......')
+            #print(product_id)
             product = Product.objects.get(id=product_id)
             data["id"]= product.id
         else:
-            print('here22......')
-            print(product_id)
+            #print('here22......')
+            #print(product_id)
             data["deleted"]=True
             if request.user.is_authenticated:
                 customer = request.user.customer

@@ -495,8 +495,8 @@ def make_invoice_from_order(request, pk):
 
 def save_all(request,form,template_name):
     data = dict()
-    print(form.errors)
-    print('am i here.........?',request.method,"Form valid?", form.is_valid() )
+    #print(form.errors)
+    #print('am i here.........?',request.method,"Form valid?", form.is_valid() )
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -536,41 +536,7 @@ def product_update(request,pk):
         form = ProductUpdateForm(instance=product)
     return save_all(request,form,'customers/product_edit_modal.html')
 
-# @login_required(login_url="account_login")
-# @allowed_users(allowed_roles=['admin', 'ceo', 'manager','editor'])
-# def updatePProduct(request, pk):
-#     product = Product.objects.get(id=pk)
-#     if request.method == 'POST' and request.is_ajax():
-#         try:
 
-#             product = get_object_or_404(Product, pk=pk)
-#             print(request.POST)
-#             print(request.FILES)
-            
-#             form = ProductForm(request.POST or None, request.FILES or None, instance=product) # class based view.
-
-           
-#             if form.is_valid():
-#                 product= form.save()
-#                 product_item_object = model_to_dict(product)
-                
-#                 product_item_object['image']=str(product_item_object['image'])
-#                 categories=""
-#                 for x in product_item_object['categories']:
-#                     categories = categories + str(x.name)  
-#                 product_item_object['categories']=  categories
-                
-#                 companies=""
-#                 for x in product_item_object['company']:
-#                     companies  = companies + str(x.name)  
-#                 product_item_object['company']=  companies
-                
-#                 return JsonResponse({'error': False, 'data': product_item_object})
-#             else:
-#                 return JsonResponse({'status': 'Fail', 'message': 'Form is invalid.'}) 
-#         except Order.DoesNotExist:
-#             return JsonResponse({'status': 'Fail', 'message': 'Record does not exist.'})
-#     return JsonResponse({'status': 'Fail', 'message': 'Error, must be an Ajax call.'})
 
 @login_required(login_url="account_login")
 def unlockProduct(request, pk):
@@ -623,7 +589,7 @@ def lockProduct(request, pk):
             return JsonResponse({'status': 'Fail', 'message': 'Record does not exist.'})
     return JsonResponse({'status': 'Fail', 'message': 'Error, must be an Ajax call.'})
 
-@allowed_users(allowed_roles=['admin', 'ceo', 'manager', 'editor'])
+@login_required(login_url="account_login")
 def edit_product_details(request):
     if request.method == 'POST':
         # Fetching data from the add new home address form
@@ -1164,20 +1130,6 @@ def createOrder(request, pk):
     return render(request, 'customers/order_form_set.html', context)
 
 
-# @login_required(login_url="account_login")
-# @allowed_users(allowed_roles=['admin'])
-# def updateOrder(request, pk):
-
-#     order = Order.objects.get(id=pk)
-#     form = OrderForm(instance=order)
-
-#     if request.method == "POST":
-#         form = OrderForm(request.POST, instance=order)
-#         if form.is_valid():
-#             form.save()
-#             return redirect("customers_home")
-#     context = {'form': form}
-#     return render(request, 'customers/order_form.html', context)
 
 
 @login_required(login_url="account_login")
@@ -1190,6 +1142,25 @@ def deleteOrder(request, pk):
     context = {'item': order}
     return render(request, 'customers/delete_order.html', context)
 
+@login_required(login_url="account_login")
+def deleteOrder_ajax(request, pk):
+    Float_thousand ="{:,.2f}"
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            
+            item = get_object_or_404(Order, pk=pk)
+           
+            item_object = {}
+            
+            item_object["item"]= 'Item has been deleted'
+            #item_object["order_total"] =  item
+            item.delete()
+
+            return JsonResponse({'status': 'Success', 'message': 'Record has been deleted.', 'data': item_object})
+            
+        except InvoiceItem.DoesNotExist:
+            return JsonResponse({'status': 'Fail', 'message': 'Record does not exist.'})
+    return JsonResponse({'status': 'Fail', 'message': 'Error, must be an Ajax call.'})
 
 @login_required(login_url="account_login")
 def deleteCustomer(request, pk):
@@ -1220,7 +1191,8 @@ class CustomerCreate(LoginRequiredMixin, generic.edit.CreateView):
 # Display a specific invoice
 @login_required(login_url="account_login")
 def order(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)
+    #throw erro if user order doesnt belong to user
+    order = get_object_or_404(Order, pk=order_id, customer__user=request.user)
     
     #----------------------------------------------
     invoice = Invoice.objects.filter(parentorder=order)
@@ -1407,9 +1379,9 @@ def getproduct(request):
 
 # Print invoice
 @login_required(login_url="account_login")
-@allowed_users(allowed_roles=['admin', 'ceo', 'manager', 'editor','datacapture'])
 def print_order(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)	
+    #view own orders
+    order = get_object_or_404(Order, pk=order_id,customer__user=request.user)	
 	
     context = {
 		'title' : "Order " + str(order_id),

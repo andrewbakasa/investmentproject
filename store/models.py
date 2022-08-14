@@ -105,35 +105,41 @@ class Company(models.Model):
 
 # Create your models here.
 class Customer(models.Model):
-	# one user to many customer 0ne-to-many......
-	# in future have onetoone..... Each user to have only one customer account
-	#user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
-	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-	#user = models.ManyToManyField(User, null=True, blank =True)
-	coporateclient =models.BooleanField(verbose_name="businessclient", default=False)
-	# user = models.OneToOneField(User, null=True, blank=True, on_delete= models.SET_NULL)
-	name = models.CharField(max_length=200, null=True )
-	address1 = models.CharField(max_length=500, null=True, blank=True)
-	address2 = models.CharField(max_length=256,null=True, blank=True)
-	phone = models.CharField(max_length=200, null=True, blank=True)
-	email = models.CharField(max_length=200, null=True, blank=True)
-	city = models.CharField(max_length=128, null=True, blank=True)
-	state = models.CharField(max_length=50, null=True, blank=True)
-	zip = models.CharField(max_length=12, null=True, blank=True)
-	date_created = models.DateTimeField(auto_now_add=True, null=True)
-	rating = models.IntegerField(default=0)
-	locked = models.BooleanField(default=False)
-	# to change a company to have multiple users for reports sharing...
+    # one user to many customer 0ne-to-many......
+    # in future have onetoone..... Each user to have only one customer account
+    #user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    #user = models.ManyToManyField(User, null=True, blank =True)
+    coporateclient =models.BooleanField(verbose_name="businessclient", default=False)
+    # user = models.OneToOneField(User, null=True, blank=True, on_delete= models.SET_NULL)
+    name = models.CharField(max_length=200, null=True )
+    address1 = models.CharField(max_length=500, null=True, blank=True)
+    address2 = models.CharField(max_length=256,null=True, blank=True)
+    phone = models.CharField(max_length=200, null=True, blank=True)
+    email = models.CharField(max_length=200, null=True, blank=True)
+    city = models.CharField(max_length=128, null=True, blank=True)
+    state = models.CharField(max_length=50, null=True, blank=True)
+    zip = models.CharField(max_length=12, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    rating = models.IntegerField(default=0)
+    locked = models.BooleanField(default=False)
+    # to change a company to have multiple users for reports sharing...
 
+    @property
+    def details(self):
+        if self.name:
+            return self.name
+        else:
+            return self.user
 
-	def invoices(self):
-			return Invoice.objects.filter(customer=self).count()
+    def invoices(self):
+            return Invoice.objects.filter(customer=self).count()
 
-	def __str__(self):
-		if self.name:
-			return self.name
-		else :
-			return "No name"	
+    def __str__(self):
+        if self.name:
+            return self.name
+        else :
+            return "No name"	
 
 		
 class InvoiceQuerySet(models.QuerySet):

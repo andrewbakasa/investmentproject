@@ -16,13 +16,10 @@
                 data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
        
               <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
-              <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success">{% trans 'Products' %}</a></li>
-              <li class="breadcrumb-item" ><a href="{% url 'customers_home' %}" class ="badge rounded-pill bg-success">{% trans 'Home' %}</a></li>
-              <li class="breadcrumb-item" ><a href="{% url 'customers_list' %}" class ="badge rounded-pill bg-success">{% trans 'Customers' %}</a></li>
              
        
               <li class="breadcrumb-item" >
-                <label id="total_projects_searched">Category</label>
+                <label id="total_projects_searched">My Orders</label>
               </li>  
             </ol>
           </div>
@@ -44,7 +41,6 @@
                               <th>Date Ordered</th>
                               <th>Value</th>
                               <th>Status</th>
-                              <th>Customer</th>
                               <th class="text-right" >Actions</th>
                         
                         </tr>
@@ -52,25 +48,23 @@
                       
         
                         {% for order in orders %}
-                              <tr>
+                              <tr id="orderrow-{{ order.id }}">
                                   <td>{{order.transaction_id}}</td>
-                                  <td>{{order.customer}}</td>
+                                  <td>{{order.customer.details}}</td>
                                   <td>{{order.date_ordered}}</td>
                                   <td>{{order.currency.symbol}}{{order.total_price | intcomma}}</td>
-                                  <td>{{order.complete}}</td>
-                                  <td>
-                                    {% if order.customer %}
-                                      <a href="{% url 'cust' order.customer.id %}">
-                                          {{order.customer.name}}
-                                      </a>
-                                      {% endif  %}
-                                  </td>
+                                  <td>{% if order.complete %} Completed {%else%} WIP {%endif%}</td>
+                                 
                                 
                                   <td class="text-right">
-                                    {% if order.customer %}
-                                    <a style="color:inherit" href="{% url 'order' order.id %}"><i class="fa fa-book"></i></a>
-                                    {% endif  %}
-                                    <a style="color:inherit" href="{% url 'delete_order' order.id %}"><i class="fa fa-trash"></i></a>
+                                  
+                                    <a style="color:inherit" href="{% url 'order' order.id %}" data-toggle="tooltip" data-placement="bottom" 
+                                    title='View Order'><i class="fa fa-eye"></i></a>
+                                 
+                                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                    data-object-name="{{ order.id }}"  data-item-id="{{order.id}}" 
+                                    data-delete-url="{% url 'delete_order_ajax' order.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                    title='Delete'> <i class="fas fa-trash"></i> 
                                   </td>
                                  
                               </tr>

@@ -12,6 +12,8 @@ urlpatterns = [
 
     path('create_order/<str:pk>/', views.createOrder, name="create_order"),
     path('delete_order/<str:pk>/', views.deleteOrder, name="delete_order"),
+    path('delete_order_ajax/<str:pk>/', views.deleteOrder_ajax, name="delete_order_ajax"),
+    
     path('delete_customer/<str:pk>/', views.deleteCustomer, name="delete_customer"),
 
     path('cust_list/', views.customers, name="customers_list"),

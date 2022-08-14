@@ -61,6 +61,7 @@
 		<tr>
 			<th>Item</th>
 			<th>Description</th>
+			<th>Seller</th>
 			<th>Cost</th>
 			<th>Qty</th>
 			<th>Total</th>
@@ -69,6 +70,7 @@
 		<tr>
 			<td>{{ item.product }}</td>
 			<td>{{ item.product.description }}</td>
+			<td>{{ item.product.created_by }}</td>
 			<td>{{order.currency.symbol}}{{ item.product.price | intcomma}}</td>
 			<td>{{ item.quantity | intcomma}}</td>
 			<td>{{order.currency.symbol}}{{ item.total | intcomma}}</td>

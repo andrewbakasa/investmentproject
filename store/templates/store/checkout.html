@@ -1,4 +1,4 @@
-{{% extends 'investments_appraisal/mentor/index.html' %}
+{% extends 'investments_appraisal/mentor/index.html' %}
 
 {% load i18n %}
 {% load static %}
@@ -6,7 +6,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Projects</title>
+    <title>CheckOut</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -196,7 +196,7 @@
 		.then((response) => response.json())
 		.then((data) => {
 			console.log('Success: ', data);
-			alert('Transaction completed.');
+			//alert('Transaction completed.');
 
 			cart = {}
 			document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"

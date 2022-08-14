@@ -1,6 +1,6 @@
 
 
-{{% extends 'investments_appraisal/mentor/index.html' %}
+{% extends 'investments_appraisal/mentor/index.html' %}
 
 {% load i18n %}
 {% load static %}
@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Projects</title>
+    <title>Orders List</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -38,14 +38,32 @@
 </main><!-- End #main -->
 {%endblock content%}
 
-{% block modal_divs %}
-  
-    
+{% block modal_divs %}    
     <div class="modal fade" id="modal-product">
       <div id='dynamic-div' class="modal-dialog modal-lg">
         <div class="modal-content"></div>
       </div>
     </div>
+     <!-- Delete confirmation modal -->
+     <div class="modal fade" id="confirmdelete" role="dialog">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h4 class="modal-title">Confirm</h4>
+              </div>
+              <div class="modal-body">
+
+              </div>
+
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                  <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                          name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+              </div>
+          </div>
+      </div>
+  </div>
 
 {% endblock %} 
 
@@ -77,21 +95,8 @@
 {% block scripts %}
  <!-- Search Button JS -->
  <script src="{% static 'mentor/assets/js/search.js' %}"></script>
-<script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
-<script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
 
-<script>
-$(function() {
-  $('.date-input').datepicker({
-  autoclose: true,
-  format: 'yyyy-mm-dd',
-  orientation: 'bottom'
 
-  });
- 
-  $('.date-input').attr('autocomplete', 'off');
-})
-</script>
 
 <script type="text/javascript">
   $('#page_select').change(function() {
@@ -154,6 +159,61 @@ $(function() {
     $('#id_start_date').val("");
     $('#id_end_date').val("");
   })  
+</script>
+
+<script>
+
+  $(document).ready(function() {
+    
+    $('#confirmdelete').on('show.bs.modal', function(e) {
+      var name = $(e.relatedTarget).data('object-name');
+      var url = $(e.relatedTarget).data('delete-url');
+      var comment_id = $(e.relatedTarget).data('item-id');
+    
+      //var name =truncChar(name,25)
+      $('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b>  Order <i>" + name + "</i>?");
+  
+      $('#confirmdelete .modal-footer input').attr('data-url', url);
+      $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
+    });
+
+   
+    /**
+     * Delete Order 
+    */
+    $('body').on('click', '.delete-button', function (e) {
+        e.preventDefault();
+        var tr_id =$('#delete-button').attr('item-id')
+        row = $('#orderrow-'+ tr_id.trim());
+       
+        var formData = {
+          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        };
+        $.ajax({
+          type: 'POST',      
+          url:   $('#delete-button').attr('data-url'), 
+          encode: true,
+          contentType: 'application/x-www-form-urlencoded',
+          crossDomain: false,
+          dataType: 'json',
+          data: formData,     // our data object
+          success: function (data) {
+            $('.close-modal').click() 				
+           
+            row.fadeOut(1000, function () {
+              $(this).remove();
+            });
+          },
+          error: function (exception) {
+            alert('Exeption:' + exception);
+          }
+        });
+      });
+    
+  
+  });	
+
+
 </script>
 
 {% endblock %}
