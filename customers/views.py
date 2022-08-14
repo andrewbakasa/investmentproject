@@ -500,7 +500,7 @@ def save_all(request,form,template_name):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            print(form.instance.id)
+            #print(form.instance.id)
             data['form_is_valid'] = True
             
             # retrieve product
