@@ -538,7 +538,7 @@
                     <td class="productPrice productData" name="price">${numberWithCommas(val.price)}</td>
                     <td class="text-right modelAction modelData" name="action">
                     
-                        <a href="/cus/product_detail${val.id}/"
+                        <a href="/ecom/p/d/${val.id}/"
                         style="color:inherit"><i class="fa fa-eye"></i>
                         </a>                    
                         ${edit_html}                
@@ -798,7 +798,7 @@
                     <td class="productPrice productData" name="price">${numberWithCommas(val.price)}</td>
                     <td class="text-right modelAction modelData" name="action">
                     
-                        <a href="/cus/product_detail${val.id}/"
+                        <a href="/ecom/p/d/${val.id}/"
                         style="color:inherit"><i class="fa fa-eye"></i>
                         </a>                    
                         ${edit_html}                
@@ -988,22 +988,22 @@
           
           });
             
-          function updateToProductTabel(product){
-        $("#productTable #product-" + product.id).children(".productData").each(function() {
-            var attr = $(this).attr("name");
-            if (attr == "name") {
-              $(this).text(product.name);
-            } else if (attr == "description") {
-              $(this).text(product.description);
-            } else if (attr == "price") {
-              $(this).text(product.price);
-            } else if (attr == "categories") {
-              $(this).text(product.categories);
-            } else if (attr == "image")  {
-              $(this).text(product.image);
+            function updateToProductTabel(product){
+                $("#productTable #product-" + product.id).children(".productData").each(function() {
+                    var attr = $(this).attr("name");
+                    if (attr == "name") {
+                    $(this).text(product.name);
+                    } else if (attr == "description") {
+                    $(this).text(product.description);
+                    } else if (attr == "price") {
+                    $(this).text(product.price);
+                    } else if (attr == "categories") {
+                    $(this).text(product.categories);
+                    } else if (attr == "image")  {
+                    $(this).text(product.image);
+                    }
+                });
             }
-          });
-    }
 
    
 
@@ -1076,7 +1076,7 @@
     });
 
     function updateLOCKInnerHTML(val){
-        new_html = ` <a href="/cus/product_detail${val.id}/"
+        new_html = ` <a href="/cus/p/d/${val.id}/"
                     style="color:inherit"><i class="fa fa-eye"></i>
                   </a>
                    
@@ -1096,7 +1096,7 @@
 
     function updateUNLOCKInnerHTML(val){
         
-        new_html = ` <a href="/cus/product_detail${val.id}/"
+        new_html = ` <a href="/ecom/p/d/${val.id}/"
                   style="color:inherit"><i class="fa fa-eye"></i>
                   </a>
 

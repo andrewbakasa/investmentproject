@@ -109,8 +109,8 @@ def create_all_user_product(request,form,template_name):
             # item_object['categories']= categories
             categories=""
             for x in item_object['categories']:
-                categories = categories + str(x.name)  
-            item_object['categories']=  categories
+                categories = categories +   str(x.name) + ', '  
+            item_object['categories']=  categories[:len(categories)-2]
             if record.image:
                 item_object['image']= record.image.url
             else:
@@ -240,8 +240,8 @@ def display_userproduct_ajax(request):
            
             categories=""
             for x in item_object['categories']:
-                categories = categories + str(x.name)  
-            item_object['categories']=  categories
+                categories = categories +   str(x.name) + ', '  
+            item_object['categories']=  categories[:len(categories)-2]
             if i.image:
                 item_object['image']= i.image.url
             else:
@@ -254,6 +254,7 @@ def display_userproduct_ajax(request):
 
 
 def product_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
+    #search my products
     current_time =timezone.now()#datetime.datetime.now()
     if request.method == 'POST':
         if search_type == 1:
@@ -330,13 +331,18 @@ def product_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
             cdate= i.date_created.ctime()
             item_object = model_to_dict(i)
             
-            categories = []
-            for j in i.categories.all():
-                categories.append(j.name)
-            item_object['categories']= categories
+            categories = ''
+          
+            for x in item_object['categories']:
+                categories = categories +   str(x.name) + ', '  
+            item_object['categories']=  categories[:len(categories)-2]
+          
             
-            
-            item_object['image']= i.image.url
+            if i.image:
+                item_object['image']= i.image.url
+            else:
+                item_object['image']=None
+           
             results.append(item_object)									 
             
             									 
@@ -425,8 +431,8 @@ def get_user_products_load_status_ajax(request, *args, **kwargs):
               
                 categories=""
                 for x in item_object['categories']:
-                    categories = categories + str(x.name)  
-                item_object['categories']=  categories
+                    categories = categories +   str(x.name) + ', '  
+                item_object['categories']=  categories[:len(categories)-2]
                 if i.image:
                     item_object['image']= i.image.url
                 else:
@@ -510,9 +516,9 @@ def save_all(request,form,template_name):
             product_item_object['image']=str(product_item_object['image'])
             categories=""
             for x in product_item_object['categories']:
-                categories = categories + str(x.name)  
-            product_item_object['categories']=  categories
-            
+                categories = categories +   str(x.name) + ', '  
+            product_item_object['categories']=  categories[:len(categories)-2]
+          
             companies=""
             for x in product_item_object['company']:
                 companies  = companies + str(x.name)  
@@ -549,10 +555,11 @@ def unlockProduct(request, pk):
             
             product_item_object['image']=str(product_item_object['image'])
             categories=""
-            for x in product_item_object['categories']:
-                categories = categories + str(x.name)  
-            product_item_object['categories']=  categories
             
+            for x in product_item_object['categories']:
+                categories = categories +   str(x.name) + ', '  
+            product_item_object['categories']=  categories[:len(categories)-2]
+          
             companies=""
             for x in product_item_object['company']:
                 companies  = companies + str(x.name)  
@@ -574,9 +581,11 @@ def lockProduct(request, pk):
            
             product_item_object['image']= str(product_item_object['image'])
             categories=""
+            
             for x in product_item_object['categories']:
-                categories = categories + str(x.name)  
-            product_item_object['categories']=  categories
+                categories = categories +   str(x.name) + ', '  
+            product_item_object['categories']=  categories[:len(categories)-2]
+          
             
             companies=""
             for x in product_item_object['company']:
@@ -668,8 +677,8 @@ def delete_product_ajax(request, id, page_no, *args, **kwargs):
             
             categories=""
             for x in item_object['categories']:
-                categories = categories + str(x.name)  
-            item_object['categories']=  categories
+                categories = categories +   str(x.name) + ', '  
+            item_object['categories']=  categories[:len(categories)-2]
             if model_.image:
                 item_object['image']= model_.image.url
             else:
@@ -773,8 +782,8 @@ class  ProductUpdate(LoginRequiredMixin, generic.edit.UpdateView):
         
         pk = kwargs.get('pk', None)
         product = get_object_or_404(Product, pk=pk)
-        print(request.POST)
-        print(request.FILES)
+        #print(request.POST)
+        #print(request.FILES)
        
         form = ProductForm(request.POST or None, request.FILES or None, instance=product) # class based view.
         #print(form)
@@ -785,9 +794,11 @@ class  ProductUpdate(LoginRequiredMixin, generic.edit.UpdateView):
             product_item_object =model_to_dict(product)
             product_item_object['image']=str(product_item_object['image'])
             categories=""
+           
             for x in product_item_object['categories']:
-                categories = categories + str(x.name)  
-            product_item_object['categories']=  categories
+                categories = categories +   str(x.name) + ', '  
+            product_item_object['categories']=  categories[:len(categories)-2]
+          
             
             companies=""
             for x in product_item_object['company']:
