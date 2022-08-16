@@ -239,8 +239,8 @@ EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 #uncomment if you want to check all files are collected into staticfile
 STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 CLOUDINARY_STORAGE = {'CLOUD_NAME': 'dsbnt7cih', 'API_KEY': '729236266824714', 'API_SECRET': 'JZXOjGXheadh0YtH7Ip7Nbu_yv0', }
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#CLOUDINARY_URL=cloudinary://729236266824714:JZXOjGXheadh0YtH7Ip7Nbu_yv0@dsbnt7cih
 WHITENOISE_AUTOREFRESH = True
 #this changed everything bus css not loaded in development mode
 WHITENOISE_MANIFEST_STRICT = False

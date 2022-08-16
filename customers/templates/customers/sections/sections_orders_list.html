@@ -34,94 +34,70 @@
                      
                     </div>
                     <div class="box-body">
-                      <table class="table table-striped">
-                        <tr>
-                              <th>Transcation</th>
-                              <th>Customer</th>
-                              <th>Date Ordered</th>
-                              <th>Value</th>
-                              <th>Status</th>
-                              <th class="text-right" >Actions</th>
-                        
-                        </tr>
-                        
-                      
-        
-                        {% for order in orders %}
-                              <tr id="orderrow-{{ order.id }}">
-                                  <td>{{order.transaction_id}}</td>
-                                  <td>{{order.customer.details}}</td>
-                                  <td>{{order.date_ordered}}</td>
-                                  <td>{{order.currency.symbol}}{{order.total_price | intcomma}}</td>
-                                  <td>{% if order.complete %} Completed {%else%} WIP {%endif%}</td>
-                                 
-                                
-                                  <td class="text-right">
+                      <table id="productTable" class="table table-striped">
+                        <thead class="thead-dark">
+                            <th style="width: 2%">Transcation</th>
+                            <th>Customer</th>
+                            <th>Date Ordered</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                            <th class="text-right" >Actions</th>
+                        </thead>
+                        <tbody id="product-table-tbody">          
+                          {% for order in orders %}
+                                <tr id="product-{{ order.id }}">
+                                    <td>{{order.transaction_id}}</td>
+                                    <td>{{order.customer.details}}</td>
+                                    <td>{{order.date_ordered}}</td>
+                                    <td>{%if order.currency %} {{order.currency.symbol}} {%else%} ${%endif%}{{order.total_price | intcomma}}</td>
+                                    <td>{% if order.complete %} Completed {%else%} WIP {%endif%}</td>
                                   
-                                    <a style="color:inherit" href="{% url 'order' order.id %}" data-toggle="tooltip" data-placement="bottom" 
-                                    title='View Order'><i class="fa fa-eye"></i></a>
-                                 
-                                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
-                                    data-object-name="{{ order.id }}"  data-item-id="{{order.id}}" 
-                                    data-delete-url="{% url 'delete_order_ajax' order.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
-                                    title='Delete'> <i class="fas fa-trash"></i> 
-                                  </td>
-                                 
-                              </tr>
-                          {% endfor %}
+                                  
+                                    <td class="text-right">
+                                    
+                                      <a style="color:inherit" href="{% url 'order' order.id %}" data-toggle="tooltip" data-placement="bottom" 
+                                      title='View Order'><i class="fa fa-eye"></i></a>
+                                  
+                                      <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                      data-object-name="{{ order.id }}"  data-item-id="{{order.id}}" 
+                                      data-delete-url="{% url 'delete_order_ajax' order.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                                      title='Delete'> <i class="fas fa-trash"></i> 
+                                    </td>
+                                  
+                                </tr>
+                            {% endfor %}
+                          </tbody>
                       </table>
                     </div>
                   </div>
               </div>
         
-          </div>
-          <!-- # for pagination...... -->
-          {% if is_paginated %}
-            <div class="box-footer text-center">
-            
-                <ul class="pagination">
-                {% if page_obj.has_previous %}
-                <!-- href="{{ request.path }}?page={{ page_obj.previous_page_number}}" -->
-        
-                <li>
-                  <a href="{% my_url page_obj.previous_page_number 'page' request.GET.urlencode %}">
-                    <i class="force-parent-lh fa fa-chevron-left" aria-hidden="true"></i>
-                  </a>
-                
-                </li>
-                {% endif %}
-                <li>
-                  <select id= 'page_select' class="form-control">
-                    {% for _ in ''|center:page_obj.paginator.num_pages %}
-                    {% if forloop.counter == page_obj.number %}
-                    <option selected="">
-                      {{ page_obj.number }}
-                    </option>
-                    {% else %}
-                    <option>
-                      {{ forloop.counter }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-                  </select>
-                </li>
-                {% if page_obj.has_next %}
-                  <!-- href="{{ request.path }}?page={{ page_obj.next_page_number }}" -->
-                  <li>
-                    <a href="{% my_url page_obj.next_page_number 'page' request.GET.urlencode %}">
-                      <i class="force-parent-lh fa fa-chevron-right" aria-hidden="true"></i>
-                    </a>
-                  </li>
-                {% endif %}
-                </ul>
-        
-              
             </div>
-          {% endif %}
           
           </div>
 
-       
+          <!--Pagination  -->
+      <div id= "page_section" class="pagination">
+        <ul class="pagination newpagination">
+            {% if current_page.has_previous %}
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                
+            {% endif %}
+    
+            <span class="current"  style="margin-left:5px">
+            Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+            </span>
+    
+            {% if current_page.has_next %}
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+            
+            {% endif %}
+        </ul>
+    </div>
+    
+
     
     </div>
   

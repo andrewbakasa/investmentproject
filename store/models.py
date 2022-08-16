@@ -375,7 +375,8 @@ class Product(models.Model):
     categories = models.ManyToManyField(ProductCategory,verbose_name="divisions")
     
     locked = models.BooleanField(default=False)
-
+    def desc_strip_unicode(self):
+        return self.description.encode('ascii', 'ignore').decode('ascii')
     def get_priority(self):
         min_val=16383
 
@@ -463,6 +464,8 @@ class OrderAttachment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
 class OrderItem(models.Model):
+    #create another table to handle items sold
+    fullfilled = models.BooleanField(default=False, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)

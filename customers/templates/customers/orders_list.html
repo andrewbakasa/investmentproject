@@ -107,6 +107,19 @@
       
     });
   })
+
+  function truncChar(str,length){
+    var myTruncatedString = str.substring(0,length-1);              
+    if (str.length > myTruncatedString.length){
+    return myTruncatedString + "..."
+    }
+    return myTruncatedString
+    }
+    function numberWithCommas(x) {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+    }
   function retrieveWYSIWYG() {
   var query = window.location.search.substring(1);
   var parms = query.split('&');
@@ -163,6 +176,11 @@
 
 <script>
 
+   //first timme
+   var display_userorders_ajax_url= "{% url 'display_userorders_ajax' %}"       
+                               
+  display_userorders_ajax_url = `{% url 'userorders_load_status_ajax' %}`; 
+
   $(document).ready(function() {
     
     $('#confirmdelete').on('show.bs.modal', function(e) {
@@ -184,7 +202,7 @@
     $('body').on('click', '.delete-button', function (e) {
         e.preventDefault();
         var tr_id =$('#delete-button').attr('item-id')
-        row = $('#orderrow-'+ tr_id.trim());
+        row = $('#product-'+ tr_id.trim());
        
         var formData = {
           csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
@@ -209,8 +227,125 @@
           }
         });
       });
-    
-  
+      $('body').on('click', '.a_page_nav', function (event) {
+                // preventing default actions
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                loadPageAjax(page_no)
+            });
+         
+            function loadPageAjax(page_no){
+                //console.log('url',display_userorders_ajax_url )
+                //console.log('PageNo: ', page_no)
+                //console.log('page_no',page_no )
+                var data
+               
+                data = {    
+                        page_no : page_no,
+                        csrfmiddlewaretoken: csrftoken,
+                    }
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_userorders_ajax_url, 
+                        data :data,
+                        // handle a successful response
+                        success: function (response) {
+                            $('#product-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+
+                        
+                            
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#product-table-tbody').append(a_html)
+                            });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'product-table-tbody',6)
+                               
+                           
+               
+                            
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                            
+                    });
+                    //add_model_class()
+            }
+            function updatePaging2(data){
+                var has_previous=''
+                //console.log(data)
+                if (data.has_previous){
+                    has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+                
+                }       
+                var has_next= ''          
+                if (data.has_next){
+                    has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                        `; 
+                }       
+                a_html=`
+                <div id= "page_section" class="pagination">
+                    <ul class="pagination newpagination">
+                        ${has_previous}            
+                        <span class="current" style="margin-left:5px" >
+                            Page ${ data.current_page } of ${ data.last }.
+                        </span>                   
+                        ${has_next}
+                    </ul>
+                    </div>`
+                    $("#page_section").html(a_html)
+            }
+            function append_no_records_found(total, tbody_id, colspan){
+                if (total == 0) {
+                    no_record_html=`<tr id="product-1">  <td colspan='${colspan}'> No Records Found <td>
+                                  </tr>` ;
+                    $(`#${tbody_id}`).append(no_record_html)
+                }
+            }
+            function append_html(counter,val,page_no){
+                //loading the page #
+                //console.log (val)
+               
+              
+               var complete_status=''
+               if (val.complete){
+                complete_status ='Completed'
+               }else {
+                complete_status ='WIP'
+               }
+
+
+      a_html= `<tr id="product-${val.id }">
+              <td>${val.transaction_id}</td>
+              <td>${val.customer_details}</td>
+              <td>${val.date_ordered}</td>
+              <td>${val.currency_symbol}${numberWithCommas(val.total_price)}</td>
+              <td>${complete_status}</td>
+              <td class="text-right">
+                <a style="color:inherit" href="/cus/order/${val.id}" data-toggle="tooltip" data-placement="bottom" 
+                title='View Order'><i class="fa fa-eye"></i></a>
+                <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                data-object-name="${val.id}"  data-item-id="${val.id}" 
+                data-delete-url="/cus/delete_order_ajax/${val.id}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                title='Delete'> <i class="fas fa-trash"></i> 
+              </td>
+          </tr> `
+                return a_html
+            }
+          
   });	
 
 

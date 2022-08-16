@@ -69,7 +69,7 @@
 		{% for item in order.orderitem_set.all %}
 		<tr>
 			<td>{{ item.product }}</td>
-			<td>{{ item.product.description }}</td>
+			<td>{{ item.product.description}}</td>
 			<td>{{ item.product.created_by }}</td>
 			<td>{{order.currency.symbol}}{{ item.product.price | intcomma}}</td>
 			<td>{{ item.quantity | intcomma}}</td>

@@ -20,7 +20,9 @@
               data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
       
             <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
-            <!-- <li class="breadcrumb-item" ><a href="{% url 'product_new' %}" class ="badge rounded-pill bg-success">{% trans 'New Product' %}</a></li> -->
+           
+            <li class="breadcrumb-item" ><a href="{% url 'user_clients' %}" class ="badge rounded-pill bg-success">{% trans 'My Sales' %}</a></li>
+    
             <li class="breadcrumb-item active">
               <a href="#"   data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_product"
               title='Add New Product' class ="badge rounded-pill bg-success">New Product &nbsp; <i  class="fas fa-plus"></i>
@@ -65,8 +67,8 @@
                           <table id="productTable" class="table table-striped">
                               <thead class="thead-dark">
                                   <th style="width: 2%" >#</th>    
-                                  <th style="width: 12%" >Division</th>
-                                  <th style="width: 16%" >Category</th>
+                                  <th style="width: 12%" >Category</th>
+                                  <th style="width: 16%" >Title</th>
                                   <th style="width: 18%" >Description</th>
                                   <th style="width: 20%" >Image Url</th>
                                   <th style="width: 7%" >Price</th>
@@ -78,7 +80,7 @@
                                 {% for product in first_page %}
                                 <tr id="product-{{product.id}}">
                                    
-                                    <td class="modelData " name="counter"> 
+                                    <td class="productData " name="counter"> 
                                       {{forloop.counter}}                                           
                                     </td>
                                     <td class="productCategories productData" name="categories">
@@ -94,9 +96,9 @@
                                         {{product.image }}
                                     </td> 
                                     
-                                    <td class="productPrice productData" name="price">{{product.price | intcomma}}</td>
+                                    <td class="productPrice productData" name="price">${{product.price | intcomma}}</td>
           
-                                    <td class="text-right productAction productData" name="action" >
+                                    <td class="text-right productAction" name="action" >
           
                                     
                                       <a href="{% url 'product_detail' product.id %}"

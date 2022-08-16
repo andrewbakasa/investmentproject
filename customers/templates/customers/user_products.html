@@ -300,7 +300,7 @@
             $('body').on('click', '.show-form-update', function(e){
                 e.stopPropagation() 
                 var btn = $(this);// fix button  delay
-                console.log('url',btn.attr("data-url"))
+                //console.log('url',btn.attr("data-url"))
                 $.ajax({
                 url: btn.attr("data-url"),
                 type: 'get',
@@ -320,7 +320,7 @@
                 var data = new FormData(this);
                 var formData
                 var form = $(this);
-                console.log(form.attr('data-url'))
+                //console.log(form.attr('data-url'))
                 $.ajax({
                     url: form.attr('data-url'),
                     //data: form.serialize(),
@@ -439,15 +439,15 @@
                                 </thead>
                                 <tbody id="product-table-tbody">
                                 
-                                    <tr id="item-${item.id}" class='edit-mode'>
-                                        <td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>
+                                    <tr id="product-${item.id}" class='edit-mode'>
+                                        <td  class="productData" name="counter"><i class="fas fa-edit"></i></td>
                                         <td class="productCategories productData" name="categories">${category_trunc}</td>
                                         <td class="productName productData" name="name">${name_trunc}</td>
                                         <td class="productDescription productData" name="description">${description_trunc}</td>
                                         <td class="productImage productData" name="image">${item.image}</td> 
-                                        <td class="productPrice productData" name="price">${numberWithCommas(item.price)}</td>
+                                        <td class="productPrice productData" name="price">$${numberWithCommas(item.price)}</td>
 
-                                        <td class="text-right modelAction modelData" name="action">
+                                        <td class="text-right productAction" name="action">
                                         
                                             <a href="/tr/i/e/${item.id}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -529,14 +529,14 @@
           
                 counter= '' 
                 a_html=`
-                <tr id="item-${val.id}">
-                    <td class="modelData " name="counter"> ${counter}</td>
+                <tr id="product-${val.id}">
+                    <td class="productData " name="counter"> ${counter}</td>
                     <td class="productCategories productData" name="categories">${category_trunc}</td>
                     <td class="productName productData" name="name">${name_trunc}</td>
                     <td class="productDescription productData" name="description">${description_trunc}</td>
                     <td class="productImage productData" name="image">${val.image}</td> 
-                    <td class="productPrice productData" name="price">${numberWithCommas(val.price)}</td>
-                    <td class="text-right modelAction modelData" name="action">
+                    <td class="productPrice productData" name="price">$${numberWithCommas(val.price)}</td>
+                    <td class="text-right productAction" name="action">
                     
                         <a href="/ecom/p/d/${val.id}/"
                         style="color:inherit"><i class="fa fa-eye"></i>
@@ -561,147 +561,147 @@
                 
                 }
         
-            function updateTable(item){
-                //after edit update the table
-                $("#product-table-tbody #item-" + item.id).children(".modelData").each(function() {
+            // function updateTable(item){
+            //     //after edit update the table
+            //     $("#product-table-tbody #item-" + item.id).children(".modelData").each(function() {
                     
                     
-                    var td=$(`#item-${item.id}`).addClass('edit-mode')
+            //         var td=$(`#item-${item.id}`).addClass('edit-mode')
                     
-                    console.log(item)
-                    var attr = $(this).attr("name");
-                    var name_trunc =truncChar(item.name,12)
-                    var description_trunc =truncChar(item.description,20)
-                    var category_trunc =truncChar(item.category,20)
+            //         console.log(item)
+            //         var attr = $(this).attr("name");
+            //         var name_trunc =truncChar(item.name,12)
+            //         var description_trunc =truncChar(item.description,20)
+            //         var category_trunc =truncChar(item.category,20)
 
-                    if (attr == "description") {
+            //         if (attr == "description") {
 
-                        $(this).text(description_trunc);
-                    } else if (attr == "category") {
-                        $(this).text(category_trunc);
-                    } else if (attr == "name") {
-                        $(this).text(name_trunc);   
-                    } else if (attr == "total_value") {
-                        $(this).text('$'+ numberWithCommas(item.total_value));
-                    } else if (attr == "current_investment") {
-                        $(this).text('$'+ numberWithCommas(item.current_investment));
-                    } else if (attr == "current_investment_percent") {
-                        $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
+            //             $(this).text(description_trunc);
+            //         } else if (attr == "category") {
+            //             $(this).text(category_trunc);
+            //         } else if (attr == "name") {
+            //             $(this).text(name_trunc);   
+            //         } else if (attr == "total_value") {
+            //             $(this).text('$'+ numberWithCommas(item.total_value));
+            //         } else if (attr == "current_investment") {
+            //             $(this).text('$'+ numberWithCommas(item.current_investment));
+            //         } else if (attr == "current_investment_percent") {
+            //             $(this).text(parseFloat(item.current_investment_percent).toFixed(1)+'%');
                     
-                    } else if (attr == "counter") {
-                        var a_html= `<td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>`
-                        $(this).html(a_html);
+            //         } else if (attr == "counter") {
+            //             var a_html= `<td  class="modelData" name="counter"><i class="fas fa-edit"></i></td>`
+            //             $(this).html(a_html);
                 
-                    } else if (attr == "public") {
-                        var public= ''
+            //         } else if (attr == "public") {
+            //             var public= ''
                     
-                        if (item.public){
-                            public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(item.views,0)}`
-                        }else{
-                            public= `<i class='bi-square'></i>${nFormatter(item.views,0)}`
-                        }
-                        var a_html= `<td  class="modelData" name="pubic">${public}</td>`
-                        $(this).html(a_html);
+            //             if (item.public){
+            //                 public= `<i style='color:blue;' class='bi bi-check-circle'></i> ${nFormatter(item.views,0)}`
+            //             }else{
+            //                 public= `<i class='bi-square'></i>${nFormatter(item.views,0)}`
+            //             }
+            //             var a_html= `<td  class="modelData" name="pubic">${public}</td>`
+            //             $(this).html(a_html);
                     
-                    }   
+            //         }   
 
 
                 
                     
-                });
-            }  
-            $('body').on("submit",".model-form-edit",function(e){
-                e.preventDefault();
-                var data = new FormData(this);
-                var formData
-                var form = $(this);
-                //console.log('before ajax')
-                var url=form.attr('data-url')
-                $.ajax({
-                    url: form.attr('data-url'),
-                    data : data,
-                    type: form.attr('method'),
-                    dataType: 'json',
-                    processData:false,
-                    contentType: false,
-                    success: function(data){
-                        //console.log('its mot get here', data)
-                        if(data.model){
-                            //console.log(data.model)
-                            $('#modal-product').modal('hide');
-                            $('.close-modal').click()
-                            updateTable(data.model);
-                            if (data.model.current_investment){
-                                $('#current_investment').html(`${numberWithCommas(data.model.current_investment)}`);
-                            }
-                            if (data.model.current_investment_percent){
-                                $('#current_investment_percent').html(`${parseFloat(data.model.current_investment_percent)}%`);
-                            }
-                            if (data.model.investors_count){
-                                $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
-                            }
+            //     });
+            // }  
+            // $('body').on("submit",".model-form-edit",function(e){
+            //     e.preventDefault();
+            //     var data = new FormData(this);
+            //     var formData
+            //     var form = $(this);
+            //     console.log('before ajax')
+            //     var url=form.attr('data-url')
+            //     $.ajax({
+            //         url: form.attr('data-url'),
+            //         data : data,
+            //         type: form.attr('method'),
+            //         dataType: 'json',
+            //         processData:false,
+            //         contentType: false,
+            //         success: function(data){
+            //             console.log('its mot get here', data)
+            //             if(data.model){
+            //                 //console.log(data.model)
+            //                 $('#modal-product').modal('hide');
+            //                 $('.close-modal').click()
+            //                 updateTable(data.model);
+            //                 if (data.model.current_investment){
+            //                     $('#current_investment').html(`${numberWithCommas(data.model.current_investment)}`);
+            //                 }
+            //                 if (data.model.current_investment_percent){
+            //                     $('#current_investment_percent').html(`${parseFloat(data.model.current_investment_percent)}%`);
+            //                 }
+            //                 if (data.model.investors_count){
+            //                     $('#investors_count').html(`${numberWithCommas(data.model.investors_count)}`);
+            //                 }
 
                             
 
                             
 
                             
-                        } else {
-                            $('.public_toggle_form-errors').html('');
-                            if (data.error) {
+            //             } else {
+            //                 $('.public_toggle_form-errors').html('');
+            //                 if (data.error) {
                              
-                                var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date','weekly_output_target']//,
-                                //console.log('before throwing error:',form.attr('data-url'),)
+            //                     var form_vars=[ '__all__','name','description','tags', 'category', 'total_value','public','closing_date','weekly_output_target']//,
+            //                     //console.log('before throwing error:',form.attr('data-url'),)
                                 
-                                for (let p=0; p < form_vars.length; p++ ){
-                                        let name_var = form_vars[p]
-                                        let error_content =''
-                                        if (data.error[name_var]){
-                                                // Find a better method here
-                                                if (data['error'][name_var][0]=='This field is required.'){
-                                                    error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
-                                                }else {
-                                                    error_content= data['error'][name_var][0] 
-                                                }
+            //                     for (let p=0; p < form_vars.length; p++ ){
+            //                             let name_var = form_vars[p]
+            //                             let error_content =''
+            //                             if (data.error[name_var]){
+            //                                     // Find a better method here
+            //                                     if (data['error'][name_var][0]=='This field is required.'){
+            //                                         error_content= '<b>' + sentenceCase(name_var) + '</b> field is required.'
+            //                                     }else {
+            //                                         error_content= data['error'][name_var][0] 
+            //                                     }
                                                 
-                                                a_html = `<div class='alert alert-danger alert dismissable'>
-                                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span></button>${error_content}
-                                                        </div> ` ;
-                                                $('.public_toggle_form-errors').append(a_html)
-                                        }
-                                }
-                                $('.public_toggle_form-errors').slideUp(50).fadeIn();
-                                window.setTimeout(function() {
-                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                        $(".public_toggle_form-errors").html('');
-                                    });
-                                }, 4000);
-                            //-----------------------
-                            } else  {
-                                // Data locked:  No edit allowed
-                                $('.public_toggle_form-errors').html('');
-                                a_html = 	`<div class='alert alert-danger alert dismissable'>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span></button>${data['locked']}
-                                </div> ` ;
-                                $('.public_toggle_form-errors').append(a_html)
-                                $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
+            //                                     a_html = `<div class='alert alert-danger alert dismissable'>
+            //                                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            //                                                 <span aria-hidden="true">&times;</span></button>${error_content}
+            //                                             </div> ` ;
+            //                                     $('.public_toggle_form-errors').append(a_html)
+            //                             }
+            //                     }
+            //                     $('.public_toggle_form-errors').slideUp(50).fadeIn();
+            //                     window.setTimeout(function() {
+            //                         $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+            //                             $(".public_toggle_form-errors").html('');
+            //                         });
+            //                     }, 4000);
+            //                 //-----------------------
+            //                 } else  {
+            //                     // Data locked:  No edit allowed
+            //                     $('.public_toggle_form-errors').html('');
+            //                     a_html = 	`<div class='alert alert-danger alert dismissable'>
+            //                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            //                     <span aria-hidden="true">&times;</span></button>${data['locked']}
+            //                     </div> ` ;
+            //                     $('.public_toggle_form-errors').append(a_html)
+            //                     $('.public_toggle_form-errors').slideUp(50).fadeIn();                           
 
-                                window.setTimeout(function() {
-                                    $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
-                                        $(".public_toggle_form-errors").html('');
-                                    });
-                                    }, 4000);
-                            } 
-                        //LAST ELSE--------------------------------------                
-                        }
-                    //END SUCCESS
-                    }
-                // END AJAX
-                })
-                return false;
-            })
+            //                     window.setTimeout(function() {
+            //                         $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+            //                             $(".public_toggle_form-errors").html('');
+            //                         });
+            //                         }, 4000);
+            //                 } 
+            //             //LAST ELSE--------------------------------------                
+            //             }
+            //         //END SUCCESS
+            //         }
+            //     // END AJAX
+            //     })
+            //     return false;
+            // })
         
         
             $('body').on('click', '.a_page_nav', function (event) {
@@ -789,14 +789,14 @@
           
 
                 a_html=`
-                <tr id="item-${val.id}">
-                    <td class="modelData " name="counter"> ${counter}</td>
+                <tr id="product-${val.id}">
+                    <td class="productData " name="counter"> ${counter}</td>
                     <td class="productCategories productData" name="categories">${category_trunc}</td>
                     <td class="productName productData" name="name">${name_trunc}</td>
                     <td class="productDescription productData" name="description">${description_trunc}</td>
                     <td class="productImage productData" name="image">${val.image}</td> 
-                    <td class="productPrice productData" name="price">${numberWithCommas(val.price)}</td>
-                    <td class="text-right modelAction modelData" name="action">
+                    <td class="productPrice productData" name="price">$${numberWithCommas(val.price)}</td>
+                    <td class="text-right productAction" name="action">
                     
                         <a href="/ecom/p/d/${val.id}/"
                         style="color:inherit"><i class="fa fa-eye"></i>
@@ -864,7 +864,7 @@
             }
             function append_no_records_found(total, tbody_id, colspan){
                 if (total == 0) {
-                    no_record_html=`<tr id="item-1">  <td colspan='${colspan}'> No Records Found <td>
+                    no_record_html=`<tr id="product-1">  <td colspan='${colspan}'> No Records Found <td>
                                   </tr>` ;
                     $(`#${tbody_id}`).append(no_record_html)
                 }
@@ -988,19 +988,25 @@
           
           });
             
-            function updateToProductTabel(product){
+            function updateToProductTable(product){
+              
+                console.log('inside productTable', product)
                 $("#productTable #product-" + product.id).children(".productData").each(function() {
                     var attr = $(this).attr("name");
-                    if (attr == "name") {
-                    $(this).text(product.name);
+                    $(this).addClass('edit-mode')
+
+                    if (attr == "counter") {
+                        $(this).html(`<i class="fas fa-edit"></i>`);
+                    }else if (attr == "name") {
+                        $(this).text(product.name);
                     } else if (attr == "description") {
-                    $(this).text(product.description);
+                        $(this).html(`${truncChar(product.description,20)}`);
                     } else if (attr == "price") {
-                    $(this).text(product.price);
+                        $(this).html(`$${product.price}`);
                     } else if (attr == "categories") {
-                    $(this).text(product.categories);
+                        $(this).text(product.categories);
                     } else if (attr == "image")  {
-                    $(this).text(product.image);
+                        $(this).text(product.image);
                     }
                 });
             }
@@ -1018,7 +1024,7 @@
         var formData
         var form = $(this);
         //var data = formData()
-        console.log('why...',form.attr('data-url'))
+        //console.log('why...',form.attr('data-url'))
         $.ajax({
             url: form.attr('data-url'),
             //data: form.serialize(),
@@ -1029,9 +1035,10 @@
             contentType: false,
             success: function(data){
               if(data.product){
-                    // $('#productTable tbody').html(data.product_list);
+                    //console.log('nnnn', data)
+                    //$('#productTable tbody').html(data.product_list);
                     if (data) {
-                      updateToProductTabel(data.product);
+                      updateToProductTable(data.product);
                     }
                     $('#modal-product').modal('hide');
               } else {
@@ -1047,7 +1054,7 @@
     $('body').on('click', '.product-lock',function(e){// for each update url
         e.preventDefault(); // prevent navigation
         var url = $(this).data('url'); // get the update form url
-        console.log("url:", url)
+        //console.log("url:", url)
         btn = e.target.id;      //get clicked button
         row = $(this).closest('tr');
        
@@ -1064,7 +1071,7 @@
             data: formData,
             dataType:  'json',
             success: function(data) { // on success..
-              console.log("data", data)
+              //console.log("data", data)
               updateLOCKInnerHTML(data.data)
                 
             },
@@ -1085,9 +1092,9 @@
                     title='lock'><i class="fa fa-lock"></i>
                     </a>   
                 `;
-        $("#productTable #product-" + val.id).children(".productData").each(function() {
+        $("#productTable #product-" + val.id).children(".productAction").each(function() {
             var attr = $(this).attr("name");
-
+            //console.log('::::',attr)
             if (attr == "action") {
               $(this).html(new_html);
             }
@@ -1117,7 +1124,7 @@
                     </a>
                   
                 `;
-        $("#productTable #product-" + val.id).children(".productData").each(function() {
+        $("#productTable #product-" + val.id).children(".productAction").each(function() {
             var attr = $(this).attr("name");
 
             if (attr == "action") {
@@ -1131,7 +1138,7 @@
     $('body').on('click', '.product-unlock',function(e){// for each update url 
         e.preventDefault(); // prevent navigation
         var url = $(this).data('url'); // get the update form url
-        console.log("url:", url)
+        //console.log("url:", url)
         btn = e.target.id;      //get clicked button
         row = $(this).closest('tr');
        
@@ -1149,7 +1156,7 @@
             data: formData,
             dataType:  'json',
             success: function(data) { // on success..
-            console.log('UNLOCK DATA::', data.data)
+            //console.log('UNLOCK DATA::', data.data)
               updateUNLOCKInnerHTML(data.data)
               // reload   until we fix the proplem----14 March 2021
               // location.reload()

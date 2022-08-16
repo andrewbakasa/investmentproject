@@ -1,0 +1,131 @@
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load humanize %}
+
+{% load widget_tweaks %}
+{% load store_extras %}
+{% load page_and_filter %}
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+       
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
+             
+       
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Sales</label>
+              </li>  
+            </ol>
+          </div>
+
+     
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            
+            <div class="row">
+              <div class="col-md-12">
+                  <div class="box">
+                    <h4 style="text-align:center;" id="personal_totals"> <b>Orders: Total</b>:${{total_sum|intcomma}} <b>Aver</b>:$ {{average| floatformat:-1 | intcomma}}</h4>
+                      <hr>
+                      <div class="row">
+                          <div class="col-lg-8">
+                              Order Status:
+                              {% for tag in BUSINESS_STATUS_CHOICE %}
+                              
+                            
+                                  <a id={{tag}} {% if status == tag %} 
+                                      class="filter-status badge rounded-pill bg-light text-dark" {% else %} 
+                                      class="filter-status badge rounded-pill bg-warning text-dark" {% endif %}  
+                                      href="#" data-url="{% url 'user_business_load_status_ajax' tag %}" 
+                                      data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                      title='Filter'>{{tag}}
+                                  </a>     
+
+
+                                  <!-- <a href="{% url 'user_investments_load_status' tag %}" {% if status == tag %} class="badge rounded-pill bg-light text-dark" {% else %}class="badge rounded-pill bg-warning text-dark" {% endif %}>{{tag}}</a> -->
+                              {% endfor %}
+                          </div>
+                      </div>
+                    <div class="box-body">
+                      <table id="productTable" class="table table-striped">
+                        <thead class="thead-dark">
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Qnty</th>
+                            <th>UP</th>
+                            <th>Date Ordered</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                            <th class="text-right" >Actions</th>
+                        </thead>
+                        <tbody id="product-table-tbody"> 
+                          
+       
+                          {% for client in first_page %}
+                                <tr id="product-{{ client.id }}">
+                                    <td>{{client.order.customer.details}}</td>
+                                    <td>{{client.product}}</td>
+                                    <td>{{client.quantity}}</td>
+                                    <td>{{client.product.price}}</td>
+                                    <td>{{client.order.date_ordered}}</td>
+                                    <td>{%if client.order.currency %} {{client.order.currency.symbol}} {%else%} ${%endif%}{{client.total | intcomma}}</td>
+                                    <td>{% if client.order.complete %} Completed {%else%} WIP {%endif%}</td>
+                                  
+                                  
+                                    <td class="text-right">
+                                    
+                                  
+                                     
+                                      <a  {% if client.fullfilled  %} 
+                                          class="toggle-order" title='Cancel' {% else %} 
+                                          class="toggle-order" title='Complete' {% endif %}  
+                                          href="#" data-url="{% url 'order-fullfill' client.id %}"  data-item-id ='{{client.id}}'
+                                          data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                          >{% if client.fullfilled  %} <i class="fas fa-cut"></i>  {% else %} <i class="fas fa-eye"></i> {% endif %}  
+                                      </a>     
+                                    </td>
+                                  
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+        
+            </div>
+          
+          </div>
+
+          <!--Pagination  -->
+      <div id= "page_section" class="pagination">
+        <ul class="pagination newpagination">
+            {% if current_page.has_previous %}
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                
+            {% endif %}
+    
+            <span class="current"  style="margin-left:5px">
+            Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+            </span>
+    
+            {% if current_page.has_next %}
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+            
+            {% endif %}
+        </ul>
+    </div>
+    
+
+    
+    </div>
+  
+</section><!-- End Projects Section -->
+

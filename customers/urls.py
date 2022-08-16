@@ -32,7 +32,11 @@ urlpatterns = [
 
     path('order_list2/', views.orders, name="orders_list2"),
     path('order_list/complete/', views.OrdersIndex.as_view(),{'complete_status': 'True'}, name="orders_list_complete", ),#arg={}
-    path('order_list/', views.OrdersIndex.as_view(),{'complete_status': 'False'}, name="orders_list", ),
+    path('order_list_1/', views.OrdersIndex.as_view(),{'complete_status': 'False'}, name="orders_list_1", ),
+    path('order_list/', views.orders, name="orders_list", ),
+    #path('myclientlist/', views.myclientlist, name="myclientlist", ),
+
+    
     path('entry/create/product/',
          views.ProductCreate.as_view(),  name='product_new'),
     path('entry/create/customer/',
@@ -85,5 +89,19 @@ urlpatterns = [
      # path('u/p/', views.get_user_products,{'type': 'unread'}, name="user_businesses_unread"),
 
      path('u_product_ajax/', views.create_userproduct_ajax, name="create_userproduct_ajax"),
-   
+     path('u/c/load_status_ajax/<str:status>', views.get_user_clients_load_status_ajax, name="user_clients_load_status_ajax"),
+     path('u/c/0/', views.get_user_clients,{'type': 'all'}, name="user_clients"),
+
+
+
+     path('u/o/load_status_ajax/', views.get_user_orders_load_status_ajax, name="userorders_load_status_ajax"),
+     path('display_useroders_ajax/', views.display_userorders_ajax, name="display_userorders_ajax"),
+     path('display_user_clients_ajax/', views.display_user_clients_ajax, name="display_user_clients_ajax"),
+
+
+     path('client_search/<str:status>/<str:slug>/search/tags/', views.client_search_and_tags_ajax,{'search_type': 1}, name='client_search_and_tags_ajax'), 
+     path('client_search/<str:status>/tags/', views.client_search_and_tags_ajax,{'search_type': 0}, name='client_tags_ajax'), 
+
+    
+     path('full_fill_order/<str:id>/', views.display_toggle_order_ajax, name="order-fullfill"),
 ]

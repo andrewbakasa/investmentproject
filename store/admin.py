@@ -9,7 +9,7 @@ admin.site.register(Company)
 admin.site.register(InvoiceItem)
 admin.site.register(InvoiceAttachment)
 admin.site.register(ExpenseAttachment)
-#admin.site.register(Currency)
+admin.site.register(Currency)
 admin.site.register(CurrencyRate)
 
 admin.site.register(ProductCategory)

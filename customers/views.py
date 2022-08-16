@@ -185,7 +185,31 @@ def get_user_products(request, type):
    
     return render(request, 'customers/user_products.html', context)
 
+def display_toggle_order_ajax(request, id):
+    current_time = timezone.now()#datetime.datetime.now()
+    
+    userdata= get_object_or_404(OrderItem,pk=id)
 
+    status=""
+    if request.method == 'POST':
+        #getting page number
+        page_no = request.POST.get('page_no', None)
+        print(userdata)
+        if userdata.fullfilled:
+            userdata.fullfilled =False
+            userdata.save()
+            status= 'Pending'
+        else:
+            userdata.fullfilled =True
+            userdata.save()
+            status= 'FullFilled'
+         
+        data={}	
+        data["changed"]=True
+        data["status"]=status
+      
+
+        return JsonResponse({"data":data})
 def display_userproduct_ajax(request):
     current_time = timezone.now()#datetime.datetime.now()
     
@@ -246,6 +270,434 @@ def display_userproduct_ajax(request):
                 item_object['image']= i.image.url
             else:
                 item_object['image']=None
+           
+            results.append(item_object)
+		
+        data["results"]=results
+        return JsonResponse({"data":data})
+
+def display_user_clients_ajax(request):
+    # class OrderItem(models.Model):
+    # product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    # order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    # quantity = models.IntegerField(default=0, null=True, blank=True)
+    # date_added = models.DateTimeField(auto_now_add=True)
+
+    # @property
+    # def total(self):
+    #     total_val= 0
+    #my_clients------
+    userdata= OrderItem.objects.filter(product__created_by=request.user)
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 3
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(userdata, pertable)
+    first_page = obj_paginator.page(1).object_list
+    page_range = obj_paginator.page_range
+    if request.method == 'POST':
+        #getting page number
+        page_no = request.POST.get('page_no', None)
+        #print('page:', page_no) 
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)   
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+        
+        #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+
+                                                
+        results=[] 												 
+        for i in obj_paginator.page(page_no).object_list:
+
+            item_object = model_to_dict(i)
+            #print (type(i.customer.details))
+            if i.order:
+                if isinstance(i.order.customer.details, User):
+                        item_object['customer_details']=i.order.customer.details.username
+                else:
+                    item_object['customer_details']= i.order.customer.details
+            else:
+                item_object['customer_details'] =None 
+
+            item_object['date_added']=i.date_added.ctime()
+
+            if i.order:
+                if i.order.currency:
+                    item_object['currency_symbol']= i.order.currency.symbol
+                else:
+                    item_object['currency_symbol']= '$'
+            else:
+                item_object['currency_symbol']= '$'
+
+            item_object['product']= i.product.name
+            item_object['total']= i.total
+            if i.product:
+                item_object['price']= i.product.price
+            else:
+                item_object['price']=None
+
+                                   
+           
+            results.append(item_object)
+		
+        data["results"]=results
+        return JsonResponse({"data":data})
+
+def get_user_clients_load_status_ajax(request,  status, *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax():
+            BUSINESS_STATUS_CHOICE = ["wip","ready","fullfilled", 'all']
+            current_time = timezone.now()#datetime.datetime.now() 
+            bus_status = request.POST.get('bus_status', None)
+            #Paging click
+            if bus_status != None:
+                status=bus_status
+
+            if status =="wip":
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('order__id').order_by('product__id')
+
+            elif status =="ready": 
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('order__id').order_by('product__id')
+
+            elif status =="fullfilled":
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('order__id').order_by('product__id')
+
+            else:
+                #allll
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+        
+            avg_value=0 
+            sum_value=0
+            # total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+            # sum_value=total_avg['sum']
+            # avg_value=total_avg['avg']
+            if sum_value==None:
+                sum_value=0
+            if avg_value==None:
+                avg_value=0    
+            #print(total_avg,sum_value,avg_value)
+
+            if not ('pertable' in request.session):
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            else:
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            pertable=request.session['pertable']
+        
+
+            obj_paginator = Paginator(queryset, pertable)
+            first_page = obj_paginator.page(1).object_list
+            #current_page = obj_paginator.get_page(1)
+            page_range = obj_paginator.page_range
+            
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
+            num_of_pages= int(obj_paginator.num_pages)
+            totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+            data={}	
+            data["per_table"]=pertable
+            data["page_no"]=page_no
+            data["num_of_pages"]=num_of_pages
+            data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+        
+
+            
+            if int(page_no)>int(num_of_pages):			
+                data["results"]=[]
+                return JsonResponse({"data":data})
+            results=[]
+
+
+            for i in obj_paginator.page(page_no).object_list:			
+                
+                item_object = model_to_dict(i)
+                
+                if i.order:
+                    if isinstance(i.order.customer.details, User):
+                            item_object['customer_details']=i.order.customer.details.username
+                    else:
+                        item_object['customer_details']= i.order.customer.details
+                else:
+                    item_object['customer_details'] =None 
+
+                item_object['date_added']=i.date_added.ctime()
+
+                if i.order:
+                    if i.order.currency:
+                        item_object['currency_symbol']= i.order.currency.symbol
+                    else:
+                        item_object['currency_symbol']= '$'
+                else:
+                    item_object['currency_symbol']= '$'
+
+                item_object['product']= i.product.name
+                item_object['total']= i.total
+                if i.product:
+                    item_object['price']= i.product.price
+                else:
+                    item_object['price']=None
+                    
+                results.append(item_object)									 
+            
+                
+            data["results"]=results
+            data["total_sum"]=float(sum_value)
+            data["average"]=float(round(avg_value,2))
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
+def client_search_and_tags_ajax(request,status, slug, search_type, *args, **kwargs):
+    current_time =timezone.now()#datetime.datetime.now()
+    if request.method == 'POST':
+        if search_type == 1:
+            if status =="wip":
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False),Q(product__description__icontains=slug)).order_by('order__id').order_by('product__id')
+   
+            elif status =="ready": 
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False),Q(product__description__icontains=slug) ).order_by('order__id').order_by('product__id')
+   
+            elif status =="fullfilled":
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True), Q(product__description__icontains=slug)).order_by('order__id').order_by('product__id')
+   
+            else:
+                #allll
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(product__description__icontains=slug)).order_by('order__id').order_by('product__id')
+            
+           
+        else:
+            if status =="wip":
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('order__id').order_by('product__id')
+   
+            elif status =="ready": 
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('order__id').order_by('product__id')
+   
+            elif status =="fullfilled":
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('order__id').order_by('product__id')
+   
+            else:
+                #allll
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+        
+        sum_value=0
+        avg_value=0     
+        #total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
+        #sum_value=total_avg['sum']
+        #avg_value=total_avg['avg']
+        if sum_value==None:
+            sum_value=0
+        if avg_value==None:
+            avg_value=0 
+
+        if not ('pertable' in request.session):
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+        else:
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+
+        pertable=request.session['pertable']
+    
+
+        obj_paginator = Paginator(queryset, pertable)
+        first_page = obj_paginator.page(1).object_list
+        # = obj_paginator.get_page(1)
+        page_range = obj_paginator.page_range
+        
+        page_no = request.POST.get('page_no', None)
+        if page_no== None:
+            page_no=1
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)    
+        
+        
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+            #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+    
+
+            
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+        results=[]
+
+
+        for i in obj_paginator.page(page_no).object_list:
+            item_object = model_to_dict(i)
+            if i.order:
+                if isinstance(i.order.customer.details, User):
+                        item_object['customer_details']=i.order.customer.details.username
+                else:
+                    item_object['customer_details']= i.order.customer.details
+            else:
+                item_object['customer_details'] =None 
+
+            item_object['date_added']=i.date_added.ctime()
+
+            if i.order:
+                if i.order.currency:
+                    item_object['currency_symbol']= i.order.currency.symbol
+                else:
+                    item_object['currency_symbol']= '$'
+            else:
+                item_object['currency_symbol']= '$'
+
+            item_object['product']= i.product.name
+            item_object['total']= i.total
+            if i.product:
+                item_object['price']= i.product.price
+            else:
+                item_object['price']=None
+
+            
+            results.append(item_object)									 
+        
+            
+        data["results"]=results
+        data["total_sum"]=float(sum_value)
+        data["average"]=float(round(avg_value,2))
+        return JsonResponse({"data":data})
+    else:
+        return JsonResponse({'error': True, 'data': 'errors'})  
+    
+
+def display_userorders_ajax(request):
+    current_time = timezone.now()#datetime.datetime.now()
+    
+    userdata= Order.objects.filter(customer__user=request.user)
+
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 3
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(userdata, pertable)
+    first_page = obj_paginator.page(1).object_list
+    page_range = obj_paginator.page_range
+    if request.method == 'POST':
+        #getting page number
+        page_no = request.POST.get('page_no', None)
+        #print('page:', page_no) 
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)   
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+        
+        #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+
+                                                
+        results=[] 												 
+        for i in obj_paginator.page(page_no).object_list:
+
+            item_object = model_to_dict(i)
+            #print (type(i.customer.details))
+            if isinstance(i.customer.details, User):
+                    item_object['customer_details']=i.customer.details.username
+            else:
+                item_object['customer_details']= i.customer.details
+            item_object['date_ordered']=i.date_ordered.ctime()
+            if i.currency:
+                item_object['currency_symbol']= i.currency.symbol
+            else:
+                item_object['currency_symbol']= '$'
+            item_object['total_price']= i.total_price
            
             results.append(item_object)
 		
@@ -443,6 +895,108 @@ def get_user_products_load_status_ajax(request, *args, **kwargs):
                 results.append(item_object)									 
             
                 
+            data["results"]=results
+            data["total_sum"]=float(sum_value)
+            data["average"]=float(round(avg_value,2))
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
+def get_user_orders_load_status_ajax(request, *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax():
+           
+            queryset = Order.objects.filter(Q(customer__user=request.user))
+            # total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+            # sum_value=total_avg['sum']
+            # avg_value=total_avg['avg']
+            sum_value=0
+            avg_value=0 
+            if sum_value==None:
+                sum_value=0
+            if avg_value==None:
+                avg_value=0    
+            #print(total_avg,sum_value,avg_value)
+
+            if not ('pertable' in request.session):
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            else:
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            pertable=request.session['pertable']
+        
+
+            obj_paginator = Paginator(queryset, pertable)
+            first_page = obj_paginator.page(1).object_list
+            #current_page = obj_paginator.get_page(1)
+            page_range = obj_paginator.page_range
+            
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
+            num_of_pages= int(obj_paginator.num_pages)
+            totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+            data={}	
+            data["per_table"]=pertable
+            data["page_no"]=page_no
+            data["num_of_pages"]=num_of_pages
+            data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+        
+
+            
+            if int(page_no)>int(num_of_pages):			
+                data["results"]=[]
+                return JsonResponse({"data":data})
+            results=[]
+
+
+            for i in obj_paginator.page(page_no).object_list:			
+                #cdate= i.date_created.ctime()
+                item_object = model_to_dict(i)
+                #print (type(i.customer.details))
+                if isinstance(i.customer.details, User):
+                     item_object['customer_details']=i.customer.details.username
+                else:
+                    item_object['customer_details']= i.customer.details
+                item_object['date_ordered']=i.date_ordered.ctime()
+                if i.currency:
+                    item_object['currency_symbol']= i.currency.symbol
+                else:
+                    item_object['currency_symbol']= '$'
+                item_object['total_price']= i.total_price
+              
+              
+              
+                
+                results.append(item_object)									 
+            
+            #print(results)    
             data["results"]=results
             data["total_sum"]=float(sum_value)
             data["average"]=float(round(avg_value,2))
@@ -998,37 +1552,138 @@ class ProductsIndex(LoginRequiredMixin,  generic.ListView):
         context['form'] = ProductForm
         return context
    
+
 @login_required(login_url="account_login")
 def orders(request):
-    
 
-    orders = Order.objects.all()
+    BUSINESS_STATUS_CHOICE = ["all"]#["unread","open","closed","all"] 
+   
+    queryset = Order.objects.filter(Q(customer__user=request.user))
+    
+    sum_value=0
+    avg_value=0
+    print('My orders...........')
+    print(queryset)
+    # total_avg= queryset.aggregate(sum=Sum('total_price'), avg=Avg('total_price'))
+    # sum_value=total_avg['sum']
+    # avg_value=total_avg['avg']
+    if sum_value==None:
+        sum_value=0
+    if avg_value==None:
+        avg_value=0  
+    form = ProductForm(initial={'created_by': request.user})
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    else:
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
 
-    myFilter = OrderFilter(request.GET, queryset=orders)
-    orders = myFilter.qs
-    
-    # add---
-    paginator = Paginator(orders, 5) # Show 25 contacts per page
-    page = request.GET.get('page')
-    
-    try:
-        orders = paginator.get_page(page)
-    except PageNotAnInteger :
-        orders = paginator.get_page(1)
-    except EmpytPage:
-        orders = paginator.get_page(paginator.num_pages)
-    
+    obj_paginator = Paginator(queryset, pertable)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
 
-    # added---
     context = {
-    'orders': orders, 
-    'myFilter': myFilter,
-    'page_obj': orders,
-    'is_paginated' : 'true',
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+         'orders':first_page,
+        'current_page':current_page,
+        'page_range':page_range,
+        "user": request.user,
+        "models": queryset,
+        "total": queryset.count(),
+        "user": request.user,
+        'form': form,
+         'status': type,
+        "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
+        "total_sum": sum_value,
+        "average": round(avg_value,2),
+        'lock_key':True,
+        'edit_key':True
     }
-    
    
     return render(request, 'customers/orders_list.html', context)
+
+@login_required(login_url="account_login")
+def get_user_clients(request, type):
+
+    BUSINESS_STATUS_CHOICE = ["wip","ready","fullfilled", 'all'] 
+   
+    queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+    
+    if type =="wip":
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('order__id').order_by('product__id')
+
+    elif type =="ready": 
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('order__id').order_by('product__id')
+
+    elif type =="fullfilled":
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('order__id').order_by('product__id')
+
+    else:
+        #all
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+    
+    
+    sum_value=0
+    avg_value=0
+    print('My clients...........')
+    print(queryset)
+    # total_avg= queryset.aggregate(sum=Sum('total_price'), avg=Avg('total_price'))
+    # sum_value=total_avg['sum']
+    # avg_value=total_avg['avg']
+    if sum_value==None:
+        sum_value=0
+    if avg_value==None:
+        avg_value=0  
+    form = ProductForm(initial={'created_by': request.user})
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    else:
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
+
+    obj_paginator = Paginator(queryset, pertable)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
+
+    context = {
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+         'orders':first_page,
+        'current_page':current_page,
+        'page_range':page_range,
+        "user": request.user,
+        "models": queryset,
+        "total": queryset.count(),
+        "user": request.user,
+        'form': form,
+        'status': type,
+        "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
+        "total_sum": sum_value,
+        "average": round(avg_value,2),
+        'lock_key':True,
+        'edit_key':True
+    }
+   
+    return render(request, 'customers/clients_list.html', context)
 
 
 class OrdersIndex(LoginRequiredMixin, generic.ListView):
