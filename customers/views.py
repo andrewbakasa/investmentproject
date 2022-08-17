@@ -75,6 +75,22 @@ from django.db.models import Q
 from django.utils import timezone
 
 
+login_required(login_url="account_login")
+def show_address(request,pk):
+    address = ShippingAddress.objects.filter(order__id=pk).first()
+    address = ShippingAddress.objects.filter(order__id=pk).first()
+    print(address)
+    return save_all2(request,address,'customers/show_address_modal.html')
+
+def save_all2(request,address,template_name):
+    data = dict()
+    
+    context = {
+    'address':address
+    }
+    data['html_form'] = render_to_string(template_name,context,request=request)
+    #print(data)
+    return JsonResponse(data)
 
 
 login_required(login_url="account_login")
@@ -287,7 +303,7 @@ def display_user_clients_ajax(request):
     # def total(self):
     #     total_val= 0
     #my_clients------
-    userdata= OrderItem.objects.filter(product__created_by=request.user)
+    userdata= OrderItem.objects.filter(product__created_by=request.user).order_by('-order__id').order_by('-order__date_ordered')
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()
         if obj:
@@ -384,17 +400,17 @@ def get_user_clients_load_status_ajax(request,  status, *args, **kwargs):
                 status=bus_status
 
             if status =="wip":
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('-order__id').order_by('-order__date_ordered')
 
             elif status =="ready": 
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('-order__id').order_by('-order__date_ordered')
 
             elif status =="fullfilled":
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('-order__id').order_by('-order__date_ordered')
 
             else:
                 #allll
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
         
             avg_value=0 
             sum_value=0
@@ -515,32 +531,32 @@ def client_search_and_tags_ajax(request,status, slug, search_type, *args, **kwar
     if request.method == 'POST':
         if search_type == 1:
             if status =="wip":
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False),Q(product__description__icontains=slug)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False),Q(product__description__icontains=slug)).order_by('-order__id').order_by('-order__date_ordered')
    
             elif status =="ready": 
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False),Q(product__description__icontains=slug) ).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False),Q(product__description__icontains=slug) ).order_by('-order__id').order_by('-order__date_ordered')
    
             elif status =="fullfilled":
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True), Q(product__description__icontains=slug)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True), Q(product__description__icontains=slug)).order_by('-order__id').order_by('-order__date_ordered')
    
             else:
                 #allll
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(product__description__icontains=slug)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(product__description__icontains=slug)).order_by('-order__id').order_by('-order__date_ordered')
             
            
         else:
             if status =="wip":
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('-order__id').order_by('-order__date_ordered')
    
             elif status =="ready": 
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('-order__id').order_by('-order__date_ordered')
    
             elif status =="fullfilled":
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('-order__id').order_by('-order__date_ordered')
    
             else:
                 #allll
-                queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+                queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
         
         sum_value=0
         avg_value=0     
@@ -1635,26 +1651,26 @@ def get_user_clients(request, type):
 
     BUSINESS_STATUS_CHOICE = ["wip","ready","fullfilled", 'all'] 
    
-    queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+    queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
     
     if type =="wip":
-        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('order__id').order_by('product__id')
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=False)).order_by('-order__id').order_by('-order__date_ordered')
 
     elif type =="ready": 
-        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('order__id').order_by('product__id')
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(order__complete=True),Q(fullfilled=False)).order_by('-order__id').order_by('-order__date_ordered')
 
     elif type =="fullfilled":
-        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('order__id').order_by('product__id')
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user),Q(fullfilled=True)).order_by('-order__id').order_by('-order__date_ordered')
 
     else:
         #all
-        queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('order__id').order_by('product__id')
+        queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
     
     
     sum_value=0
     avg_value=0
-    print('My clients...........')
-    print(queryset)
+    # print('My clients...........')
+    # print(queryset)
     # total_avg= queryset.aggregate(sum=Sum('total_price'), avg=Avg('total_price'))
     # sum_value=total_avg['sum']
     # avg_value=total_avg['avg']

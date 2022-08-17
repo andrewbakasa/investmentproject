@@ -66,6 +66,7 @@ urlpatterns = [
     
     
    
+    path('show_address/<str:pk>/', views.show_address, name="show_address"),
     path('product_update/<str:pk>/', views.product_update, name="update_product"),
 
     path('delete_product_old/<str:pk>/', views.deleteProduct, name="delete_product_okd"),

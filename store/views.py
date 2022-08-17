@@ -725,7 +725,8 @@ def update_item(request):
     print('action: ', action)
     print('product_id: ', product_id)
 
-    customer = request.user.customer
+    #customer = request.user.customer
+    customer = get_object_or_404(Customer, user=request.user)
     product = Product.objects.get(id=product_id)
 
     # get the latest order for this customer if none create
@@ -761,7 +762,8 @@ def update_item_ajax(request):
             #print(product_id)
             data["deleted"]=True
             if request.user.is_authenticated:
-                customer = request.user.customer
+                #customer = request.user.customer
+                customer = get_object_or_404(Customer, user=request.user)
                 #delete all null recors
                 order, created = Order.objects.get_or_create(customer=customer, complete=False)
                 OrderItem.objects.filter(order=order, product__isnull=True).delete()
@@ -778,7 +780,8 @@ def update_item_ajax(request):
         
 
         if request.user.is_authenticated:
-            customer = request.user.customer
+            #customer = request.user.customer
+            customer = get_object_or_404(Customer, user=request.user)
             # get the latest order for this customer if none create
             order, created = Order.objects.get_or_create(customer=customer, complete=False)
             orderitem, created = OrderItem.objects.get_or_create(order=order, product=product)
@@ -839,7 +842,11 @@ def process_order(request):
     data = json.loads(request.body)
 
     if request.user.is_authenticated:
-        customer = request.user.customer
+        #---------worng----
+        #customer = request.user.customer
+        customer = get_object_or_404(Customer, user=request.user)
+        print('>>>>>', customer)
+
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         #online purchasing by user dont provide company details
         if order.company is None:
@@ -860,6 +867,9 @@ def process_order(request):
     if (total == order.total_price) and (len(order.orderitem_set.all()) > 0):
         order.complete = True
     order.save()
+
+    print('oder................', order)
+    print("cus:................", customer)
 
     if order.shipping == True:
         ShippingAddress.objects.create(

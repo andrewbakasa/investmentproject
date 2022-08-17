@@ -92,7 +92,13 @@
                                           href="#" data-url="{% url 'order-fullfill' client.id %}"  data-item-id ='{{client.id}}'
                                           data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                           >{% if client.fullfilled  %} <i class="fas fa-cut"></i>  {% else %} <i class="fas fa-eye"></i> {% endif %}  
-                                      </a>     
+                                      </a> 
+                                      
+                                        <a  class="show-address" title='Show Address'  
+                                            href="#" data-url="{% url 'show_address' client.order.id %}"  data-item-id ='{{client.id}}'
+                                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                                            ><i class="fas fa-address-book"></i>  
+                                        </a>  
                                     </td>
                                   
                                 </tr>

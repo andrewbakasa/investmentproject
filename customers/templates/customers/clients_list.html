@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Sales List</title>
+    <title>Sales Management</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -234,6 +234,9 @@
           }
         });
       });
+      $('body').on('click', '.close-modal', function (e) {
+          $('#modal-product').modal('hide'); 
+      })
       $('body').on('click', '.a_page_nav', function (event) {
                 // preventing default actions
                 event.preventDefault();
@@ -283,7 +286,7 @@
                                 $('#product-table-tbody').append(a_html)
                             });
                             //Append Zero Record Annotation
-                            append_no_records_found(response.data.totalrecords,'product-table-tbody',7)
+                            append_no_records_found(response.data.totalrecords,'product-table-tbody',9)
                                
                            
                
@@ -375,6 +378,11 @@
                             data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                             >${icon_display} 
                         </a> 
+                        <a  class="show-address" title='Show Address'  
+                            href="#" data-url="/cus/show_address/${val.on}/"  data-item-id ='${val.on}'
+                            data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                            ><i class="fas fa-address-book"></i>  
+                        </a>  
                       </td>
                   </tr>`
 
@@ -474,7 +482,7 @@
                                     $('#product-table-tbody').append(a_html)
                                 });
                                 //Append Zero Record Annotation
-                                append_no_records_found(response.data.totalrecords,'product-table-tbody',7)
+                                append_no_records_found(response.data.totalrecords,'product-table-tbody',9)
                                
                             
 
@@ -526,7 +534,7 @@
                                 $('#product-table-tbody').append(a_html)
                             });
                             //Append Zero Record Annotation
-                            append_no_records_found(response.data.totalrecords,'product-table-tbody',7)
+                            append_no_records_found(response.data.totalrecords,'product-table-tbody',9)
                                
                            
                             },
@@ -540,7 +548,20 @@
    
   });	
 
-
+  $('body').on('click', '.show-address', function(){
+        var btn = $(this);// fix button  delay
+        $.ajax({
+          url: btn.attr("data-url"),
+          type: 'get',
+          dataType:'json',
+          beforeSend: function(){
+            $('#modal-product').modal('show');
+          },
+          success: function(data){
+            $('#modal-product .modal-content').html(data.html_form);
+          }
+        });
+      }) 
 </script>
 
 {% endblock %}
