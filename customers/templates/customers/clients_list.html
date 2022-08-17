@@ -8,7 +8,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 {% block page_title %}
-    <title>Client List</title>
+    <title>Sales List</title>
 {% endblock %}
 
 {% block stylesheets %}
@@ -179,13 +179,13 @@
 
  
    //first timme
-   var display_user_clients_ajax_url= "{% url 'display_user_clients_ajax' %}" 
-        var status= '{{status}}'
-        
-        if (status){ 
-                               
-          display_user_clients_ajax_url = `{% url 'user_clients_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
-        }
+    var display_user_clients_ajax_url= "{% url 'display_user_clients_ajax' %}" 
+    var status= '{{status}}'
+    
+    if (status){ 
+                            
+      display_user_clients_ajax_url = `{% url 'user_clients_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
+    }
 
   $(document).ready(function() {
     
@@ -359,6 +359,8 @@
             a_html= ` <tr id="product-${val.id}">
                       <td>${val.customer_details}</td>
                       <td>${val.product}</td>
+                      <td>${val.on}</td>
+                      <td>${val.prn}</td> 
                       <td>${val.quantity}</td>
                       <td>${val.price}</td>
                       <td>${val.date_added}</td>
@@ -421,12 +423,13 @@
                     bus_status =$(this).attr('id')
                     var search_val = $('#search').val().toLowerCase();
                     search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                    
                     if (search_val.length == 0 ){
-                        display_client_ajax_url = `{% url 'user_clients_load_status_ajax' 12345 %}`.replace(/12345/, bus_status.toString()); 
+                        display_user_clients_ajax_url = `{% url 'user_clients_load_status_ajax' 12345 %}`.replace(/12345/, bus_status.toString()); 
                     } else{
-                        display_client_ajax_url = `{% url 'client_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, bus_status.toString()).replace(/6789/, search_val.toString()); 
+                        display_user_clients_ajax_url = `{% url 'client_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, bus_status.toString()).replace(/6789/, search_val.toString()); 
                     }
-                    var url =display_client_ajax_url
+                    var url =display_user_clients_ajax_url
                     console.log('in filter:', url) 
                     $('#li_current_status').css('display','block')
                     $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
@@ -489,9 +492,9 @@
                 search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
                 if (search_val.length == 0 ){
                     //tag
-                    display_client_ajax_url = `{% url 'user_clients_load_status_ajax' 12345 %}`.replace(/12345/, bus_status.toString()); 
+                    display_user_clients_ajax_url = `{% url 'user_clients_load_status_ajax' 12345 %}`.replace(/12345/, bus_status.toString()); 
                 } else{
-                    display_client_ajax_url = `{% url 'client_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, bus_status.toString()).replace(/6789/, search_val.toString()); 
+                    display_user_clients_ajax_url = `{% url 'client_search_and_tags_ajax' 12345 6789 %}`.replace(/12345/, bus_status.toString()).replace(/6789/, search_val.toString()); 
                 }
                 // click first page
                 page_no=1
@@ -499,7 +502,7 @@
                 $.ajax({
                         type: "POST",
                         // define url name
-                        url: display_client_ajax_url, 
+                        url: display_user_clients_ajax_url, 
                         data : {    
                             page_no : page_no, 
                             status:status,

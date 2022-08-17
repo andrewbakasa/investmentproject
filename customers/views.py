@@ -346,19 +346,25 @@ def display_user_clients_ajax(request):
             item_object['date_added']=i.date_added.ctime()
 
             if i.order:
+                item_object['on']= i.order.id
                 if i.order.currency:
                     item_object['currency_symbol']= i.order.currency.symbol
                 else:
                     item_object['currency_symbol']= '$'
             else:
                 item_object['currency_symbol']= '$'
+                item_object['on']= None
 
-            item_object['product']= i.product.name
+            
             item_object['total']= i.total
             if i.product:
                 item_object['price']= i.product.price
+                item_object['prn']= i.product.id
+                item_object['product']= i.product.name
             else:
                 item_object['price']=None
+                item_object['prn']=None
+                item_object['product']= None
 
                                    
            
@@ -472,20 +478,26 @@ def get_user_clients_load_status_ajax(request,  status, *args, **kwargs):
                 item_object['date_added']=i.date_added.ctime()
 
                 if i.order:
+                    item_object['on']= i.order.id
                     if i.order.currency:
                         item_object['currency_symbol']= i.order.currency.symbol
                     else:
                         item_object['currency_symbol']= '$'
                 else:
                     item_object['currency_symbol']= '$'
+                    item_object['on']= None
 
-                item_object['product']= i.product.name
+                
                 item_object['total']= i.total
                 if i.product:
                     item_object['price']= i.product.price
+                    item_object['prn']= i.product.id
+                    item_object['product']= i.product.name
                 else:
                     item_object['price']=None
-                    
+                    item_object['prn']=None
+                    item_object['product']= None
+                        
                 results.append(item_object)									 
             
                 
@@ -610,19 +622,25 @@ def client_search_and_tags_ajax(request,status, slug, search_type, *args, **kwar
             item_object['date_added']=i.date_added.ctime()
 
             if i.order:
+                item_object['on']= i.order.id
                 if i.order.currency:
                     item_object['currency_symbol']= i.order.currency.symbol
                 else:
                     item_object['currency_symbol']= '$'
             else:
                 item_object['currency_symbol']= '$'
+                item_object['on']= None
 
-            item_object['product']= i.product.name
+            
             item_object['total']= i.total
             if i.product:
                 item_object['price']= i.product.price
+                item_object['prn']= i.product.id
+                item_object['product']= i.product.name
             else:
                 item_object['price']=None
+                item_object['prn']=None
+                item_object['product']= None
 
             
             results.append(item_object)									 

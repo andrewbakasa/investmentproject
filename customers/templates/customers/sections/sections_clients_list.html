@@ -16,8 +16,9 @@
                 data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
        
               <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success">{% trans 'Products Registeration' %}</a></li>
              
-       
+            
               <li class="breadcrumb-item" >
                 <label id="total_projects_searched">Sales</label>
               </li>  
@@ -56,6 +57,8 @@
                         <thead class="thead-dark">
                             <th>Customer</th>
                             <th>Product</th>
+                            <th>ON</th>
+                            <th>PrN</th>
                             <th>Qnty</th>
                             <th>UP</th>
                             <th>Date Ordered</th>
@@ -70,6 +73,8 @@
                                 <tr id="product-{{ client.id }}">
                                     <td>{{client.order.customer.details}}</td>
                                     <td>{{client.product}}</td>
+                                    <td>{{client.product.id}}</td>
+                                    <td>{{client.order.id}}</td>
                                     <td>{{client.quantity}}</td>
                                     <td>{{client.product.price}}</td>
                                     <td>{{client.order.date_ordered}}</td>
