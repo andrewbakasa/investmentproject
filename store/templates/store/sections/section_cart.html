@@ -13,7 +13,8 @@
               <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
                 data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
        
-              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success">{% trans 'Store' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                data-toggle="tooltip" data-placement="bottom" title='Shop Goods'>{% trans 'Store' %}</a></li>
              
               <li class="breadcrumb-item" >
                 <label id="total_projects_searched">Cart</label>
@@ -45,33 +46,44 @@
                     <br>
         
                     <div class="box-element" id="cart-table">
-                            <div class="cart-row">
-                                <div style="flex:2"></div>
-                                <div style="flex:2"><strong>Item</strong></div>
-                                <div style="flex:1"><strong>Price</strong></div>
-                                <div style="flex:1"><strong>Quantity</strong></div>
-                                <div style="flex:1"><strong>Total</strong></div>
-                            </div>
-            
-                        {% for orderitem in orderitems %}
-                            <div class="cart-row" id="cart-item-{{orderitem.product.id}}">
-                                <div style="flex:2"><img class="row-image" src="{{orderitem.product.imageURL}}"></div>
-                                <div style="flex:2" name ='item'><p>{{orderitem.product.name}}</p></div>
-                                <!-- orderitem.product.price -->
-                                <div style="flex:1" name ='price'><p>${{orderitem.product.price|floatformat:2| intcomma}}</p></div>
-                                <div style="flex:1" name ='quantity'>
-                                    <p class="quantity" name ='number-part'>{{orderitem.quantity| intcomma}}</p>
-                                    <div class="quantity">
-                                        <img data-product="{{orderitem.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
-        
-                                        <img data-product="{{orderitem.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
-                                    </div>
-                                </div>
-                                <!-- orderitem.total -->
-                                <div style="flex:1" name ='total'><p>${{orderitem.total| intcomma}}</p></div>
-                            </div>
-                        {% endfor %}
-        
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="thead-dark">
+                                    <th></th>
+                                    <th><strong>Item</strong></th>
+                                    <th><strong>Price</strong></th>
+                                    <th><strong>Quantity</strong></th>
+                                    <th><strong>Total</strong></th>
+                                </thead>
+                                <tbody id="t-tbody">
+                                    {% for orderitem in orderitems %}
+                                    
+                                            <tr class="{{orderitem.product.id}}">
+                                                <div id="cart-item-{{orderitem.product.id}}">
+                                    
+                                                        <td style="flex:2" class="{{orderitem.product.id}}"><img class="row-image" src="{{orderitem.product.imageURL}}"></td>
+                                                        <td style="flex:2" class="{{orderitem.product.id}}" name ='item'><p>{{orderitem.product.name}}</p></td>
+                                                        <!-- orderitem.product.price -->
+                                                        <td style="flex:1" class="{{orderitem.product.id}}" name ='price'><p>${{orderitem.product.price|floatformat:2| intcomma}}</p></td>
+                                                        <td style="flex:1" class="{{orderitem.product.id}}" name ='quantity'>
+                                                            <p class="quantity" name ='number-part'>{{orderitem.quantity| intcomma}}</p>
+                                                            <div class="quantity">
+                                                                <img data-product="{{orderitem.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
+                                
+                                                                <img data-product="{{orderitem.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
+                                                            </div>
+                                                        </td>
+                                                        <!-- orderitem.total -->
+                                                        <td style="flex:1" class="{{orderitem.product.id}}" name ='total'><p>${{orderitem.total| intcomma}}</p></td>
+                                                    </div>
+                                                </div>
+                                            </tr>
+                                    
+                                    {% endfor %}
+                               </tbody>
+                            </table>
+                        </div>                           
                     </div>
                     <br>
                 </div>
