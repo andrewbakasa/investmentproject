@@ -11,7 +11,68 @@
 {% block stylesheets %}
     <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
+    <style>
+       @media
+	  only screen 
+    and (max-width: 760px), (min-device-width: 768px) 
+    and (max-device-width: 1024px)  {
 
+		/* Force table to not be like tables anymore */
+		table, thead, tbody, th, td, tr {
+			display: block;
+		}
+
+		/* Hide table headers (but not display: none;, for accessibility) */
+		thead tr {
+			position: absolute;
+			top: -9999px;
+			left: -9999px;
+		}
+
+    tr {
+      margin: 0 0 1rem 0;
+    }
+      
+    tr:nth-child(odd) {
+      background: #ccc;
+    }
+    
+		td {
+			/* Behave  like a "row" */
+			border: none;
+			border-bottom: 1px solid #eee;
+			position: relative;
+			padding-left: 50%;
+		}
+
+		td:before {
+			/* Now like a table header */
+			position: absolute;
+			/* Top/left values mimic padding */
+			top: 0;
+			left: 6px;
+			width: 45%;
+			padding-right: 10px;
+			white-space: nowrap;
+		}
+            /*
+            Label the data
+        You could also use a data-* attribute and content for this. That way "bloats" the HTML, this way means you need to keep HTML and CSS in sync. Lea Verou has a clever way to handle with text-shadow.
+            */
+            td:nth-of-type(1):before { content: "#"; }
+            td:nth-of-type(2):before { content: "Name"; }
+            td:nth-of-type(3):before { content: "Description"; }
+            td:nth-of-type(4):before { content: "Category"; }
+            td:nth-of-type(5):before { content: "Value"; }
+            td:nth-of-type(6):before { content: "Current"; }
+            td:nth-of-type(7):before { content: "%"; } 
+            td:nth-of-type(8):before { content: "Investors"; }
+            td:nth-of-type(9):before { content: "Date Created"; }
+            td:nth-of-type(10):before { content: "Public"; }
+            td:nth-of-type(11):before { content: "Actions"; } 
+          
+        }
+    </style>
 
 <!-- < -->
 {% endblock %}
@@ -87,44 +148,46 @@
                                 </div>
                             </div>
                             <div class="table-responsive">
-                                <table id="userBusinessTable" class="table table-striped">
-                                    <thead class="thead-dark">
-                                        <th style="width: 2%" >#</th>    
-                                        <th style="width: 12%" >Name</th>
-                                        <th style="width: 16%" >Description</th>
-                                        <th style="width: 8%" >Category</th>
-                                        <th style="width: 7%" >Value</th>
-                                        <th style="width: 7%" >Current</th>
-                                        <th style="width: 3%" >%</th>
-                                        <th style="width: 8%" >Investors</th>
-                                        <th style="width: 19%" >Date Created</th>
-                                        <th style="width: 7%" >Public</th>
-                                        <th style="width: 11%" class="text-right">Actions</th>
+                                <table role='table' id="userBusinessTable" class="table table-striped">
+                                    <thead role="rowgroup" class="thead-dark">
+                                        <tr role="row" >
+                                            <th role="columnheader" style="width: 2%" >#</th>    
+                                            <th role="columnheader"  style="width: 12%" >Name</th>
+                                            <th role="columnheader"  style="width: 16%" >Description</th>
+                                            <th role="columnheader"  style="width: 8%" >Category</th>
+                                            <th role="columnheader"  style="width: 7%" >Value</th>
+                                            <th role="columnheader"  style="width: 7%" >Current</th>
+                                            <th role="columnheader"  style="width: 3%" >%</th>
+                                            <th role="columnheader"  style="width: 8%" >Investors</th>
+                                            <th role="columnheader"  style="width: 19%" >Date Created</th>
+                                            <th role="columnheader"  style="width: 7%" >Public</th>
+                                            <th role="columnheader"  style="width: 11%" class="text-right">Actions</th>
+                                       </tr>
                                     </thead>
-                                    <tbody id="userbusiness-table-tbody">
+                                    <tbody role="rowgroup" id="userbusiness-table-tbody">
                                     {% for item in first_page  %}
-                                    <tr id="item-{{item.id}}" >
-                                        <td class="modelData " name="counter"> 
+                                    <tr role="row" id="item-{{item.id}}" >
+                                        <td role="cell" class="modelData " name="counter"> 
                                             {{forloop.counter}}                                           
                                         </td>
-                                        <td class="modelData" name="name" >{{item.name|truncatechars:12}}</td>
-                                        <td class="modelData" name="description" >{{item.description|truncatechars:20}}</td>
-                                        <td class="modelData" name="category" >{{item.category|truncatechars:20}}</td>
-                                        <td class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
-                                        <td class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
-                                        <td class="modelData" name="current_investment_percent" >{{item.current_investment_percent| floatformat:-1| intcomma}}%</td>
+                                        <td role="cell"  class="modelData" name="name" >{{item.name|truncatechars:12}}</td>
+                                        <td role="cell"  class="modelData" name="description" >{{item.description|truncatechars:20}}</td>
+                                        <td role="cell"  class="modelData" name="category" >{{item.category|truncatechars:20}}</td>
+                                        <td role="cell"  class="modelData" name="total_value" >${{item.total_value| intcomma}}</td>
+                                        <td role="cell"  class="modelData" name="current_investment" >${{item.current_investment| intcomma}}</td>
+                                        <td role="cell"  class="modelData" name="current_investment_percent" >{{item.current_investment_percent| floatformat:-1| intcomma}}%</td>
                                       
-                                        <td class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
+                                        <td role="cell"  class="modelData" name="investors_count" >{{item.investors_count| intcomma}}</td>
                                     
                                             
-                                        <td class="modelData" name="date_created" >{{item.date_created}}</td>
+                                        <td role="cell"  class="modelData" name="date_created" >{{item.date_created}}</td>
 
-                                        <td class="modelData" name="public" >
+                                        <td role="cell"  class="modelData" name="public" >
                                             {% if item.public %}<i style='color:blue;' class="bi bi-check-circle"></i>
                                             {% else %} <i class="bi-square"></i>{% endif %} {{ item.views | shrink_num}}
                                         </td>
                                        
-                                        <td class="text-right modelAction modelData" name="action">
+                                        <td role="cell"  class="text-right modelAction modelData" name="action">
                                             
                                             <a href="{% url 'edit-investment' item.id %}"
                                                 style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -164,6 +227,8 @@
                                 </table>
                             
                             </div>
+
+                          
 
                             {%else%}
 

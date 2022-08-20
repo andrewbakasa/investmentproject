@@ -6,6 +6,7 @@ $(document).ready(function(){
           sbutton.remove()
           //append here
           sbutton.insertAfter("#navbar")
+          $('table').removeClass('table table-striped');
       }
 
       function desktop_view(){
@@ -15,8 +16,10 @@ $(document).ready(function(){
           sbutton.remove()
           //append in ul tag
           navbar_ul.append(sbutton)
+          $('table').addClass('table table-striped');
       }
       $(window).resize(function() {
+        console.log('nnn',$(this).width()  )
           if ($(this).width() < 744) {
             mobile_view()
           } else {
@@ -28,7 +31,7 @@ $(document).ready(function(){
 
     function checkPosition() {
         //mobile
-        if (window.matchMedia('(max-width: 991px)').matches) {
+        if (window.matchMedia('(max-width: 768px)').matches) {
           mobile_view()
         } else {
           desktop_view() 

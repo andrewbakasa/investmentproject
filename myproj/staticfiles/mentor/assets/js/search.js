@@ -17,7 +17,7 @@ $(document).ready(function(){
           navbar_ul.append(sbutton)
       }
       $(window).resize(function() {
-          if ($(this).width() < 991) {
+          if ($(this).width() < 744) {
             mobile_view()
           } else {
             desktop_view()

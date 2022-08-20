@@ -47,43 +47,43 @@
         
                     <div class="box-element" id="cart-table">
 
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead class="thead-dark">
-                                    <th></th>
-                                    <th><strong>Item</strong></th>
-                                    <th><strong>Price</strong></th>
-                                    <th><strong>Quantity</strong></th>
-                                    <th><strong>Total</strong></th>
-                                </thead>
-                                <tbody id="t-tbody">
-                                    {% for orderitem in orderitems %}
-                                    
-                                            <tr class="{{orderitem.product.id}}">
-                                                <div id="cart-item-{{orderitem.product.id}}">
-                                    
-                                                        <td style="flex:2" class="{{orderitem.product.id}}"><img class="row-image" src="{{orderitem.product.imageURL}}"></td>
-                                                        <td style="flex:2" class="{{orderitem.product.id}}" name ='item'><p>{{orderitem.product.name}}</p></td>
-                                                        <!-- orderitem.product.price -->
-                                                        <td style="flex:1" class="{{orderitem.product.id}}" name ='price'><p>${{orderitem.product.price|floatformat:2| intcomma}}</p></td>
-                                                        <td style="flex:1" class="{{orderitem.product.id}}" name ='quantity'>
-                                                            <p class="quantity" name ='number-part'>{{orderitem.quantity| intcomma}}</p>
-                                                            <div class="quantity">
-                                                                <img data-product="{{orderitem.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
+                       
+                        <table role="table" class="table table-striped" >
+                            <thead role="rowgroup" class="thead-dark">
+                                <tr role="row">
+                                    <th role="columnheader"></th>
+                                    <th role="columnheader"><strong>Item</strong></th>
+                                    <th role="columnheader"><strong>Price</strong></th>
+                                    <th role="columnheader"><strong>Quantity</strong></th>
+                                    <th role="columnheader"><strong>Total</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody id="t-tbody" role="rowgroup">
+                                {% for orderitem in orderitems %}
                                 
-                                                                <img data-product="{{orderitem.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
-                                                            </div>
-                                                        </td>
-                                                        <!-- orderitem.total -->
-                                                        <td style="flex:1" class="{{orderitem.product.id}}" name ='total'><p>${{orderitem.total| intcomma}}</p></td>
-                                                    </div>
+                                        <tr role="row" class="{{orderitem.product.id}}">
+                                            <td  role="cell" class="{{orderitem.product.id}}"><img class="row-image" src="{{orderitem.product.imageURL}}"></td>
+                                            <td  role="cell" class="{{orderitem.product.id}}" name ='item'><p>{{orderitem.product.name}}</p></td>
+                                            <!-- orderitem.product.price -->
+                                            <td  role="cell" class="{{orderitem.product.id}}" name ='price'><p>${{orderitem.product.price|floatformat:2| intcomma}}</p></td>
+                                            <td  role="cell" class="{{orderitem.product.id}}" name ='quantity'>
+                                                <p class="quantity" name ='number-part'>{{orderitem.quantity| intcomma}}</p>
+                                                <div class="quantity">
+                                                    <img data-product="{{orderitem.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
+                    
+                                                    <img data-product="{{orderitem.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
                                                 </div>
-                                            </tr>
+                                            </td>
+                                            <!-- orderitem.total -->
+                                            <td  role="cell" class="{{orderitem.product.id}}" name ='total'><p>${{orderitem.total| intcomma}}</p></td>
                                     
-                                    {% endfor %}
-                               </tbody>
-                            </table>
-                        </div>                           
+                                        </tr>
+                                
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                      
+                      
                     </div>
                     <br>
                 </div>

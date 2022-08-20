@@ -10,6 +10,68 @@
 
 {% block stylesheets %}
 <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+<style>
+    @media
+   only screen 
+ and (max-width: 760px), (min-device-width: 768px) 
+ and (max-device-width: 1024px)  {
+
+     /* Force table to not be like tables anymore */
+     table, thead, tbody, th, td, tr {
+         display: block;
+     }
+
+     /* Hide table headers (but not display: none;, for accessibility) */
+     thead tr {
+         position: absolute;
+         top: -9999px;
+         left: -9999px;
+     }
+
+ tr {
+   margin: 0 0 1rem 0;
+ }
+   
+ tr:nth-child(odd) {
+   background: #ccc;
+ }
+ 
+     td {
+         /* Behave  like a "row" */
+         border: none;
+         border-bottom: 1px solid #eee;
+         position: relative;
+         padding-left: 50%;
+     }
+
+     td:before {
+         /* Now like a table header */
+         position: absolute;
+         /* Top/left values mimic padding */
+         top: 0;
+         left: 6px;
+         width: 45%;
+         padding-right: 10px;
+         white-space: nowrap;
+     }
+         /*
+         Label the data
+     You could also use a data-* attribute and content for this. That way "bloats" the HTML, this way means you need to keep HTML and CSS in sync. Lea Verou has a clever way to handle with text-shadow.
+         */
+         td:nth-of-type(1):before { content: "#"; }
+         td:nth-of-type(2):before { content: "Title"; }
+         td:nth-of-type(3):before { content: "Summary"; }
+         td:nth-of-type(4):before { content: "Value"; }
+         td:nth-of-type(5):before { content: "Contri."; }
+         td:nth-of-type(6):before { content: "Category"; }
+         td:nth-of-type(7):before { content: "Owner"; } 
+         td:nth-of-type(8):before { content: "Application Status"; }
+         td:nth-of-type(9):before { content: "Actions"; }
+         /* td:nth-of-type(10):before { content: "Public"; }
+         td:nth-of-type(11):before { content: "Actions"; } 
+        */
+     }
+ </style>
 {% endblock %}
 
 {% block content_header %}   
@@ -81,32 +143,35 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table id="usersTable" class="table table-striped">
-                                        <thead class="thead-dark">
-                                        <th style="width: 1%" >#</th>    
-                                        <th style="width: 15%" >Invest. Title</th>
-                                        <th style="width: 22%" >Invest. Summary</th>
-                                        <th style="width: 10%" >Total Value</th>
-                                        <th style="width: 10%" >My Contr.</th>
-                                        <th style="width: 10%" >Category</th>
-                                        <th style="width: 10%" >Owner</th>
-                                        <th style="width: 10%" >Appl. Status</th>
-                                        <th style="width: 12%" class="text-right">Actions</th>
-                                        </thead>
-                                        <tbody id="userinvestment-table-tbody">
-                                        {% for item in first_page  %}
-                                        <tr id="item-{{item.id}}" >
-                                            <td>{{forloop.counter}}</td>
+                                    <table role="table" id="usersTable" class="table table-striped">
                                         
-                                            <td class="modelData" name="name" >{{item.inv_name |truncatechars:15}}</td>
-                                            <td class="modelData" name="description" >{{item.summary|truncatechars:40}}</td>
-                                            <td class="modelData" name="category" >${{item.total_value| intcomma}}</td>
-                                            <td class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
-                                            <td class="modelData" name="category" >{{item.cat_name}}</td>
+                                        <thead role="rowgroup" class="thead-dark">
+                                            <tr role="row">
+                                                <th role="columnheader"   style="width: 1%" >#</th>    
+                                                <th role="columnheader"   style="width: 15%" >Invest. Title</th>
+                                                <th role="columnheader"   style="width: 22%" >Invest. Summary</th>
+                                                <th role="columnheader"   style="width: 10%" >Total Value</th>
+                                                <th role="columnheader"   style="width: 10%" >My Contr.</th>
+                                                <th role="columnheader"   style="width: 10%" >Category</th>
+                                                <th role="columnheader"   style="width: 10%" >Owner</th>
+                                                <th role="columnheader"   style="width: 10%" >Appl. Status</th>
+                                                <th role="columnheader"   style="width: 12%" class="text-right">Actions</th>
+                                            </tr>
+                                       </thead>
+                                        <tbody role="rowgroup"id="userinvestment-table-tbody">
+                                        {% for item in first_page  %}
+                                        <tr role="row" id="item-{{item.id}}" >
+                                            <td role="cell">{{forloop.counter}}</td>
+                                        
+                                            <td role="cell" class="modelData" name="name" >{{item.inv_name |truncatechars:15}}</td>
+                                            <td role="cell" class="modelData" name="description" >{{item.summary|truncatechars:40}}</td>
+                                            <td role="cell" class="modelData" name="category" >${{item.total_value| intcomma}}</td>
+                                            <td role="cell" class="modelData" name="myinvest" >${{item.myinvest| intcomma}}</td>
+                                            <td role="cell" class="modelData" name="category" >{{item.cat_name}}</td>
                                             
-                                            <td class="modelData" name="email" > {% if item.application_status == "engagement" %} {{item.email}} {% else %} N/A {%endif%}</td>
-                                            <td class="modelData" name="application_status" >{{ item.application_status }}</td>
-                                            <td class="text-right modelAction modelData" name="action">
+                                            <td role="cell" class="modelData" name="email" > {% if item.application_status == "engagement" %} {{item.email}} {% else %} N/A {%endif%}</td>
+                                            <td role="cell" class="modelData" name="application_status" >{{ item.application_status }}</td>
+                                            <td role="cell" class="text-right modelAction modelData" name="action">
                                                 <a href="{% url 'investment-details' item.iid %}"
                                                     style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                                                     title='View Investment'><i class="fas fa-eye"></i>

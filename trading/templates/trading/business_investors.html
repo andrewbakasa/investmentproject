@@ -8,8 +8,68 @@
     <title>Personal Investors List</title>
 {% endblock %}
 
+
 {% block stylesheets %}
 <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+<style>
+    @media
+   only screen 
+ and (max-width: 760px), (min-device-width: 768px) 
+ and (max-device-width: 1024px)  {
+
+     /* Force table to not be like tables anymore */
+     table, thead, tbody, th, td, tr {
+         display: block;
+     }
+
+     /* Hide table headers (but not display: none;, for accessibility) */
+     thead tr {
+         position: absolute;
+         top: -9999px;
+         left: -9999px;
+     }
+
+ tr {
+   margin: 0 0 1rem 0;
+ }
+   
+ tr:nth-child(odd) {
+   background: #ccc;
+ }
+ 
+     td {
+         /* Behave  like a "row" */
+         border: none;
+         border-bottom: 1px solid #eee;
+         position: relative;
+         padding-left: 50%;
+     }
+
+     td:before {
+         /* Now like a table header */
+         position: absolute;
+         /* Top/left values mimic padding */
+         top: 0;
+         left: 6px;
+         width: 45%;
+         padding-right: 10px;
+         white-space: nowrap;
+     }
+         /*
+         Label the data
+     You could also use a data-* attribute and content for this. That way "bloats" the HTML, this way means you need to keep HTML and CSS in sync. Lea Verou has a clever way to handle with text-shadow.
+         */
+         td:nth-of-type(1):before { content: "#"; }
+         td:nth-of-type(2):before { content: "Email"; }
+         td:nth-of-type(3):before { content: "Title"; }
+         td:nth-of-type(4):before { content: "Motivation"; }
+         td:nth-of-type(5):before { content: "Value"; }
+         td:nth-of-type(6):before { content: "Date Created."; }
+         td:nth-of-type(7):before { content: "Application Stage"; }
+         td:nth-of-type(8):before { content: "Actions"; } 
+     }
+
+ </style>
 {% endblock %}
 
 {% block content_header %}   
@@ -74,29 +134,30 @@
               
                         
                         <div class="table-responsive">
-                            <table id="userBusinessTable" class="table table-striped">
-                                <thead class="thead-dark">
-                                <th style="width: 1%" >#</th>    
-                                <th style="width: 9%" >Email</th>
-                                <th style="width: 9%" >Title</th>
-                                <th style="width: 25%" >motivation</th>
-                                <th style="width: 8%" >Value</th>
-                                <th style="width: 17%" >Date Created</th>
-                                <th style="width: 10%" >Application Stage</th>
-                                <th style="width: 7%" class="text-right">Actions</th>
+                            <table role="table" id="userBusinessTable" class="table table-striped">
+                                 <thead role="rowgroup" class="thead-dark">
+                                    <tr role="row"><th style="width: 1%" >#</th>    
+                                        <th role="columnheader" style="width: 9%" >Email</th>
+                                        <th role="columnheader"  style="width: 9%" >Title</th>
+                                        <th role="columnheader"  style="width: 25%" >motivation</th>
+                                        <th role="columnheader"  style="width: 8%" >Value</th>
+                                        <th role="columnheader"  style="width: 17%" >Date Created</th>
+                                        <th role="columnheader"  style="width: 10%" >Application Stage</th>
+                                        <th role="columnheader" style="width: 7%" class="text-right">Actions</th>
+                                    </tr>
                                 </thead>
-                                <tbody id="userbusiness-table-tbody">
+                                <tbody role="rowgroup" id="userbusiness-table-tbody">
                                 {% for item in models  %}
-                                <tr id="item-{{item.id}}" >
-                                    <td class="modelData" name="counter" >{{forloop.counter}}</td>
-                                    <td class="modelData" name="name" >{{item.user.email}}</td>
-                                    <td class="modelData" name="name" >{{item.name}}</td>
-                                    <td class="modelData" name="motivation" >{{item.motivation|truncatechars:45}}</td>
-                                    <td class="modelData" name="total_value" >${{item.value| intcomma}}</td>
+                                <tr role="row" id="item-{{item.id}}" >
+                                    <td role="cell" class="modelData" name="counter" >{{forloop.counter}}</td>
+                                    <td role="cell" class="modelData" name="name" >{{item.user.email}}</td>
+                                    <td role="cell" class="modelData" name="name" >{{item.name}}</td>
+                                    <td role="cell" class="modelData" name="motivation" >{{item.motivation|truncatechars:45}}</td>
+                                    <td role="cell" class="modelData" name="total_value" >${{item.value| intcomma}}</td>
                                          
-                                    <td class="modelData" name="date_created" >{{ item.date_created }}</td>
-                                    <td class="modelData" name="application_status" >{{ item.application_status }}</td>
-                                    <td class="text-right modelAction modelData" name="action">
+                                    <td role="cell" class="modelData" name="date_created" >{{ item.date_created }}</td>
+                                    <td role="cell" class="modelData" name="application_status" >{{ item.application_status }}</td>
+                                    <td role="cell" class="text-right modelAction modelData" name="action">
                                         
                                         <a href="{% url 'investor-details' item.id investment.id  %}"
                                             style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
@@ -204,11 +265,49 @@
 
 {% block scripts %}
 <script>
+    
+        function checkPosition() {
+            //mobile
+           
+            if (
+                (window.matchMedia('(max-width: 760px)').matches) || 
+                ((window.matchMedia('min-device-width: 768px').matches) && (window.matchMedia('max-device-width: 1024px').matches)) 
+                ) {
+                mobile_view()
+            } else {
+                desktop_view() 
+            }
+        }
+
+     
+
+        function mobile_view(){
+            $('table').removeClass('table table-striped');
+        }
+
+        function desktop_view(){
+            $('table').addClass('table table-striped');
+        }
+
+        $(window).resize(function() {
+            console.log('width: ' , $(this).width())
+            
+          if ($(this).width() < 744) {
+            mobile_view()
+          } else {
+            desktop_view()
+          }
+      });     
     $(document).ready(function (){ 
         $("#investments a:first").addClass( "active") 
         $("#enterprenuer a:first").addClass( "active") 
-        $("#registerbusiness a:first").addClass( "active") 
-    })
+        $("#registerbusiness a:first").addClass( "active")
+        
+        //does it on start
+        checkPosition()
+
+
+   })
      $('#confirmdelete').on('show.bs.modal', function(e) {
         var name = $(e.relatedTarget).data('object-name');
         var url = $(e.relatedTarget).data('delete-url');
