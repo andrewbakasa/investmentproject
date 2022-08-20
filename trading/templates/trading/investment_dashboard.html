@@ -106,16 +106,7 @@
                 <div class="col-md-8 col-md-pull-4" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
                     <div class="box" >
                       <div class="box-header">
-                          <!-- <div class="btn-group row text-center"> -->
-                            <!-- <button id="toggle">show/hide all</button> -->
-                            <!-- &nbsp;&nbsp;
-                            <button id="entireperiod" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5"><small>{% trans 'Full Period' %}</small></button>  &nbsp; &nbsp;         
-                            <button id="6month" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Last 6 month' %}</small></button>  &nbsp; &nbsp;
-                            <button id="3month" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Last 3 Month' %}</small></button> &nbsp; &nbsp;
-                            <button id="currentMonth" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Curr. Month' %}</small></button> &nbsp; &nbsp;
-                            <button id="currentWeek" class="btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 range-chooser"><small>{% trans 'Current Week' %}</small></button>
                           
-                          </div> -->
                           <div class="btn-group row" role="group"   aria-label="Basic example" style="text-align: left;white-space: nowrap;">
                             <button id="entireperiod" class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Full Period' %}</small></button>          
                             <button id="6month"       class="btn-clicked btn btn-s btn-default col-lg-2 col-md-4 col-sm-5 col-xs-6"><small>{% trans 'Last 6 months' %}</small></button> 
@@ -128,87 +119,93 @@
                     </div>
         
                     <div class="box" >      
-                      <div class="box-header">
-                        <h3 class="box-title">{% trans 'Investments Inflows' %}<a href="{% url 'update_project_graph_pref' %}"
-                        data-toggle="tooltip" data-placement="bottom" title='Change Graph Preference' 
-                        >&nbsp;<i class="fas fa-user fa-fw"></i></a></h3>
-                      </div>
-                      <div class="box-body">
-                        <canvas id="myreleasesChart" width="450" height="250"></canvas>
-                      </div>
-                    </div>
-                  
-                  
+                        <div class="box-header">
+                          <h3 class="box-title">{% trans 'Investments Inflows' %}<a href="{% url 'update_project_graph_pref' %}"
+                          data-toggle="tooltip" data-placement="bottom" title='Change Graph Preference' 
+                          >&nbsp;<i class="fas fa-user fa-fw"></i></a></h3>
+                        </div>
+                        <div class="box-body">
+                          <canvas id="myreleasesChart" width="450" height="250"></canvas>
+                        </div>
+                    </div>                  
                 </div>
 
                  <!-- A -->
                  <div class="col-md-4 col-md-push-8">
                   
-                  <div class="box" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;">
-                      <div class="box-content">
-                        <table class="table">
-                          <tr><th></th><th>{{ today|date:"F" }}</th><th>{{ last_month|date:"F" }}</th></tr>
-                          <!-- RELEASES -->
-                          <tr>
-                              <th>{% trans 'Engaged' %}</th>
+                    <div class="box" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;">
+                        <div class="box-content">
+                          <table class="table col-md-4 ">
+                            <tr>
+                              <th></th>
+                              <th>{{ today|date:"F" }}</th>
+                              <th>{{ last_month|date:"F" }}</th>
+                            </tr>
+                            <!-- RELEASES -->
+                            <tr>
+                                <th>{% trans 'Engaged' %}</th>
+                            
+                                <td>
+                                  <a href="#" data-toggle="modal" data-target="#modal_show_releases_current" 
+                                  data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Engaged' >${{ releases|shrink_num }}</a>
+                                </td>
+                                <td>                  
+                                  <a href="#" data-toggle="modal" data-target="#modal_show_releases_previous" 
+                                  data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Engaged'>${{ previous_releases|shrink_num}}</a>
+                                </td>
+                              
+                            </tr>
+                            <!-- ADMISSIONS -->
+                            <tr>
+                              <th>{% trans 'Verification' %}</th>
                           
                               <td>
-                                <a href="#" data-toggle="modal" data-target="#modal_show_releases_current" 
-                                data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Engaged' >${{ releases|shrink_num }}</a>
+                                <a href="#" data-toggle="modal" data-target="#modal_show_admissions_current" 
+                                data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Verification' >${{ admissions|shrink_num }}</a>
                               </td>
                               <td>                  
-                                <a href="#" data-toggle="modal" data-target="#modal_show_releases_previous" 
-                                data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Engaged'>${{ previous_releases|shrink_num}}</a>
+                                <a href="#" data-toggle="modal" data-target="#modal_show_admissions_previous" 
+                                data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Verification'>${{ previous_admissions|shrink_num }}</a>
                               </td>
                             
                           </tr>
-                          <!-- ADMISSIONS -->
                           <tr>
-                            <th>{% trans 'Verification' %}</th>
-                        
-                            <td>
-                              <a href="#" data-toggle="modal" data-target="#modal_show_admissions_current" 
-                              data-toggle="tooltip" data-placement="bottom" title='Show {{  today|date:"F"  }} Investment Verification' >${{ admissions|shrink_num }}</a>
-                            </td>
-                            <td>                  
-                              <a href="#" data-toggle="modal" data-target="#modal_show_admissions_previous" 
-                              data-toggle="tooltip" data-placement="bottom" title='Show {{ last_month|date:"F" }} Investment Verification'>${{ previous_admissions|shrink_num }}</a>
-                            </td>
+                            <th>{% trans 'Difference' %}</th><td{% if difference < 0 %} class="text-red"{% endif %}>${{ difference|shrink_num }}</td><td{% if previous_difference < 0 %} class="text-red"{% endif %}>${{ previous_difference|shrink_num}}</td>
+                          </tr>
                           
-                        </tr>
-                        <tr>
-                          <th>{% trans 'Difference' %}</th><td{% if difference < 0 %} class="text-red"{% endif %}>${{ difference|shrink_num }}</td><td{% if previous_difference < 0 %} class="text-red"{% endif %}>${{ previous_difference|shrink_num}}</td>
-                        </tr>
-                        
-            
-                        </table>
-                      </div>
-                  </div>
+              
+                          </table>
+                        </div>
+                    </div>
+                    
+                    <div class="box" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;">
+                        <div class="box-header">
+                          <h3 class="box-title">{% trans 'Investments Analytics' %}</h3>
+                        </div>
+                        <div class="box-body">
+                          <table role="table" class="table">
+                            <thead role="rowgroup">
+                              <tr role="row">
+                                <th role="columnheader">{% trans 'KPI' %}</th>
+                                <th role="columnheader">{% trans 'Target' %}</th>
+                                <th role="columnheader">{% trans 'Actual' %}</th>
+                              </tr>
+                            </thead>
+                          <tbody role="rowgroup">
+                            {% for kpi in dict_kpi %}
+                              <tr row="role">
+                                <td role="cell"><a href="#">{{ kpi.name }}</a></td>
+                                <td >${{ kpi.target|shrink_num }}</td>
+                                <td id="{{ kpi.id }}" {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>${{ kpi.actual|shrink_num }}</td>
+                                
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                          </table>
+                        </div>
+                    </div>
                   
-                  <div class="box" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;">
-                      <div class="box-header">
-                        <h3 class="box-title">{% trans 'Investments Analytics' %}</h3>
-                      </div>
-                      <div class="box-body">
-                        <table class="table">
-                          <tr>
-                            <th>{% trans 'KPI' %}</th>
-                            <th>{% trans 'Target' %}</th>
-                            <th>{% trans 'Actual' %}</th>
-                          </tr>
-                        {% for kpi in dict_kpi %}
-                          <tr>
-                            <td><a href="#">{{ kpi.name }}</a></td>
-                            <td >${{ kpi.target|shrink_num }}</td>
-                            <td id="{{ kpi.id }}" {% if kpi.actualPercent <= 0.5 %} class="text-red"{% endif %}>${{ kpi.actual|shrink_num }}</td>
-                            
-                          </tr>
-                        {% endfor %}
-                        </table>
-                      </div>
-                  </div>
-                  
-              </div>
+                 </div>
             </div>
 
         </div>
@@ -515,7 +512,37 @@ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !
  <script>
   $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
+    //does it on start
+    //checkPosition()
   });
+
+      function mobile_view(){
+          $('table').removeClass('table table-striped');
+      }
+
+      function desktop_view(){
+          
+          $('table').addClass('table table-striped');
+      }
+      $(window).resize(function() {
+        console.log('width',$(this).width()  )
+          if ($(this).width() < 744) {
+            //mobile_view()
+          } else {
+            //desktop_view()
+          }
+      });
+     
+
+      function checkPosition() {
+         
+          if (window.matchMedia('(max-width: 768px)').matches) {
+            mobile_view()
+          } else {
+            desktop_view() 
+          }
+      }
+   
   </script>
  <script type="text/javascript">
 

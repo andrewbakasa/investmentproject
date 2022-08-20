@@ -322,8 +322,41 @@
                             
         display_ajax_url = `{% url 'user_investments_load_status_ajax' 12345 %}`.replace(/12345/, status.toString()); 
     }
+
+    function checkPosition() {
+            //mobile
+           
+            if (
+                (window.matchMedia('(max-width: 760px)').matches) || 
+                ((window.matchMedia('min-device-width: 768px').matches) && (window.matchMedia('max-device-width: 1024px').matches)) 
+                ) {
+                mobile_view()
+            } else {
+                desktop_view() 
+            }
+        }
+
+        function mobile_view(){
+            $('table').removeClass('table table-striped');
+        }
+
+        function desktop_view(){
+            $('table').addClass('table table-striped');
+        }
+
+        $(window).resize(function() {
+            console.log('width: ' , $(this).width())
+            
+          if ($(this).width() < 744) {
+            mobile_view()
+          } else {
+            desktop_view()
+          }
+      });  
+     
     
     $(document).ready(function (){ 
+        checkPosition()
         $("#investments a:first").addClass( "active") 
         $("#investors a:first").addClass( "active") 
         $("#exploreinvestments a:first").addClass( "active") 

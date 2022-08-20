@@ -35,26 +35,28 @@
                      
                     </div>
                     <div class="box-body">
-                      <table id="productTable" class="table table-striped">
-                        <thead class="thead-dark">
-                            <th style="width: 2%">Transcation</th>
-                            <th>Customer</th>
-                            <th>Date Ordered</th>
-                            <th>Value</th>
-                            <th>Status</th>
-                            <th class="text-right" >Actions</th>
+                      <table role="table" id="productTable" class="table table-striped">
+                        <thead role="rowgroup" class="thead-dark">
+                          <tr role="row">
+                            <th role="columnheader">Transcation</th>
+                            <th role="columnheader">Customer</th>
+                            <th role="columnheader">Date Ordered</th>
+                            <th role="columnheader">Value</th>
+                            <th role="columnheader">Status</th>
+                            <th role="columnheader" class="text-right" >Actions</th>
+                          </tr>
                         </thead>
-                        <tbody id="product-table-tbody">          
+                        <tbody role="rowgroup" id="product-table-tbody">          
                           {% for order in orders %}
-                                <tr id="product-{{ order.id }}">
-                                    <td>{{order.transaction_id}}</td>
-                                    <td>{{order.customer.details}}</td>
-                                    <td>{{order.date_ordered}}</td>
-                                    <td>{%if order.currency %} {{order.currency.symbol}} {%else%} ${%endif%}{{order.total_price | intcomma}}</td>
-                                    <td>{% if order.complete %} Completed {%else%} WIP {%endif%}</td>
+                                <tr role="row" id="product-{{ order.id }}">
+                                    <td role="cell">{{order.transaction_id}}</td>
+                                    <td role="cell">{{order.customer.details}}</td>
+                                    <td role="cell">{{order.date_ordered}}</td>
+                                    <td role="cell">{%if order.currency %} {{order.currency.symbol}} {%else%} ${%endif%}{{order.total_price | intcomma}}</td>
+                                    <td role="cell">{% if order.complete %} Completed {%else%} WIP {%endif%}</td>
                                   
                                   
-                                    <td class="text-right">
+                                    <td role="cell" class="text-right">
                                     
                                       <a style="color:inherit" href="{% url 'order' order.id %}" data-toggle="tooltip" data-placement="bottom" 
                                       title='View Order'><i class="fa fa-eye"></i></a>

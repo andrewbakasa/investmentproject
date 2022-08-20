@@ -54,36 +54,38 @@
                           </div>
                       </div>
                     <div class="box-body">
-                      <table id="productTable" class="table table-striped">
-                        <thead class="thead-dark">
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>ON</th>
-                            <th>PrN</th>
-                            <th>Qnty</th>
-                            <th>UP</th>
-                            <th>Date Ordered</th>
-                            <th>Value</th>
-                            <th>Status</th>
-                            <th class="text-right" >Actions</th>
+                      <table role="table" id="productTable" class="table table-striped">
+                        <thead role="rowgroup" class="thead-dark">
+                            <tr role="row">
+                              <th role="columnheader">Customer</th>
+                              <th role="columnheader">Product</th>
+                              <th role="columnheader">ON</th>
+                              <th role="columnheader">PrN</th>
+                              <th role="columnheader">Qnty</th>
+                              <th role="columnheader">UP</th>
+                              <th role="columnheader">Date Ordered</th>
+                              <th role="columnheader">Value</th>
+                              <th role="columnheader">Status</th>
+                              <th role="columnheader" class="text-right" >Actions</th>
+                            </tr>
                         </thead>
-                        <tbody id="product-table-tbody"> 
+                        <tbody row="rowgroup" id="product-table-tbody"> 
                           
        
                           {% for client in first_page %}
-                                <tr id="product-{{ client.id }}">
-                                    <td>{{client.order.customer.details}}</td>
-                                    <td>{{client.product}}</td>
-                                    <td>{{client.product.id}}</td>
-                                    <td>{{client.order.id}}</td>
-                                    <td>{{client.quantity}}</td>
-                                    <td>{{client.product.price}}</td>
-                                    <td>{{client.order.date_ordered}}</td>
-                                    <td>{%if client.order.currency %} {{client.order.currency.symbol}} {%else%} ${%endif%}{{client.total | intcomma}}</td>
-                                    <td>{% if client.order.complete %} Completed {%else%} WIP {%endif%}</td>
+                                <tr role="row" id="product-{{ client.id }}">
+                                    <td role="cell">{{client.order.customer.details}}</td>
+                                    <td role="cell">{{client.product}}</td>
+                                    <td role="cell">{{client.product.id}}</td>
+                                    <td role="cell">{{client.order.id}}</td>
+                                    <td role="cell">{{client.quantity|intcomma}}</td>
+                                    <td role="cell">{%if client.order.currency %} {{client.order.currency.symbol}} {%else%} ${%endif%}{{client.product.price}}</td>
+                                    <td role="cell">{{client.order.date_ordered}}</td>
+                                    <td role="cell">{%if client.order.currency %} {{client.order.currency.symbol}} {%else%} ${%endif%}{{client.total | intcomma}}</td>
+                                    <td role="cell">{% if client.order.complete %} Completed {%else%} WIP {%endif%}</td>
                                   
                                   
-                                    <td class="text-right">
+                                    <td role="cell" class="text-right">
                                     
                                   
                                      

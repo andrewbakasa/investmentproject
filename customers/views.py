@@ -193,7 +193,7 @@ def get_user_products(request, type):
         'form': form,
          'status': type,
         "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
-        "total_sum": sum_value,
+        "total_sum": float(round(sum_value,2)),
         "average": round(avg_value,2),
         'lock_key':True,
         'edit_key':True
@@ -518,7 +518,7 @@ def get_user_clients_load_status_ajax(request,  status, *args, **kwargs):
             
                 
             data["results"]=results
-            data["total_sum"]=float(sum_value)
+            data["total_sum"]=float(round(sum_value,2))
             data["average"]=float(round(avg_value,2))
             return JsonResponse({"data":data})
         else:
@@ -663,7 +663,7 @@ def client_search_and_tags_ajax(request,status, slug, search_type, *args, **kwar
         
             
         data["results"]=results
-        data["total_sum"]=float(sum_value)
+        data["total_sum"]=float(round(sum_value,2))
         data["average"]=float(round(avg_value,2))
         return JsonResponse({"data":data})
     else:
@@ -835,7 +835,7 @@ def product_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
         
             
         data["results"]=results
-        data["total_sum"]=float(sum_value)
+        data["total_sum"]=float(round(sum_value,2))
         data["average"]=float(round(avg_value,2))
         return JsonResponse({"data":data})
     else:
@@ -930,7 +930,7 @@ def get_user_products_load_status_ajax(request, *args, **kwargs):
             
                 
             data["results"]=results
-            data["total_sum"]=float(sum_value)
+            data["total_sum"]=float(round(sum_value,2))
             data["average"]=float(round(avg_value,2))
             return JsonResponse({"data":data})
         else:
@@ -1032,7 +1032,7 @@ def get_user_orders_load_status_ajax(request, *args, **kwargs):
             
             #print(results)    
             data["results"]=results
-            data["total_sum"]=float(sum_value)
+            data["total_sum"]=float(round(sum_value,2))
             data["average"]=float(round(avg_value,2))
             return JsonResponse({"data":data})
         else:
@@ -1596,8 +1596,8 @@ def orders(request):
     
     sum_value=0
     avg_value=0
-    print('My orders...........')
-    print(queryset)
+    #print('My orders...........')
+    #print(queryset)
     # total_avg= queryset.aggregate(sum=Sum('total_price'), avg=Avg('total_price'))
     # sum_value=total_avg['sum']
     # avg_value=total_avg['avg']
@@ -1638,7 +1638,7 @@ def orders(request):
         'form': form,
          'status': type,
         "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
-        "total_sum": sum_value,
+        "total_sum": float(round(sum_value,2)),
         "average": round(avg_value,2),
         'lock_key':True,
         'edit_key':True
@@ -1711,7 +1711,7 @@ def get_user_clients(request, type):
         'form': form,
         'status': type,
         "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
-        "total_sum": sum_value,
+        "total_sum": float(round(sum_value,2)),
         "average": round(avg_value,2),
         'lock_key':True,
         'edit_key':True
