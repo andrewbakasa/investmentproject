@@ -391,6 +391,11 @@ td:before {
                     });
                     //add_model_class()
             }
+            function update_totals(data) {
+                ahtml =`<b>Orders: Total</b>:$${numberWithCommas(data['total_sum'])} <b>Aver</b>:$${numberWithCommas(data['average'])}`
+                $('#personal_totals').html(ahtml)
+            
+            }
             function updatePaging2(data){
                 var has_previous=''
                 //console.log(data)
@@ -560,7 +565,7 @@ td:before {
                             success: function (response) {
                                 $('#product-table-tbody').html('')
                                 updatePaging2(response.data)
-                                //update_totals(response.data)
+                                update_totals(response.data)
                                 if (response.data.per_table){
                                     per_table=response.data.per_table
                                 }
@@ -612,7 +617,7 @@ td:before {
                         success: function (response) {
                             $('#product-table-tbody').html('')
                             updatePaging2(response.data)
-                            //update_totals(response.data)
+                            update_totals(response.data)
                             if (response.data.per_table){
                                 per_table=response.data.per_table
                             }

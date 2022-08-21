@@ -69,9 +69,9 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models.aggregates import Avg, Count, Max, Sum
-from django.db.models import Q
+from django.db.models import Q, F
 
- 
+from django.db.models import FloatField 
 from django.utils import timezone
 
 
@@ -412,15 +412,9 @@ def get_user_clients_load_status_ajax(request,  status, *args, **kwargs):
                 #allll
                 queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
         
-            avg_value=0 
-            sum_value=0
-            # total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
-            # sum_value=total_avg['sum']
-            # avg_value=total_avg['avg']
-            if sum_value==None:
-                sum_value=0
-            if avg_value==None:
-                avg_value=0    
+            total_avg= queryset.aggregate(sum=Sum(F('quantity')*F('product__price'),output_field=FloatField()), avg=Avg(F('quantity')*F('product__price'),output_field=FloatField()))
+            sum_value=total_avg['sum']
+            avg_value=total_avg['avg']
             #print(total_avg,sum_value,avg_value)
 
             if not ('pertable' in request.session):
@@ -558,15 +552,11 @@ def client_search_and_tags_ajax(request,status, slug, search_type, *args, **kwar
                 #allll
                 queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
         
-        sum_value=0
-        avg_value=0     
-        #total_avg= queryset.aggregate(sum=Sum('total_value'), avg=Avg('total_value'))
-        #sum_value=total_avg['sum']
-        #avg_value=total_avg['avg']
-        if sum_value==None:
-            sum_value=0
-        if avg_value==None:
-            avg_value=0 
+        
+        total_avg= queryset.aggregate(sum=Sum(F('quantity')*F('product__price'),output_field=FloatField()), avg=Avg(F('quantity')*F('product__price'),output_field=FloatField()))
+        sum_value=total_avg['sum']
+        avg_value=total_avg['avg']
+       
 
         if not ('pertable' in request.session):
             obj= UserPreference.objects.filter(user=request.user).first()
@@ -1667,17 +1657,10 @@ def get_user_clients(request, type):
         queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
     
     
-    sum_value=0
-    avg_value=0
-    # print('My clients...........')
-    # print(queryset)
-    # total_avg= queryset.aggregate(sum=Sum('total_price'), avg=Avg('total_price'))
-    # sum_value=total_avg['sum']
-    # avg_value=total_avg['avg']
-    if sum_value==None:
-        sum_value=0
-    if avg_value==None:
-        avg_value=0  
+    total_avg= queryset.aggregate(sum=Sum(F('quantity')*F('product__price'),output_field=FloatField()), avg=Avg(F('quantity')*F('product__price'),output_field=FloatField()))
+    sum_value=total_avg['sum']
+    avg_value=total_avg['avg']
+
     form = ProductForm(initial={'created_by': request.user})
     if not ('pertable' in request.session):
         obj= UserPreference.objects.filter(user=request.user).first()

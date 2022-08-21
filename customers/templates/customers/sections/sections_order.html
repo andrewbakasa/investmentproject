@@ -31,52 +31,48 @@
      
           <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
               {% if order %}
-                  <div class="box">
-                      <div class="box-body">
-                  
-                      
-                            <p >Order Detail <a href="#">{{ order.customer.details }}</a></p>
-                            <p >Order Date: <a href="#">{{ order.date_ordered|date:'SHORT_DATE_FORMAT' }}</a></p>
-                            <p>{% if order.transaction_id %} Trans:id:{{ order.transaction_id }} {% endif%}</p>
-                              
-                          
-                            
+              
+              <h4 style="text-align:center;" id="personal_totals"> <b>My Order</b> valued @ {{ order.currency.symbol}}{{ order.total_price| intcomma }}</h4>
+              <hr>
+                  <div class="box row">
+                      <div class="col-md-8 col-md-pull-4">
+                            <p >Order Detail <a href="#">{{ order.customer.details }}</a> &nbsp;
+                               Order Date: <a href="#">{{ order.date_ordered|date:'D F d, Y' }}</a> &nbsp;
+                              {% if order.transaction_id %} Trans:id:{{ order.transaction_id }} {% endif%}</p>
                       </div>
-
-                      <div class="panel-footer">
-                      
+                      <div class="col-md-4 col-md-push-8">                      
                         <a href="{% url 'print_order' order.id %}" target="_new" class="btn btn-outline-primary">Printable Order</a>
                         <a href="{% url 'order_pdf_view' order.id %}" target="_blank" class="btn btn-outline-primary">View Pdf</a>
                       </div>
                   </div>
                   <!-- Order items -->
                     <div class="panel panel-default">
-                      <div class="panel-heading">Order items</div>
-                      <table class="table table-hover" id="orderdata">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Item</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Seller</th>
-                            <th scope="col">Cost</th>
-                            <th scope="col">Qty</th>
-                            <th scope="col">Total</th>
-                            <th scope="col" class="text-right">Actions</th>
+                    
+                      <table role="table" class="table table-hover" id="orderdata">
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th row="columnheader" scope="col">#</th>
+                            <th row="columnheader"  scope="col">Item</th>
+                            <th row="columnheader"  scope="col">Description</th>
+                            <th row="columnheader"  scope="col">Seller</th>
+                            <th row="columnheader"  scope="col">Cost</th>
+                            <th row="columnheader"  scope="col">Qty</th>
+                            <th row="columnheader" scope="col">Total</th>
+                            <th row="columnheader" scope="col" class="text-right">Actions</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody role="rowgroup">
                           {% for item in order.orderitem_set.all %}
-                          <tr id="orderrow-{{ item.id }}">
+                          <tr  role="row" id="orderrow-{{ item.id }}">
                             <th scope="row">{{ forloop.counter }} </th>
-                            <td>{{ item.product }}</td>
-                            <td>{{ item.product.description }}</td>
-                            <td>{{ item.product.created_by }}</td>
-                            <td>{{ item.order.currency.symbol}} {{ item.product.price| intcomma }}</td>
-                            <td>{{ item.quantity | intcomma }}</td>
-                            <td>{{item.order.currency.symbol}} {{ item.total| intcomma }}</td>
+                            <td role="cell">{{ item.product }}</td>
+                            <td role="cell">{{ item.product.description }}</td>
+                            <td role="cell">{{ item.product.created_by }}</td>
+                            <td role="cell">{{ item.order.currency.symbol}} {{ item.product.price| intcomma }}</td>
+                            <td role="cell">{{ item.quantity | intcomma }}</td>
+                            <td role="cell">{{item.order.currency.symbol}} {{ item.total| intcomma }}</td>
                           
-                            <td class="text-right">
+                            <td role="cell" class="text-right">
                                   <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
                                   data-object-name="{{ item.product }}"  data-item-id="{{item.id}}" 
                                   data-delete-url="{% url 'delete_order_item' order.id  item.id %}"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
