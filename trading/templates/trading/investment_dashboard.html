@@ -512,6 +512,7 @@ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !
  <script>
   $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
+    detect()
     //does it on start
     //checkPosition()
   });
@@ -527,27 +528,43 @@ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !
           $('table').addClass('table table-striped');
           $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
       }
-      $(window).resize(function() {
-        //console.log('width',$(this).width()  )
-          if ($(this).width() < 744) {
+      function detect(){
+      
+        if ($(this).width() < 744) {
             // make it bigger
             $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
             //releasesChartData[full_period] = null
-            if (variable_toggle==false){
-              $('#'+ current_id).click()
-              location.reload();
+            if (var_toggle_mobile==false){// change over from desktop
+                releasesChartData[current_iloc] = null;
+                $('#'+ current_id).click()
+                var_toggle_mobile= true
+              //location.reload();
+            }else if (var_toggle_mobile==null){// initial set to false
+               var_toggle_mobile= false
+               //console.log('initial:mobile: var_toggle_mobile>>>',var_toggle_mobile)
             }
-            variable_toggle= true
+
+            
           } else {
             //desktop_view()
             $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
-            if (variable_toggle==true){
+            if (var_toggle_mobile==true){//changeover:action
+              releasesChartData[current_iloc] = null;
               $('#'+ current_id).click()
-              location.reload();
+              var_toggle_mobile= false
+              
+              //location.reload();
+            }else if (var_toggle_mobile==null){
+               var_toggle_mobile= true
+               
             }
-            variable_toggle= false
+            
 
-          }
+          } 
+      }
+      $(window).resize(function() {
+        //console.log('width',$(this).width()  )
+         detect()
       });
      
 
@@ -595,6 +612,8 @@ function numberWithCommas(x) {
 
  function make_list(res) {
     var iter2=0
+    legend_z =[]
+    legend_a =[]
     for (var i = 0; i < res.dataset.length; i++) {
         //----------ccccc do it here--------------------------------
         //console.log('pushed>>>', res.dataset[i].name)
@@ -636,11 +655,8 @@ function numberWithCommas(x) {
  
  var drawReleases = function(res) {
   make_list(res)
-  //console.log('draing first time:', legend_z)
   var ctx = document.getElementById("myreleasesChart").getContext('2d');
   var dp = res.last_14day_dp
-  //console.log(dp)
-  //$('#desired_rate').html(`$${numberWithCommas(dp)}`)
   $('#desired_rate').html(`$${nFormatter(dp)}`)
   
   var data = {
@@ -712,52 +728,48 @@ function numberWithCommas(x) {
 
 var updatereleasesChart = function(chartData) {
 
+      var data = {
+          labels: chartData.labels,
+          datasets: []
+      };
+      //console.log('test:',chartData)
+      for (var i = 0; i < chartData.dataset.length; i++) {
+          var dataset = {
+            label: chartData.dataset[i].name,
+            fill: false,
+            pointRadius: 2,
+            backgroundColor: colors[i],
+            borderColor: colors[i],
+            data: chartData.dataset[i].data
+          };
+          //skipp hidden datasets
+          if (window.matchMedia('(max-width: 768px)').matches) {
+              if (!legend_z.includes(dataset.label)){// limit data
+              data.datasets.push(dataset);
+            }
+          }else{
+            // in desktop mode show all
+            data.datasets.push(dataset);
+          }
 
-
-  var data = {
-      labels: chartData.labels,
-      datasets: []
-  };
-  //console.log('test:',chartData)
-  for (var i = 0; i < chartData.dataset.length; i++) {
-    var dataset = {
-      label: chartData.dataset[i].name,
-      fill: false,
-      pointRadius: 2,
-      backgroundColor: colors[i],
-      borderColor: colors[i],
-      data: chartData.dataset[i].data
-    };
-    //push data not hidenn
-    
-    if (window.matchMedia('(max-width: 768px)').matches) {
-        if (!legend_z.includes(dataset.label)){
-        data.datasets.push(dataset);
       }
-    }else{
-      // in desktop mode show all
-      data.datasets.push(dataset);
-    }
 
-  }
-  //console.log('is it?', data.datasets)
-  releasesChart.data.labels = data.labels;
-  for (var i = 0; i < data.datasets.length; i++) {
-    //console.log('updateing...',i, data.datasets[i].data ,)
-    //console.log('name...',i, data.datasets[i].label)
-    if (legend_z.includes(data.datasets[i].label)){
-      //console.log(data.datasets[i].data)
-      //console.log('.........................',i, releasesChart.data.datasets)
-      releasesChart.data.datasets[i].data = data.datasets[i].data;
-    }
-    
-       //releasesChart.data.datasets[i].data = chartData.dataset[i].data;
-   
-   
-    
-
-  }
-  releasesChart.update();
+      //copy data
+      releasesChart.data.labels = data.labels;
+      releasesChart.data.datasets = [];
+      for (var i = 0; i < data.datasets.length; i++) {
+          var dataset = {
+            label: data.datasets[i].label,
+            fill: false,
+            pointRadius: 2,
+            backgroundColor: colors[i],
+            borderColor: colors[i],
+            data: data.datasets[i].data
+          };
+          //push data not hidenn
+          releasesChart.data.datasets.push(dataset);
+      }
+      releasesChart.update();
 };
 
 
@@ -768,7 +780,9 @@ var six_months = 3;
 var full_period = 4;
 var releasesChartData = new Array(4);
 var current_id ='entireperiod'
-var variable_toggle=null
+var current_iloc =full_period
+var var_toggle_mobile=null
+
 //set focus with time delay
 setTimeout(function () {
  $('#entireperiod').focus();
@@ -810,64 +824,26 @@ function set_user_pref_on_start(){
       if (!user_pref_array.includes(iter)){
           // hide all other except [user prefs]
           ds.hidden = true
-          //console.log('ds',ds)
-          //console.log('iter:>>',user_pref_array, iter)
-          //legend_z.push(iter)
-          if (!legend_z.includes(ds.label)){
-            legend_z.push(ds.label)
-          }
-          //console.log('{label,state}', ds.label, ds.hidden)
-          // console.log('{label,state}', ds.data.label, ds.data.hidden)
+        
       }
-      if (!legend_a.includes(ds.label)){
-        legend_a.push(ds.label)  
-      } 
       
     });
-
-   
-      max_to_hide= legend_a.length- 2
-      let continue_run= true
-      let i = legend_a.length - 1;
-      while ((continue_run = true) && (i >= 0)) {
-        //start from back and go front
-          if (!(legend_z.includes(legend_a[i]))){
-              // push unique
-              if (legend_z.length < max_to_hide){ 
-                legend_z.push(legend_a[i])
-              }else{
-                // condition for exit
-                continue_run = false
-              } 
-          }
-          i--;
-          // loop it through
-          if (i < 0){
-            continue_run=false
-          }
-      }
-    //console.log('all' ,legend_a)
-    //console.log('hidden', legend_z)
     releasesChart.update();
 }   
 
-// $("#toggle").click(function() {
-//   releasesChart.data.datasets.forEach(function(ds) {
-//     ds.hidden = !ds.hidden;
-//     }
-//   });
-//   releasesChart.update();
-// });
 // update charts
 $('#entireperiod').click(function() {
+ 
   current_id ='entireperiod'
+  current_iloc = full_period
     if (releasesChartData[full_period] == null) {
       $.getJSON("{% url 'get_project_output_by_rolling_week' minus_full_period today %}", {}, function(res, status) {
+        make_list(res)
         updatereleasesChart(res);
         releasesChartData[full_period] = res;
       });
     } else {
-     
+        
         updatereleasesChart(releasesChartData[full_period]);
     }
  
@@ -877,8 +853,10 @@ $('#entireperiod').click(function() {
  // update charts
 $('#6month').click(function() {
     current_id ='6month'
+    current_iloc =six_months
     if (releasesChartData[six_months] == null) {
       $.getJSON("{% url 'get_project_output_by_rolling_week' minus_6_months today %}", {}, function(res, status) {
+        make_list(res)
         updatereleasesChart(res);
         releasesChartData[six_months] = res;
       });
@@ -889,13 +867,12 @@ $('#6month').click(function() {
   
 });
 
-
-
 $('#3month').click(function() {
     current_id ='3month'
+    current_iloc =three_months
     if (releasesChartData[three_months] == null) {
       $.getJSON("{% url 'get_project_output_by_rolling_week' minus_3_months today %}", {}, function(res, status) {
-       
+        make_list(res)
         updatereleasesChart(res);
         releasesChartData[three_months] = res;
       });
@@ -906,13 +883,12 @@ $('#3month').click(function() {
  
 });
 
-
-
 $('#currentMonth').click(function() {
   current_id ='currentMonth'
+  current_iloc =one_month
   if (releasesChartData[one_month] == null) {
     $.getJSON("{% url 'get_project_output_by_rolling_week' first_day_of_month last_day_of_month %}", {}, function(res, status) {
-      
+      make_list(res)
       updatereleasesChart(res);
       releasesChartData[one_month] = res;
     });
@@ -922,12 +898,12 @@ $('#currentMonth').click(function() {
   }
 });
 
-
 $('#currentWeek').click(function() {
   current_id ='currentWeek'
+  current_iloc =one_week
   if (releasesChartData[one_week] == null) {
     $.getJSON("{% url 'get_project_output_by_rolling_week' first_day_of_week last_day_of_week %}", {}, function(res, status) {
-      //console.log('res>>>>',res)
+      make_list(res)
       updatereleasesChart(res);
       releasesChartData[one_week] = res;
     });
@@ -939,10 +915,10 @@ $('#currentWeek').click(function() {
   
 });
 function truncChar2(str,length){
-            var myTruncatedString = str.substring(0,length-1);              
-           
-            return myTruncatedString
-        }   
+      var myTruncatedString = str.substring(0,length-1);              
+      
+      return myTruncatedString
+  }   
 $('body').on('click', '.download-investors-excel', function(){
         
         $('#run-excel').prop('disabled', true);
