@@ -518,18 +518,35 @@ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !
 
       function mobile_view(){
           $('table').removeClass('table table-striped');
+           // make it bigger
+          $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
       }
 
       function desktop_view(){
           
           $('table').addClass('table table-striped');
+          $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
       }
       $(window).resize(function() {
-        console.log('width',$(this).width()  )
+        //console.log('width',$(this).width()  )
           if ($(this).width() < 744) {
-            //mobile_view()
+            // make it bigger
+            $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
+            //releasesChartData[full_period] = null
+            if (variable_toggle==false){
+              $('#'+ current_id).click()
+              location.reload();
+            }
+            variable_toggle= true
           } else {
             //desktop_view()
+            $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
+            if (variable_toggle==true){
+              $('#'+ current_id).click()
+              location.reload();
+            }
+            variable_toggle= false
+
           }
       });
      
@@ -573,9 +590,53 @@ function numberWithCommas(x) {
  ];
  //var balanceChart = null;
  var releasesChart = null;
- 
+ var legend_z =[]
+ var legend_a =[]
+
+ function make_list(res) {
+    var iter2=0
+    for (var i = 0; i < res.dataset.length; i++) {
+        //----------ccccc do it here--------------------------------
+        //console.log('pushed>>>', res.dataset[i].name)
+        var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
+        iter2 +=1    
+        if (!user_pref_array.includes(iter2)){
+            if (!legend_z.includes(res.dataset[i].name)){
+              legend_z.push(res.dataset[i].name)
+            }
+            
+        }
+        if (!legend_a.includes(res.dataset[i].name)){
+          legend_a.push(res.dataset[i].name)  
+        } 
+        //----------------------------------------------------------
+    }
+
+      max_to_hide= legend_a.length- 2
+      let continue_run= true
+      let r = legend_a.length - 1;
+      while ((continue_run = true) && (r >= 0)) {
+        //start from back and go front
+          if (!(legend_z.includes(legend_a[r]))){
+              // push unique
+              if (legend_z.length < max_to_hide){ 
+                legend_z.push(legend_a[r])
+              }else{
+                // condition for exit
+                continue_run = false
+              } 
+          }
+          r--;
+          // loop it through
+          if (r < 0){
+            continue_run=false
+          }
+      }
+}
  
  var drawReleases = function(res) {
+  make_list(res)
+  //console.log('draing first time:', legend_z)
   var ctx = document.getElementById("myreleasesChart").getContext('2d');
   var dp = res.last_14day_dp
   //console.log(dp)
@@ -586,6 +647,7 @@ function numberWithCommas(x) {
       labels: res.labels,
       datasets: []
   };
+ 
   for (var i = 0; i < res.dataset.length; i++) {
     var dataset = {
       label: res.dataset[i].name,
@@ -595,8 +657,19 @@ function numberWithCommas(x) {
       borderColor: colors[i],
       data: res.dataset[i].data
     };
-    data.datasets.push(dataset);
+  
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        if (!legend_z.includes(dataset.label)){
+        data.datasets.push(dataset);
+      }
+    }else{
+      // in desktop mode show all
+      data.datasets.push(dataset);
+    }
+    
   }
+  //console.log('view dtaset:',data)
   releasesChart = new Chart(ctx, {
       type: 'line',
       data: data,
@@ -613,15 +686,75 @@ function numberWithCommas(x) {
                       beginAtZero: true
                   }
               }]
-          }
+          },
+          /*Hide Legend*/
+          legend: {
+            labels: {
+                filter: function(item, chart) {
+                    //console.log(item.text, legend_z)
+                    //console.log('legend_z',legend_z)
+                    // Logic to remove a particular legend item goes here
+                    
+                    if (window.matchMedia('(max-width: 768px)').matches) {
+                      return !legend_z.includes(item.text);
+                    }else{
+                      // in desktop mode show all
+                      return true
+                    }
+                   
+                    
+                }
+            }
+        }
       }
   });
 };
 
 var updatereleasesChart = function(chartData) {
-  releasesChart.data.labels = chartData.labels;
+
+
+
+  var data = {
+      labels: chartData.labels,
+      datasets: []
+  };
+  //console.log('test:',chartData)
   for (var i = 0; i < chartData.dataset.length; i++) {
-    releasesChart.data.datasets[i].data = chartData.dataset[i].data;
+    var dataset = {
+      label: chartData.dataset[i].name,
+      fill: false,
+      pointRadius: 2,
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      data: chartData.dataset[i].data
+    };
+    //push data not hidenn
+    
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        if (!legend_z.includes(dataset.label)){
+        data.datasets.push(dataset);
+      }
+    }else{
+      // in desktop mode show all
+      data.datasets.push(dataset);
+    }
+
+  }
+  //console.log('is it?', data.datasets)
+  releasesChart.data.labels = data.labels;
+  for (var i = 0; i < data.datasets.length; i++) {
+    //console.log('updateing...',i, data.datasets[i].data ,)
+    //console.log('name...',i, data.datasets[i].label)
+    if (legend_z.includes(data.datasets[i].label)){
+      //console.log(data.datasets[i].data)
+      //console.log('.........................',i, releasesChart.data.datasets)
+      releasesChart.data.datasets[i].data = data.datasets[i].data;
+    }
+    
+       //releasesChart.data.datasets[i].data = chartData.dataset[i].data;
+   
+   
+    
 
   }
   releasesChart.update();
@@ -634,13 +767,16 @@ var three_months = 2;
 var six_months = 3;
 var full_period = 4;
 var releasesChartData = new Array(4);
-
+var current_id ='entireperiod'
+var variable_toggle=null
 //set focus with time delay
 setTimeout(function () {
  $('#entireperiod').focus();
+
 }, 100);   
 // initialize- First Graph
 $.getJSON("{% url 'get_project_output_by_rolling_week' minus_full_period today %}", {}, function(res, status) {
+  //set_user_pref_on_start(res)
   drawReleases(res);
   releasesChartData[full_period] = res;
   set_user_pref_on_start()
@@ -665,6 +801,7 @@ function nFormatter(num, digits) {
 function set_user_pref_on_start(){
   // This method initialise user specific pref when page loads 
     var iter=0
+    
     var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
     //console.log('user pref:',user_pref_array)
     releasesChart.data.datasets.forEach(function(ds) {
@@ -673,11 +810,44 @@ function set_user_pref_on_start(){
       if (!user_pref_array.includes(iter)){
           // hide all other except [user prefs]
           ds.hidden = true
+          //console.log('ds',ds)
+          //console.log('iter:>>',user_pref_array, iter)
+          //legend_z.push(iter)
+          if (!legend_z.includes(ds.label)){
+            legend_z.push(ds.label)
+          }
           //console.log('{label,state}', ds.label, ds.hidden)
           // console.log('{label,state}', ds.data.label, ds.data.hidden)
-      }     
+      }
+      if (!legend_a.includes(ds.label)){
+        legend_a.push(ds.label)  
+      } 
       
     });
+
+   
+      max_to_hide= legend_a.length- 2
+      let continue_run= true
+      let i = legend_a.length - 1;
+      while ((continue_run = true) && (i >= 0)) {
+        //start from back and go front
+          if (!(legend_z.includes(legend_a[i]))){
+              // push unique
+              if (legend_z.length < max_to_hide){ 
+                legend_z.push(legend_a[i])
+              }else{
+                // condition for exit
+                continue_run = false
+              } 
+          }
+          i--;
+          // loop it through
+          if (i < 0){
+            continue_run=false
+          }
+      }
+    //console.log('all' ,legend_a)
+    //console.log('hidden', legend_z)
     releasesChart.update();
 }   
 
@@ -690,6 +860,7 @@ function set_user_pref_on_start(){
 // });
 // update charts
 $('#entireperiod').click(function() {
+  current_id ='entireperiod'
     if (releasesChartData[full_period] == null) {
       $.getJSON("{% url 'get_project_output_by_rolling_week' minus_full_period today %}", {}, function(res, status) {
         updatereleasesChart(res);
@@ -705,6 +876,7 @@ $('#entireperiod').click(function() {
 
  // update charts
 $('#6month').click(function() {
+    current_id ='6month'
     if (releasesChartData[six_months] == null) {
       $.getJSON("{% url 'get_project_output_by_rolling_week' minus_6_months today %}", {}, function(res, status) {
         updatereleasesChart(res);
@@ -720,6 +892,7 @@ $('#6month').click(function() {
 
 
 $('#3month').click(function() {
+    current_id ='3month'
     if (releasesChartData[three_months] == null) {
       $.getJSON("{% url 'get_project_output_by_rolling_week' minus_3_months today %}", {}, function(res, status) {
        
@@ -736,6 +909,7 @@ $('#3month').click(function() {
 
 
 $('#currentMonth').click(function() {
+  current_id ='currentMonth'
   if (releasesChartData[one_month] == null) {
     $.getJSON("{% url 'get_project_output_by_rolling_week' first_day_of_month last_day_of_month %}", {}, function(res, status) {
       
@@ -750,9 +924,10 @@ $('#currentMonth').click(function() {
 
 
 $('#currentWeek').click(function() {
+  current_id ='currentWeek'
   if (releasesChartData[one_week] == null) {
     $.getJSON("{% url 'get_project_output_by_rolling_week' first_day_of_week last_day_of_week %}", {}, function(res, status) {
-      
+      //console.log('res>>>>',res)
       updatereleasesChart(res);
       releasesChartData[one_week] = res;
     });
