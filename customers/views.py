@@ -69,8 +69,9 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models.aggregates import Avg, Count, Max, Sum
-from django.db.models import Q, F
-
+from django.db.models import Q, F, ExpressionWrapper, IntegerField
+from django.db.models import Max, Value
+from django.db.models.functions import Cast, Coalesce
 from django.db.models import FloatField 
 from django.utils import timezone
 
@@ -156,6 +157,11 @@ def get_user_products(request, type):
     
     
     total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+    # total_avg= queryset.aggregate(
+    #      sum=Coalesce(Sum('price'), Value(0)), 
+    #      avg=Coalesce(Avg('price'), Value(0))
+    #     ) 
+    
     sum_value=total_avg['sum']
     avg_value=total_avg['avg']
     if sum_value==None:
@@ -412,7 +418,20 @@ def get_user_clients_load_status_ajax(request,  status, *args, **kwargs):
                 #allll
                 queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
         
-            total_avg= queryset.aggregate(sum=Sum(F('quantity')*F('product__price'),output_field=FloatField()), avg=Avg(F('quantity')*F('product__price'),output_field=FloatField()))
+            total_avg= queryset.aggregate(
+                sum=Coalesce(
+                    Sum(
+                        F('quantity')*F('product__price'),
+                        output_field=FloatField())
+                        , Value(0.0)
+                    ), 
+                avg=Coalesce(
+                    Avg(
+                        F('quantity')*F('product__price'),
+                        output_field=FloatField())
+                        , Value(0.0)
+                    )
+                )  
             sum_value=total_avg['sum']
             avg_value=total_avg['avg']
             #print(total_avg,sum_value,avg_value)
@@ -553,7 +572,20 @@ def client_search_and_tags_ajax(request,status, slug, search_type, *args, **kwar
                 queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
         
         
-        total_avg= queryset.aggregate(sum=Sum(F('quantity')*F('product__price'),output_field=FloatField()), avg=Avg(F('quantity')*F('product__price'),output_field=FloatField()))
+        total_avg= queryset.aggregate(
+                sum=Coalesce(
+                    Sum(
+                        F('quantity')*F('product__price'),
+                        output_field=FloatField())
+                        , Value(0.0)
+                    ), 
+                avg=Coalesce(
+                    Avg(
+                        F('quantity')*F('product__price'),
+                        output_field=FloatField())
+                        , Value(0.0)
+                    )
+                )   
         sum_value=total_avg['sum']
         avg_value=total_avg['avg']
        
@@ -738,7 +770,20 @@ def product_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
         else:
             queryset = Product.objects.filter(Q(created_by=request.user))
           
-        total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+        #total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+        total_avg= queryset.aggregate(
+            sum=Coalesce(
+                    Sum('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    ), 
+            avg=Coalesce
+                    (Avg('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    )
+        )  
+        
         sum_value=total_avg['sum']
         avg_value=total_avg['avg']
         if sum_value==None:
@@ -836,7 +881,19 @@ def get_user_products_load_status_ajax(request, *args, **kwargs):
         if request.is_ajax():
            
             queryset = Product.objects.filter(Q(created_by=request.user))
-            total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+            #total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+            total_avg= queryset.aggregate(
+                 sum=Coalesce(
+                    Sum('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    ), 
+                 avg=Coalesce(
+                    Avg('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    )
+                )  
             sum_value=total_avg['sum']
             avg_value=total_avg['avg']
             if sum_value==None:
@@ -1657,7 +1714,27 @@ def get_user_clients(request, type):
         queryset = OrderItem.objects.filter(Q(product__created_by=request.user)).order_by('-order__id').order_by('-order__date_ordered')
     
     
-    total_avg= queryset.aggregate(sum=Sum(F('quantity')*F('product__price'),output_field=FloatField()), avg=Avg(F('quantity')*F('product__price'),output_field=FloatField()))
+    #income = ExpressionWrapper(F('quantity') * F('product__price') , output_field=FloatField())
+    total_avg= queryset.aggregate(
+          sum=Coalesce(
+             Sum(
+                ExpressionWrapper(
+                        F('quantity') * F('product__price') , output_field=FloatField()
+                    )
+                )
+              , Value(0.0)
+              ), 
+          avg=Coalesce(
+                Avg(
+                     ExpressionWrapper(
+                           F('quantity') * F('product__price') , output_field=FloatField()
+                        )
+                   )
+                , Value(0.0)
+            )
+    )
+
+   
     sum_value=total_avg['sum']
     avg_value=total_avg['avg']
 
