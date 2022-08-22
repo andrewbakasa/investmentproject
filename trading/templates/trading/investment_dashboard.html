@@ -607,25 +607,25 @@ function numberWithCommas(x) {
  ];
  //var balanceChart = null;
  var releasesChart = null;
- var legend_z =[]
+ var legend_hide =[]
  var legend_a =[]
 
  function make_list(res) {
     var iter2=0
-    legend_z =[]
+    legend_hide =[]
     legend_a =[]
     for (var i = 0; i < res.dataset.length; i++) {
         //----------ccccc do it here--------------------------------
         //console.log('pushed>>>', res.dataset[i].name)
         var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
-        iter2 +=1    
+        iter2 +=1 
         if (!user_pref_array.includes(iter2)){
-            if (!legend_z.includes(res.dataset[i].name)){
-              legend_z.push(res.dataset[i].name)
+            if (!legend_hide.includes(res.dataset[i].name) || 1){
+              legend_hide.push(res.dataset[i].name)
             }
             
         }
-        if (!legend_a.includes(res.dataset[i].name)){
+        if (!legend_a.includes(res.dataset[i].name) || 1){
           legend_a.push(res.dataset[i].name)  
         } 
         //----------------------------------------------------------
@@ -634,12 +634,13 @@ function numberWithCommas(x) {
       max_to_hide= legend_a.length- 2
       let continue_run= true
       let r = legend_a.length - 1;
-      while ((continue_run = true) && (r >= 0)) {
+      
+        while ((continue_run = true) && (r >= 0)) {
         //start from back and go front
-          if (!(legend_z.includes(legend_a[r]))){
+          if (!(legend_hide.includes(legend_a[r]))|| 1){
               // push unique
-              if (legend_z.length < max_to_hide){ 
-                legend_z.push(legend_a[r])
+              if (legend_hide.length < max_to_hide){ 
+                legend_hide.push(legend_a[r])
               }else{
                 // condition for exit
                 continue_run = false
@@ -651,6 +652,19 @@ function numberWithCommas(x) {
             continue_run=false
           }
       }
+      var mySet = new Set(legend_hide);
+      var mySet2 = new Set(legend_a);
+
+      while (((mySet.size + 1) > mySet2.size) && (legend_hide.length+2 > legend_a.length)) {
+         //console.log("1:2:" ,mySet.size,mySet2.size)
+         legend_hide.pop()
+          mySet = new Set(legend_hide);
+         //mySet2 = new Set(legend_a);
+
+      }
+     
+      //console.log('legend_hide', legend_hide)
+      //console.log('legend_a', legend_a)
 }
  
  var drawReleases = function(res) {
@@ -676,7 +690,7 @@ function numberWithCommas(x) {
   
 
     if (window.matchMedia('(max-width: 768px)').matches) {
-        if (!legend_z.includes(dataset.label)){
+        if (!legend_hide.includes(dataset.label)){// include in not in hidden
         data.datasets.push(dataset);
       }
     }else{
@@ -707,12 +721,12 @@ function numberWithCommas(x) {
           legend: {
             labels: {
                 filter: function(item, chart) {
-                    //console.log(item.text, legend_z)
-                    //console.log('legend_z',legend_z)
+                    //console.log(item.text, legend_hide)
+                    //console.log('legend_hide',legend_hide)
                     // Logic to remove a particular legend item goes here
                     
                     if (window.matchMedia('(max-width: 768px)').matches) {
-                      return !legend_z.includes(item.text);
+                      return !legend_hide.includes(item.text);// dont show hiden
                     }else{
                       // in desktop mode show all
                       return true
@@ -732,7 +746,8 @@ var updatereleasesChart = function(chartData) {
           labels: chartData.labels,
           datasets: []
       };
-      //console.log('test:',chartData)
+      //console.log('chartData:',chartData)
+      //console.log('chartData:',chartData.dataset)
       for (var i = 0; i < chartData.dataset.length; i++) {
           var dataset = {
             label: chartData.dataset[i].name,
@@ -744,7 +759,7 @@ var updatereleasesChart = function(chartData) {
           };
           //skipp hidden datasets
           if (window.matchMedia('(max-width: 768px)').matches) {
-              if (!legend_z.includes(dataset.label)){// limit data
+              if (!legend_hide.includes(dataset.label)){// limit data
               data.datasets.push(dataset);
             }
           }else{
@@ -769,6 +784,8 @@ var updatereleasesChart = function(chartData) {
           //push data not hidenn
           releasesChart.data.datasets.push(dataset);
       }
+      //console.log('releasesChart:',releasesChart)
+      //console.log('releasesChart:',releasesChart.data)
       releasesChart.update();
       set_user_pref_on_start()
 };
@@ -816,13 +833,20 @@ function nFormatter(num, digits) {
 function set_user_pref_on_start(){
   // This method initialise user specific pref when page loads 
     var iter=0
-    
+    // A--->5.
+    // B======>7
     var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
     //console.log('user pref:',user_pref_array)
+
+    //console.log('user_pref_array, ', user_pref_array)
     releasesChart.data.datasets.forEach(function(ds) {
-      iter +=1
+     
+      //console.log('what is ds',ds.label)
+
+      //gett the index of label
+      index = legend_a.indexOf(ds.label)+1
       //chech if iter is not i user_pref      
-      if (!user_pref_array.includes(iter)){
+      if (!user_pref_array.includes(index)){
           // hide all other except [user prefs]
           ds.hidden = true
         
@@ -844,7 +868,7 @@ $('#entireperiod').click(function() {
         releasesChartData[full_period] = res;
       });
     } else {
-        
+        make_list(releasesChartData[full_period])
         updatereleasesChart(releasesChartData[full_period]);
     }
  
@@ -862,7 +886,7 @@ $('#6month').click(function() {
         releasesChartData[six_months] = res;
       });
     } else {
-        
+        make_list(releasesChartData[six_months])
         updatereleasesChart(releasesChartData[six_months]);
     }
   
@@ -878,7 +902,7 @@ $('#3month').click(function() {
         releasesChartData[three_months] = res;
       });
     } else {
-      
+      make_list(releasesChartData[three_months])
       updatereleasesChart(releasesChartData[three_months]);
     }
  
@@ -894,7 +918,7 @@ $('#currentMonth').click(function() {
       releasesChartData[one_month] = res;
     });
   } else {
-   
+    make_list(releasesChartData[one_month])
     updatereleasesChart(releasesChartData[one_month]);
   }
 });
@@ -909,7 +933,7 @@ $('#currentWeek').click(function() {
       releasesChartData[one_week] = res;
     });
   } else {
-    
+    make_list(releasesChartData[one_week])
     updatereleasesChart(releasesChartData[one_week]);
   }
   

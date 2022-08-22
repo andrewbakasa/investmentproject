@@ -34,8 +34,12 @@ def get_project_output_by_rolling_week(request,dstart, dend):
     last_data_14day=0
     if output_df.shape[0]>0: 
         dataset = []        
-        dates_, points_ = get_data_points(output_df, dstart, dend)        
-        dataset.append({'name':'7d rolling av.' , 'data': points_})
+        dates_, points_ = get_data_points(output_df, dstart, dend) 
+        unique_name_ = '7d rolling av.'
+        #last_id =dataset[-1]['name']
+        #-----unique
+        #unique_name_= get_unique_name(unique_name_, last_id)      
+        dataset.append({'name':unique_name_ , 'data': points_})
         
        
         av=0
@@ -46,8 +50,14 @@ def get_project_output_by_rolling_week(request,dstart, dend):
         
         #---------------
         full_span = get_date_span(dates_)
-        dataset.append({'name':'Av_' + str(full_span)+ "d" , 'data': av_data_points})
-        
+        unique_name_ = 'Av_' + str(full_span)+ "d"
+        #last_id =dataset[-1]['name']
+        #-----unique
+        unique_name_= get_unique_name(unique_name_, dataset)
+
+        dataset.append({'name':unique_name_ , 'data': av_data_points})
+        #print("----------------cheeck data seet---------------------")
+        #print(dataset)
         list_ =[]
         #convert from standard day into  item span
         days_list =[14,30,60,120]
@@ -78,7 +88,34 @@ def get_item_span_from_date_span(dates_,input_days_span):
         if input_days_span <= val:
             return i+1
     return (len(dates_))
-    
+
+def get_dataset_name(dataset):
+    list_ =[]
+    for i in dataset:
+        list_.append(i['name'])
+    return list_
+def check_name(name, list_):
+    if name in  list_:
+        return True
+    else:
+        return False
+
+def get_unique_name(unique_name_, dataset):
+    list_= get_dataset_name(dataset)
+
+    new_name = unique_name_
+    tt= 0
+    check_test = check_name (new_name , list_)
+    while check_test:# if found then run else return original name
+        new_name = unique_name_ + str(tt)
+        check_test = check_name (new_name , list_)
+       
+        if not check_test:# not found
+            unique_name_ = new_name
+            #print('val:>>>>>>>>>>>>>>>>>>>',unique_name_)
+
+        tt += 1
+    return   unique_name_
 def get_aggregate_rolling_averages_multiple(dates_,dataset,points_, list_=[], verbose_=False):
      #----------------------------------
     iter=0
@@ -99,8 +136,15 @@ def get_aggregate_rolling_averages_multiple(dates_,dataset,points_, list_=[], ve
         # insert 11 at point before last
         if iter==1:
             last_data_14day= dyn_data_points[-1]
+        
+        unique_name_ = 'Av_' + str(val)+ "d"
+        # print('Last DAtasert')
+        #print(dataset[-1]['name'])
+        #last_id =dataset[-1]['name']
+        #-----unique
+        unique_name_= get_unique_name(unique_name_, dataset)
 
-        dict_point ={'name':'Av_' + str(val)+ "d"  , 'data': dyn_data_points}
+        dict_point ={'name':unique_name_  , 'data': dyn_data_points}
         last_index =len(dataset)-1
         if last_index >=0:
             dataset.insert(last_index, dict_point)
