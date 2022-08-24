@@ -55,14 +55,6 @@ $(document).ready(function(){
           desktop_view() 
         }
     }
-    $('input').click(function () {
-      var val = $(this).val();
-      // console.log('>>>',val)
-      if (val == "") {
-          // console.log('>>> EMPY VAL')
-          this.select();
-      }
-  });
    
     $('body').on("focus","#search",function(e){
       $(".search-box").addClass("border-searching");

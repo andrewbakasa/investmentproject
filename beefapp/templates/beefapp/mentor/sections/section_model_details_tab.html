@@ -29,7 +29,7 @@
       
         
         {% if usermodel %}
-            <li class="breadcrumb-item"><a id ='model_name'  href="{{ model.get_absolute_url }}" class ="badge rounded-pill bg-light text-dark">{{usermodel.name | truncatechars:15}}</a></li>
+            <li class="breadcrumb-item"><a id ='model_name'  href="{{ model.get_absolute_url }}" class ="badge rounded-pill bg-success">{{usermodel.name | truncatechars:15}}</a></li>
             <li id ='run_simu' class="breadcrumb-item"><a class="model-run show-form-download"   href="#" data-url="{% url 'get_beef_model_spreadsheets' usermodel.id %}" 
                 data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
                 title='Download Excel. {{usermodel.hits}} hits'><i class="fas fa-download"></i>
