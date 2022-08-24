@@ -202,7 +202,8 @@ def get_user_products(request, type):
         "total_sum": float(round(sum_value,2)),
         "average": round(avg_value,2),
         'lock_key':True,
-        'edit_key':True
+        'edit_key':True,
+        'total_products': queryset.count(),
     }
    
     return render(request, 'customers/user_products.html', context)

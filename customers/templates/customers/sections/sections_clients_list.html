@@ -21,7 +21,7 @@
              
             
               <li class="breadcrumb-item" >
-                <label id="total_projects_searched">Sales</label>
+                <label id="total_projects_searched">Sales List</label>
               </li>  
             </ol>
           </div>
@@ -94,7 +94,7 @@
                                           class="toggle-order" title='Complete' {% endif %}  
                                           href="#" data-url="{% url 'order-fullfill' client.id %}"  data-item-id ='{{client.id}}'
                                           data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                          >{% if client.fullfilled  %} <i class="fas fa-cut"></i>  {% else %} <i class="fas fa-eye"></i> {% endif %}  
+                                          >{% if client.fullfilled  %} <i class="fas fa-cut"></i>  {% else %} <i class="fas fa-clipboard-check"></i> {% endif %}  
                                       </a> 
                                       
                                         <a  class="show-address" title='Show Address'  
