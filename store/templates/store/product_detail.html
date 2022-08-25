@@ -100,7 +100,7 @@
         imageaspect()
       }
       function desktop_view(){
-        $(".img-fluid").css({'width':'250px',})
+        $(".img-fluid").css({'max-width':'250px',})
         $("#img-and-btn-wrapper").css({'width':'50%','height':'50%'})
         
     }
@@ -176,6 +176,37 @@
           }
 
       console.log('Cart: ', cart)
+
+
+      $(document).ready(function (){ 
+            set_product_in_mycart()
+            
+            
+            
+        })
+        function set_product_in_mycart(){
+            $('.product-item').each( function (){
+                if (this.hasAttribute('mycart_na')){                     
+                    $(this).removeClass('engagement')
+                }else if (this.hasAttribute('mycart')){
+                    $(this).addClass('engagement')
+                
+                }
+                
+            })
+        }
+
+        $('.myspan[mycart]').each( function (){
+                  $(this).addClass('advanced2')                   
+            })
+            // display:none and remove ele
+            $('.myspan[mycart_na]').each( function (){
+                $(this).css(
+                    { "display":"none",
+                    // "title":"", 
+                    }
+                )//.remove()          
+            }) 
       </script>
 
     {% endblock %}

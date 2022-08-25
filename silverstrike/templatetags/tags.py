@@ -28,6 +28,24 @@ def userInvestorRejectedMethod(model, user):
 def userInvestorMethod(model, user):
     return model.userIsInvestorAttr(user)
 
+
+@register.simple_tag
+def userHasOrderProductMethod(model, product):
+    if isinstance(model,dict) or isinstance(model,list):
+        Found= False
+        for i in model:
+            if (str(i['product']['id']) == str(product.id)):
+                Found= True
+                break
+        if Found == True:
+            return "mycart"
+        else:
+            return "mycart_na"
+    elif model ==None:
+        return "mycart_na"
+    return model.productIsInMyCart(product)
+
+
 @register.simple_tag
 def userInvestorValueMethod(model, user):
     return model.userInvestorValue(user)

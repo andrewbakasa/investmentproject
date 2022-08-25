@@ -38,7 +38,7 @@ function numberWithCommas(x) {
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
     }
-function updateToProductTabel(product){
+function updateToProductTabel(product,action){
    
     $("#o_total_qnty").html(`<h5>Items: <strong>${numberWithCommas(product.o_total_qnty)}</strong></h5>`)
     $("#o_total_price").html(`<h5>Total: <strong>$${numberWithCommas(product.o_total_price)}</strong></h5>`)
@@ -48,6 +48,36 @@ function updateToProductTabel(product){
         //$("#cart-item-" + product.id).remove()
         $("#t-tbody").children("."+ product.id).remove()
     }
+
+    
+    if  (product.quantity == 1 && action =="add" ) {
+        console.log("First Time ADDITION", product.quantity,action)
+        var target = $("#div-" + product.id).children('.project-item') 
+        target.each( function(){
+            if ($(this)[0].hasAttribute('mycart_na')){
+                $(this).attr('mycart','');
+                $(this).removeAttr('mycart_na')
+                $(this).addClass('engagement') 
+            }
+
+            var target2 = $(this).find('.myspan')
+            target2.removeAttr('mycart_na')
+            target2.addClass('advanced2')
+
+            target2.css(
+                { "display":"block",
+                // "title":"", 
+                }
+            )
+           
+
+        })
+       
+    
+
+    }
+
+ 
     //console.log(product)
     //console.log('',  $("#t-tbody").children("."+ product.id)[0])
     $("#t-tbody").children("."+ product.id).children().each(function() {
@@ -58,6 +88,7 @@ function updateToProductTabel(product){
         } else if (attr == "price") {
           //$(this).text(product.price);
         } else if (attr == "quantity") {
+            console.log("2:Qnty : Action", product.quantity,action)
           $(this).find("p").html(`${numberWithCommas(product.quantity)}`);
         } else if (attr == "total") {
           $(this).html(`$${numberWithCommas(product.total)}`);
@@ -89,7 +120,7 @@ $('body').on("click",".update-cart",function(e){
             //console.log("output", response.data)
             
                 if (response.data) {
-                updateToProductTabel(response.data);
+                updateToProductTabel(response.data, action);
                 flip_cart_display()
                 }
                 //$('#modal-product').modal('hide');

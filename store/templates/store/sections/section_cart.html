@@ -62,12 +62,12 @@
                                 {% for orderitem in orderitems %}
                                 
                                         <tr role="row" class="{{orderitem.product.id}}">
-                                            <td  role="cell" class="{{orderitem.product.id}}"><img class="row-image" src="{{orderitem.product.imageURL}}"></td>
+                                            <td  role="cell" class="{{orderitem.product.id}}"><img class="row-image"  src="{{orderitem.product.imageURL}}"></td>
                                             <td  role="cell" class="{{orderitem.product.id}}" name ='item'><p>{{orderitem.product.name}}</p></td>
                                             <!-- orderitem.product.price -->
                                             <td  role="cell" class="{{orderitem.product.id}}" name ='price'><p>${{orderitem.product.price|floatformat:2| intcomma}}</p></td>
                                             <td  role="cell" class="{{orderitem.product.id}}" name ='quantity'>
-                                                <p class="quantity" name ='number-part'>{{orderitem.quantity| intcomma}}</p>
+                                                <p class="quantity"  name ='number-part'>{{orderitem.quantity| intcomma}}</p>
                                                 <div class="quantity">
                                                     <img data-product="{{orderitem.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
                     

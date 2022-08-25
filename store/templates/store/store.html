@@ -95,6 +95,7 @@
        });
        return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
    }
+
      
      if (search_tags){            
          display_product_ajax_url = `{% url 'product_search_tag_ajax' 12345 %}`.replace(/12345/, tag_id.toString()); 
@@ -201,7 +202,8 @@
                              $('#project_div').append(a_html)
                              
                          });
-                       
+                         set_product_in_mycart()
+                         display_none()
                          },
                          error: function () {
                              alert('Error Occured');
@@ -296,25 +298,83 @@
               
           
           });
+        $(document).ready(function (){ 
+            set_product_in_mycart()
+            
+            
+            
+        })
+        function set_product_in_mycart(){
+            $('.project-item').each( function (){
+                if (this.hasAttribute('mycart_na')){                     
+                    $(this).removeClass('engagement')
+                }else if (this.hasAttribute('mycart')){
+                    $(this).addClass('engagement')
+                
+                }
+                
+            })
+        }
+        
+           $('.myspan[mycart]').each( function (){
+                  $(this).addClass('advanced2')                   
+            })
+            // display:none and remove ele
+            $('.myspan[mycart_na]').each( function (){
+                $(this).css(
+                    { "display":"none",
+                    // "title":"", 
+                    }
+                )//.remove()          
+            })
 
+          function display_none(){
+            $('.myspan[mycart]').each( function (){
+                  $(this).addClass('advanced2')                   
+            })
+            // display:none and remove ele
+            $('.myspan[mycart_na]').each( function (){
+                $(this).css(
+                    { "display":"none",
+                    // "title":"", 
+                    }
+                )//.remove()          
+            })
+          }
           function append_html(counter,val){
+
+              var mycartitem=''
+              var ready_attr='mycart_na'
+              if (val.productIsInMyCart ==true) {
+                  ready_attr='mycart'
+                  
+                  mycartitem= `<a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
+                          <span class="advanced2">CartItem</span>
+                        </a>`
+              } else {
+                  mycartitem= `<a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
+                          <span mycart_na class="myspan">CartItem</span>
+                        </a>`
+              }
               
+               
               var image_url=''
-              console.log(val)
+              //console.log(val)
               if (val.image) {
-                 image_url=`<img class="img-fluid thumbnail" src="${val.image}">`
+                 image_url=`<img  class="img-fluid thumbnail" src="${val.image}">`
               }else{
                 image_url=`<img class="img-fluid thumbnail" src="{% static 'images/placeholder.png' %}">`
               }
               a_html=`
               <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                <div class="project-item umodel-item">
+                <div ${ready_attr} class="project-item umodel-item">
+                    ${mycartitem}
                     ${image_url}
                     <div class="box-element-product">
                         <h6><strong>${truncChar(val.name,25)}</strong></h6>
                         <hr>
                         <button data-product="${val.id}" data-action="add" class="btn btn-outline-primary add-btn update-cart">Add to Cart</button>
-                        <a class="btn btn-outline-success" href="/ecom/p/d/${val.id}/">View</a>
+                        <a class="btn btn-outline-success" href="/e/p/d/${val.id}/">View</a>
                     
                         <h4 style="display: inline-block; float: right">$${val.price}</h4>
                     </div>

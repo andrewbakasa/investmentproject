@@ -78,8 +78,21 @@ from django.views import generic
 
 def product_load_tags_search_string(request, tagname, search_str):
     # replicate
-    #print(tagname, search_str) 
-    
+  
+    if request.user.is_authenticated:
+        customer, _ = Customer.objects.get_or_create(user=request.user)
+        customer = get_object_or_404(Customer, user=request.user)
+        ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+       
+        orderitems=None
+        order=None
+    else:
+        ordermodel =None
+        cookie_data = cookie_cart(request)
+        #total_quantity = cookie_data['total_quantity']
+        order = cookie_data['order']
+        ordermodel = cookie_data['orderitems']
+
     tags= ProductCategory.objects.filter(name=tagname)
     models= Product.objects.filter(Q(tags__in=tags), Q(description__icontains=search_str))
 
@@ -122,12 +135,29 @@ def product_load_tags_search_string(request, tagname, search_str):
         'slug':search_str,
         'tag_name':tagname,
         'tag_id':tags.first().id if tags.first() else "",
-        'total_quantity': request.session['total_quantity'] if 'total_quantity' in request.session else ''
+        'total_quantity': request.session['total_quantity'] if 'total_quantity' in request.session else '', 
+        'ordermodel' : ordermodel
     }
 
     return render(request, 'store/store.html', context)
 
 def product_load_tags(request, tag_id):
+   
+    if request.user.is_authenticated:
+        customer, _ = Customer.objects.get_or_create(user=request.user)
+        customer = get_object_or_404(Customer, user=request.user)
+        ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+       
+        orderitems=None
+        order=None
+    else:
+        ordermodel =None
+        cookie_data = cookie_cart(request)
+        #total_quantity = cookie_data['total_quantity']
+        order = cookie_data['order']
+        ordermodel = cookie_data['orderitems']
+       
+
     models= Product.objects.filter(Q(categories__in=tag_id))
     tag= get_object_or_404(ProductCategory,pk=tag_id)
     if not ('perpage' in request.session):
@@ -166,13 +196,27 @@ def product_load_tags(request, tag_id):
         'search_tags':True,
         'tag_id':tag_id,
         'tag_name':tag.name,
-        'total_quantity': request.session['total_quantity'] if 'total_quantity' in request.session else ''
+        'total_quantity': request.session['total_quantity'] if 'total_quantity' in request.session else '', 
+        'ordermodel' : ordermodel
     }
 
     return render(request, 'store/store.html', context)
 
 #from store.lib import get_current_user_groups
 def product_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
+    if request.user.is_authenticated:
+        customer, _ = Customer.objects.get_or_create(user=request.user)
+        customer = get_object_or_404(Customer, user=request.user)
+        ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+        orderitems=None
+        order=None
+    else:
+        ordermodel =None
+        cookie_data = cookie_cart(request)
+        #total_quantity = cookie_data['total_quantity']
+        order = cookie_data['order']
+        orderitems = cookie_data['orderitems']
+
     if request.method == 'POST':
         #description= request.POST['description']
         if search_type=='tags':
@@ -238,6 +282,19 @@ def product_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
             for i in obj_paginator.page(page_no).object_list:			
                 cdate= i.date_created.ctime()
                 item_object = model_to_dict(i)
+
+                if request.user.is_authenticated:
+                    True_or_False, record=ordermodel.productIsInMyCart_2(i)
+
+                else:
+                    True_or_False=False
+                    #locate appropriate orderitem
+                    for j in orderitems:
+                        if str(j['product']['id'])==str(i.id):
+                            True_or_False=True
+                            break    # break here 
+
+                item_object['productIsInMyCart']=True_or_False
                 
                 categories=""
                 for x in item_object['categories']:
@@ -257,6 +314,20 @@ def product_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
 def display_product_ajax(request):
     current_time = timezone.now()#datetime.datetime.now()
     models= Product.objects.all()#.order_by('-date')
+
+    if request.user.is_authenticated:
+        customer, _ = Customer.objects.get_or_create(user=request.user)
+        customer = get_object_or_404(Customer, user=request.user)
+        ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+        orderitems=None
+        order=None
+
+    else:
+        ordermodel =None
+        cookie_data = cookie_cart(request)
+        #total_quantity = cookie_data['total_quantity']
+        order = cookie_data['order']
+        orderitems = cookie_data['orderitems']
 
 
     if not ('perpage' in request.session):
@@ -332,7 +403,19 @@ def display_product_ajax(request):
             
             cdate= i.date_created.ctime()
             item_object = model_to_dict(i)
-            
+            if request.user.is_authenticated:
+                True_or_False, record=ordermodel.productIsInMyCart_2(i)
+
+            else:
+                True_or_False=False
+                #locate appropriate orderitem
+                for j in orderitems:
+                    if str(j['product']['id'])==str(i.id):
+                        True_or_False=True
+                        break    # break here 
+
+            item_object['productIsInMyCart']=True_or_False
+        
             categories=""
             for x in item_object['categories']:
                 categories = categories + str(x.name)  
@@ -349,6 +432,20 @@ def display_product_ajax(request):
         return JsonResponse({"data":data})
 
 def product_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **kwargs):
+    
+    if request.user.is_authenticated:
+        customer, _ = Customer.objects.get_or_create(user=request.user)
+        customer = get_object_or_404(Customer, user=request.user)
+        ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+        orderitems=None
+        order=None
+    else:
+        ordermodel =None
+        cookie_data = cookie_cart(request)
+        #total_quantity = cookie_data['total_quantity']
+        order = cookie_data['order']
+        orderitems = cookie_data['orderitems']
+
     if request.method == 'POST':
         if search_type == 1:
             modelsdata= Product.objects.filter(Q(categories__in=tag_id), Q(description__icontains=slug))
@@ -413,7 +510,19 @@ def product_search_and_tags_ajax(request,tag_id, slug, search_type, *args, **kwa
             for i in obj_paginator.page(page_no).object_list:			
                 cdate= i.date_created.ctime()
                 item_object = model_to_dict(i)
-               
+                
+                if request.user.is_authenticated:
+                    True_or_False, record=ordermodel.productIsInMyCart_2(i)
+
+                else:
+                    True_or_False=False
+                    #locate appropriate orderitem
+                    for j in orderitems:
+                        if str(j['product']['id'])==str(i.id):
+                            True_or_False=True
+                            break    # break here 
+
+                item_object['productIsInMyCart']=True_or_False
                  
                 categories=""
                 for x in item_object['categories']:
@@ -615,6 +724,17 @@ def store(request):
     context = {}
 
     data = cart_data(request)
+    if request.user.is_authenticated:
+        customer, _ = Customer.objects.get_or_create(user=request.user)
+        customer = get_object_or_404(Customer, user=request.user)
+        ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+    else :
+        ordermodel = None
+        ordermodel =None
+        cookie_data = cookie_cart(request)
+        #total_quantity = cookie_data['total_quantity']
+        ordermodel = cookie_data['order']
+        ordermodel = cookie_data['orderitems']
 
     products = Product.objects.all().order_by('name')
     models= Product.objects.all().order_by('name')
@@ -658,6 +778,7 @@ def store(request):
     context['page_range'] = page_range
     context['total_quantity'] = data['total_quantity']
     context['list_missing'] = [1,2]
+    context['ordermodel']= ordermodel
 
     return render(request, 'store/store.html', context)
 def store1(request):
@@ -892,8 +1013,26 @@ class ProductDetailView(DetailView):
 
     def get(self, request, pk) :
         context = {}
+
+       
+        if request.user.is_authenticated:
+            customer, _ = Customer.objects.get_or_create(user=self.request.user)
+            customer = get_object_or_404(Customer, user=self.request.user)
+            ordermodel, created = Order.objects.get_or_create(customer=customer, complete=False)
+            context['ordermodel'] = ordermodel
+            orderitems=None
+            order=None
+        else:
+            ordermodel =None
+            cookie_data = cookie_cart(request)
+            #total_quantity = cookie_data['total_quantity']
+            order = cookie_data['order']
+            orderitems = cookie_data['orderitems']
+            context['ordermodel'] = orderitems
+
         product = Product.objects.get(id=pk)
         data = cart_data(request)
         context['total_quantity'] = data['total_quantity']
         context['product'] = product
+        
         return render(request, self.template_name, context)

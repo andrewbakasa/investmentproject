@@ -458,6 +458,22 @@ class Order(models.Model):
                 shipping = True
         return shipping
 
+
+    def productIsInMyCart(self, product):       
+        qs = self.orderitem_set.filter(product=product).first()
+        if qs:
+            #print(qs.application_status)
+            # + recieved or pending, etc
+            return 'mycart '
+
+        return 'mycart_na'
+
+    def productIsInMyCart_2(self, product):       
+        qs = self.orderitem_set.filter(product=product).first()
+        if qs:
+            return True, qs
+
+        return False, _
 class OrderAttachment(models.Model):
     file = models.FileField(upload_to='order/')
     displayname = models.CharField(max_length=128)

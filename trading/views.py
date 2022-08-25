@@ -1180,6 +1180,8 @@ def investment_search_ajax(request,tag_id_or_slug, search_type,*args, **kwargs):
                 item_object['date_created']=f'{i.date_created.ctime()}'
                 item_object['uniqueid']=i.category.uniqueid
                 
+               
+
                 True_or_False, record=i.userIsInvestor_2(request.user)
                 item_object['userIsInvestor']=True_or_False
                 if True_or_False ==True:

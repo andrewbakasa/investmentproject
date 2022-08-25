@@ -66,7 +66,7 @@ function updateToProductTabel(product){
 
 $('body').on("click",".update-cart",function(e){
     e.preventDefault();
-    var url = '/ecom/update_item_ajax/'
+    var url = '/e/update_item_ajax/'
     var productId = this.dataset.product
     var action = this.dataset.action
     
@@ -135,7 +135,7 @@ function addCookieItem(productId, action){
 function updateUserOrder(productId, action){
     //console.log('User is authenticated. Sending data...')
 
-    var url = '/ecom/update_item/'
+    var url = '/e/update_item/'
     //console.log('...', url)
     fetch(url, {
         method: 'POST',

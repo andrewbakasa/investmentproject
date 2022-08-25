@@ -37,10 +37,12 @@
           <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
             {% for product in first_page %}
                   <div id="div-{{product.id}}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                      <div class="project-item umodel-item">
-
+                      <div {%  userHasOrderProductMethod ordermodel product %} class="project-item umodel-item">
+                        <a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
+                          <span {% userHasOrderProductMethod ordermodel product %} class="myspan">CartItem</span>
+                        </a>
                           {% if product.imageURL %}
-                          <img class="img-fluid thumbnail" src="{{product.imageURL}}">
+                          <img  class="img-fluid thumbnail" src="{{product.imageURL}}">
                           {% else %}
                           <img class="img-fluid thumbnail" src="{% static 'images/placeholder.png' %}">
                           {% endif %}                       
