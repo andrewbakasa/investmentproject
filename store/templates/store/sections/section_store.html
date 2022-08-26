@@ -16,7 +16,8 @@
               <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
                 data-toggle="tooltip" data-placement="bottom" title='Go to Shopping'><i class="fas fa-shopping-cart"></i></a></li>
               
-              <li class="breadcrumb-item" ><a href="{% url 'orders_list' %}" class ="badge rounded-pill bg-success">{% trans 'Orders' %}</a></li>
+              <li class="breadcrumb-item" ><a href="{% url 'orders_list' %}" class ="badge rounded-pill bg-success"
+                data-toggle="tooltip" data-placement="bottom" title='Orders'><i class="fas fa-bullseye"></i></a></li>
             
               {%if search_tags %}
               <li class="breadcrumb-item" >

@@ -4,7 +4,7 @@
 {% load humanize %}
 {% load widget_tweaks %}
 
-          <form class="model-form-add form-horizontal modal-wide" enctype="multipart/form-data" method="post" data-url="{% url 'create_userbusiness_ajax' %}">
+          <form id= 'form-ub' class="model-form-add form-horizontal modal-wide" enctype="multipart/form-data" method="post" data-url="{% url 'create_userbusiness_ajax' %}">
               {% csrf_token %}
            
               <div class="modal-body">

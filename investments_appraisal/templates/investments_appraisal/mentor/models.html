@@ -65,7 +65,7 @@
             </div>
         </div>
     </div>
-
+   
     <!-- Modal: modalAdd New Model -->
     <div class="modal fade" id="modal_add_new_model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true" style="overflow-y: auto !important">
@@ -411,7 +411,12 @@
                 $('#confirmdelete .modal-footer input').attr('model-id', model_id);
             });
           
-        
+            $('#modal_add_new_model').on('hidden.bs.modal', function (e) {
+                //console.log('Clearing contents.......')
+                //reset and clear contents
+                $(this).find('#form-model')[0].reset();
+            })
+
           $('body').on('click', '.delete-button', function (e) {
             e.preventDefault();
             var tr_id =$('#delete-button').attr('model-id')
