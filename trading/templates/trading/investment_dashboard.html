@@ -517,13 +517,13 @@ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !
     //checkPosition()
   });
 
-      function mobile_view(){
+      function mobile_viewa(){
           $('table').removeClass('table table-striped');
            // make it bigger
           $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
       }
 
-      function desktop_view(){
+      function desktop_viewa(){
           
           $('table').addClass('table table-striped');
           $('#myreleasesChart').css({'width':'100%', 'height':'100%'})
@@ -571,9 +571,9 @@ aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !
       function checkPosition() {
          
           if (window.matchMedia('(max-width: 768px)').matches) {
-            mobile_view()
+            mobile_viewa()
           } else {
-            desktop_view() 
+            desktop_viewa() 
           }
       }
    

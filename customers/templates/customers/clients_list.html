@@ -175,17 +175,17 @@ td:before {
             (window.matchMedia('(max-width: 760px)').matches) || 
             ((window.matchMedia('min-device-width: 768px').matches) && (window.matchMedia('max-device-width: 1024px').matches)) 
             ) {
-            mobile_view()
+            mobile_viewa()
         } else {
-            desktop_view() 
+            desktop_viewa() 
         }
     }
 
-  function mobile_view(){
+  function mobile_viewa(){
       $('table').removeClass('table table-striped');
   }
 
-  function desktop_view(){
+  function desktop_viewa(){
       $('table').addClass('table table-striped');
   }
 
@@ -193,9 +193,9 @@ td:before {
       console.log('width: ' , $(this).width())
       
     if ($(this).width() < 744) {
-      mobile_view()
+      mobile_viewa()
     } else {
-      desktop_view()
+      desktop_viewa()
     }
 });  
 

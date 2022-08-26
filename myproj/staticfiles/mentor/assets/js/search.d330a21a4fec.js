@@ -13,9 +13,9 @@ $(document).ready(function(){
               //append here
               sbutton.insertAfter("#navbar")
               // $('table').removeClass('table table-striped');
-              //console.log('DESKTOP-MOBILE SHIFT')
+              console.log('DESKTOP-MOBILE SHIFT')
           }else{
-              //console.log('IN MOBILE VIEW')
+            console.log('IN MOBILE VIEW')
           }
 
           
@@ -35,7 +35,7 @@ $(document).ready(function(){
               //append in ul tag
               navbar_ul.append(sbutton)
               // $('table').addClass('table table-striped')
-              //console.log('MOBILE-DESKTOP SHIFT')
+              console.log('MOBILE-DESKTOP SHIFT')
           }else {
             //console.log('IN DESKTOP VIEW')
           }
