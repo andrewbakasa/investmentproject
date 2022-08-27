@@ -23,10 +23,10 @@ def get_project_output_by_rolling_week(request,dstart, dend):
     #print(project_obj)
     project = get_object_or_404(Investment, pk=project_id)
     qs=project.kpi_output_qs_released
-
+    #print('qs',qs)
     
     output_df = pd.DataFrame(qs.values())
-    #print(output_df)	
+    #print('df', output_df)	
    
 
     labels = []

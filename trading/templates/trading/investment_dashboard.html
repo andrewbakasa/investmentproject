@@ -611,31 +611,31 @@ function numberWithCommas(x) {
  var legend_a =[]
 
  function make_list(res) {
-    var iter2=0
-    legend_hide =[]
-    legend_a =[]
-    for (var i = 0; i < res.dataset.length; i++) {
-        //----------ccccc do it here--------------------------------
-        //console.log('pushed>>>', res.dataset[i].name)
-        var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
-        iter2 +=1 
-        if (!user_pref_array.includes(iter2)){
-            if (!legend_hide.includes(res.dataset[i].name) || 1){
-              legend_hide.push(res.dataset[i].name)
-            }
-            
-        }
-        if (!legend_a.includes(res.dataset[i].name) || 1){
-          legend_a.push(res.dataset[i].name)  
-        } 
-        //----------------------------------------------------------
-    }
+      var iter2=0
+      legend_hide =[]
+      legend_a =[]
+      for (var i = 0; i < res.dataset.length; i++) {
+          //----------ccccc do it here--------------------------------
+          //console.log('pushed>>>', res.dataset[i].name)
+          var user_pref_array = JSON.parse("{{json_userprefs_graph_options}}")
+          iter2 +=1 
+          if (!user_pref_array.includes(iter2)){
+              if (!legend_hide.includes(res.dataset[i].name) || 1){
+                legend_hide.push(res.dataset[i].name)
+              }
+              
+          }
+          if (!legend_a.includes(res.dataset[i].name) || 1){
+            legend_a.push(res.dataset[i].name)  
+          } 
+          //----------------------------------------------------------
+      }
 
       max_to_hide= legend_a.length- 2
       let continue_run= true
       let r = legend_a.length - 1;
       
-        while ((continue_run = true) && (r >= 0)) {
+      while ((continue_run = true) && (r >= 0)) {
         //start from back and go front
           if (!(legend_hide.includes(legend_a[r]))|| 1){
               // push unique
@@ -654,8 +654,10 @@ function numberWithCommas(x) {
       }
       var mySet = new Set(legend_hide);
       var mySet2 = new Set(legend_a);
-
-      while (((mySet.size + 1) > mySet2.size) && (legend_hide.length+2 > legend_a.length)) {
+      // while loop should exit:infite loop removed 27 August 2022 1753HRS
+      while (((mySet.size + 1) > mySet2.size) && 
+           (legend_hide.length+2 > legend_a.length) && 
+                                legend_hide.length>0) {
          //console.log("1:2:" ,mySet.size,mySet2.size)
          legend_hide.pop()
           mySet = new Set(legend_hide);
@@ -809,7 +811,9 @@ setTimeout(function () {
 // initialize- First Graph
 $.getJSON("{% url 'get_project_output_by_rolling_week' minus_full_period today %}", {}, function(res, status) {
   //set_user_pref_on_start(res)
+  console.log('bfore draw')
   drawReleases(res);
+  console.log(res)
   releasesChartData[full_period] = res;
   set_user_pref_on_start()
 });
