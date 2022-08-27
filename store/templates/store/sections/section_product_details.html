@@ -16,6 +16,16 @@
               <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
                 data-toggle="tooltip" data-placement="bottom" title='Go to Shopping'><i class="fas fa-shopping-cart"></i></a></li>
              
+            <li class="breadcrumb-item" >
+                <a href="{% url 'cart' %}" class ="badge rounded-pill bg-success iconClass-primary"
+                    data-toggle="tooltip" data-placement="bottom" title='Go to Cart'><i class="fas fa-shopping-bag"></i>
+                    {% if total_quantity != 0 %} 
+                        <span id= 'span-cart-total' class="counter counter-lg" style="color: red; top:-2px;">{{total_quantity}}</span>
+                    {%else%}
+                       <span id= 'span-cart-total' class="counter counter-lg" style="color: red; top:-2px; display:none">{{total_quantity}}</span>
+                    {% endif %}
+                </a>
+                </li>
               <li class="breadcrumb-item" >
                 <label id="total_projects_searched">Product Details</label>
               </li>  

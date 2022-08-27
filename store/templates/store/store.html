@@ -345,8 +345,10 @@
 
               var mycartitem=''
               var ready_attr='mycart_na'
+              var engagement_attr = ''
               if (val.productIsInMyCart ==true) {
                   ready_attr='mycart'
+                  engagement_attr= 'engagement'
                   
                   mycartitem= `<a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
                           <span class="advanced2">CartItem</span>
@@ -367,7 +369,7 @@
               }
               a_html=`
               <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                <div ${ready_attr} class="project-item umodel-item">
+                <div ${ready_attr} class="project-item umodel-item ${engagement_attr}">
                     ${mycartitem}
                     ${image_url}
                     <div class="box-element-product">
