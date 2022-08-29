@@ -60,6 +60,10 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'customers.apps.CustomersConfig',
     'comment',
+    
+    # 'django.contrib.gis',
+    #leaflet,
+    #'rest_framework_gis',
 
 ]
 
@@ -201,7 +205,14 @@ PLOTLY_COMPONENTS = [
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 """
-
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (44.638569, -63.586262),
+    'DEFAULT_ZOOM': 18,
+    'MAX_ZOOM': 20,
+    'MIN_ZOOM': 3,
+    'SCALE': 'both',
+    'ATTRIBUTION_PREFIX': 'Location Tracker'
+}
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 

@@ -19,6 +19,13 @@ from django.utils.translation import gettext_lazy as _
 from datetime import date
 
 
+# from django.contrib.gis.db import models as geomodels
+
+# class Shop(geomodels.Model):
+#     name = geomodels.CharField(max_length=100)
+#     location = geomodels.PointField()
+#     address = geomodels.CharField(max_length=100)
+#     city = geomodels.CharField(max_length=50)
 
 class ClientCompany(models.Model):
 	

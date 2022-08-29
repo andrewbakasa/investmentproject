@@ -76,6 +76,24 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 
 
+# from django.views import generic
+# from django.contrib.gis.geos import fromstr
+# from django.contrib.gis.db.models.functions import Distance
+# from .models import Shop
+# class Home(generic.ListView):
+#     longitude = -80.191788
+#     latitude = 25.761681
+
+#     user_location = Point(longitude, latitude, srid=4326)
+
+#     model = Shop
+#     context_object_name = 'shops'
+#     queryset = Shop.objects.annotate(distance=Distance('location',
+#     user_location)
+#     ).order_by('distance')[0:6]
+#     template_name = 'shops/index.html'
+
+
 def product_load_tags_search_string(request, tagname, search_str):
     # replicate
   
@@ -869,9 +887,12 @@ def update_item(request):
 
 def update_item_ajax(request):
     #
+    
     if request.method == 'POST':
+       
         product_id = request.POST.get('productId', None)
         action = request.POST.get('action', None)
+        #print(product_id, action)
         data={}
         if not (product_id == None or len(product_id)==0):
             #print('here......')
@@ -913,6 +934,8 @@ def update_item_ajax(request):
             elif action == 'remove':
                 orderitem.quantity -= 1
                 #data["quantity"]=orderitem.quantity + 1
+            elif action == 'remove_from_cart':
+                orderitem.quantity =0
 
             orderitem.save()
 

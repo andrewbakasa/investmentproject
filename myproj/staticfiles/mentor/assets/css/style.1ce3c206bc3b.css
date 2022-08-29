@@ -1267,6 +1267,12 @@ section {
   object-fit: cover;
 }
 
+.product-details .product-item {
+  height: 200px;
+  width: 250px;
+ 
+}
+
 .product-details .advanced2 {
   text-align: center;
   width: 200px;

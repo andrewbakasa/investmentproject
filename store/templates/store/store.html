@@ -48,7 +48,29 @@
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   
   
-    
+  {% block modal_divs %}
+  <!-- Delete confirmation modal -->
+  <div class="modal fade" id="confirmdelete" role="dialog">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h4 class="modal-title">Confirm</h4>
+              </div>
+              <div class="modal-body">
+
+              </div>
+
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                  <input type="button" class="update-cart  btn btn-danger" data-product="" data-action=""
+                          name="update-cart" value="Yes" >
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% endblock %}  
 
   {% block scripts %}
       <!-- Search Button JS -->
@@ -58,17 +80,29 @@
       <script type="text/javascript" src="{% static 'js/cart.js' %}"></script> 
       <script type="text/javascript">
         var user = '{{request.user}}'
+
+        $('#confirmdelete').on('show.bs.modal', function(e) {
+            var name = $(e.relatedTarget).data('object-name');
+            var item_id = $(e.relatedTarget).data('item-id');
+            //console.log(item_id)
+            //var name =truncChar(name,25)
+            $('#confirmdelete .modal-body').html("Are you sure you want to <b>remove</b> <i>[" + name + "]</i> item from your <b>Cart</b> ?");
+          
+            $('#confirmdelete .modal-footer input').attr('data-action', 'remove_from_cart');
+            $('#confirmdelete .modal-footer input').attr('data-product', item_id);
+        });
+
         //first timme
-     var display_product_ajax_url= "{% url 'display_product_ajax' %}" 
-     var search_tags= '{{search_tags}}'
-     var tag_id= '{{tag_id}}'
-     function truncChar(str,length){
-              var myTruncatedString = str.substring(0,length-1);              
-              if (str.length > myTruncatedString.length){
-                return myTruncatedString + "..."
-              }
-              return myTruncatedString
-          }
+        var display_product_ajax_url= "{% url 'display_product_ajax' %}" 
+        var search_tags= '{{search_tags}}'
+        var tag_id= '{{tag_id}}'
+        function truncChar(str,length){
+                var myTruncatedString = str.substring(0,length-1);              
+                if (str.length > myTruncatedString.length){
+                    return myTruncatedString + "..."
+                }
+                return myTruncatedString
+            }
          
         function flip_cart_display (){
             if ($('#cart-total').html() >0){
@@ -351,13 +385,17 @@
                   ready_attr='mycart'
                   engagement_attr= 'engagement'
                   
-                  mycartitem= `<a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
-                          <span class="advanced2">CartItem</span>
-                        </a>`
+                  mycartitem= `<a href="#" data-toggle="modal" data-target="#confirmdelete" data-object-name="${val.name}"  
+                                data-item-id="${val.id}" style="color: red" data-toggle="tooltip" data-placement="bottom"  
+                                title='Remove From Cart'>
+                               <span class="advanced2 myspan">CartItem</span>
+                              </a>`
               } else {
-                  mycartitem= `<a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
-                          <span mycart_na class="myspan">CartItem</span>
-                        </a>`
+                  mycartitem= `<a href="#" data-toggle="modal" data-target="#confirmdelete"vdata-object-name="${val.name}" 
+                                data-item-id="${val.id}" style="color: red" data-toggle="tooltip" data-placement="bottom"  
+                                title='Remove From Cart'>
+                                <span mycart_na class="myspan">CartItem</span>
+                               </a>`
               }
               
                

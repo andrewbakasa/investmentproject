@@ -38,8 +38,11 @@
                     <div class="box-element">
                             <div class="row product-details">
                                 
-                                <div {%  userHasOrderProductMethod ordermodel product %} id="img-and-btn-wrapper" class="product-item col-md-8  col-md-pull-4">  
-                                    <a href="#" data-toggle="tooltip" data-placement="bottom"  title='Manage Business'>
+                                <div {%  userHasOrderProductMethod ordermodel product %} id="img-and-btn-wrapper" class="product-item col-md-4  col-md-pull-8  col-sm-6 col-xsm-6">  
+                                  
+                                    <a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                                        data-object-name="{{ product.name }}"  data-item-id="{{product.id}}" 
+                                        style="color: red" data-toggle="tooltip" data-placement="bottom"  title='Remove From Cart'>
                                         <span {% userHasOrderProductMethod ordermodel product %} class="myspan">CartItem</span>
                                     </a>
                                     {% if product.imageURL %}
@@ -49,7 +52,7 @@
                                     {% endif %}
                                 </div>
         
-                                <div class="col-md-4 col-md-push-8" >
+                                <div class="col-md-8 col-md-push-4" >
                                     <div class="product-details-button-cart">
                                         <button  data-product="{{product.id}}" data-action="add" class="btn btn-outline-primary add-btn update-cart">Add to Cart</button>
                                     </div>

@@ -49,7 +49,29 @@
   <div id="preloader"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   
-  
+  {% block modal_divs %}
+    <!-- Delete confirmation modal -->
+    <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="update-cart  btn btn-danger" data-product="" data-action=""
+                            name="update-cart" value="Yes" >
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
   {% block scripts %}
       <!-- Search Button JS -->
       <script src="{% static 'mentor/assets/js/search.js' %}"></script>
@@ -58,6 +80,23 @@
       <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
       <script type="text/javascript">
       var user = '{{request.user}}'
+
+
+       $('#confirmdelete').on('show.bs.modal', function(e) {
+            var name = $(e.relatedTarget).data('object-name');
+            var item_id = $(e.relatedTarget).data('item-id');
+            //console.log(item_id)
+            //var name =truncChar(name,25)
+            $('#confirmdelete .modal-body').html("Are you sure you want to <b>remove</b> <i>[" + name + "]</i> item from your <b>Cart</b> ?");
+          
+            $('#confirmdelete .modal-footer input').attr('data-action', 'remove_from_cart');
+            $('#confirmdelete .modal-footer input').attr('data-product', item_id);
+        });
+
+     
+
+
+
       checkPosition()
        function imageaspect() {
         var maxWidth = 150; // Max width for the image
@@ -96,12 +135,12 @@
       function mobile_view(){
         console.log('matching')
         $(".img-fluid").css({'width':'100%',})
-        $("#img-and-btn-wrapper").css({'width':'70%','height':'50%'})
+       // $("#img-and-btn-wrapper").css({'width':'70%','height':'50%'})
         //imageaspect()
       }
       function desktop_view(){
         $(".img-fluid").css({'max-width':'250px',})
-        $("#img-and-btn-wrapper").css({'width':'50%','height':'50%'})
+       // $("#img-and-btn-wrapper").css({'width':'50%','height':'50%'})
         
     }
       function checkPosition() {
