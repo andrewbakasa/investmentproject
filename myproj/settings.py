@@ -3,7 +3,7 @@ from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
+from os import environ
 
 SECRET_KEY = config('SECRET_KEY')
 
@@ -246,6 +246,10 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = config('EM_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
+
+
+GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 
 
 
