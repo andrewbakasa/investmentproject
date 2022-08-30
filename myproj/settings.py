@@ -111,26 +111,19 @@ WSGI_APPLICATION = 'myproj.wsgi.application'
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'LIMS',
-#         'USER': 'postgres',
-#         'PASSWORD': '<my_password_is_here>',
-#         'HOST': 'localhost'
+#         #'ENGINE': 'django.db.backends.sqlite3',
+#         'ENGINE':'django.contrib.gis.db.backends.postgis',
+#'ENGINE': 'django.contrib.gis.db.backends.spatialite'
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
-# import dj_database_url
-# DATABASES['default'] = dj_database_url.config()
-DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-#DATABASES['default']['NAME'] = os.environ['NAME']
 
+import dj_database_url
+DATABASES ={}
+DATABASES['default'] = dj_database_url.config()
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
