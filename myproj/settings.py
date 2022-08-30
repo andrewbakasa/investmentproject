@@ -61,11 +61,10 @@ INSTALLED_APPS = [
     'customers.apps.CustomersConfig',
     'comment',
     
-    'django.contrib.gis',
-    'leaflet',
-    'djgeojson',
-    #'rest_framework_gis',
-    "markers",
+     'django.contrib.gis',
+     'leaflet',
+     'djgeojson',
+     "markers",
 
 ]
 
