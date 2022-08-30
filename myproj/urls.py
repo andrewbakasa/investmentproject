@@ -3,7 +3,8 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-
+#from djgeojson.views import GeoJSONLayerView
+# from gislocation.models import MushroomSpot
 urlpatterns = [
     
     path('', include('investments_appraisal.urls')),
@@ -17,6 +18,8 @@ urlpatterns = [
     path('comment/', include('comment.urls')),
     path('e/', include('store.urls')),
     path('cus/', include('customers.urls')),
+    path("markers/", include("markers.urls")),
     #path('api/', include('comment.api.urls')),  # only required for API Framework
+   # path('data.geojson$', GeoJSONLayerView.as_view(model=MushroomSpot, properties=('title', 'description', 'picture_url')), name='data')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
