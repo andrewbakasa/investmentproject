@@ -892,7 +892,7 @@ def update_item_ajax(request):
        
         product_id = request.POST.get('productId', None)
         action = request.POST.get('action', None)
-        #print(product_id, action)
+        print(product_id, action)
         data={}
         if not (product_id == None or len(product_id)==0):
             #print('here......')

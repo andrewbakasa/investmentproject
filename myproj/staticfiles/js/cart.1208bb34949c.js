@@ -1,4 +1,22 @@
+//console.log('Hello World')
 
+var updateButtons = document.getElementsByClassName('update-cart')
+
+// for(i = 0; i < updateButtons.length; i++){
+//     updateButtons[i].addEventListener('click', function(){
+//         var productId = this.dataset.product
+//         var action = this.dataset.action
+//         console.log('productId: ', productId, 'action: ', action)
+
+//         console.log('user: ', user)
+
+//         if(user === 'AnonymousUser'){
+//             addCookieItem(productId, action)
+//         }else{
+//             updateUserOrder(productId, action)
+//         }
+//     })
+// }
 function getToken(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -63,6 +81,9 @@ function updateToProductTabel(product,action){
                 // "title":"", 
                 }
             )
+          
+
+          
 
             target2.fadeIn(600, function(){
                 target2.text(`${product.quantity}`)
@@ -142,6 +163,8 @@ function updateToProductTabel(product,action){
         }
       });
 }
+
+
 $('body').on("click",".update-cart",function(e){
     e.preventDefault();
     var url = '/e/update_item_ajax/'
@@ -177,7 +200,9 @@ $('body').on("click",".update-cart",function(e){
     })
    
     return false;
-})
+    })
+ 
+
 function flip_cart_display (){
     if ($('#cart-total').html() >0){
         $('#cart-total').css({ "display":"block"})
@@ -186,6 +211,8 @@ function flip_cart_display (){
     }     
 }
 function addCookieItem(productId, action){
+    //console.log('Not logged in.')
+
     if(action == 'add'){
         // if the item with the product id is not in cart
         // add it to cart
