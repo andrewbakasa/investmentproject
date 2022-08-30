@@ -8,4 +8,4 @@ class Marker(models.Model):
     """A marker with name and location."""
 
     name = models.CharField(max_length=255)
-    location = PointField()
+    location = PointField(default=None)
