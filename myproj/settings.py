@@ -276,6 +276,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 import django_on_heroku
 django_on_heroku.settings(locals())
 
+# I pray this fixes everything
+""" 
+I'm using the Python sample application on stack cedar 14 and the regular Heroku buildpack Heroku/python with PostGIS and had the same problem that my database settings were overwritten with the wrong DB engine, which caused heroku run python manage.py migrate to fail with the above error. Just adding the engine in the settings would not change anything. After some investigation I found out that it is the call to django_heroku.settings(locals()) in the last line of my settings.py which is reverting my changes.
+
+I fixed it by overwriting the engine again like this by adding a line afterwards:
+
+ """
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+
 ''' 
 If you are deploying your application to Heroku using Git, 
 you can’t have an .env file in your project root. 
