@@ -27,6 +27,9 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Zimbabwe'
 # Application definition
 
+
+
+
 INSTALLED_APPS = [
    
     'whitenoise.runserver_nostatic',
@@ -61,12 +64,17 @@ INSTALLED_APPS = [
     'customers.apps.CustomersConfig',
     'comment',
     
-     'django.contrib.gis',
-     'leaflet',
-     'djgeojson',
-     "markers",
+     'django.contrib.gis' ,
+     'leaflet', 
+     'djgeojson', 
+      "markers" 
 
 ]
+# if not DEBUG:
+#     INSTALLED_APPS.append('django.contrib.gis') 
+#     INSTALLED_APPS.append('leaflet')
+#     INSTALLED_APPS.append('djgeojson') 
+#     INSTALLED_APPS.append("markers") 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -109,21 +117,43 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproj.wsgi.application'
 
+import os
+if os.name == 'nt':
+    import platform
+    OSGEO4W = r"C:\OSGeo4W"
+    
+    if '64' in platform.architecture()[0]:
+        #OSGEO4W += "64"
+        pass
+    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+    os.environ['OSGEO4W_ROOT'] = OSGEO4W
+    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+# if DEBUG :
+DATABASES = {
+    'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE':'django.contrib.gis.db.backends.postgis',
+        # 'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
-
-# DATABASES = {
-#     'default': {
-#         #'ENGINE': 'django.db.backends.sqlite3',
-#         'ENGINE':'django.contrib.gis.db.backends.postgis',
-#'ENGINE': 'django.contrib.gis.db.backends.spatialite'
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-import dj_database_url
-DATABASES ={}
-DATABASES['default'] = dj_database_url.config()
-DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+DATABASES = {
+    'default': {
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': 'db',
+         'USER': 'andrew',
+         'PASSWORD': 'andrew',
+         'PORT' : '5432',
+    },
+}
+# else:
+#     import dj_database_url
+#     DATABASES ={}
+#     DATABASES['default'] = dj_database_url.config()
+#     DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
@@ -161,56 +191,7 @@ USE_L10N = True
 
 USE_TZ = True
 
- 
-""" CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-ASGI_APPLICATION = 'myproj.routing.application'
-
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [('127.0.0.1',6379),],
-#         }
-#     }
-# }
- 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
-#     },
-#     'CONFIG': {
-#             "hosts": [('redis',6379)],
-#         },
-# } 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'asgi_redis.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('localhost', 6379)],
-        },
-        'ROUTING': 'myproj.routing.channel_routing',
-    }
-}
-
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'django_plotly_dash.finders.DashAssetFinder',
-    'django_plotly_dash.finders.DashComponentFinder',
-]
-
-PLOTLY_COMPONENTS = [
-    'dash_core_components',
-    'dash_html_components',
-    'dash_renderer',
-
-    'dpd_components',
-] 
- 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
-
-"""
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (44.638569, -63.586262),
     'DEFAULT_ZOOM': 18,
@@ -219,16 +200,12 @@ LEAFLET_CONFIG = {
     'SCALE': 'both',
     'ATTRIBUTION_PREFIX': 'Location Tracker'
 }
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
+
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-
-# AJAXIMAGE_DIR = 'ajaximage/'
-# AJAXIMAGE_AUTH_TEST = lambda u: True
 
 LOGIN_REDIRECT_URL = 'index'
 LOGIN_URL = 'account_login'
@@ -252,10 +229,20 @@ EMAIL_HOST_USER = config('EM_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 
 
-GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
-GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
+#GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+#GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
+#print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
+gdalpath = r'C:\OSGeo4W\bin\gdal305.dll'
+geospath = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
 
-
+# print(os.environ.get('ENV'))
+GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else geospath
+GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else gdalpath
+# print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
+# if os.name == 'nt':
+#     VENV_BASE = os.environ['VIRTUAL_ENV']
+#     os.environ['PATH'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo') + ';' + os.environ['PATH']
+#     os.environ['PROJ_LIB'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo\\data\\proj') + ';' + os.environ['PATH']
 
 #uncomment if you want to check all files are collected into staticfile
 STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'

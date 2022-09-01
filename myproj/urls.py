@@ -19,7 +19,5 @@ urlpatterns = [
     path('e/', include('store.urls')),
     path('cus/', include('customers.urls')),
     path("markers/", include("markers.urls")),
-    #path('api/', include('comment.api.urls')),  # only required for API Framework
-   # path('data.geojson$', GeoJSONLayerView.as_view(model=MushroomSpot, properties=('title', 'description', 'picture_url')), name='data')
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
