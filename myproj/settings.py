@@ -118,18 +118,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproj.wsgi.application'
 
 import os
-if os.name == 'nt':
-    import platform
-    OSGEO4W = r"C:\OSGeo4W"
+# if os.name == 'nt':
+#     import platform
+#     OSGEO4W = r"C:\OSGeo4W"
     
-    if '64' in platform.architecture()[0]:
-        #OSGEO4W += "64"
-        pass
-    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
-    os.environ['OSGEO4W_ROOT'] = OSGEO4W
-    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
-    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
-    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+#     if '64' in platform.architecture()[0]:
+#         #OSGEO4W += "64"
+#         pass
+#     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+#     os.environ['OSGEO4W_ROOT'] = OSGEO4W
+#     os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+#     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+#     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
 # if DEBUG :
 DATABASES = {
     'default': {
@@ -232,12 +232,12 @@ EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 #GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
 #GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 #print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
-gdalpath = r'C:\OSGeo4W\bin\gdal305.dll'
-geospath = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
+# gdalpath = r'C:\OSGeo4W\bin\gdal305.dll'
+# geospath = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
 
 # print(os.environ.get('ENV'))
-GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else geospath
-GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else gdalpath
+GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
 # print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
 # if os.name == 'nt':
 #     VENV_BASE = os.environ['VIRTUAL_ENV']
