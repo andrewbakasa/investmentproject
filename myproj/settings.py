@@ -236,8 +236,8 @@ EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 # geospath = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
 
 # print(os.environ.get('ENV'))
-GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
-GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
+# GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
+# GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
 # print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
 # if os.name == 'nt':
 #     VENV_BASE = os.environ['VIRTUAL_ENV']
