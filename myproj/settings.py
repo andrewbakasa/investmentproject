@@ -199,9 +199,12 @@ EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 
 
 
-GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
-GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
+# GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
+# GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
 
+
+GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 #uncomment if you want to check all files are collected into staticfile
 STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 CLOUDINARY_STORAGE = {'CLOUD_NAME': 'dsbnt7cih', 'API_KEY': '729236266824714', 'API_SECRET': 'JZXOjGXheadh0YtH7Ip7Nbu_yv0', }
