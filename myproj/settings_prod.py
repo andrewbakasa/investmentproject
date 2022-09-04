@@ -67,14 +67,12 @@ INSTALLED_APPS = [
      'django.contrib.gis' ,
      'leaflet', 
      'djgeojson', 
-      "markers" 
+      "markers",
+       'rest_framework',
+      'rest_framework_gis',
 
 ]
-# if not DEBUG:
-#     INSTALLED_APPS.append('django.contrib.gis') 
-#     INSTALLED_APPS.append('leaflet')
-#     INSTALLED_APPS.append('djgeojson') 
-#     INSTALLED_APPS.append("markers") 
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -117,28 +115,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproj.wsgi.application'
 
-import os
-if os.name == 'nt':
-    import platform
-    OSGEO4W = r"C:\OSGeo4W"
-    
-    if '64' in platform.architecture()[0]:
-        #OSGEO4W += "64"
-        pass
-    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
-    os.environ['OSGEO4W_ROOT'] = OSGEO4W
-    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
-    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
-    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
-# if DEBUG :
-# DATABASES = {
-#     'default': {
-#         #'ENGINE': 'django.db.backends.sqlite3',
-#         'ENGINE':'django.contrib.gis.db.backends.postgis',
-#         # 'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+
 
 DATABASES = {
     'default': {
@@ -149,13 +126,7 @@ DATABASES = {
          'PORT' : '5432',
     },
 }
-# else:
-#     import dj_database_url
-#     DATABASES ={}
-#     DATABASES['default'] = dj_database_url.config()
-#     DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-# Password validation
-# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -229,21 +200,9 @@ EMAIL_HOST_USER = config('EM_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 
 
-#GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
-#GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
-#print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
-GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal305.dll'
-GEOS_LIBRARY_PATH = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
 
-# print(os.environ.get('ENV'))
-# GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
-# GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
-print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
-# if os.name == 'nt':
-#     VENV_BASE = os.environ['VIRTUAL_ENV']
-#     os.environ['PATH'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo') + ';' + os.environ['PATH']
-#     os.environ['PROJ_LIB'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo\\data\\proj') + ';' + os.environ['PATH']
-
+GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 #uncomment if you want to check all files are collected into staticfile
 STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 CLOUDINARY_STORAGE = {'CLOUD_NAME': 'dsbnt7cih', 'API_KEY': '729236266824714', 'API_SECRET': 'JZXOjGXheadh0YtH7Ip7Nbu_yv0', }
@@ -314,6 +273,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Configure Django App for Heroku.
 import django_on_heroku
 django_on_heroku.settings(locals())
+
+# I pray this fixes everything
+""" 
+I'm using the Python sample application on stack cedar 14 and the regular Heroku buildpack Heroku/python with PostGIS and had the same problem that my database settings were overwritten with the wrong DB engine, which caused heroku run python manage.py migrate to fail with the above error. Just adding the engine in the settings would not change anything. After some investigation I found out that it is the call to django_heroku.settings(locals()) in the last line of my settings.py which is reverting my changes.
+
+I fixed it by overwriting the engine again like this by adding a line afterwards:
+
+ """
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 ''' 
 If you are deploying your application to Heroku using Git, 

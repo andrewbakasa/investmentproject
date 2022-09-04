@@ -532,7 +532,7 @@ class UserBusinessModelCreate(LoginRequiredMixin, generic.edit.CreateView):
 		return context
 
 #Any one can access
-def index(request):
+def home_index(request):
 	#1. Projects Count
 	projects_qs= Investment.objects.all()
 	if projects_qs:

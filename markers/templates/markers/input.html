@@ -1,0 +1,51 @@
+
+{% load i18n %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Personal Investors List</title>
+{% endblock %}
+
+
+{% load leaflet_tags %}
+{% leaflet_js plugins="forms" %}
+{% leaflet_css plugins="forms" %}
+{% load static %}
+
+
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+  </div>
+  
+  <!---Removed padding from 70px-- 0px-->
+  <section style= 'padding: 5px 0;' id="projects" class="projects">  
+    <div class="container box-element" data-aos="fade-up">
+
+      <form method="POST"> {% csrf_token %}
+        {{ form }}
+            <button type="submit" value="Save">Save</button>
+        </form>
+        
+      
+    </div>
+   
+  </section><!-- End User Section --> 
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+
+
+
+
+
+

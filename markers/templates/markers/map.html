@@ -11,6 +11,9 @@
 </head>
 <body>
     {{ markers|json_script:"markers-data" }}
+    {{ json_user_location_x|json_script:"user-x-data" }}
+    {{ json_user_location_y|json_script:"user-y-data" }}
+    <div class="marker-position">Click on map</div>
     <div id="map"></div>
     <script src="{% static 'map/map.js' %}"></script>
 </body>

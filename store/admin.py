@@ -2,6 +2,24 @@ from django.contrib import admin
 
 from .models import *
 
+
+from django.contrib.gis import admin
+
+
+@admin.register(Shop)
+class ShopAdmin(admin.OSMGeoAdmin):
+    """Marker admin."""
+    pass
+    #list_display = ("name", "location")
+
+
+@admin.register(ShopLocation)
+class ShopLocationAdmin(admin.OSMGeoAdmin):
+    """Marker admin."""
+    pass
+
+    #list_display = ("name", "location")
+
 admin.site.register(Invoice)
 admin.site.register(Expense)
 admin.site.register(Customer)

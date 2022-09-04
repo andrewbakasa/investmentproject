@@ -19,14 +19,20 @@ from django.utils.translation import gettext_lazy as _
 from datetime import date
 
 
-# from django.contrib.gis.db import models as geomodels
 
-# class Shop(geomodels.Model):
-#     name = geomodels.CharField(max_length=100)
-#     location = geomodels.PointField()
-#     address = geomodels.CharField(max_length=100)
-#     city = geomodels.CharField(max_length=50)
+from django.contrib.gis.db.models import PointField
+class ShopLocation(models.Model):
+    """A marker with name and location."""
 
+    name = models.CharField(max_length=255)
+    location = PointField(default=None)
+
+class Shop(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
+    name = models.CharField(max_length=100)
+    location = PointField(default=None)
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
 class ClientCompany(models.Model):
 	
 	#user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -367,6 +373,8 @@ class ProductCategory(models.Model):
 
 
 class Product(models.Model):
+    shop = models.ForeignKey(Shop, related_name='shopA', on_delete= models.SET_NULL,null=True, blank=True)
+    locate_shop = models.ForeignKey(ShopLocation, on_delete= models.SET_NULL,null=True, blank=True)
     name = models.CharField('category', max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     digital = models.BooleanField(default=False, null=True, blank=False)

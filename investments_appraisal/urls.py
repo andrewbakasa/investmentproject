@@ -13,7 +13,7 @@ urlpatterns = [
     path('api/get_failures_releases_graph_by_rolling_month/<dstart>/<dend>/',
          views.api.get_failures_releases_graph_by_rolling_month, name='get_failures_releases_graph_by_rolling_month'),
    
-    path('', views.general_page.index, name="index"),#Home
+    path('', views.general_page.home_index, name="index"),#Home
     path('about/', views.general_page.about, name="about"),
     path('pr/', views.general_page.projects, name="projects"),
     
@@ -40,7 +40,7 @@ urlpatterns = [
     path('display_models_ajax_filter/<str:slug>/', views.general_page.display_models_ajax_filter, name="display_models_ajax_filter"),
 
     path('display_projects_ajax/', views.general_page.display_projects_ajax, name="display_projects_ajax"),
-    path('investment/', views.general_page.index, name='investments_start_page'),     
+    path('investment/', views.general_page.home_index, name='investments_start_page'),     
    
     path('update_model/<str:pk>/', views.general_page.usermodel_update_ajax, name="update_model"),
     
