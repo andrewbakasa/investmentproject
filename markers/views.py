@@ -22,6 +22,8 @@ from django.views import generic
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+from django.db.models import Q
+
 
 longitude =-20.756114
 latitude = 27.553711
@@ -125,6 +127,18 @@ class CreateMarkers(LoginRequiredMixin,CreateView):
         #form.instance.author = self.request.user
         #form.instance.investmentblog = investmentblog
         return super().form_valid(form)
+
+    
+    def get_context_data(self, **kwargs):
+        """Return the view context data."""
+        context = super().get_context_data(**kwargs)
+        #filter product
+      
+        context["json_user_location_x"] =user_location.x#location_es
+        context["json_user_location_y"] =user_location.y#location_es
+    
+        return context
+
 
 
 class Home(ListView):
@@ -274,7 +288,23 @@ class ProductLocationView(APIView):
   
         serializer = ProductSerializer(product_queryset, many=True)
         print("in AAAAAAAAAAAAAAAAAAa")
-        print(serializer, serializer.data)
+        #print(serializer, serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+class ProductLocationSlugView(APIView):
+    # add permission to check if user is authenticated
+    #permission_classes = [permissions.IsAuthenticated]
+
+    # 3. Retrieve
+    def get(self, request,  *args, **kwargs):
+      
+        #product = Product.objects.filter(product__id = product_id)
+        slug =  self.kwargs.get('slug')
+        product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(distance=Distance('shop__location',  
+                                            user_location)).order_by('distance')[0:6]
+  
+        serializer = ProductSerializer(product_queryset, many=True)
+        print("With Slug.................")
+        #print(serializer, serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MarkerLocationView(APIView):

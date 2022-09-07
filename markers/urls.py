@@ -15,6 +15,7 @@ from .views import (
     # TodoDetailApiView,
     ProductLocationView,
     MarkerLocationView,
+    ProductLocationSlugView,
 )
 urlpatterns = [
     path('map/', views.MarkersMapView.as_view(), name='marker_home'),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('p/location/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
     # path('ajax/', views.data_ajax, name='data_ajax'),
     path('api_locate_product/', ProductLocationView.as_view(),  name='locate_product_api'),
+    path('api_locate_product2/<str:slug>/', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
     #path('api_locate_marker/', MarkerLocationView.as_view(),  name='locate_marker'),
     # path('api/', include(router.urls)),
 

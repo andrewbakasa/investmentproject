@@ -15,6 +15,13 @@
     {{ json_user_location_y|json_script:"user-y-data" }}
     <div class="marker-position">Click on map</div>
     <div id="map"></div>
+    <div class="formBlock">
+        <form id="form">
+            <input type="text" name="start" class="input"  id="start"/>
+            <input type="text" name="end" class="input"/>
+            <button>Get Directions</button>
+        </form>
+    </div>
     <script src="{% static 'map/map.js' %}"></script>
 </body>
 </html>
