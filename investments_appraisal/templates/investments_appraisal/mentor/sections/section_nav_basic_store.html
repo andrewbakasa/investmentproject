@@ -9,7 +9,9 @@
 <nav id="navbar" class="navbar order-last order-lg-0">
     <ul id="navbar-ul">
         <li id="index"><a href="{% url 'index' %}">Home</a></li>
-        <li id="_home"><a href="{% url 'product_location_map_view' %}">Product Location</a></li>      
+        {% if request.user.is_authenticated %}
+        <li id="_home"><a href="{% url 'gen_location_product_slug' %}">Product Location</a></li>  
+        {%endif%}    
         <li ><a href="{% url 'cart' %}">Go to Cart</a></li>
         
         <!-- <a href="{% url 'cart' %}">

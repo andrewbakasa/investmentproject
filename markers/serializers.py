@@ -11,6 +11,18 @@ from .models import WorldBorder
 from .models import  Marker
 from store.models import Product
 
+
+
+
+class ProduceBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'image', 'price' ]
+        read_only_fields = ('',)
+
+    
+
+
 class MarkerSerializer(GeoFeatureModelSerializer):
 
 	class Meta:
@@ -30,15 +42,10 @@ class ProductSerializer(GeoFeatureModelSerializer):
 		
 	class Meta:
 		model = Product
-		fields = ['name', 'image'] #shop_name
+		fields = ['id', 'name', 'image', 'price'] #shop_name
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 
-	# def to_representation(self, instance):
-	# 	representation = super(ProductSerializer, self).to_representation(instance)
-	# 	representation['location'] = instance.shop.location
-	# 	representation['shopname'] = instance.shop.name
-	# 	return representation
 
 class WorldBorderSerializer(gis_serializers.GeoFeatureModelSerializer):
     """world border GeoJSON serializer."""

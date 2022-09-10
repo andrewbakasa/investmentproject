@@ -1,0 +1,141 @@
+
+{% extends 'investments_appraisal/mentor/index.html' %}
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Products Location</title>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'map/map_product.css' %}">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    {{ json_user_location_x|json_script:"user-x-data" }}
+    {{ json_user_location_y|json_script:"user-y-data" }}
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+
+{% block content %}
+
+ 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+     
+  </div><!-- End Breadcrumbs -->
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                
+              <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                data-toggle="tooltip" data-placement="bottom" title='Go to Shopping'><i class="fas fa-shopping-cart"></i></a></li>
+             
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Cart</label>
+              </li>  
+            </ol>
+          </div>
+
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="row">   
+                <input type="text" name="start" class="input" id="start"/>
+                <button id="btn">Get Closest Product Location(s) </button>
+                <!-- <div class="formBlock">
+                    <input type="text" name="start" class="input" id="start"/>
+                    <button id="btn">Get Closest Product Location(s) </button>
+                </div> -->
+            </div>
+             <!-- LAYOUT -->
+             <div class="row">
+              
+                <!-- B -->
+                <div class="col-md-8 col-md-pull-4" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
+                    <div class="apartments row">
+                        {% for product in product_qs %}
+                            <div id="{{product.id}}" class="col-lg-4">                   
+                                {% if product.imageURL %}
+                                    <img src="{{product.imageURL}}" class="img-fluid product-tag" data-item-id="{{product.id}}">
+                                {% else %}
+                                    <img  src="{% static 'images/placeholder.png' %}" class="img-fluid product-tag" data-item-id="{{product.id}}">
+                                {% endif %} 
+                                
+                                <h2>{{product.name}}</h2>
+                                <p>{{product.price}}</p>
+                            </div>
+                        {% endfor %}   
+                    </div>            
+                </div>
+
+                 <!-- A -->
+                 <div class="col-md-4 col-md-push-8">
+                  
+                    <div id="mapid" class="map">
+         
+                    </div>
+                 </div>
+
+
+            </div>
+
+          </div>
+
+       
+
+    </div>
+  
+</section><!-- End Projects Section -->
+
+
+ 
+</main><!-- End #main -->
+
+
+{%endblock content%}
+
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  
+  
+  {% block scripts %}
+      <!-- Search Button JS -->
+      <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+      
+      <script>
+         var product_qs= '{{json_product_qs}}'
+         //var product_qs = JSON.parse("{{json_product_qs}}")
+         var base_data_url= '{% url "locate_product_api" %}'
+         var slug_data_url = `{% url 'locate_product_api_slug' 12345 %}`
+         var default_img =`{% static 'images/placeholder.png' %}`
+      </script>
+      <script src="{% static 'map/map_product.js' %}"></script>
+      
+    {% endblock %}
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_store.html' %}
+
+{% endblock %}
+
+
+

@@ -1,5 +1,22 @@
 from django.contrib.gis.db.models import PointField
 from django.db import models
+
+
+from django.contrib.gis import forms
+
+from django.contrib.gis.db import models as geo_models
+# class Parks(geo_models.Model):
+#     park_name_en = geo_models.CharField(max_length=256)    
+#     description = geo_models.TextField()
+#     picture = geo_models.ImageField()
+#     geom = geo_models.PointField(widget= forms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}) )
+
+@property
+def picture_url(self):
+    return self.picture.url
+
+def __unicode__(self):
+    return self.title
 class Marker(models.Model):
     name = models.CharField(max_length=255)
     location = PointField(default=None)

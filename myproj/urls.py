@@ -18,6 +18,6 @@ urlpatterns = [
     path('comment/', include('comment.urls')),
     path('e/', include('store.urls')),
     path('cus/', include('customers.urls')),
-    path("markers/", include("markers.urls")),
+    path("m/", include("markers.urls")),
   ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

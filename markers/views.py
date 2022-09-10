@@ -1,6 +1,8 @@
 """Markers view."""
 
 from http.client import HTTPResponse
+
+from django.http import HttpResponse
 from django.views.generic.base import TemplateView
 from django.http import JsonResponse
 from django.db.models import F
@@ -9,8 +11,9 @@ import json
 
 from django.core.serializers import serialize
 from django.views.generic.base import TemplateView
+from common.decorators import allowed_users, login_in_user_only_with_routing
 
-from markers.forms import MarkerForm
+from markers.forms import MarkerForm, ShopForm
 from store.models import Product, Shop
 
 from .models import Marker
@@ -23,12 +26,21 @@ from django.contrib.gis.geos import fromstr
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.db.models import Q
+from django.utils.decorators import method_decorator
+
+
+from django.urls import reverse, reverse_lazy
+from django.forms.models import model_to_dict
+
 
 
 longitude =-20.756114
 latitude = 27.553711
 
 user_location = Point(longitude, latitude, srid=4326)
+# def park_insert(request):
+#     form = ParkForm()
+#     return render(request, 'addpark.html', {'form': form})
 class MarkersMapView(TemplateView):
     """Markers map view."""
 
@@ -74,26 +86,21 @@ class MarkersMapView(TemplateView):
     
         return context
 class MarkersMapViewTest(TemplateView):
-    """Markers map view."""
 
-    template_name = "markers/test.html"
+    template_name = "markers/nearbyproducts.html"
 
     def get_context_data(self, **kwargs):
-        """Return the view context data."""
+     
         context = super().get_context_data(**kwargs)
         #filter product
         queryset = Product.objects.filter().annotate(distance=Distance('shop__location',  
                                                    user_location)).order_by('distance')[0:6]
-        print("****************************************")
-        print(queryset, queryset.count() )    
-        for i in  queryset:
-            print(f"{i.name},  {i.distance}") 
+    
 
         context["markers"] = json.loads(serialize("geojson", queryset)) 
-        print(context["markers"])
-        print("****************************************")
+        
         list_ =[user_location.x,user_location.y]
-        location_es = json.dumps(list_)#f"{user_location.x},{user_location.y}"
+        #location_es = json.dumps(list_)
        
         context["json_user_location_x"] =user_location.x#location_es
         context["json_user_location_y"] =user_location.y#location_es
@@ -105,27 +112,13 @@ class CreateMarkers(LoginRequiredMixin,CreateView):
     form_class = MarkerForm
     template_name = 'markers/input.html'
 
-    def get(self, request, *args, **kwargs):
-        # investment = get_object_or_404(Marker,pk=self.kwargs.get('id'))
-        # investmentblog, created=InvestmentBlog.objects.get_or_create(investment=investment)
-        # form = self.form_class(initial={'user': investmentblog })
-        
-        context={}
-        # id=investmentblog.investment.id
-        # investment = get_object_or_404(Investment,pk=id)
-        # context["investment"] = investment
-        # context["investment_id"] = id
-        context["form"] = self.form_class
-        
+    def get(self, request, *args, **kwargs):        
+        context={}       
+        context["form"] = self.form_class        
         return render(request, self.template_name, context)
        
 
-    def form_valid(self, form):
-        #investment = get_object_or_404(Investment,pk=self.kwargs.get('id'))
-        #investmentblog, created=InvestmentBlog.objects.get_or_create(investment=investment)
-       
-        #form.instance.author = self.request.user
-        #form.instance.investmentblog = investmentblog
+    def form_valid(self, form):       
         return super().form_valid(form)
 
     
@@ -158,25 +151,12 @@ def data_ajax(request, *args, **kwargs):
     
     queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
-  
-   
-                                    
-    # print(queryset, queryset.count() )    
-    # for i in  queryset:
-    #     print(f"{i}, {i}, {i.distance}")         
-    # data = json.loads(serialize("geojson", queryset, geometry_field=('shop__location'),fields=('shop__name',))) 
-    # # serialize('geojson', City.objects.all(),
-    # #       geometry_field='point',
-    # #       fields=('name',))
-    print("I ma her.......................................")
 
     serializers = CustomSerializer()
     data = serializers.serialize(queryset, geometry_field='shop__location', fields=('shop__name', 'shop__location', ))
-    print(data) 
-    print('NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNn')
+   
     data =get_map_data()
-    print(data)
-        #return HTTPResponse(data, content_type="application/json")
+   
     return JsonResponse(data, safe=False)
 
 from django.contrib.gis.serializers.geojson import Serializer 
@@ -231,7 +211,135 @@ from store.models import Product
 
 from . serializers import  MarkerSerializer, ProductSerializer
 
+# Normally in views.py
+class MapView(TemplateView):
+    model = Shop
+    form_class = ShopForm
+    template_name = 'markers/create.html'
 
+    def get(self, request, *args, **kwargs):        
+        context={}       
+        context["form"] = self.form_class        
+        return render(request, self.template_name, context)
+       
+class MapViewCreate(LoginRequiredMixin, generic.edit.CreateView):
+    model = Shop
+    template_name = 'markers/create.html'
+    success_url = reverse_lazy('user_products')
+
+    def get_form_class(self):
+        return ShopForm
+
+   
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        
+        form = ShopForm(request.POST) # class based view.
+        if form.is_valid():
+            # for f in files:
+            #     ...  # Do something with each file.
+            return self.form_valid(form)
+        else:
+            print(form.errors)
+            return self.form_invalid(form)
+
+class AjaxableResponseMixin(object):
+    def render_to_json_response(self, context, **response_kwargs):
+        print(context)
+        data = json.dumps(context)
+        response_kwargs['content_type'] = 'application/json'
+        return HttpResponse(data, **response_kwargs)
+
+    def form_invalid(self, form):
+        response = super(AjaxableResponseMixin, self).form_invalid(form)
+        if self.request.is_ajax():
+            return self.render_to_json_response(form.errors, status=400)
+        else:
+            return response
+
+    def form_valid(self, form):
+        response = super(AjaxableResponseMixin, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return self.render_to_json_response(data)
+        else:
+            return response
+
+class MapUpdateView(LoginRequiredMixin, AjaxableResponseMixin, generic.edit.UpdateView):
+    #template_name = 'customers/product_edit.html'
+    template_name = 'customers/product_edit_modal.html'
+    #template_name = 'customers/products.html'
+    model = Product
+    success_url = reverse_lazy('products')
+
+    form_class= ShopForm
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object() # assign the object to the view
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        
+        
+        pk = kwargs.get('pk', None)
+        shop = get_object_or_404(Shop, pk=pk)
+        form = ShopForm(request.POST or None, request.FILES or None,instance=shop) # class based view.
+        if form.is_valid():
+            form.save()
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return generic.edit.ProcessFormView.get(self, request, *args, **kwargs)
+    
+class  MapUpdate(LoginRequiredMixin, generic.edit.UpdateView):
+    form_class= ShopForm
+    model = Product
+    template_name = 'customers/product_edit_modal.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object() # assign the object to the view
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)        
+        
+        pk = kwargs.get('pk', None)
+        product = get_object_or_404(Shop, pk=pk)
+       
+        form = ShopForm(request.POST or None, request.FILES or None, instance=product) # class based view.
+        #print(form)
+        data =  dict()
+        if form.is_valid():
+            product= form.save()
+
+            product_item_object =model_to_dict(product)
+            product_item_object['image']=str(product_item_object['image'])
+            categories=""
+           
+            for x in product_item_object['categories']:
+                categories = categories +   str(x.name) + ', '  
+            product_item_object['categories']=  categories[:len(categories)-2]
+          
+            
+            companies=""
+            for x in product_item_object['company']:
+                companies  = companies + str(x.name)  
+            product_item_object['company']=  companies
+            
+
+            data['product'] = product_item_object
+        else:
+            data['error'] =  "form not valid!"
+        return JsonResponse(data)
+   
+  
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
@@ -287,9 +395,10 @@ class ProductLocationView(APIView):
                                             user_location)).order_by('distance')[0:6]
   
         serializer = ProductSerializer(product_queryset, many=True)
-        print("in AAAAAAAAAAAAAAAAAAa")
-        #print(serializer, serializer.data)
+      
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+@method_decorator(login_in_user_only_with_routing(), name='dispatch')   
 class ProductLocationSlugView(APIView):
     # add permission to check if user is authenticated
     #permission_classes = [permissions.IsAuthenticated]
@@ -303,8 +412,7 @@ class ProductLocationSlugView(APIView):
                                             user_location)).order_by('distance')[0:6]
   
         serializer = ProductSerializer(product_queryset, many=True)
-        print("With Slug.................")
-        #print(serializer, serializer.data)
+        print('>>>>>>>>>>>>>>>>>>>>>>>>', serializer.data,)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MarkerLocationView(APIView):
@@ -319,5 +427,30 @@ class MarkerLocationView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
    
+# ----our clients dont pass here but leapfrog to their page
+#import json
+from django.core.serializers.json import DjangoJSONEncoder
+from django.forms.models import model_to_dict
+
+class ProductLocationView2(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'markers/product.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+       
+        # product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
+        #                                     user_location)).order_by('distance')[0:6]
+  
+        # context['product_qs'] = product_queryset
+
+        # serializer = ProductSerializer(product_queryset, many=True)
+        # context['json_product_qs'] =serializer.data
+
+        context["json_user_location_x"] =user_location.x#location_es
+        context["json_user_location_y"] =user_location.y#location_es
+    
+        return context
+
+
 
 

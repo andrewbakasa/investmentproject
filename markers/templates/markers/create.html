@@ -1,0 +1,72 @@
+{% load leaflet_tags %}
+<html>
+    <head>
+        {% leaflet_js plugins="forms" %}
+        {% leaflet_css plugins="forms" %}
+       
+    </head>
+    <body>
+        <h1>Edit {{ object }}</h1>
+        <form method="post" class="form-horizontal" enctype="multipart/form-data">
+            {% csrf_token %}
+        {{ form }}
+        <input type="submit"/>
+        </form>
+        <script>
+              function addClick(map){
+              var xlng = 0.000256;
+              var xlat = 0.000200;
+              //var map =document.getElementById('main');
+              console.log(map)
+              map.addEventListener("click",  function(e) {
+                console.log(e.latlng.lat,e.latlng.lng);
+                //var c = L.circle([e.latlng.lat,e.latlng.lng], {radius: 15}).addTo(map);
+                L.polygon([
+                  [e.latlng.lat-xlat,e.latlng.lng-xlng],
+                  [e.latlng.lat+xlat,e.latlng.lng-xlng],
+                  [e.latlng.lat-xlat,e.latlng.lng+xlng],
+                  [e.latlng.lat+xlat,e.latlng.lng+xlng],
+                ]).addTo(map);
+                
+                  L.polyline([
+                  [e.latlng.lat,e.latlng.lng-xlng],
+                  [e.latlng.lat,e.latlng.lng+xlng]
+                ]).addTo(map);
+                
+              });
+              }
+          
+            // Store the variable to hold the map in scope
+            var map =document.getElementById('id_location-map');
+            console.log("map", map)
+            // window.addEventListener("map:init", function (e) {           
+            //     map = e.originalEvent.detail.map;
+            //     console.log('Map object:' , map)
+            // });
+
+            // map.on('map:loadfield', function (e) {
+            //     // Customize map for field
+            //     console.log(e.field, e.fieldid);
+            // });
+
+            addClick(map)
+            map.addEventListener("click",  function(e) {
+                console.log("target",e.originalEvent)
+                console.log("target", e.target)
+                console.log("map",e.view.map)
+                console.log("L",e.view.L)
+                console.log("LatLng",e.view.L.latlng)
+                console.log("loc",e.view.location)
+                console.log("geo-id-loc",e.view.geodjango_id_location)
+                console.log("document",e.view.document)
+                console.log("e",e)
+                //alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng)
+                //var latlng = map.mouseEventToLatLng(e.originalEvent);
+                //console.log(latlng.lat + ', ' + latlng.lng);
+            });
+        </script>
+      
+    </body>
+</html>
+
+

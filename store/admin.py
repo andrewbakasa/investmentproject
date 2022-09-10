@@ -5,6 +5,9 @@ from .models import *
 
 from django.contrib.gis import admin
 
+# @admin.register(Shop)
+# class ShopAdmin(LeafletGeoAdmin):
+#     form = ShopForm
 
 @admin.register(Shop)
 class ShopAdmin(admin.OSMGeoAdmin):

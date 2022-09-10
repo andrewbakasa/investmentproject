@@ -508,7 +508,7 @@ def create_usermodel_ajax2(request,  _id, *args, **kwargs):
             'message': 'Error, must be an Ajax call.'
         }
         return JsonResponse(error, content_type="application/json")  
-@method_decorator(allowed_users(allowed_roles=['admin',  'editor','datacapture']), name='dispatch')  
+#@method_decorator(allowed_users(allowed_roles=['admin',  'editor','datacapture']), name='dispatch')  
 class UserBusinessModelCreate(LoginRequiredMixin, generic.edit.CreateView):
 	model = UserModel
 	template_name = 'investments_appraisal/usermodel_edit.html'

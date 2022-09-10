@@ -25,7 +25,7 @@
         ];
 
       var dataurl = '{% url "locate_product_api" %}';
-      
+      var map
       function removeAllMarkers(map,fgroup_markers){
           map.removeLayer(fgroup_markers);
           //clear contents
@@ -36,7 +36,11 @@
       window.addEventListener("map:init", function (event) {
         //console.log('in init:')
         map = event.detail.map;
-       
+        console.log(";;;;;;;;;;")
+        console.log(event.detail._container)
+
+        
+        addClick()
         // Download GeoJSON data with Ajax
         fetch(dataurl)
           .then(function(resp) {
@@ -44,7 +48,7 @@
             return resp.json();
           })
           .then(function(data) {
-            //console.log('fetching data:', data)
+            console.log('fetching data:', data)
             L.geoJson(data, {
               pointToLayer: function(feature, latlng) {
                 const smallIcon = L.divIcon({
@@ -60,14 +64,14 @@
               },
               onEachFeature: function onEachFeature(feature, layer) {
                 var props = feature.properties;
-                //console.log('Prop:', props)
+                console.log('Prop:', props)
                 var content 
                 
                 if (props.image) {
-                  content = `<img width="100" object-fit: cover ; src="${props.image}" </br><p>${props.name}</p>`;
+                  content = `<img width="100" object-fit: cover ; src="${props.image}" </br><p>${props.name}</br> $${numberWithCommas(props.price)}</p>`;
                
                 } else {
-                  content = `<img width="100"  object-fit: cover ;src=""/><h3>${props.name}</h3><p>${props.name}</p>`;
+                  content = `<img width="100"  object-fit: cover ;src=""/><h3>${props.name}</h3><p>${props.name}</br> $${numberWithCommas(props.price)}</p>`;
                
                 }
                 //content.setStyle({fillColor :'blue'})
@@ -86,7 +90,11 @@
       });
 
 
- 
+function numberWithCommas(x) {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+}
 // Pass the layerGroup to the function
 function removeallFeatures(layerGroup) {
     // Use getLayers to get the array
@@ -361,16 +369,43 @@ index_a=1
        
       }) 
     </script>
+    <script>
+      function addClick(){
+        var xlng = 0.000256;
+        var xlat = 0.000200;
+        //var map =document.getElementById('main');
+        console.log(map)
+        map.addEventListener("click",  function(e) {
+          console.log(e.latlng.lat,e.latlng.lng);
+          //var c = L.circle([e.latlng.lat,e.latlng.lng], {radius: 15}).addTo(map);
+          L.polygon([
+            [e.latlng.lat-xlat,e.latlng.lng-xlng],
+            [e.latlng.lat+xlat,e.latlng.lng-xlng],
+            [e.latlng.lat-xlat,e.latlng.lng+xlng],
+            [e.latlng.lat+xlat,e.latlng.lng+xlng],
+          ]).addTo(map);
+          
+            L.polyline([
+            [e.latlng.lat,e.latlng.lng-xlng],
+            [e.latlng.lat,e.latlng.lng+xlng]
+          ]).addTo(map);
+          
+        });
+        }
+       
+    </script>
   </head>
   <body>
-    <div class="formBlock">
-      <form id="form">
-        
-      </form>
-        <input type="text" name="start" class="input" id="start"/>
-        <button id="btn">Get Closest Product Location(s) </button>
-  </div>
-    <h3>Nearby Service Centres</h3>
+    <div class="row">    
+        <div class="formBlock">
+          <form id="form">
+            
+          </form>
+            <input type="text" name="start" class="input" id="start"/>
+            <button id="btn">Get Closest Product Location(s) </button>
+        </div>
+    </div>
+    <h3 id="header_title">Nearby Product Location</h3>
     {% leaflet_map "main" %}
   </body>
 </html>

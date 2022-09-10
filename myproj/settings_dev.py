@@ -232,20 +232,11 @@ EMAIL_HOST_USER = config('EM_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 
 
-#GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
-#GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
-#print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
+
 GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal305.dll'
 GEOS_LIBRARY_PATH = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
 
-# print(os.environ.get('ENV'))
-# GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GEOS_LIBRARY_PATH')
-# GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else environ.get('GDAL_LIBRARY_PATH')
-print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
-# if os.name == 'nt':
-#     VENV_BASE = os.environ['VIRTUAL_ENV']
-#     os.environ['PATH'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo') + ';' + os.environ['PATH']
-#     os.environ['PROJ_LIB'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo\\data\\proj') + ';' + os.environ['PATH']
+#print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
 
 #uncomment if you want to check all files are collected into staticfile
 STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
@@ -328,15 +319,4 @@ Inside Heroku’s dashboard, first select your app and click on the Settings tab
 '''
 
 # Error 500 When DEBUG=FALSE ON HEROKU SERVER
-""" 
-Collectstatic ignores images that are referenced within comment 
-but there is a typical behaviour in Django processing 
-when Debug=False is set which actually tries to parse and 
-verify images within HTML comments (This does not happen when Debug=True is set).
 
-When I removed comments, I was able to render the page and 500 error was gone. 
-
-For what it's worth, you'll face the same issue if you have an html comment in your code that calls the template tag "static" (probably the behavior is the same for every commented template tag), this was my case:
-
-removing the comment resolved the 500 error (which also, was not being logged).
-"""

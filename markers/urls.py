@@ -16,14 +16,23 @@ from .views import (
     ProductLocationView,
     MarkerLocationView,
     ProductLocationSlugView,
+    MapView,
+    ProductLocationView2,
+    
 )
 urlpatterns = [
+    
+    #path('', views.park_insert(), name='park_insert'),
     path('map/', views.MarkersMapView.as_view(), name='marker_home'),
+    path('createmap/', views.MapViewCreate.as_view(), name='createmap'),
     path('create/', views.CreateMarkers.as_view(), name='map'),
-    path('p/location/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
+    path('p/l/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
     # path('ajax/', views.data_ajax, name='data_ajax'),
     path('api_locate_product/', ProductLocationView.as_view(),  name='locate_product_api'),
     path('api_locate_product2/<str:slug>/', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
+    path('product/', ProductLocationView2.as_view(),  name='gen_location_product_slug'),
+  
+   
     #path('api_locate_marker/', MarkerLocationView.as_view(),  name='locate_marker'),
     # path('api/', include(router.urls)),
 
