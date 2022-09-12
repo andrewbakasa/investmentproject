@@ -16,10 +16,10 @@ class ShopAdmin(admin.OSMGeoAdmin):
     #list_display = ("name", "location")
 
 
-@admin.register(ShopLocation)
-class ShopLocationAdmin(admin.OSMGeoAdmin):
-    """Marker admin."""
-    pass
+# @admin.register(ShopLocation)
+# class ShopLocationAdmin(admin.OSMGeoAdmin):
+#     """Marker admin."""
+#     pass
 
     #list_display = ("name", "location")
 

@@ -192,16 +192,12 @@ class ShopForm1(gisforms.ModelForm):
         return GEOSGeometry('POINT('+longitude+' '+latitude+')')
 class ShopForm(forms.ModelForm):
     formfield_overrides = FORMFIELD_OVERRIDES
-    lat = forms.FloatField(required=False, label='Latitude')
-    lng = forms.FloatField(required=False, label='Longtitude')
-    #location1 = gisforms.PointField(widget=gisforms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}))
-    location = PointField()
-
+    lat = forms.FloatField(required=True, label='Latitude')
+    lng = forms.FloatField(required=True, label='Longtitude')
+   
     class Meta:
-        #widgets = {'location': LeafletWidget()}
         model = Shop
-        fields = ['user', 'name', 'location', 'address','city']
-        #exclude = ['', ]
+        fields = ['name', 'address','city']
         widgets = {
             'address': Textarea(attrs={'cols': 30, 'rows': 3}),
         }
@@ -212,18 +208,12 @@ class ShopForm(forms.ModelForm):
         if isinstance(location, Point):
             self.initial["lng"], self.initial["lat"] = location.tuple
 
-    def clean(self):
-        data = super().clean()
-        print('.............', data)
-        if set(self.changed_data)>={"lat","lng"}:
-            lat, lng = data.pop("lat", None), data.pop("lng", None)
-            data["location"] = Point(lng, lat, srid=4326)
-    
-        if not ("location" in data or ("lat" in data and "lng" in data)):
-            raise forms.ValidationError(
-                {"location": "No coordinates."})
-        return data
-    def clean_location(self):
-        coordinates = self.cleaned_data['location']
-        latitude, longitude = coordinates.split(', ', 1)
-        return GEOSGeometry('POINT('+longitude+' '+latitude+')')
+    # def clean(self):
+    #     data = super().clean()
+    #     if set(self.changed_data)>={"lat","lng"}:
+    #         lat, lng = data.pop("lat", None), data.pop("lng", None)
+            
+     
+    #     if not ("lat" in data and "lng" in data):
+    #         raise forms.ValidationError(_(f'Data not provided'))
+    #     return data

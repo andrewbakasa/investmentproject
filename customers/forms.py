@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.forms.widgets import CheckboxSelectMultiple
 from store.models import ProductCategory
-
+from django.db.models import Q
 class OrderForm(ModelForm):
     class Meta:
         model = Order
@@ -34,7 +34,25 @@ class ProductUpdateForm(forms.ModelForm):
                     }))
     class Meta:
         model = Product
-        fields = ['name', 'price', 'categories', 'description','image']
+        fields = ['shop', 'name', 'price', 'categories', 'description','image']
+    
+    def __init__(self, *args, **kwargs):
+        #self.request = kwargs.pop('request', None)
+        instance= kwargs.get('instance', None) 
+        #print('Product>>>', instance)
+        #print("kwargs",kwargs)
+        user=None
+        if instance:
+            if instance.created_by:
+                user=instance.created_by  
+        #print(self.request,user)
+        super(ProductUpdateForm,self).__init__(*args, **kwargs)
+        #print('NNNNNN:', self.fields)
+        #self.fields['shop'].widget.attrs['readonly']=True
+        if user:
+             self.fields['shop'].queryset = Shop.objects.filter(Q(user = user))
+        # else:
+        #     self.fields['shop'].queryset= None
 
 class ProductForm(forms.ModelForm):
     description = forms.CharField(
@@ -47,16 +65,25 @@ class ProductForm(forms.ModelForm):
                     }))
     class Meta:
         model = Product
-        fields = ['name', 'price', 'categories', 'description','image','created_by']
+        fields = ['shop', 'name', 'price', 'categories', 'description','image','created_by']
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        initial_arguments= kwargs.get('initial', None) 
+        #print("kwargs",kwargs)
+        user=None
+        if initial_arguments:
+            if initial_arguments['created_by']:
+                user=initial_arguments['created_by']
 
-        super(ProductForm, self).__init__(*args, **kwargs)
-
-        # self.fields["categories"].widget = CheckboxSelectMultiple()
-        # self.fields["categories"].queryset = ProductCategory.objects.all()
-
-   
+        super(ProductForm,self).__init__(*args, **kwargs)
+        
+        #print('NNNNNN:', self.fields)
+        if user:
+            self.fields['shop'].queryset = Shop.objects.filter(Q(user = user))
+        # else:
+        #     self.fields['shop'].queryset= None
+  
     # def clean_image(self):
     #     image = self.cleaned_data.get('image', None) 
     #     if image:

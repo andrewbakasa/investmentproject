@@ -12,6 +12,7 @@ import json
 from django.core.serializers import serialize
 from django.views.generic.base import TemplateView
 from common.decorators import allowed_users, login_in_user_only_with_routing
+from customers.forms import ProductForm
 
 from markers.forms import MarkerForm, ShopForm
 from store.models import Product, Shop
@@ -31,6 +32,14 @@ from django.utils.decorators import method_decorator
 
 from django.urls import reverse, reverse_lazy
 from django.forms.models import model_to_dict
+from rest_framework import viewsets
+from rest_framework_gis import filters
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import permissions
 
 
 
@@ -359,28 +368,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Response(serialized.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-"""World borders API views."""
-from rest_framework import viewsets
-from rest_framework_gis import filters
-
-
-#from .models import WorldBorder
-#from .serializers import WorldBorderSerializer
-
-
-# class WorldBorderViewSet(viewsets.ReadOnlyModelViewSet):
-#     """World border view set."""
-
-#     bbox_filter_field = "mpoly"
-#     filter_backends = (filters.InBBoxFilter,)
-#     queryset = WorldBorder.objects.all()
-#     bbox_filter_include_overlapping = True
-#     serializer_class = WorldBorderSerializer
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
 
 
 class ProductLocationView(APIView):
@@ -393,7 +380,6 @@ class ProductLocationView(APIView):
         #product = Product.objects.filter(product__id = product_id)
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
-  
         serializer = ProductSerializer(product_queryset, many=True)
       
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -405,16 +391,35 @@ class ProductLocationSlugView(APIView):
 
     # 3. Retrieve
     def get(self, request,  *args, **kwargs):
-      
-        #product = Product.objects.filter(product__id = product_id)
         slug =  self.kwargs.get('slug')
         product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
   
         serializer = ProductSerializer(product_queryset, many=True)
-        print('>>>>>>>>>>>>>>>>>>>>>>>>', serializer.data,)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+class AddProduct():
+    pass
+def add_shop(request, *args, **kwargs):
+    if request.method == "POST":
+        form= ShopForm(request.POST)
+        lat, lng = request.POST["lat"], request.POST["lng"]
+        #print(lat, lng)
+        if form.is_valid():
+            location = Point(float(lng), float(lat),srid=4326)
+            instance = form.save(commit=False)
+            instance.location = location
+            instance.user = request.user
+            instance.save()
+        else:
+            print(form.errors)
+           
+    form= ShopForm()
+    context = {
+        "form":form,
+        "json_user_location_x": user_location.x,
+        "json_user_location_y": user_location.y
+    }
+    return render(request,'markers/addshop.html',context)
 class MarkerLocationView(APIView):
     # add permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]

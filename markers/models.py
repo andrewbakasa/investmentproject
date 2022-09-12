@@ -19,7 +19,7 @@ def __unicode__(self):
     return self.title
 class Marker(models.Model):
     name = models.CharField(max_length=255)
-    location = PointField(default=None)
+    location = PointField(default=None)#see far way country.....
 
 
 from django.contrib.gis.db import models as gis_models

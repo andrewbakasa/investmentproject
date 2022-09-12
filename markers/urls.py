@@ -18,6 +18,7 @@ from .views import (
     ProductLocationSlugView,
     MapView,
     ProductLocationView2,
+    add_shop,
     
 )
 urlpatterns = [
@@ -30,6 +31,7 @@ urlpatterns = [
     path('api_locate_product/', ProductLocationView.as_view(),  name='locate_product_api'),
     path('api_locate_product2/<str:slug>/', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
     path('product/', ProductLocationView2.as_view(),  name='gen_location_product_slug'),
+    path('addshop/', add_shop,  name='add_shop'),
   
    
     #path('api_locate_marker/', MarkerLocationView.as_view(),  name='locate_marker'),

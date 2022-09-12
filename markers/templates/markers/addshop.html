@@ -1,0 +1,201 @@
+
+{% extends 'investments_appraisal/mentor/index.html' %}
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Add Shop</title>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'shop/css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    {{ json_user_location_x|json_script:"user-x-data" }}
+    {{ json_user_location_y|json_script:"user-y-data" }}
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+
+{% block content %}
+
+ 
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+        
+    </div><!-- End Breadcrumbs -->
+<!---Removed padding from 70px-- 0px-->
+    <section style= 'padding: 5px 0;' id="projects" class="projects">
+        <div class="container  box-element" data-aos="fade-up">
+            <!-- ======= Breadcrumbs ======= -->
+            <div class="row">
+                <ol class="breadcrumb" >
+                <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                    data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                    
+                <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                    data-toggle="tooltip" data-placement="bottom" title='Go to Shopping'><i class="fas fa-shopping-cart"></i></a></li>
+                
+                  
+                <li class="breadcrumb-item" ><a href="{% url 'gen_location_product_slug' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                        data-toggle="tooltip" data-placement="bottom" title='Product Location'><i class="fas fa-map-marker"></i></a></li>
+                        
+                <li class="breadcrumb-item" >
+                    <label id="total_projects_searched">Cart</label>
+                </li>  
+                </ol>
+            </div>
+
+
+            
+
+            <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            
+                <!-- LAYOUT -->
+                <div class="row">
+                
+                    <!-- B -->
+                    <div class="col-md-6 col-md-pull-6" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
+                            <form id="form" class="myform" method="POST">
+                                {% csrf_token %}
+                                
+                               </br>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label" for="{{ form.shop.id_for_label }}">{{ form.name.label }}</label>
+                                    <div class="col-sm-10">
+                                      {{ form.name|add_class:"form-control" }}
+                                      {% for error in form.name.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                      {% endfor %}
+                                    </div>  
+                                </div>
+                                </br>
+                               
+                               </br>
+                               <div class="form-group row">
+                                    <label class="col-sm-2 control-label" for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                                    <div class="col-sm-10">
+                                    {{ form.address|add_class:"form-control" }}
+                                    {% for error in form.address.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                               </br>
+                               <div class="form-group row">
+                                    <label class="col-sm-2 control-label" for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                                    <div class="col-sm-10">
+                                    {{ form.city|add_class:"form-control" }}
+                                    {% for error in form.city.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                </br>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label" for="{{ form.lat.id_for_label }}">{{ form.lat.label }}</label>
+                                    <div class="col-sm-10">
+                                    {{ form.lat|add_class:"form-control" }}
+                                    {% for error in form.lat.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                </br>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label" for="{{ form.lng.id_for_label }}">{{ form.lng.label }}</label>
+                                    <div class="col-sm-10">
+                                    {{ form.lng|add_class:"form-control" }}
+                                    {% for error in form.lng.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                </br>
+                              
+                                <div>
+                                    <p></p>
+                                    <button>Submit</buttom>
+                                    <p></p>   
+                                </div>
+                            </form>    
+                    </div>
+
+                    <!-- A -->
+                    <div class="col-md-6 col-md-push-6">
+                        </br>
+                        <div class ="shopaddress">
+                            
+                            <div class="form-group row">
+                                <label class="col-sm-2 control-label" for="address">Address</label>
+                                <div class="col-sm-10">
+                                    <input type="text" id="address" placeholder="find Address" class="form-control">
+                                </div>
+                            </div>
+                            </br>
+
+                           
+                            <div class="text-right" style="justify-content: center;">                               
+                                <button onclick="findAddresses()" class="btn btn-danger" >Find</button>
+                             </div>
+
+                            <div id="addresses"></div>
+                            <div id="mapid" class="map">
+                                hey
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    
+    </section><!-- End Projects Section -->
+
+
+ 
+</main><!-- End #main -->
+
+
+{%endblock content%}
+
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  
+  
+  {% block scripts %}
+      <!-- Search Button JS -->
+      <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+      
+      <script>
+        
+      </script>
+      <script src="{% static 'shop/js/app.js' %}"></script>
+      
+    {% endblock %}
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_store.html' %}
+
+{% endblock %}
+
+
+   

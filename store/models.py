@@ -31,8 +31,14 @@ class Shop(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
     name = models.CharField(max_length=100)
     location = PointField(default=None)
-    address = models.CharField(max_length=100)
+    address = models.CharField(max_length=300)
     city = models.CharField(max_length=50)
+    
+    def __str__(self):
+        if self.name:
+            return self.name
+        else :
+            return "No name"
 class ClientCompany(models.Model):
 	
 	#user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -373,8 +379,7 @@ class ProductCategory(models.Model):
 
 
 class Product(models.Model):
-    shop = models.ForeignKey(Shop, related_name='shopA', on_delete= models.SET_NULL,null=True, blank=True)
-    locate_shop = models.ForeignKey(ShopLocation, on_delete= models.SET_NULL,null=True, blank=True)
+    shop = models.ForeignKey(Shop, related_name='shopA', on_delete= models.SET_NULL,null=True, blank=False)
     name = models.CharField('category', max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     digital = models.BooleanField(default=False, null=True, blank=False)

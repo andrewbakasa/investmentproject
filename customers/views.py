@@ -100,7 +100,9 @@ def create_userproduct_ajax(request):
 		form = ProductForm(request.POST or None, request.FILES or None)
 	else:
 		#first time call from loco failure list
-		form = ProductForm(initial={'created_by': request.user})
+        # kwargs = super().get_form_kwargs()
+        # kwargs.update({'user': self.request.user})
+		form = ProductForm(initial={'created_by': request.user ,'user' : request.user})
 	return create_all_user_product(request,form,'customers/user_product_modal.html')
 
 
