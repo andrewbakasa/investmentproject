@@ -48,9 +48,13 @@
                   
                 <li class="breadcrumb-item" ><a href="{% url 'gen_location_product_slug' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
                         data-toggle="tooltip" data-placement="bottom" title='Product Location'><i class="fas fa-map-marker"></i></a></li>
-                        
+                 
+                
+                 <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                        data-toggle="tooltip" data-placement="bottom" title='Sell Products'><i class="fas fa-bullhorn"></i></a></li>
+                      
                 <li class="breadcrumb-item" >
-                    <label id="total_projects_searched">Cart</label>
+                    <label id="total_projects_searched">Add New Shop Location</label>
                 </li>  
                 </ol>
             </div>
@@ -120,13 +124,11 @@
                                     {% endfor %}
                                     </div>
                                 </div>
-                                </br>
                               
                                 <div>
-                                    <p></p>
-                                    <button>Submit</buttom>
-                                    <p></p>   
-                                </div>
+                                    <button>Submit</button>
+                                </div> 
+                                </br>
                             </form>    
                     </div>
 
@@ -140,17 +142,13 @@
                                 <div class="col-sm-10">
                                     <input type="text" id="address" placeholder="find Address" class="form-control">
                                 </div>
-                            </div>
-                            </br>
-
-                           
-                            <div class="text-right" style="justify-content: center;">                               
-                                <button onclick="findAddresses()" class="btn btn-danger" >Find</button>
+                            </div>                           
+                            <div>                               
+                                <button onclick="findAddresses()" >Find</button>
                              </div>
 
                             <div id="addresses"></div>
                             <div id="mapid" class="map">
-                                hey
                             </div>
                         </div>
 

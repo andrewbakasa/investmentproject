@@ -45,11 +45,14 @@
               <li class="breadcrumb-item" ><a href="{% url 'store' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
                 data-toggle="tooltip" data-placement="bottom" title='Go to Shopping'><i class="fas fa-shopping-cart"></i></a></li>
               
-                <li class="breadcrumb-item" ><a href="{% url 'add_shop' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+              <li class="breadcrumb-item" ><a href="{% url 'add_shop' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
                   data-toggle="tooltip" data-placement="bottom" title='Add New Shop'><i class="fas fa-building"></i></a></li>
-                
+              
+              <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                  data-toggle="tooltip" data-placement="bottom" title='Sell Products'><i class="fas fa-bullhorn"></i></a></li>
+                 
               <li class="breadcrumb-item" >
-                <label id="total_projects_searched">Cart</label>
+                <label id="total_projects_searched">Nearby Products and Services</label>
               </li>  
             </ol>
           </div>
@@ -57,11 +60,7 @@
           <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
             <div class="row">   
                 <input type="text" name="start" class="input" id="start"/>
-                <button id="btn">Get Closest Product Location(s) </button>
-                <!-- <div class="formBlock">
-                    <input type="text" name="start" class="input" id="start"/>
-                    <button id="btn">Get Closest Product Location(s) </button>
-                </div> -->
+                <button id="btn">Search</button>
             </div>
              <!-- LAYOUT -->
              <div class="row">
