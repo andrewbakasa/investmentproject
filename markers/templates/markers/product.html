@@ -12,11 +12,11 @@
 
 {% block stylesheets %}
     <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'map/map_product.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'products/style.css' %}">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    {{ json_user_location_x|json_script:"user-x-data" }}
-    {{ json_user_location_y|json_script:"user-y-data" }}
+    {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
+    {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
 {% endblock %}
 
 {% block content_header %}
@@ -76,8 +76,8 @@
                                     <img  src="{% static 'images/placeholder.png' %}" class="img-fluid product-tag" data-item-id="{{product.id}}">
                                 {% endif %} 
                                 
-                                <h2>{{product.name}}</h2>
-                                <p>{{product.price}}</p>
+                                <h4>{{product.name}}</h4>
+                                <p>{{product.distance}} {{product.price}}</p>
                             </div>
                         {% endfor %}   
                     </div>            
@@ -130,7 +130,7 @@
          var slug_data_url = `{% url 'locate_product_api_slug' 12345 %}`
          var default_img =`{% static 'images/placeholder.png' %}`
       </script>
-      <script src="{% static 'map/map_product.js' %}"></script>
+      <script src="{% static 'products/app.js' %}"></script>
       
     {% endblock %}
 {% block content_custom_menu_navbar %}

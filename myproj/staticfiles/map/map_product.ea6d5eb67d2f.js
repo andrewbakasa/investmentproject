@@ -8,8 +8,8 @@
  }).addTo(map);
 
  const color = ["#fe4848", "#fe6c58", "#fe9068", "#feb478", "#fed686"];
- const user_loc_x = JSON.parse(document.getElementById('user-x-data').textContent);
- const user_loc_y = JSON.parse(document.getElementById('user-y-data').textContent);
+ const user_loc_x = JSON.parse(document.getElementById('user-x-data').textContent);//--Long--
+ const user_loc_y = JSON.parse(document.getElementById('user-y-data').textContent);//--Lat--
  
  //console.log ("val>>>",user_loc_x,user_loc_y,)
  var pA = new L.FeatureGroup();

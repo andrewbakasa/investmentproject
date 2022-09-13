@@ -15,8 +15,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'shop/css/style.css' %}">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    {{ json_user_location_x|json_script:"user-x-data" }}
-    {{ json_user_location_y|json_script:"user-y-data" }}
+    {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
+    {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
 {% endblock %}
 
 {% block content_header %}
@@ -47,7 +47,7 @@
                 
                   
                 <li class="breadcrumb-item" ><a href="{% url 'gen_location_product_slug' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
-                        data-toggle="tooltip" data-placement="bottom" title='Product Location'><i class="fas fa-map-marker"></i></a></li>
+                        data-toggle="tooltip" data-placement="bottom" title='Product Location'><i class="fas fa-map-marker-alt"></i></a></li>
                  
                 
                  <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"

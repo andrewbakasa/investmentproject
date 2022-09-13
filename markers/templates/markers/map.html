@@ -11,8 +11,8 @@
 </head>
 <body>
     {{ markers|json_script:"markers-data" }}
-    {{ json_user_location_x|json_script:"user-x-data" }}
-    {{ json_user_location_y|json_script:"user-y-data" }}
+    {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
+    {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
     <div class="marker-position">Click on map</div>
     <div id="map"></div>
     <div class="formBlock">

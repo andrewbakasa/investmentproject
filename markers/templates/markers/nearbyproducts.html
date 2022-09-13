@@ -4,8 +4,8 @@
   <head>
     {% leaflet_js %}
     {% leaflet_css %}
-    {{ json_user_location_x|json_script:"user-x-data" }}
-    {{ json_user_location_y|json_script:"user-y-data" }}
+    {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
+    {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
     <style>
       .leaflet-container { height: 100%; }
     </style>

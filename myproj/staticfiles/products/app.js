@@ -6,26 +6,22 @@
      maxZoom: 19,
      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
  }).addTo(map);
-var pr=  product_qs
 
-//console.log("prodlist", pr)
- // color table
  const color = ["#fe4848", "#fe6c58", "#fe9068", "#feb478", "#fed686"];
  const user_loc_x = JSON.parse(document.getElementById('user-x-data').textContent);//--Long--
  const user_loc_y = JSON.parse(document.getElementById('user-y-data').textContent);//--Lat--
- // coordinate array with popup text
+ 
  //console.log ("val>>>",user_loc_x,user_loc_y,)
  var pA = new L.FeatureGroup();
  var pB = new L.FeatureGroup();
  var pointsA = [
-     [parseFloat(user_loc_x), parseFloat(user_loc_y), "view position"],
+     //           Lat                     Long
+     [parseFloat(user_loc_y), parseFloat(user_loc_x), "view position"],
    ];
 
  var dataurl = base_data_url;
  var map
- var my_lat=user_loc_x
- var  my_lng=user_loc_y
- var my_latlng
+
  function removeAllMarkers(map,fgroup_markers){
      map.removeLayer(fgroup_markers);
      //clear contents
@@ -62,8 +58,7 @@ var pr=  product_qs
            });
             // Add marker to this.mapMarker for future reference
             mapMarkers.push(L.marker(latlng, {icon: smallIcon}));
-            my_lat=latlng.lat
-            my_lng=latlng.lng
+          
            return L.marker(latlng, {icon: smallIcon});
          },
          onEachFeature: function onEachFeature(feature, layer) {
@@ -72,22 +67,23 @@ var pr=  product_qs
           
            var content 
            // append data
-           a_html=append_html(props)
-                 
+           a_html=append_html(props)                 
            $(a_html).bind("mouseover",function(){
-                
                 map.flyTo([layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]],9)
            }).appendTo($('.apartments'));
            //-----------------------------
            if (props.image) {
-             content = `<img width="100" object-fit: cover ; src="${props.image}" </br><p>${props.name}</br> $${numberWithCommas(props.price)}</p>`;
+             content = `<img width="100" object-fit: cover ; src="${props.image}" </br><p>${props.name} &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)} </br> $${nFormatter(props.price,2)}</p>`;
           
            } else {
-             content = `<img width="100"  object-fit: cover ;src=""/><h3>${props.name}</h3><p>${props.name}</br> $${numberWithCommas(props.price)}</p>`;
+             content = `<img width="100"  object-fit: cover ;src=""/><h3>${props.name}</h3><p>${props.name}&nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)}</br> $${nFormatter(props.price,2)}</p>`;
           
            }
            //content.setStyle({fillColor :'blue'})
-           layer.bindPopup(content);
+          // let tooltip = L.tooltip({
+          //   permanent:true
+          // }).setContent(props.price)
+          layer.bindPopup(content)//.bindTooltip(tooltip);
            pB.addLayer(layer);
 
        }})//.addTo(map);
@@ -198,23 +194,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
                  
                   var content 
                   //-- append data------
-                  a_html=append_html(props)
-                 
-                 $(a_html).bind("mouseover",function(){
-                    
+                  a_html=append_html(props)                 
+                 $(a_html).bind("mouseover",function(){                    
                     map.flyTo([layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]],9)
                  }).appendTo($('.apartments'));
                   //-------------------
                   if (props.image) {
-                    content = `<img width="100" object-fit: cover ; src="${props.image}" </br><p>${props.name}</p>`;
+                    content = `<img width="100" object-fit: cover ; src="${props.image}" </br><p>${props.name} &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)}</br> $${nFormatter(props.price,2)} </p>`;
                 
                   } else {
-                    content = `<img width="100"  object-fit: cover ;src=""/><h3>${props.name}</h3><p>${props.name}</p>`;
+                    content = `<img width="100"  object-fit: cover ;src=""/><h3>${props.name}</h3><p>${props.name}&nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)}</br> $${nFormatter(props.price,2)}</p>`;
                 
                   }
                   //content.setStyle({fillColor :'blue'})
                   //console.log('This LAy>>>>>>>>>>>>>>', layer.feature.geometry.coordinates)
-                  layer.bindPopup(content); 
+                  // let tooltip = L.tooltip({
+                  //   permanent:true
+                  // }).setContent(props.price)
+                  layer.bindPopup(content)//.bindTooltip(tooltip); 
                   pB.addLayer(layer);
               }})//.addTo(map);
             // origin::::::
@@ -253,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 }) 
 function set_map(map){
     
-    map.setView([parseFloat(user_loc_x), parseFloat(user_loc_y)], 5);
+    map.setView([parseFloat(user_loc_y), parseFloat(user_loc_x)], 5);
      
     const allMarkers = new L.FeatureGroup();
     // adding markers to the layer pointsA
@@ -365,18 +362,59 @@ function append_html(val){
         var prod_url = ''
         //console.log('ITERATION', val)
         if (val.image !== null) {
-            prod_url =`<img src="${val.image}" class="img-fluid product-tag" data-item-id="${val.id}}">`
+            prod_url =`<img src="${val.image}" class="img-fluid product-tag" data-item-id="${val.pid}}">`
         }else {
-            prod_url=` <img  src="${default_img}" class="img-fluid product-tag" data-item-id="${val.id}}">`
+            prod_url=` <img  src="${default_img}" class="img-fluid product-tag" data-item-id="${val.pid}}">`
         }
         
     
-        a_html =`<div id="${val.id}" class="col-lg-4">                   
+        a_html =`<div id="${val.pid}" class="col-lg-4 annotation">                   
                     ${prod_url}
-                    <h2>${val.name}</h2>
-                    <p>${val.price}</p>
+                    <h5>
+                      <a data-toggle="tooltip" data-placement="bottom" 
+                          title='View Prorduct Details' 
+                           href="/e/p/d/${val.pid}/">${val.name}
+                       </a> &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(val.distance,1)}
+                    </h5>
+                    <p>$${nFormatter(val.price,2)}</p>
                 </div>`
                   
   return a_html
+}
+function nFormatterdist(num, digits) {
+  //digits=1
+  const lookup = [
+      { value: 1, symbol: "m" },
+      { value: 1e3, symbol: "km" },
+      // { value: 1e6, symbol: ",000 km" },
+      // { value: 1e9, symbol: "Gm" },
+      // { value: 1e12, symbol: "Tm" },
+      // { value: 1e15, symbol: "Pm" },
+      // { value: 1e18, symbol: "Em" }
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var item = lookup.slice().reverse().find(function(item) {
+      return num >= item.value;
+  });
+  prenum= item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+  return numberWithCommas(prenum)
+}
+
+function nFormatter(num, digits) {
+  //digits=1
+  const lookup = [
+      { value: 1, symbol: "" },
+      { value: 1e3, symbol: "k" },
+      { value: 1e6, symbol: "M" },
+      { value: 1e9, symbol: "G" },
+      { value: 1e12, symbol: "T" },
+      { value: 1e15, symbol: "P" },
+      { value: 1e18, symbol: "E" }
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var item = lookup.slice().reverse().find(function(item) {
+      return num >= item.value;
+  });
+  return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
 }
         

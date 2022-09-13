@@ -43,10 +43,13 @@ from rest_framework import permissions
 
 
 
-longitude =-20.756114
-latitude = 27.553711
+latitude =-18.985227330788064#-20.756114
+longitude= 32.658821726608004#27.553711
+# Point(Lat,Long)
+user_location = Point(longitude,latitude,srid=4326)
 
-user_location = Point(longitude, latitude, srid=4326)
+# pnt = Point(5, 23)
+# Note "X and Y coordinates". X is longitude, Y is latitude. In this example 5 is longitude and 23 is latitude.
 # def park_insert(request):
 #     form = ParkForm()
 #     return render(request, 'addpark.html', {'form': form})
@@ -84,14 +87,14 @@ class MarkersMapView(TemplateView):
         #--------------------------------------------------
         print(user_location)
         dict_={}
-        dict_['x']=user_location.x
-        dict_['y']=user_location.y
+        dict_['x']=user_location.x# long
+        dict_['y']=user_location.y# lat
         list_ =[user_location.x,user_location.y]
         location_es = json.dumps(list_)#f"{user_location.x},{user_location.y}"
         
         print(location_es)
-        context["json_user_location_x"] =user_location.x#location_es
-        context["json_user_location_y"] =user_location.y#location_es
+        context["json_user_location_x"] =user_location.x#location_long
+        context["json_user_location_y"] =user_location.y#location_lat
     
         return context
 class MarkersMapViewTest(TemplateView):
@@ -396,6 +399,7 @@ class ProductLocationSlugView(APIView):
                                             user_location)).order_by('distance')[0:6]
   
         serializer = ProductSerializer(product_queryset, many=True)
+        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class AddProduct():
     pass
