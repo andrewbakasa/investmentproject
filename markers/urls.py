@@ -28,8 +28,8 @@ urlpatterns = [
     path('createmap/', views.MapViewCreate.as_view(), name='createmap'),
     path('create/', views.CreateMarkers.as_view(), name='map'),
     path('p/l/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
-    path('api_locate_product/', ProductLocationView.as_view(),  name='locate_product_api'),
-    path('api_locate_product2/<str:slug>/', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
+    path('api_locate_product/<str:x>/<str:y>', ProductLocationView.as_view(),  name='locate_product_api'),
+    path('api_locate_product2/<str:slug>/<str:x>/<str:y>', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
     path('product/', ProductLocationView2.as_view(),  name='gen_location_product_slug'),
     path('addshop/', add_shop,  name='add_shop'),
   

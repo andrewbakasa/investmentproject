@@ -1057,5 +1057,5 @@ class ProductDetailView(DetailView):
         data = cart_data(request)
         context['total_quantity'] = data['total_quantity']
         context['product'] = product
-        
+        context['is_user_owner'] = (product.created_by == self.request.user)
         return render(request, self.template_name, context)

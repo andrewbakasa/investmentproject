@@ -313,8 +313,32 @@
             $("#enterprenuer a:first").addClass( "active") 
             $("#registerbusiness a:first").addClass( "active") 
             checkPosition()
+            var edit_record = "{{edit}}"
+            var pid = "{{pid}}"
+            console.log('edit_record,pid', edit_record,pid)
+            if (edit_record){
+                quick_product_edit(pid)
+                // console.log('Will launch soon...')
+                // window.setTimeout(function() {
+                //     quick_product_edit(pid)                 
+                // }, 0);
+            }
             
         })
+        function quick_product_edit (pid){
+            var url =  `/cus/product_update/${pid}/`
+                $.ajax({
+                url: url,
+                type: 'get',
+                dataType:'json',
+                beforeSend: function(){
+                    $('#modal-product').modal('show');
+                },
+                success: function(data){
+                    $('#modal-product .modal-content').html(data.html_form);
+                }
+                });
+        }
         $('#confirmdelete').on('show.bs.modal', function(e) {
             var name = $(e.relatedTarget).data('object-name');
             var url = $(e.relatedTarget).data('delete-url');

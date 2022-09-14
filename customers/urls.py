@@ -85,6 +85,7 @@ urlpatterns = [
      path('user_product_search/<str:slug>/tags/', views.product_search_and_tags_ajax,{'search_type': 0}, name='user_product_tags_ajax'), 
  
      path('u/p/0/', views.get_user_products,{'type': 'all'}, name="user_products"),
+     path('u/p/0/<str:pid>/edit/', views.get_user_products_with_edit,{'type': 'all'}, name="user_products_with_edit"),
      path('u_product_ajax/', views.create_userproduct_ajax, name="create_userproduct_ajax"),
      path('u/c/load_status_ajax/<str:status>', views.get_user_clients_load_status_ajax, name="user_clients_load_status_ajax"),
      path('u/c/0/', views.get_user_clients,{'type': 'ready'}, name="user_clients"),

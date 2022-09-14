@@ -53,9 +53,18 @@
                                 </div>
         
                                 <div class="col-md-8 col-md-push-4" >
-                                    <div class="product-details-button-cart">
-                                        <button  data-product="{{product.id}}" data-action="add" class="btn btn-outline-primary add-btn update-cart">Add to Cart</button>
+                                    <div class="row">
+                                         <div class="product-details-button-cart col-lg-4 col-sm-4 col-xm-4">
+                                            <button  data-product="{{product.id}}" data-action="add" class="btn btn-outline-primary add-btn update-cart">Add to Cart</button>
+                                        </div>
+                                        {% if is_user_owner %}
+                                        <div class="col-lg-4 col-sm-4 col-xm-4">
+                                            <a href="{% url 'user_products_with_edit' product.id %}" 
+                                             data-toggle="tooltip" data-placement="bottom" title='Edit Product Details'><i class="fas fa-edit"></i></a>
+                                        </div>
+                                        {% endif %}
                                     </div>
+                                   
                                     <div class="">
                                         <!-- <div > -->
             

@@ -149,6 +149,76 @@ def create_all_user_product(request,form,template_name):
 
 
 @login_required(login_url="account_login")
+def get_user_products_with_edit(request, pid, type,):
+    BUSINESS_STATUS_CHOICE = ["all"]#["unread","open","closed","all"] 
+    current_time =timezone.now()# datetime.datetime.now()
+      
+
+   
+    queryset = Product.objects.filter(Q(created_by=request.user))
+    
+    
+    
+    total_avg= queryset.aggregate(
+            sum=Coalesce(
+                    Sum('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    ), 
+            avg=Coalesce
+                    (Avg('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    )
+        )  
+    sum_value=total_avg['sum']
+    avg_value=total_avg['avg']
+    if sum_value==None:
+        sum_value=0
+    if avg_value==None:
+        avg_value=0  
+    form = ProductForm(initial={'created_by': request.user})
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    else:
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(queryset, pertable)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
+
+    context = {
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+        'current_page':current_page,
+        'page_range':page_range,
+        "user": request.user,
+        "models": queryset,
+        "total": queryset.count(),
+        "user": request.user,
+        'form': form,
+         'status': type,
+         'edit': True ,
+         'pid':pid,
+        "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
+        "total_sum": float(round(sum_value,2)),
+        "average": round(avg_value,2),
+        'lock_key':True,
+        'edit_key':True,
+        'total_products': queryset.count(),
+    }
+   
+    return render(request, 'customers/user_products.html', context)
+@login_required(login_url="account_login")
 def get_user_products(request, type):
     BUSINESS_STATUS_CHOICE = ["all"]#["unread","open","closed","all"] 
     current_time =timezone.now()# datetime.datetime.now()
@@ -158,11 +228,19 @@ def get_user_products(request, type):
     queryset = Product.objects.filter(Q(created_by=request.user))
     
     
-    total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
-    # total_avg= queryset.aggregate(
-    #      sum=Coalesce(Sum('price'), Value(0)), 
-    #      avg=Coalesce(Avg('price'), Value(0))
-    #     ) 
+    #total_avg= queryset.aggregate(sum=Sum('price'), avg=Avg('price'))
+    total_avg= queryset.aggregate(
+            sum=Coalesce(
+                    Sum('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    ), 
+            avg=Coalesce
+                    (Avg('price',
+                        output_field=FloatField())
+                        , Value(0.0)
+                    )
+        )  
     
     sum_value=total_avg['sum']
     avg_value=total_avg['avg']

@@ -48,6 +48,15 @@ longitude= 32.658821726608004#27.553711
 # Point(Lat,Long)
 user_location = Point(longitude,latitude,srid=4326)
 
+# def update_user_location (request):
+#     userloc = userlocation_data(request)
+#     print('my current loc: x:y', userloc)
+#     if 'lat' in userloc and 'lng' in userloc :
+#         user_location.x= userloc['lng']
+#         user_location.y =userloc['lat']
+#         print('FOUND IT EUREKA.........................updating user location>>>>>>>>>>>>>>>>')
+  
+
 # pnt = Point(5, 23)
 # Note "X and Y coordinates". X is longitude, Y is latitude. In this example 5 is longitude and 23 is latitude.
 # def park_insert(request):
@@ -61,38 +70,30 @@ class MarkersMapView(TemplateView):
     def get_context_data(self, **kwargs):
         """Return the view context data."""
         context = super().get_context_data(**kwargs)
+        #----------------------------------
+       
         queryset = Marker.objects.annotate(distance=Distance('location',  
                                                    user_location)).order_by('distance')[0:6]
 
-        for i in  queryset:
-            print(f"{i.name}, {i.location}, {i.distance}")                                           
-        print('her is same', queryset)
-
 
         context["markers"] = json.loads(serialize("geojson", queryset))
-
-
-        print(context["markers"]) 
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-
         #----------------------------FOR TESTING::::::::-------
         #--------------------------------------------------
         queryset = Product.objects.annotate(shopname=F('shop__name'),location=F('shop__location')).annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
           
-        for i in  queryset:
-            print(f"{i.shopname}, {i.location}, {i.distance}")         
+           
         context["markers"] = json.loads(serialize("geojson", queryset, fields=('name','location', 'distance'))) 
         #----------------------------------------------------
         #--------------------------------------------------
-        print(user_location)
+       
         dict_={}
         dict_['x']=user_location.x# long
         dict_['y']=user_location.y# lat
         list_ =[user_location.x,user_location.y]
         location_es = json.dumps(list_)#f"{user_location.x},{user_location.y}"
         
-        print(location_es)
+       
         context["json_user_location_x"] =user_location.x#location_long
         context["json_user_location_y"] =user_location.y#location_lat
     
@@ -105,6 +106,8 @@ class MarkersMapViewTest(TemplateView):
      
         context = super().get_context_data(**kwargs)
         #filter product
+         #----------------------------------
+       
         queryset = Product.objects.filter().annotate(distance=Distance('shop__location',  
                                                    user_location)).order_by('distance')[0:6]
     
@@ -149,12 +152,15 @@ class CreateMarkers(LoginRequiredMixin,CreateView):
 class Home(ListView):
     model = Marker
     context_object_name = 'shops'
+    
     queryset = Shop.objects.annotate(distance=Distance('location',   user_location)
     ).order_by('distance')[0:6]
     template_name = 'shops/index.html'
 
 def data_ajax(request, *args, **kwargs):
     #filter product
+    #----------------------------------
+   
     queryset = Product.objects.values('name', shopname=F('shop__name'),location=F('locate_shop__location')).annotate(distance=Distance('locate_shop__location',  
                                             user_location)).order_by('distance')[0:6].values('name','location')
     #values() function has _meta data and cannot work with serilizers
@@ -379,8 +385,11 @@ class ProductLocationView(APIView):
 
     # 3. Retrieve
     def get(self, request,  *args, **kwargs):
-      
-        #product = Product.objects.filter(product__id = product_id)
+       #----------------------------------
+       
+        x =  self.kwargs.get('x')
+        y =  self.kwargs.get('y')
+        user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
         serializer = ProductSerializer(product_queryset, many=True)
@@ -395,11 +404,13 @@ class ProductLocationSlugView(APIView):
     # 3. Retrieve
     def get(self, request,  *args, **kwargs):
         slug =  self.kwargs.get('slug')
+        x =  self.kwargs.get('x')
+        y =  self.kwargs.get('y')
+        user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
   
         serializer = ProductSerializer(product_queryset, many=True)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class AddProduct():
     pass
@@ -429,6 +440,7 @@ class MarkerLocationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     # 3. Retrieve
     def get(self, request, *args, **kwargs):
+         #----------------------------------
         marker_queryset = Marker.objects.annotate(distance=Distance('location',  
                                                    user_location)).order_by('distance')[0:6]
 
@@ -446,7 +458,7 @@ class ProductLocationView2(LoginRequiredMixin, generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-       
+        #----------------------------------
         # product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
         #                                     user_location)).order_by('distance')[0:6]
   
@@ -461,5 +473,31 @@ class ProductLocationView2(LoginRequiredMixin, generic.TemplateView):
         return context
 
 
+def userlocation_data(request):
+   
+    cookie_data = cookie_userlocation(request)
+    print('row data:', cookie_data)
+    if cookie_data:
+        if 'latLng' in cookie_data :
+            print(cookie_data['latLng'], type(cookie_data['latLng']))
+            if isinstance(cookie_data['latLng'],list):
+                latitude = cookie_data['latLng'][0]
+                longitude = cookie_data['latLng'][1]
 
+                return {
+                    'lng': longitude,
+                    'lat': latitude,
+                }
+    return {}
+
+# create cart for guest user
+def cookie_userlocation(request):
+    try:
+        userlocation = json.loads(request.COOKIES['userlocation'])
+    except:
+        userlocation = {}
+
+    return {
+        'latLng': userlocation,
+    }
 

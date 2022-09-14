@@ -126,8 +126,8 @@
       <script>
          var product_qs= '{{json_product_qs}}'
          //var product_qs = JSON.parse("{{json_product_qs}}")
-         var base_data_url= '{% url "locate_product_api" %}'
-         var slug_data_url = `{% url 'locate_product_api_slug' 12345 %}`
+         var base_data_url= '{% url "locate_product_api" 12345  6789 %}'
+         var slug_data_url = `{% url 'locate_product_api_slug' 12345 67 89 %}`
          var default_img =`{% static 'images/placeholder.png' %}`
       </script>
       <script src="{% static 'products/app.js' %}"></script>
