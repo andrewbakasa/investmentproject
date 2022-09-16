@@ -31,15 +31,17 @@ class MarkerSerializer(GeoFeatureModelSerializer):
 		geo_field = 'location'
 
 class ProductSerializer(GeoFeatureModelSerializer):
-	#distance = serializers.IntegerField()	
-	#distance = serializers.CharField()
-	#location_signature = serializers.PrimaryKeyRelatedField(read_only=True)
 	location = GeometrySerializerMethodField(source='shop.location')
 	#shop_name = serializers.StringRelatedField(read_only=True)
 
 	distance = serializers.SerializerMethodField()
 	pid = serializers.SerializerMethodField()
-
+	shopname = serializers.SerializerMethodField()
+	def get_shopname(self, obj):
+		try:
+			return obj.shop.name
+		except:
+			return None
 	def get_pid(self, obj):
 		try:
 			return obj.pk
@@ -56,7 +58,7 @@ class ProductSerializer(GeoFeatureModelSerializer):
 		
 	class Meta:
 		model = Product
-		fields = ['pid', 'name', 'image', 'price','distance'] #shop_name
+		fields = ['pid', 'name', 'image', 'price','distance', 'shopname'] 
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 

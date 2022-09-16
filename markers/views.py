@@ -43,8 +43,9 @@ from rest_framework import permissions
 
 
 
-latitude =-18.985227330788064#-20.756114
+
 longitude= 32.658821726608004#27.553711
+latitude =-18.985227330788064#-20.756114
 # Point(Lat,Long)
 user_location = Point(longitude,latitude,srid=4326)
 
