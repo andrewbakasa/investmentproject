@@ -94,6 +94,10 @@ MIDDLEWARE = [
     #'common.get_username.RequestMiddleware',
 ]
 
+SECURE_SSL_REDIRECT=False
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:4200',
     'http://127.0.0.1:4200',

@@ -384,16 +384,16 @@ function nFormatter(num, digits) {
 function showError(error) {
   switch(error.code) {
     case error.PERMISSION_DENIED:
-      $('#total_projects_searched').html("User denied the request for Geolocation.")
+      $('#total_projects_searched').innerHTML = "User denied the request for Geolocation."
       break;
     case error.POSITION_UNAVAILABLE:
-      $('#total_projects_searched').html("Location information is unavailable.")
+      $('#total_projects_searched').innerHTML = "Location information is unavailable."
       break;
     case error.TIMEOUT:
-      $('#total_projects_searched').html("The request to get user location timed out.")
+      $('#total_projects_searched').innerHTML = "The request to get user location timed out."
       break;
     case error.UNKNOWN_ERROR:
-      $('#total_projects_searched').html( "An unknown error occurred.")
+      $('#total_projects_searched').innerHTML = "An unknown error occurred."
       break;
   }
 }

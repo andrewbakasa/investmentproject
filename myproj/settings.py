@@ -88,7 +88,8 @@ MIDDLEWARE = [
     #'investments_appraisal.middlewares.LastUserActivityMiddleware',
     #'common.get_username.RequestMiddleware',
 ]
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:4200',
     'http://127.0.0.1:4200',
