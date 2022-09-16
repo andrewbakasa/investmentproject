@@ -13,7 +13,6 @@
  var latest_user_loc_x=user_loc_x
  var latest_user_loc_y=user_loc_y 
  var accuracy ="Not Given"
- var var_redraw=true // at start
  function getToken(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -250,7 +249,7 @@ function set_map(map){
     new L.Control.CustomButtons(null, overlayMaps, { collapsed: false }).addTo(map);
   }
   
-  function get_bounds_and_resize_MapView(redraw=true){
+  function get_bounds_and_resize_MapView(){
     var layers_count =0
       // Create new empty bounds
       let bounds = new L.LatLngBounds();
@@ -277,8 +276,7 @@ function set_map(map){
       if (bounds.isValid() && layers_count > 1) {
         // Valid, fit bounds
         //console.log('Valid bounds')
-        if (redraw)
-          map.flyToBounds(bounds);
+        map.flyToBounds(bounds);
       } else {
         //console.log('No valid bounds')
         // Invalid, fit world
@@ -409,12 +407,11 @@ function getPosition(position){
   //hit database and refress
   //calcultate if user has moved significantly from last position
   if (get_transition_metre(5)){// at every 5 metres refresh
-    myScript(var_redraw)
-    var_redraw=false
+    myScript()
   }
   
 }
-function myScript(redraw=true){
+function myScript(){
  
   // keep last position
   latest_user_loc_x = user_loc_x 
@@ -501,7 +498,7 @@ function myScript(redraw=true){
       //trigger 
       //element.click()
       addStartPoint()
-      get_bounds_and_resize_MapView(redraw)
+      get_bounds_and_resize_MapView()
      
     });
 
