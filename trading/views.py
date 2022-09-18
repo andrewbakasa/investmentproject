@@ -1358,19 +1358,28 @@ def investment_details(request,id):
 
 @login_required
 def investor_details(request,id, investment_id):
-    
+    #print('Inside....>', id, investment_id)
     # limit investment to my own ONLY: avoid other users accessing private data
-    investment_obj = get_object_or_404(Investment,pk=investment_id,creater=request.user)
+    #investment_obj= Investment.objects.filter(Q(id=investment_id)).first()
+    #---------------Throw an erro
+    investment_obj = get_object_or_404(Investment,pk=investment_id ,creater=request.user)
+    #print(investment_obj)
     #only investors of current investments
     investor_obj = get_object_or_404(Investor,pk=id, investment=investment_obj)
+    #investor_obj= Investor.objects.filter(Q(id=id)).first()
     if investor_obj.application_status =='pending':
         investor_obj.application_status ='verification'
         investor_obj.date_status_changed=timezone.now()# datetime.datetime.now()
         investor_obj.save()
         changed_to_verification=True
         messages.success(request, "Application state as been changed from pending to verification")
-  
-    userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
+    """
+    This was giving an error for 5 days in was through an error and could not be detected..
+    UserProfile has no value and it wasnt enforced anyway in the modules
+    get_object_or_404 replace by queryset filter with .first() to get first object
+    """ 
+    #userprofile_obj = get_object_or_404(UserProfile,user=investor_obj.user)
+    userprofile_obj= UserProfile.objects.filter(Q(user=investor_obj.user)).first()
 
     form = InvestorStatusUpdate(instance=investor_obj,user=request.user)
 
