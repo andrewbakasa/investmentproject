@@ -10,7 +10,7 @@
     <ul id="navbar-ul">
         <li id="index"><a href="{% url 'index' %}">Home</a></li>
         {% if request.user.is_authenticated %}
-        <li id="_home"><a href="{% url 'gen_location_product_slug' %}">Product Location</a></li>  
+        <li id="_home"><a href="{% url 'gen_location_product_slug' %}">GeoFind</a></li>  
         {%endif%}    
         <li ><a href="{% url 'cart' %}">Go to Cart</a></li>
         

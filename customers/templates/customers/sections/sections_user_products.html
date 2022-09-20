@@ -24,9 +24,13 @@
               data-toggle="tooltip" data-placement="bottom" title='Manage Sales'><i class="fas fa-bullhorn"></i></a></li>
             
             <li class="breadcrumb-item" ><a href="{% url 'gen_location_product_slug' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
-                data-toggle="tooltip" data-placement="bottom" title='Product Location'><i class="fas fa-map-marker-alt"></i></a></li>
+                data-toggle="tooltip" data-placement="bottom" title='GeoFind'><i class="fas fa-map-marker-alt"></i></a></li>
  
-            <li class="breadcrumb-item active">
+            <li class="breadcrumb-item" ><a href="{% url 'user_shops' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
+                  data-toggle="tooltip" data-placement="bottom" title='Manage Warehouse Centres'><i class="fas fa-building"></i></a></li>
+        
+            
+             <li class="breadcrumb-item active">
               <a href="#"   data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_product"
               title='Add New Product' class ="badge rounded-pill bg-success"><i  class="fas fa-plus"></i>
               </a>
@@ -71,10 +75,11 @@
                               <thead class="thead-dark">
                                   <th style="width: 2%" >#</th>    
                                   <th style="width: 12%" >Category</th>
-                                  <th style="width: 16%" >Title</th>
-                                  <th style="width: 18%" >Description</th>
-                                  <th style="width: 20%" >Image Url</th>
+                                  <th style="width: 15%" >Title</th>
+                                  <th style="width: 16%" >Description</th>
+                                  <th style="width: 15%" >Image Url</th>
                                   <th style="width: 7%" >Price</th>
+                                  <th style="width: 7%" >Shop</th>
                                   <th style="width: 11%" class="text-right">Actions</th>
                               </thead>
                               <tbody id="product-table-tbody">
@@ -100,6 +105,7 @@
                                     </td> 
                                     
                                     <td class="productPrice productData" name="price">${{product.price | intcomma}}</td>
+                                    <td class="productShop productData" name="shop">{{product.shop.name}}</td>
           
                                     <td class="text-right productAction" name="action" >
           

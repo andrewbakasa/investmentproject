@@ -1,0 +1,634 @@
+{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>Warehouse Registration</title>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap-datepicker.min.css' %}">
+    <style>
+        @media
+       only screen 
+     and (max-width: 760px), (min-device-width: 768px) 
+     and (max-device-width: 1024px)  {
+ 
+         /* Force table to not be like tables anymore */
+         table, thead, tbody, th, td, tr {
+             display: block;
+         }
+ 
+         /* Hide table headers (but not display: none;, for accessibility) */
+         thead tr {
+             position: absolute;
+             top: -9999px;
+             left: -9999px;
+         }
+ 
+     tr {
+       margin: 0 0 1rem 0;
+     }
+       
+     tr:nth-child(odd) {
+       background: #ccc;
+     }
+     
+         td {
+             /* Behave  like a "row" */
+             border: none;
+             border-bottom: 1px solid #eee;
+             position: relative;
+             padding-left: 50%;
+         }
+ 
+         td:before {
+             /* Now like a table header */
+             position: absolute;
+             /* Top/left values mimic padding */
+             top: 0;
+             left: 6px;
+             width: 45%;
+             padding-right: 10px;
+             white-space: nowrap;
+         }
+             /*
+             Label the data
+         You could also use a data-* attribute and content for this. That way "bloats" the HTML, this way means you need to keep HTML and CSS in sync. Lea Verou has a clever way to handle with text-shadow.
+             */
+             td:nth-of-type(1):before { content: "#"; }
+             td:nth-of-type(2):before { content: "Category"; }
+             td:nth-of-type(3):before { content: "Title"; }
+             td:nth-of-type(4):before { content: "Description"; }
+             td:nth-of-type(5):before { content: "Image Url"; }
+             td:nth-of-type(6):before { content: "Price"; }
+             td:nth-of-type(7):before { content: "Action"; }            
+         }
+     </style>
+
+<!-- < -->
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+  
+   <!-- ======= Projects Section ======= -->  
+   {% include 'customers/sections/sections_user_shops.html' %} 
+   
+
+  
+</main><!-- End #main -->
+
+{%endblock%}
+
+
+
+{% block modal_divs %}
+    <!-- EDIT DISPLAY HOLDER -->
+    <div class="modal fade" id="modal-shop">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
+     <!-- Delete confirmation modal -->
+     <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap3-typeahead.min.js' %}"></script>
+    <script src="{% static 'basic_ui/js/custom-dates.js' %}"></script>
+  
+    <script>
+        $(function() {
+        $('.date-input').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        orientation: 'bottom'
+        
+        });
+        
+        $('.date-input').attr('autocomplete', 'off');
+        })
+    </script>
+    <script>
+    function checkPosition() {
+            //mobile
+           
+            if (
+                (window.matchMedia('(max-width: 760px)').matches) || 
+                ((window.matchMedia('min-device-width: 768px').matches) && (window.matchMedia('max-device-width: 1024px').matches)) 
+                ) {
+                mobile_viewa()
+            } else {
+                desktop_viewa() 
+            }
+        }
+
+        function mobile_viewa(){
+            $('table').removeClass('table table-striped');
+        }
+
+        function desktop_viewa(){
+            $('table').addClass('table table-striped');
+        }
+
+        $(window).resize(function() {
+            console.log('width: ' , $(this).width())
+            
+          if ($(this).width() < 744) {
+            mobile_viewa()
+          } else {
+            desktop_viewa()
+          }
+      });  
+     
+        
+
+
+    function nFormatter(num, digits) {
+        digits=1
+        const lookup = [
+            { value: 1, symbol: "" },
+            { value: 1e3, symbol: "k" },
+            { value: 1e6, symbol: "M" },
+            { value: 1e9, symbol: "G" },
+            { value: 1e12, symbol: "T" },
+            { value: 1e15, symbol: "P" },
+            { value: 1e18, symbol: "E" }
+        ];
+        const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+        var item = lookup.slice().reverse().find(function(item) {
+            return num >= item.value;
+        });
+        return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+    }
+
+   
+        
+        function truncChar(str,length){
+            var myTruncatedString = str.substring(0,length-1);              
+            if (str.length > myTruncatedString.length){
+            return myTruncatedString + "..."
+            }
+            return myTruncatedString
+        }
+        function numberWithCommas(x) {
+                    var parts = x.toString().split(".");
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return parts.join(".");
+                }
+        function getToken(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+        var csrftoken = getToken('csrftoken');
+      
+        //first timme
+        var display_usershop_ajax_url= "{% url 'display_usershop_ajax' %}" 
+       
+        
+       
+                               
+        display_usershop_ajax_url = `{% url 'usershops_load_status_ajax' %}`; 
+      
+        function sentenceCase(input){
+        
+            if (input.length >0){
+                if (input.length > 1){
+                    // at least teo letter
+                    var first =input.slice(0, 1).toUpperCase()
+                    var trail =first + input.slice(1, input.length)
+                    return trail
+                }else {
+                    // one leer
+                    var first =input.slice(0, 0).toUpperCase()
+                    return first
+                }
+            
+            }
+            return input
+        
+        }
+        $(document).ready(function (){ 
+            $("#investments a:first").addClass( "active") 
+            $("#enterprenuer a:first").addClass( "active") 
+            $("#registerbusiness a:first").addClass( "active") 
+            checkPosition()
+            var edit_record = "{{edit}}"
+            var pid = "{{pid}}"
+          
+           
+            
+        })
+       
+        $('#confirmdelete').on('show.bs.modal', function(e) {
+            var name = $(e.relatedTarget).data('object-name');
+            var url = $(e.relatedTarget).data('delete-url');
+            var comment_id = $(e.relatedTarget).data('item-id');
+        
+            var name =truncChar(name,25)
+            $('#confirmdelete .modal-body').html("Are you sure you want to <b>delete</b> <i>" + name + "</i>?");
+    
+            $('#confirmdelete .modal-footer input').attr('data-url', url);
+            $('#confirmdelete .modal-footer input').attr('item-id', comment_id);
+        });
+
+            $('body').on('click', '.delete-button', function (e) {
+                e.preventDefault();
+                var tr_id =$('#delete-button').attr('item-id')
+                row = $('#shop-'+ tr_id.trim());
+                var formData = {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                };
+                $.ajax({
+                    type: 'POST',      
+                    url:   $('#delete-button').attr('data-url'), 
+                    encode: true,
+                    contentType: 'application/x-www-form-urlencoded',
+                    crossDomain: false,
+                    dataType: 'json',
+                    data: formData,     // our data object
+                    success: function (data) {
+                        $('.close-modal').click()               
+                        row.fadeOut(1000, function () {
+                            //remove the row deleted
+                            $(this).remove();
+                            // if deleted page make the page disappear, point to prev page
+                            //page-1
+                            if (data.data.total_pages < data.data.deleted_page){                     
+                                var index= parseInt(data.data.total_pages)-1
+                                window.setTimeout(function() {
+                                    $(".a_page_nav:eq(" +  index  +")").trigger('click');
+                                }, 1000);
+                            }else{
+                                // if item on the current page get to zero
+                                // point to page-1
+                                var total = $('#shop-table-tbody').children().length
+                                if (total == 0){
+                                    //refresh the current pages
+                                    var index= parseInt(data.data.deleted_page)-1
+                                    if (index<1){
+                                        // if deleteting first page  then scroll all into first page
+                                        index=1
+                                    } 
+                                    
+                                    loadPageAjax(index)
+                                }
+
+                            }
+                            
+                        
+                        });
+                        // if deleting page one and there are more pages behind.... push al those pages
+                    
+                    },
+                    error: function (exception) {
+                        alert('Exeption:' + exception);
+                    }
+                });
+            });
+            $('body').on('click', '.close-modal', function (e) {
+                $('#modal-shop').modal('hide'); 
+            })
+            //------LOAD THE FORM ON MODAL DIV----------
+            $('body').on('click', '.show-form-update', function(e){
+                e.stopPropagation() 
+                var btn = $(this);// fix button  delay
+                //console.log('url',btn.attr("data-url"))
+                $.ajax({
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType:'json',
+                beforeSend: function(){
+                    $('#modal-shop').modal('show');
+                },
+                success: function(data){
+                    $('#modal-shop .modal-content').html(data.html_form);
+                }
+                });
+            })
+          
+        
+            $('body').on('click', '.a_page_nav', function (event) {
+                // preventing default actions
+                event.preventDefault();
+                var page_no = $(this).attr('href');
+                // ajax call
+                loadPageAjax(page_no)
+            });
+           
+            function updatePaging2(data){
+                var has_previous=''
+                //console.log(data)
+                if (data.has_previous){
+                    has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+                
+                }       
+                var has_next= ''          
+                if (data.has_next){
+                    has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+                        `; 
+                }       
+                a_html=`
+                <div id= "page_section" class="pagination">
+                    <ul class="pagination newpagination">
+                        ${has_previous}            
+                        <span class="current" style="margin-left:5px" >
+                            Page ${ data.current_page } of ${ data.last }.
+                        </span>                   
+                        ${has_next}
+                    </ul>
+                    </div>`
+                    $("#page_section").html(a_html)
+            }
+
+            function append_html(counter,val,page_no){
+                var js_date_created = new Date(val.date_created)
+                js_date_created= getDateTime_(js_date_created)
+                //console.log('2. time: ', js_date_created.getTime())
+                var name_trunc =truncChar(val.name,12)
+                var address_trunc =truncChar(val.address,20)     
+        
+                delete_html= `<a href="#"  data-toggle="modal" data-target="#confirmdelete" 
+                    data-object-name="${val.name}"  data-item-id="${val.id}" 
+                    data-delete-url="/cus/delete_shop/${val.id}/${page_no}/"  style="color: red" data-toggle="tooltip" data-placement="bottom" 
+                    title='Delete'> <i class="fas fa-trash"></i> 
+                    </a> `          
+
+                a_html=`
+                <tr id="shop-${val.id}">
+                    <td class="shopData " name="counter"> ${counter}</td>
+                    <td class="shopName shopData" name="name">${name_trunc}</td>
+                    <td class="shopAddress shopData" name="address">${address_trunc}</td>
+                    <td class="shopCity shopData" name="city">${val.city}</td>
+                    <td class="shopLongitude shopData" name="longitude">${val.location.x}</td>
+                    <td class="shopLatitude shopData" name="latitude">${val.location.y}</td>
+                    <td class="text-right shopAction" name="action">
+                    
+                        <a href="/m/s/${val.id}/u/"
+                        style="color:inherit"><i class="fa fa-edit"></i>
+                        </a>                    
+                                     
+                        ${delete_html}               
+                       
+                    </td>
+                </tr>` ;
+                return a_html
+            }
+            function loadPageAjax(page_no){
+                //console.log('url',display_usershop_ajax_url )
+                //console.log('PageNo: ', page_no)
+                //console.log('page_no',page_no )
+                var data
+               
+                data = {    
+                        page_no : page_no,
+                        csrfmiddlewaretoken: csrftoken,
+                    }
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_usershop_ajax_url, 
+                        data :data,
+                        // handle a successful response
+                        success: function (response) {
+                            $('#shop-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+
+                        
+                            
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#shop-table-tbody').append(a_html)
+                            });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'shop-table-tbody',6)
+                               
+                           
+               
+                            
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                            
+                    });
+                    //add_model_class()
+            }
+            
+           
+            function update_total_results(total){
+                    html=`Total [${total}]`
+                    $('#total_items').html(html)
+            }
+            function append_no_records_found(total, tbody_id, colspan){
+                if (total == 0) {
+                    no_record_html=`<tr id="shop-1">  <td colspan='${colspan}'> No Records Found <td>
+                                  </tr>` ;
+                    $(`#${tbody_id}`).append(no_record_html)
+                }
+            }
+            $('body').on('click', '.filter-status', function (e) {
+                    e.preventDefault(); 
+                    var clicked_id = $(this).attr('id')
+                    var myclass =$('.filter-status')
+                    bus_status =$(this).attr('id')
+                    var search_val = $('#search').val().toLowerCase();
+                    search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                    if (search_val.length == 0 ){
+                        display_usershop_ajax_url = `{% url 'usershops_load_status_ajax' %}`; 
+                    } else{
+                        display_usershop_ajax_url = `{% url 'user_shop_search_and_tags_ajax' 6789 %}`.replace(/6789/, search_val.toString()); 
+                    }
+                    var url =display_usershop_ajax_url 
+                    $('#li_current_status').css('display','block')
+                    $('#current_status').html(`<i>[${clicked_id}]</i> <span aria-hidden="true">×</span>`)
+                  
+                    $.each(myclass, function(i, val) {
+                        let loop_id= $(this).attr('id')
+                        if (clicked_id == loop_id){
+                            $(this).removeClass('bg-warning')
+                            $(this).addClass('bg-light')
+                        }else {
+                            $(this).addClass('bg-warning')
+                            $(this).removeClass('bg-light')
+                        }
+                    });            
+                    // click first page
+                    page_no=1
+                    // ajax call
+                    $.ajax({
+                            type: "POST",
+                            // define url name
+                            url: url, 
+                            data : {    
+                                page_no : page_no, 
+                                status:clicked_id,
+                                csrfmiddlewaretoken: csrftoken,
+                            },
+                            // handle a successful response
+                            success: function (response) {
+                                $('#shop-table-tbody').html('')
+                                updatePaging2(response.data)
+                                if (response.data.per_table){
+                                    per_table=response.data.per_table
+                                }
+                                var base_counter =(parseInt(page_no)-1)*per_table
+                                var counter=base_counter
+                                update_total_results(response.data.totalrecords)
+                                $.each(response.data.results, function(i, val) {
+                                    counter=  counter +1
+                                    a_html=append_html(counter,val,page_no)                           
+                                    // add each model on every line
+                                    $('#shop-table-tbody').append(a_html)
+                                });
+                                //Append Zero Record Annotation
+                                append_no_records_found(response.data.totalrecords,'shop-table-tbody',6)
+                               
+                            
+
+                                },
+                                error: function () {
+                                    alert('Error Occured');
+                                }
+                        }); 
+            
+            });
+            
+            $("body").on("keyup", "#search", function(){
+
+                var search_val = $(this).val().toLowerCase();
+                search_val = search_val.replace(/[^a-zA-Z0-9]/g,"")
+                if (search_val.length == 0 ){
+                    //tag
+                    display_usershop_ajax_url = `{% url 'usershops_load_status_ajax' %}`; 
+                } else{
+                    display_usershop_ajax_url = `{% url 'user_shop_search_and_tags_ajax' 6789 %}`.replace(/6789/, search_val.toString()); 
+                }
+                // click first page
+                page_no=1
+                // ajax call
+                $.ajax({
+                        type: "POST",
+                        // define url name
+                        url: display_usershop_ajax_url, 
+                        data : {    
+                            page_no : page_no, 
+                            csrfmiddlewaretoken: csrftoken,
+                        },
+                        // handle a successful response
+                        success: function (response) {
+                            $('#shop-table-tbody').html('')
+                            updatePaging2(response.data)
+                            if (response.data.per_table){
+                                per_table=response.data.per_table
+                            }
+                            var base_counter =(parseInt(page_no)-1)*per_table
+                            var counter=base_counter
+                            update_total_results(response.data.totalrecords)
+                            $.each(response.data.results, function(i, val) {
+                                counter=  counter +1
+                                a_html=append_html(counter,val,page_no)                           
+                                // add each model on every line
+                                $('#shop-table-tbody').append(a_html)
+                            });
+                            //Append Zero Record Annotation
+                            append_no_records_found(response.data.totalrecords,'shop-table-tbody',6)
+                               
+                           
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                        }); 
+            
+          
+          });
+            
+ 
+
+   $('body').on('click', '.close-modal', function (e) {
+        $('#modal-shop').modal('hide'); 
+    })
+
+    $('#modal_add_new_shop').on('hidden.bs.modal', function (e) {
+        //console.log('Clearing contents.......')
+        //reset and clear contents
+        $(this).find('#shop-form')[0].reset();
+    })
+
+ 
+    $('body').on('click', '.close-modal', function (e) {
+        $('#modal-shop').modal('hide'); 
+    })
+           
+    </script>
+{% endblock %}
+
+<!---------------------- CUSTOM SEARCH ------------------>
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+
+{% endblock %}

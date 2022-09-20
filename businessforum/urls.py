@@ -19,3 +19,4 @@ urlpatterns = [
     path('blog/<int:pk>/delete/', PostDeleteView.as_view(), name='blog-delete'),
     
 ]
+

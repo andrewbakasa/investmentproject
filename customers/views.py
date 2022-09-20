@@ -288,6 +288,62 @@ def get_user_products(request, type):
    
     return render(request, 'customers/user_products.html', context)
 
+
+@login_required(login_url="account_login")
+def get_user_shops(request, type):
+    BUSINESS_STATUS_CHOICE = ["all"]#["unread","open","closed","all"] 
+    current_time =timezone.now()# datetime.datetime.now()
+      
+
+    # class Shop(models.Model):
+    # user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
+    # name = models.CharField(max_length=100)
+    # location = PointField(default=None)
+    # address = models.CharField(max_length=300)
+    # city = models.CharField(max_length=50)
+    
+   
+    queryset = Shop.objects.filter(Q(user=request.user))
+    
+   
+    #form = ShopForm(initial={'user': request.user})
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    else:
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 10
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(queryset, pertable)
+    first_page = obj_paginator.page(1).object_list
+    current_page = obj_paginator.get_page(1)
+    page_range = obj_paginator.page_range
+
+    context = {
+        'obj_paginator':obj_paginator,
+        'first_page':first_page,
+        'current_page':current_page,
+        'page_range':page_range,
+        "user": request.user,
+        "models": queryset,
+        "total": queryset.count(),
+        "user": request.user,
+        #'form': form,
+         'status': type,
+        "BUSINESS_STATUS_CHOICE": BUSINESS_STATUS_CHOICE,
+        'lock_key':True,
+        'edit_key':True,
+        'total_shops': queryset.count(),
+    }
+   
+    return render(request, 'customers/user_shops.html', context)
+
 def display_toggle_order_ajax(request, id):
     current_time = timezone.now()#datetime.datetime.now()
     
@@ -362,9 +418,13 @@ def display_userproduct_ajax(request):
                                                 
         results=[] 												 
         for i in obj_paginator.page(page_no).object_list:
-
             item_object = model_to_dict(i)
-           
+            #--------SHOP NAME ANNOTATION-----------------
+            if i.shop:
+                item_object['shop']= i.shop.name
+            else:
+                item_object['shop']=""
+
             categories=""
             for x in item_object['categories']:
                 categories = categories +   str(x.name) + ', '  
@@ -374,6 +434,66 @@ def display_userproduct_ajax(request):
             else:
                 item_object['image']=None
            
+            results.append(item_object)
+		
+        data["results"]=results
+        return JsonResponse({"data":data})
+def display_usershop_ajax(request):
+    current_time = timezone.now()#datetime.datetime.now()
+    
+    userdata= Shop.objects.filter(user=request.user)
+
+    if not ('pertable' in request.session):
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            request.session['pertable']=obj.pertable
+        else:# nothing in db
+            request.session['pertable']= 3
+    pertable=request.session['pertable']
+    obj_paginator = Paginator(userdata, pertable)
+    first_page = obj_paginator.page(1).object_list
+    page_range = obj_paginator.page_range
+    if request.method == 'POST':
+        #getting page number
+        page_no = request.POST.get('page_no', None)
+        #print('page:', page_no) 
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)   
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+        
+        #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+
+                                                
+        results=[] 												 
+        for i in obj_paginator.page(page_no).object_list:
+
+            item_object = model_to_dict(i)
+            location = item_object['location'] 
+            dict_ ={}
+            dict_['x']=location.x
+            dict_['y']=location.y
+            item_object['location'] =dict_
             results.append(item_object)
 		
         data["results"]=results
@@ -932,7 +1052,11 @@ def product_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
         for i in obj_paginator.page(page_no).object_list:			
             cdate= i.date_created.ctime()
             item_object = model_to_dict(i)
-            
+            #--------SHOP NAME ANNOTATION-----------------
+            if i.shop:
+                item_object['shop']= i.shop.name
+            else:
+                item_object['shop']=""
             categories = ''
           
             for x in item_object['categories']:
@@ -956,7 +1080,94 @@ def product_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
         return JsonResponse({"data":data})
     else:
         return JsonResponse({'error': True, 'data': 'errors'})  
-  
+def shop_search_and_tags_ajax(request, slug, search_type, *args, **kwargs):
+    #search my products
+    current_time =timezone.now()#datetime.datetime.now()
+    if request.method == 'POST':
+        if search_type == 1:
+            queryset = Shop.objects.filter(Q(user=request.user), (Q(name__icontains=slug) | Q(address__icontains=slug)))
+        else:
+            queryset = Shop.objects.filter(Q(user=request.user))
+          
+        
+      
+        if not ('pertable' in request.session):
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+        else:
+            obj= UserPreference.objects.filter(user=request.user).first()
+            if obj:
+                request.session['pertable']=obj.pertable
+            else:# nothing in db
+                request.session['pertable']= 10
+
+        pertable=request.session['pertable']
+    
+
+        obj_paginator = Paginator(queryset, pertable)
+        first_page = obj_paginator.page(1).object_list
+        # = obj_paginator.get_page(1)
+        page_range = obj_paginator.page_range
+        
+        page_no = request.POST.get('page_no', None)
+        if page_no== None:
+            page_no=1
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)    
+        
+        
+        data={}	
+        data["per_table"]=pertable
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+            #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
+        
+        data["current_page"]=current_page.number     
+        
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
+        
+        data["last"]=current_page.paginator.num_pages 
+    
+
+            
+        if int(page_no)>int(num_of_pages):			
+            data["results"]=[]
+            return JsonResponse({"data":data})
+        results=[]
+
+
+        for i in obj_paginator.page(page_no).object_list:			
+           
+            item_object = model_to_dict(i)
+            location = item_object['location'] 
+            dict_ ={}
+            dict_['x']=location.x
+            dict_['y']=location.y
+            item_object['location'] =dict_
+            results.append(item_object)									 
+            
+            									 
+        
+            
+        data["results"]=results
+        data["total_sum"]=float(0)
+        data["average"]=float(0)
+        return JsonResponse({"data":data})
+    else:
+        return JsonResponse({'error': True, 'data': 'errors'})  
+    
 def get_user_products_load_status_ajax(request, *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
@@ -1042,7 +1253,12 @@ def get_user_products_load_status_ajax(request, *args, **kwargs):
             for i in obj_paginator.page(page_no).object_list:			
                 cdate= i.date_created.ctime()
                 item_object = model_to_dict(i)
-              
+                #--------SHOP NAME ANNOTATION-----------------
+                if i.shop:
+                    item_object['shop']= i.shop.name
+                else:
+                    item_object['shop']=""
+
                 categories=""
                 for x in item_object['categories']:
                     categories = categories +   str(x.name) + ', '  
@@ -1066,6 +1282,94 @@ def get_user_products_load_status_ajax(request, *args, **kwargs):
         
     else:
         return JsonResponse({'error': True, 'data': "Request not ajax"})
+
+def get_user_shops_load_status_ajax(request, *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax():
+           
+            queryset = Shop.objects.filter(Q(user=request.user))
+           
+
+            if not ('pertable' in request.session):
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            else:
+                obj= UserPreference.objects.filter(user=request.user).first()
+                if obj:
+                    request.session['pertable']=obj.pertable
+                else:# nothing in db
+                    request.session['pertable']= 10
+            pertable=request.session['pertable']
+        
+
+            obj_paginator = Paginator(queryset, pertable)
+            first_page = obj_paginator.page(1).object_list
+            #current_page = obj_paginator.get_page(1)
+            page_range = obj_paginator.page_range
+            
+            page_no = request.POST.get('page_no', None)
+            if page_no== None:
+                page_no=1 
+            num_of_pages= int(obj_paginator.num_pages)
+            totalrecords= int(obj_paginator.count)
+            current_page = obj_paginator.get_page(page_no)    
+            
+            
+            data={}	
+            data["per_table"]=pertable
+            data["page_no"]=page_no
+            data["num_of_pages"]=num_of_pages
+            data["totalrecords"]=totalrecords
+                #data["has_previous"]=False
+            if current_page.has_previous():
+                data["has_previous"]=True  
+                data["first"]=1 
+                data["previous_page_number"]=current_page.previous_page_number() 
+            
+            data["current_page"]=current_page.number     
+            
+            #data["has_next"]=False
+            if current_page.has_next():
+                data["has_next"]=True  
+                data["next_page_number"]=current_page.next_page_number()
+            
+            data["last"]=current_page.paginator.num_pages 
+        
+
+            
+            if int(page_no)>int(num_of_pages):			
+                data["results"]=[]
+                return JsonResponse({"data":data})
+            results=[]
+
+
+            for i in obj_paginator.page(page_no).object_list:
+                item_object = model_to_dict(i)
+                #print(item_object)
+                location = item_object['location'] 
+                dict_ ={}
+                dict_['x']=location.x
+                dict_['y']=location.y
+                item_object['location'] =dict_# "{0},{1}".format(location.y, location.x)
+                #print(item_object)
+                results.append(item_object)									 
+            
+                
+            data["results"]=results
+            data["total_sum"]=float(0)
+            data["average"]=float(0)
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
+
+
+
 def get_user_orders_load_status_ajax(request, *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
@@ -1411,6 +1715,39 @@ def delete_product_ajax(request, id, page_no, *args, **kwargs):
             'message': 'Error, must be an Ajax call.'
         }
         return JsonResponse(error, content_type="application/json") 
+
+@login_required(login_url="account_login")
+def delete_shop_ajax(request, id, page_no, *args, **kwargs):
+   
+    if request.method == 'POST':
+        #print(request.POST)
+        if request.is_ajax():
+            
+            model_ = get_object_or_404(Shop, pk=id)
+            item_object = model_to_dict(model_)
+            location = item_object['location'] 
+            dict_ ={}
+            dict_['x']=location.x
+            dict_['y']=location.y
+            item_object['location'] =dict_
+            data= {}
+            #data['total_pages']=total_pages
+            data['deleted_page']=page_no
+            
+           
+            data['model']=item_object
+            model_.delete()
+            
+            return JsonResponse({'error': False, 'data': data})
+            
+        else:
+            return JsonResponse({'error': True, 'data': "errors encontered"})
+    else:
+        error = {
+            'message': 'Error, must be an Ajax call.'
+        }
+        return JsonResponse(error, content_type="application/json") 
+
 class ProductCreate(LoginRequiredMixin, generic.edit.CreateView):
     model = Product
     template_name = 'customers/product_edit.html'

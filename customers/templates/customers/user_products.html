@@ -558,7 +558,8 @@
                                         <td class="productDescription productData" name="description">${description_trunc}</td>
                                         <td class="productImage productData" name="image">${item.image}</td> 
                                         <td class="productPrice productData" name="price">$${numberWithCommas(item.price)}</td>
-
+                                        <td class="productShop productData" name="shop">${(item.shop)}</td>
+                                        
                                         <td class="text-right productAction" name="action">
                                         
                                             <a href="/tr/i/e/${item.id}"
@@ -648,6 +649,7 @@
                     <td class="productDescription productData" name="description">${description_trunc}</td>
                     <td class="productImage productData" name="image">${val.image}</td> 
                     <td class="productPrice productData" name="price">$${numberWithCommas(val.price)}</td>
+                    <td class="productShop productData" name="shop">${(val.shop)}</td>
                     <td class="text-right productAction" name="action">
                     
                         <a href="/e/p/d/${val.id}/"
@@ -908,6 +910,7 @@
                     <td class="productDescription productData" name="description">${description_trunc}</td>
                     <td class="productImage productData" name="image">${val.image}</td> 
                     <td class="productPrice productData" name="price">$${numberWithCommas(val.price)}</td>
+                    <td class="productShop productData" name="shop">${(val.shop)}</td>
                     <td class="text-right productAction" name="action">
                     
                         <a href="/e/p/d/${val.id}/"
@@ -1115,6 +1118,8 @@
                         $(this).html(`${truncChar(product.description,20)}`);
                     } else if (attr == "price") {
                         $(this).html(`$${product.price}`);
+                    } else if (attr == "shop") {
+                        $(this).html(`$${product.shop}`);    
                     } else if (attr == "categories") {
                         $(this).text(product.categories);
                     } else if (attr == "image")  {

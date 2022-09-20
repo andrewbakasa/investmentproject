@@ -19,7 +19,7 @@ from .views import (
     MapView,
     ProductLocationView2,
     add_shop,
-    
+    ShopUpdateView,
 )
 urlpatterns = [
     
@@ -32,7 +32,7 @@ urlpatterns = [
     path('api_locate_product2/<str:slug>/<str:x>/<str:y>', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
     path('product/', ProductLocationView2.as_view(),  name='gen_location_product_slug'),
     path('addshop/', add_shop,  name='add_shop'),
-  
+    path('s/<int:pk>/u/', ShopUpdateView.as_view(), name='shop-update'),
    
     #path('api_locate_marker/', MarkerLocationView.as_view(),  name='locate_marker'),
     # path('api/', include(router.urls)),

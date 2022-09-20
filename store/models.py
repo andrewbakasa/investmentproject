@@ -1,7 +1,7 @@
 
 from __future__ import unicode_literals
 from django.db import models
-
+from django.urls import reverse
 from django.dispatch import receiver
 
 from django.db.models.signals import post_save
@@ -39,6 +39,14 @@ class Shop(models.Model):
             return self.name
         else :
             return "No name"
+    
+    def get_absolute_url(self):
+        return reverse('shop-update', kwargs={'pk':self.pk})
+
+    class Meta:
+        ordering = ['location']
+
+
 class ClientCompany(models.Model):
 	
 	#user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -379,7 +387,7 @@ class ProductCategory(models.Model):
 
 
 class Product(models.Model):
-    shop = models.ForeignKey(Shop, related_name='shopA', on_delete= models.SET_NULL,null=True, blank=False)
+    shop = models.ForeignKey(Shop,verbose_name="Warehouse", related_name='shopA', on_delete= models.SET_NULL,null=True, blank=False)
     name = models.CharField('category', max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     digital = models.BooleanField(default=False, null=True, blank=False)

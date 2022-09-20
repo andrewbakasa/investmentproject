@@ -1,7 +1,7 @@
 """Markers view."""
 
 from http.client import HTTPResponse
-
+ 
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView
 from django.http import JsonResponse
@@ -20,7 +20,7 @@ from store.models import Product, Shop
 from .models import Marker
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render,redirect
 
 from django.views import generic
 from django.contrib.gis.geos import fromstr
@@ -437,6 +437,65 @@ def add_shop(request, *args, **kwargs):
         "json_user_location_y": user_location.y
     }
     return render(request,'markers/addshop.html',context)
+
+class ShopUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
+    model = Shop
+    template_name = 'markers/addshop.html'
+    form_class = ShopForm
+
+    def get(self, request, *args, **kwargs):
+        item = get_object_or_404(Shop,pk=self.kwargs.get('pk'))
+        #print('Location >>>>>>>>>>>........', item.location, item.location.x, item.location.y)
+        form = self.form_class(instance= item,  initial={'lng': item.location.x, 'lat': item.location.y})
+        #print(form)
+        # form.lng =item.location.x
+        # form.lat =item.location.y
+        context={}
+        context["form"] = form
+        context["edit"] = True
+        context["x"] = item.location.x
+        context["y"] = item.location.y
+        return render(request, self.template_name, context)
+    
+   
+    def form_valid(self, form):
+        print('>>>>>>>', self.request.POST["lat"], self.request.POST["lng"])
+        lat, lng = self.request.POST["lat"], self.request.POST["lng"]
+        instance = form.save(commit=False)
+        location = Point(float(lng), float(lat),srid=4326)
+        instance.location = location
+        instance.user = self.request.user
+        instance.save()
+        form.save_m2m()
+        return redirect('user_shops')
+  
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.user:
+            return True
+        return False
+def edit_shop(request, *args, **kwargs):
+    if request.method == "POST":
+        form= ShopForm(request.POST)
+        lat, lng = request.POST["lat"], request.POST["lng"]
+        #print(lat, lng)
+        if form.is_valid():
+            location = Point(float(lng), float(lat),srid=4326)
+            instance = form.save(commit=False)
+            instance.location = location
+            instance.user = request.user
+            instance.save()
+        else:
+            print(form.errors)
+           
+    form= ShopForm()
+    context = {
+        "form":form,
+        "json_user_location_x": user_location.x,
+        "json_user_location_y": user_location.y
+    }
+    return render(request,'markers/addshop.html',context)
+
 class MarkerLocationView(APIView):
     # add permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]

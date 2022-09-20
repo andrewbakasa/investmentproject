@@ -55,9 +55,16 @@ class ShopForm0(gisforms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        location = self.initial.get("location", None)
-        if isinstance(location, Point):
-            self.initial["lng"], self.initial["lat"] = location.tuple
+        # location = self.initial.get("location", None)
+        # if isinstance(location, Point):
+        #     self.initial["lng"], self.initial["lat"] = location.tuple
+
+        instance= kwargs.get('instance', None) 
+        if instance:
+            if instance.location:
+                #self.fields['user']=initial_arguments.user
+                self.fields["lng"], self.fields["lat"] = instance.location.tuple
+
 
     def clean(self):
         data = super().clean()
@@ -204,16 +211,13 @@ class ShopForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        location = self.initial.get("location", None)
-        if isinstance(location, Point):
-            self.initial["lng"], self.initial["lat"] = location.tuple
-
-    # def clean(self):
-    #     data = super().clean()
-    #     if set(self.changed_data)>={"lat","lng"}:
-    #         lat, lng = data.pop("lat", None), data.pop("lng", None)
-            
-     
-    #     if not ("lat" in data and "lng" in data):
-    #         raise forms.ValidationError(_(f'Data not provided'))
-    #     return data
+        # location = self.initial.get("location", None)
+        # if isinstance(location, Point):
+        #     self.initial["lng"], self.initial["lat"] = location.tuple
+        instance= kwargs.get('instance', None) 
+        if instance:
+            if instance.location:
+                #self.fields['user']=initial_arguments.user
+                self.lng, self.lat = instance.location.tuple
+                #self.lng, self.lat = instance.location.tuple
+                print(self.lng, self.lat)
