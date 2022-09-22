@@ -11,27 +11,23 @@ router.register(r'productsapi', views.ProductViewSet)
 #router.register(r'markersapi', views.MarkersViewSet)
 
 from .views import (
-    # TodoListApiView,
-    # TodoDetailApiView,
     ProductLocationView,
     MarkerLocationView,
     ProductLocationSlugView,
     MapView,
-    ProductLocationView2,
+    ProductLocationViewLandingPage,
     add_shop,
     ShopUpdateView,
 )
-urlpatterns = [
-    
-    #path('', views.park_insert(), name='park_insert'),
-    path('map/', views.MarkersMapView.as_view(), name='marker_home'),
-    path('createmap/', views.MapViewCreate.as_view(), name='createmap'),
-    path('create/', views.CreateMarkers.as_view(), name='map'),
-    path('p/l/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
-    path('api_locate_product/<str:x>/<str:y>', ProductLocationView.as_view(),  name='locate_product_api'),
-    path('api_locate_product2/<str:slug>/<str:x>/<str:y>', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
-    path('product/', ProductLocationView2.as_view(),  name='gen_location_product_slug'),
-    path('addshop/', add_shop,  name='add_shop'),
+urlpatterns = [   
+    #path('map/', views.MarkersMapView.as_view(), name='marker_home'),
+    #path('createmap/', views.MapViewCreate.as_view(), name='createmap'),
+    #path('create/', views.CreateMarkers.as_view(), name='map'),
+    #path('p/l/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
+    path('api_geofind/<str:x>/<str:y>', ProductLocationView.as_view(),  name='locate_product_api'),
+    path('api_geofind/tag/<str:slug>/<str:x>/<str:y>', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
+    path('p/geo/s/', ProductLocationViewLandingPage.as_view(),  name='geo_find_product_landing'),
+    path('add/w/', add_shop,  name='add_shop'),
     path('s/<int:pk>/u/', ShopUpdateView.as_view(), name='shop-update'),
    
     #path('api_locate_marker/', MarkerLocationView.as_view(),  name='locate_marker'),

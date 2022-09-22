@@ -514,19 +514,12 @@ class MarkerLocationView(APIView):
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 
-class ProductLocationView2(LoginRequiredMixin, generic.TemplateView):
+class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
     template_name = 'markers/product.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        #----------------------------------
-        # product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
-        #                                     user_location)).order_by('distance')[0:6]
-  
-        # context['product_qs'] = product_queryset
-
-        # serializer = ProductSerializer(product_queryset, many=True)
-        # context['json_product_qs'] =serializer.data
+      
 
         context["json_user_location_x"] =user_location.x#location_es
         context["json_user_location_y"] =user_location.y#location_es
