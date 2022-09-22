@@ -407,7 +407,7 @@ class ProductLocationSlugView(APIView):
         slug =  self.kwargs.get('slug')
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
-        print('My viewpoint:', x,y)
+        #print('My viewpoint:', x,y)
         user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]

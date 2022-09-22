@@ -72,9 +72,9 @@ def registered_user_only_with_client_routing():
 def login_in_user_only_with_routing():
     def decorator(view_func):
         def wrapper_func(request, *args, **kwargs):
-            print(">>>>>>>>>>>>>>><><><><<><><><")
+            #print(">>>>>>>>>>>>>>><><><><<><><><")
             if not request.user.is_authenticated:
-                print(",,,,,,,,,,,,,,,,,,,,, Logn please")
+               # print(",,,,,,,,,,,,,,,,,,,,, Logn please")
                 #return HttpResponse("You are not authorized to view this page")
                 return redirect('home_page')
                 
