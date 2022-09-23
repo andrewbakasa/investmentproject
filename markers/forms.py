@@ -4,7 +4,7 @@ from leaflet.forms.widgets import LeafletWidget
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models import PointField
 from store.models import Product, Shop
-from .models import Marker
+from .models import Marker, TradedCurrency
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ModelForm, Textarea
 LEAFLET_WIDGET_ATTRS = {
@@ -221,3 +221,77 @@ class ShopForm(forms.ModelForm):
                 self.lng, self.lat = instance.location.tuple
                 #self.lng, self.lat = instance.location.tuple
                 print(self.lng, self.lat)
+""" 
+    user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
+    residence = models.ForeignKey(UserLocation,verbose_name="location", on_delete= models.SET_NULL,null=True, blank=False)
+    currency_offered =models.ForeignKey(Currency, on_delete= models.SET_NULL, null=True)
+    currency_expected = models.ForeignKey(Currency, on_delete= models.SET_NULL, null=True)
+    rate_expected = models.IntegerField(default=0)
+    description = models.TextField(blank=True, null=True)
+    value = models.IntegerField()
+    complete =models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
+"""
+
+class TradedCurrencyForm(forms.ModelForm):
+    description = forms.CharField(
+                    help_text=" Describe the use",#text to help
+                    widget=forms.Textarea( attrs={
+                    'cols'          : "30", #size
+                    'rows'          : "3", #size
+                    'placeholder'   : 'Description', 
+                    'style'         : 'resize : none' 
+                    }))
+    class Meta:
+        model = TradedCurrency
+        fields = ['currency_offered', 'currency_expected', 'rate_expected', 'description','value' , 'created_by']
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        initial_arguments= kwargs.get('initial', None) 
+        #print("kwargs",kwargs)
+        user=None
+        if initial_arguments:
+            if initial_arguments['created_by']:
+                user=initial_arguments['created_by']
+
+        super(TradedCurrencyForm,self).__init__(*args, **kwargs)
+        
+
+class TradedCurrencyFormUpdate(forms.ModelForm):
+    description = forms.CharField(
+                    help_text=" Describe the use",#text to help
+                    widget=forms.Textarea( attrs={
+                    'cols'          : "30", #size
+                    'rows'          : "3", #size
+                    'placeholder'   : 'Description', 
+                    'style'         : 'resize : none' 
+                    }))
+    class Meta:
+        model = TradedCurrency
+        fields = ['currency_offered', 'currency_expected', 'rate_expected', 'description','value' ]
+
+    def clean_currency_expected(self): 
+         #print(data)
+        currency_expected = self.cleaned_data['currency_expected'] 
+        if currency_expected != None:
+            if 'currency_offered' in self.cleaned_data:
+                currency_offered = self.cleaned_data['currency_offered']
+                if currency_offered == currency_expected:
+                    raise ValidationError(_(f'Same currency is not feasible'))
+                return currency_expected
+        return currency_expected
+            
+
+    def clean_currency_offered(self): 
+         #print(data)
+        currency_offered = self.cleaned_data['currency_offered'] 
+        if currency_offered != None:
+            if 'currency_expected' in self.cleaned_data:
+                currency_expected = self.cleaned_data['currency_expected']
+                if currency_expected == currency_offered:
+                    raise ValidationError(_(f'Same currency is not feasible'))
+                return currency_offered
+        return currency_offered
+            

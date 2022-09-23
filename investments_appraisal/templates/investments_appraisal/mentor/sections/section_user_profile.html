@@ -14,7 +14,7 @@
      <div class="row mt-5"> 
       <div class="col-lg-12 mt-5 mt-lg-0"> 
         <div class="box-body">
-            <form  enctype="multipart/form-data" method="POST" class="form-horizontal user-profile-update" data-url="{% url 'update_user_profile_ajax' %}">
+            <form  enctype="multipart/form-data" method="POST" class="form-horizontal user-profile-update" enctype="multipart/form-data" data-url="{% url 'update_user_profile_ajax' %}">
       
                   {% csrf_token %}
 
@@ -72,6 +72,15 @@
 
     
               </br>
+              <div class="form-group row">
+                <label class="col-sm-2 control-label" for="{{ profile_form.image.id_for_label }}">{{ profile_form.image.label }}</label>
+                <div class="col-sm-10">
+                  {{ profile_form.image|add_class:"form-control" }}
+                  {% for error in profile_form.image.errors %}
+                  <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                </div>
+              </div>
               <div  class="public_toggle_form-errors form-error2 form-group" style='display:none'>
               </div>
               <div class="box-footer">

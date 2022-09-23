@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 
 from django.contrib.auth.models import  Group #User,
 from django.conf.urls.static import static
-from common.models import User
+#from common.models import User
 
 
 from django.core.files.storage import FileSystemStorage

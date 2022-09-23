@@ -316,7 +316,7 @@ class UserProfileForm(forms.ModelForm):
                 }), required=False)
     class Meta:
         model = UserProfile
-        fields = ['age', 'country', 'sex', 'profession' ,'aboutyou']
+        fields = ['age', 'country', 'sex', 'profession' ,'aboutyou', 'image']
 class UserForm(forms.ModelForm):
     
     class Meta:

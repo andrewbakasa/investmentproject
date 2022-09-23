@@ -2636,7 +2636,8 @@ def update_user_profile_ajax(request,  *args, **kwargs):
 	profile, created = UserProfile.objects.get_or_create(user=request.user)
 	if request.method == 'POST':
 		if request.is_ajax():
-			form = UserProfileForm(request.POST or None,instance=profile)
+			
+			form = UserProfileForm(request.POST or None, request.FILES or None,instance=profile)
 			form.instance.user =request.user
 			if form.is_valid():
 				form.save()
@@ -2648,6 +2649,11 @@ def update_user_profile_ajax(request,  *args, **kwargs):
 			latest = UserProfile.objects.latest('id').id
 			record = UserProfile.objects.get(pk=latest)
 			item_object = model_to_dict(record)
+			print(item_object)
+			if 'image' in item_object:
+				item_object['image']= record.image.url
+			else:
+				item_object['image']=None
 			#print (item_object)
 			return JsonResponse({'error': False, 'data': item_object})
 		else:

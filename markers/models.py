@@ -1,52 +1,59 @@
+from pyexpat import model
 from django.contrib.gis.db.models import PointField
 from django.db import models
+from django.contrib.auth.models import User
 
-
+from django.urls import reverse
 from django.contrib.gis import forms
 
 from django.contrib.gis.db import models as geo_models
-# class Parks(geo_models.Model):
-#     park_name_en = geo_models.CharField(max_length=256)    
-#     description = geo_models.TextField()
-#     picture = geo_models.ImageField()
-#     geom = geo_models.PointField(widget= forms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}) )
 
-@property
-def picture_url(self):
-    return self.picture.url
+from store.models import Currency
 
-def __unicode__(self):
-    return self.title
 class Marker(models.Model):
     name = models.CharField(max_length=255)
     location = PointField(default=None)#see far way country.....
 
-
-from django.contrib.gis.db import models as gis_models
-
-class WorldBorder(gis_models.Model):
-    # Regular Django fields corresponding to the attributes in the
-    # world borders shapefile.
-    name = gis_models.CharField(max_length=50)
-    area = gis_models.IntegerField()
-    pop2005 = gis_models.IntegerField('Population 2005')
-    fips = gis_models.CharField('FIPS Code', max_length=2, null=True)
-    iso2 = gis_models.CharField('2 Digit ISO', max_length=2)
-    iso3 = gis_models.CharField('3 Digit ISO', max_length=3)
-    un = gis_models.IntegerField('United Nations Code')
-    region = gis_models.IntegerField('Region Code')
-    subregion = gis_models.IntegerField('Sub-Region Code')
-    lon = gis_models.FloatField()
-    lat = gis_models.FloatField()
-
-    # GeoDjango-specific: a geometry field (MultiPolygonField)
-    mpoly = gis_models.MultiPolygonField()
-
-    # Returns the string representation of the model.
+class UserLocation(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    location = PointField(default=None, null=True)
+    
     def __str__(self):
-        return self.name
+        if self.user:
+            return self.user.username
+        else :
+            return "No name"
+    
+    def get_absolute_url(self):
+        return reverse('shop-update', kwargs={'pk':self.pk})
 
     class Meta:
-        ordering = ['name']
-        verbose_name_plural = "World borders"
+        ordering = ['location']
+
+
+
+class TradedCurrency(models.Model):
+    #user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
+    residence = models.ForeignKey(UserLocation,verbose_name="location", on_delete= models.SET_NULL,null=True, blank=False)
+    currency_offered =models.ForeignKey(Currency, related_name="offered", on_delete= models.SET_NULL, null=True)
+    currency_expected = models.ForeignKey(Currency,related_name="expected", on_delete= models.SET_NULL, null=True)
+    rate_expected = models.IntegerField(default=0)
+    description = models.TextField(blank=True, null=True)
+    value = models.IntegerField(default=0)
+    complete =models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
+  
+
+    def __str__(self):
+        if self.description:
+            return self.description
+        return "No Data"
+    
+    class Meta:
+        ordering = ['date_created']
+
+
+    
+from django.contrib.gis.db import models as gis_models
 

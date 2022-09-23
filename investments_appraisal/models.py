@@ -418,6 +418,9 @@ class UserProfile(models.Model):
     aboutyou = models.TextField(blank=True, null=True, verbose_name='About Me') 
     last_login= models.DateTimeField(blank=True, null=True)
     login_count=models.IntegerField(default=0)
+    
+    # Image
+    image = models.ImageField(upload_to='profile_images', blank=True)
 
   
     def __str__(self):
@@ -425,3 +428,14 @@ class UserProfile(models.Model):
 
     class Meta:
         ordering = ['last_modified',]         
+    
+       
+    @property
+    def imageURL(self):
+        try:
+            url = self.image.url
+          
+        except:
+            url = "" 
+      
+        return url

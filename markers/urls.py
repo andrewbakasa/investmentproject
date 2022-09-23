@@ -8,30 +8,28 @@ from django.views.generic import TemplateView
 from rest_framework import routers
 router = routers.DefaultRouter()
 router.register(r'productsapi', views.ProductViewSet)
-#router.register(r'markersapi', views.MarkersViewSet)
-
 from .views import (
     ProductLocationView,
-    MarkerLocationView,
     ProductLocationSlugView,
     MapView,
     ProductLocationViewLandingPage,
     add_shop,
     ShopUpdateView,
+    CurrencyTradingLocationViewLandingPage,
+    CurrencyLocationView,
+    TradedCurrencyLocationSlugView
 )
-urlpatterns = [   
-    #path('map/', views.MarkersMapView.as_view(), name='marker_home'),
-    #path('createmap/', views.MapViewCreate.as_view(), name='createmap'),
-    #path('create/', views.CreateMarkers.as_view(), name='map'),
-    #path('p/l/', views.MarkersMapViewTest.as_view(), name='product_location_map_view'),
+urlpatterns = [
     path('api_geofind/<str:x>/<str:y>', ProductLocationView.as_view(),  name='locate_product_api'),
     path('api_geofind/tag/<str:slug>/<str:x>/<str:y>', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
     path('p/geo/s/', ProductLocationViewLandingPage.as_view(),  name='geo_find_product_landing'),
     path('add/w/', add_shop,  name='add_shop'),
     path('s/<int:pk>/u/', ShopUpdateView.as_view(), name='shop-update'),
-   
-    #path('api_locate_marker/', MarkerLocationView.as_view(),  name='locate_marker'),
-    # path('api/', include(router.urls)),
-
+    path('c/tr/', CurrencyTradingLocationViewLandingPage.as_view(),  name='currency_trade_landing'),
+    path('api_currency/<str:x>/<str:y>', CurrencyLocationView.as_view(),  name='locate_currency_api'),
+    path('api_currency/tag/<str:slug>/<str:x>/<str:y>', TradedCurrencyLocationSlugView.as_view(),  name='locate_currency_api_slug'),
+    
+    path('traded_currency_ajax/', views.create_tc_ajax, name="create_tc_ajax"),
+    path('tc_update/', views.tc_update, name="update_tc"),
 ]
 

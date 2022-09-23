@@ -1,0 +1,290 @@
+
+{% extends 'investments_appraisal/mentor/index.html' %}
+
+{% load i18n %}
+{% load static %}
+{% load tags %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title>CT Geo-Locations</title>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'currency/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
+    {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
+{% endblock %}
+
+{% block content_header %}
+   
+{% endblock %}
+
+
+
+{% block content %}
+
+ 
+<main id="main">
+  <!-- ======= Breadcrumbs ======= -->
+  <div class="breadcrumbs">
+     
+  </div><!-- End Breadcrumbs -->
+<!---Removed padding from 70px-- 0px-->
+<section style= 'padding: 5px 0;' id="projects" class="projects">
+    <div class="container  box-element" data-aos="fade-up">
+         <!-- ======= Breadcrumbs ======= -->
+         <div class="row">
+            <ol class="breadcrumb" >
+              <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                
+                    
+              <!-- <li class="breadcrumb-item active">
+                <a href="#"   data-toggle="modal" data-placement="bottom" data-target="#modal_add_new_currency_request"
+                title='Add New Request' class ="badge rounded-pill bg-success"><i  class="fas fa-plus"></i>
+                </a>
+              </li> -->
+              <li class="breadcrumb-item active">
+                    <a class="product-edit show-form-update" href="#" data-url="{% url 'update_tc' %}" 
+                        data-target="#modal-edit-product-div" style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
+                        title='Update Currency Trade Request'><i class="fa fa-edit"></i>
+                    </a>
+              </li>
+
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Nearby Currency Trading</label>
+              </li>  
+            </ol>
+          </div>
+
+          <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="row">   
+                <input type="text" name="start" class="input" id="start"/>
+                <button id="btn">Search</button>
+            </div>
+             <!-- LAYOUT -->
+             <div class="row">
+              
+                <!-- B -->
+                <div class="apartment-handle col-md-8 col-md-pull-4" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
+                    <div class="apartments row">
+                        {% for product in product_qs %}
+                            <div id="{{product.id}}" class="col-lg-4">                   
+                                {% if product.imageURL %}
+                                    <img src="{{product.imageURL}}" class="img-fluid product-tag" data-item-id="{{product.id}}">
+                                {% else %}
+                                    <img  src="{% static 'images/placeholder.png' %}" class="img-fluid product-tag" data-item-id="{{product.id}}">
+                                {% endif %} 
+                                
+                                <h4>{{product.name}}</h4>
+                                <p>{{product.distance}} {{product.price}}</p>
+                            </div>
+                        {% endfor %}   
+                    </div>            
+                </div>
+
+                 <!-- A -->
+                 <div class="map-handle col-md-4 col-md-push-8">
+                  
+                    <div id="mapid" class="map" >
+         
+                    </div>
+                 </div>
+
+
+            </div>
+
+          </div>
+
+       
+
+    </div>
+  
+</section><!-- End Projects Section -->
+
+
+ 
+</main><!-- End #main -->
+
+
+{%endblock content%}
+
+
+
+{% block modal_divs %}
+    <!-- EDIT DISPLAY HOLDER -->
+    <div class="modal fade" id="modal-tc">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
+     <!-- Delete confirmation modal -->
+     <div class="modal fade" id="confirmdelete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default close-modal" data-dismiss="modal">No</button>
+
+                    <input type="button" class="delete-button  btn btn-danger" id="delete-button"
+                            name="delete-button" value="Yes" data-url="" tr-id="" item-id="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal: modalAdd New Product -->
+    <div class="modal fade" id="modal_add_new_currency_request" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" style="overflow-y: auto !important">
+         <!-- Small	.modal-sm	300px
+        Default	None	500px
+        Large	.modal-lg	800px   :::: class="modal-dialog modal-lg"
+        Extra large	.modal-xl	1140px 
+         -->
+        <div class="modal-dialog  modal-lg" role="document">
+            <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header">
+                    <h4 class="modal-title myModalLabel">Add Your Request</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <!--Body-->
+                <div class="modal-body">
+
+                    {% include 'markers/tradedcurrency_modal.html' %}
+            
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+ <!-- ======= Footer ======= --> 
+ {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+ 
+  
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  
+  
+  {% block scripts %}
+      <!-- Search Button JS -->
+      <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+      
+      <script>
+         var product_qs= '{{json_product_qs}}'
+         //var product_qs = JSON.parse("{{json_product_qs}}")
+         var base_data_url= '{% url "locate_currency_api" 12345  66778899 %}'  /* numbers contains number*/
+         var slug_data_url = `{% url 'locate_currency_api_slug' 12345 6677 8899 %}` /* numbers contains number*/
+         var default_img =`{% static 'images/placeholder.png' %}`
+
+          //------LOAD THE FORM ON MODAL DIV----------
+          $('body').on('click', '.show-form-update', function(e){
+                e.stopPropagation() 
+                var btn = $(this);// fix button  delay
+                //console.log('url',btn.attr("data-url"))
+                $.ajax({
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType:'json',
+                beforeSend: function(){
+                    $('#modal-tc').modal('show');
+                },
+                success: function(data){
+                    $('#modal-tc .modal-content').html(data.html_form);
+                }
+                });
+            })
+          $('body').on("submit",".product-form",function(e){
+              e.preventDefault();
+              console.log('...........>>>>>>>>>>>')
+              // var form= $('#formid')[0];
+              // var formData = new FormData(form)
+              var data = new FormData(this);
+              var formData
+              var form = $(this);
+              //var data = formData()
+              //console.log('why...',form.attr('data-url'))
+              $.ajax({
+                  url: form.attr('data-url'),
+                  //data: form.serialize(),
+                  data : data,
+                  type: form.attr('method'),
+                  dataType: 'json',
+                  processData:false,
+                  contentType: false,
+                  success: function(data){
+                   
+                    console.log('Output', data)
+                    if(data.product){
+                          console.log('success', data)
+                         
+                          $('#modal-tc').modal('hide');
+                    } else {
+                        $('.public_toggle_form-errors').html("")
+                        if (data.error) {
+                              console.log('Error', data.error)
+                              var form_vars=['__all__','currency_offered', 'currency_expected', 'rate_expected', 'description','value']//,
+                      
+                              for (let p=0; p < form_vars.length; p++ ){
+                                  let name_var = form_vars[p]
+                                  if (data.error[name_var]){
+                                  a_html = 	`<div class='alert alert-danger alert dismissable'>
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span></button> ${data['error'][name_var][0]}
+                                  </div> ` ;
+                                  $('.public_toggle_form-errors').append(a_html)
+                                  
+                                  }
+                              }
+                              $('.public_toggle_form-errors').slideUp(50).fadeIn();
+                              window.setTimeout(function() {
+                                  $(".public_toggle_form-errors").fadeIn().slideUp(500, function(){
+                                      $(".public_toggle_form-errors").html('');
+                                  });
+                                  }, 4000);
+                             }
+                       }
+                    }
+                })
+                return false;
+            })
+    
+            $('body').on('click', '.close-modal', function (e) {
+                $('#modal-tc').modal('hide'); 
+            })
+
+      </script>
+      <script src="{% static 'currency/app.js' %}"></script>
+      
+    {% endblock %}
+{% block content_custom_menu_navbar %}
+<!-- ======= Header ======= -->
+{% include 'investments_appraisal/mentor/sections/section_nav_store.html' %}
+
+{% endblock %}
+
+
+
