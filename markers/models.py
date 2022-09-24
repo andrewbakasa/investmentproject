@@ -16,7 +16,7 @@ class Marker(models.Model):
 
 class UserLocation(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    location = PointField(default=None, null=True)
+    location = PointField(default=None)
     
     def __str__(self):
         if self.user:
@@ -24,8 +24,8 @@ class UserLocation(models.Model):
         else :
             return "No name"
     
-    def get_absolute_url(self):
-        return reverse('shop-update', kwargs={'pk':self.pk})
+    # def get_absolute_url(self):
+    #     return reverse('shop-update', kwargs={'pk':self.pk})
 
     class Meta:
         ordering = ['location']
@@ -34,7 +34,7 @@ class UserLocation(models.Model):
 
 class TradedCurrency(models.Model):
     #user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
-    residence = models.ForeignKey(UserLocation,verbose_name="location", on_delete= models.SET_NULL,null=True, blank=False)
+    residence = models.ForeignKey(UserLocation,verbose_name="location", related_name='residenceA', on_delete= models.SET_NULL,null=True, blank=False)
     currency_offered =models.ForeignKey(Currency, related_name="offered", on_delete= models.SET_NULL, null=True)
     currency_expected = models.ForeignKey(Currency,related_name="expected", on_delete= models.SET_NULL, null=True)
     rate_expected = models.IntegerField(default=0)
