@@ -354,8 +354,8 @@ class TradedCurrencyLocationSlugView(APIView):
         # Q(offered =slug)
         #user expectation
         uc_queryset = TradedCurrency.objects.filter(
-                      Q(currency_offered=user_qs.currency_expected),
-                      Q(currency_expected=user_qs.currency_offered)
+                      Q(currency_offered=user_tc_instance.currency_expected),
+                      Q(currency_expected=user_tc_instance.currency_offered)
                       ).annotate(distance=Distance('residence__location',  
                                             user_location)).order_by('distance')[0:6]
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
