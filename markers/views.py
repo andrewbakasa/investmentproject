@@ -256,19 +256,19 @@ class CurrencyLocationView(APIView):
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)
         # user allowed one incomplete record only
-        user_qs, tc_created = TradedCurrency.objects.get_or_create(created_by=self.request.user, complete=False)
+        user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=self.request.user, complete=False)
         if tc_created:
             ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
             if location_created:
                 #save location Point
                 ul_instance.location =user_location
                 ul_instance.save()
-            TradedCurrency.residence =ul_instance
-            TradedCurrency.save()
+            user_tc_instance.residence =ul_instance
+            user_tc_instance.save()
         #user expectation
         uc_queryset = TradedCurrency.objects.filter(
-                      Q(currency_offered=user_qs.currency_expected),
-                      Q(currency_expected=user_qs.currency_offered)
+                      Q(currency_offered=user_tc_instance.currency_expected),
+                      Q(currency_expected=user_tc_instance.currency_offered)
                       ).annotate(distance=Distance('residence__location',  
                                             user_location)).order_by('distance')[0:6]
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
@@ -320,15 +320,15 @@ class TradedCurrencyLocationSlugView(APIView):
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)
         # user allowed one incomplete record only
-        user_qs, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
+        user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
         if tc_created:
             ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
             if location_created:
                 #save location Point
                 ul_instance.location =user_location
                 ul_instance.save()
-            TradedCurrency.residence =ul_instance
-            TradedCurrency.save()
+            user_tc_instance.residence =ul_instance
+            user_tc_instance.save()
 
         #Q(description__icontains =slug)
         # Q(value =slug)
@@ -449,17 +449,17 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
         y =  user_location.x# default val
         user_location = Point(float(x), float(y),srid=4326)#default
 
-        user_qs, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
+        user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
         if tc_created:
             ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
             if location_created:
                 #save location Point
                 ul_instance.location =user_location
                 ul_instance.save()
-            TradedCurrency.residence =ul_instance
-            TradedCurrency.save()
+            user_tc_instance.residence =ul_instance
+            user_tc_instance.save()
         #context["form"] =TradedCurrencyForm(initial ={'created_by': self.request.user})
-        context["form"] =TradedCurrencyForm(instance =user_qs)
+        context["form"] =TradedCurrencyForm(instance =user_tc_instance)
         return context
 
 class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
@@ -547,8 +547,17 @@ def create_tc(request,form,template_name):
 
 login_required(login_url="account_login")
 def tc_update(request):
-    instance_,created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
-    #print(instance_)
+   
+    #first time creation giving Error 500 on Heroku 23 Sep 2022
+    instance_,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
+    if tc_created:
+            ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
+            if location_created:
+                #save defaul location Point
+                ul_instance.location =user_location
+                ul_instance.save()
+            instance_.residence =ul_instance
+            instance_.save()
     if request.method == 'POST':
         form = TradedCurrencyFormUpdate(request.POST or None, instance=instance_)
     else:
