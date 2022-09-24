@@ -274,8 +274,12 @@ class CurrencyLocationView(APIView):
             #     ul_instance.save()
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
+        else:
+            user_tc_instance.residence.location =user_location
+            user_tc_instance.save()
         #user expectation
         uc_queryset = TradedCurrency.objects.filter(
+                      Q(complete=False),
                       Q(currency_offered=user_tc_instance.currency_expected),
                       Q(currency_expected=user_tc_instance.currency_offered)
                       ).annotate(distance=Distance('residence__location',  
@@ -347,13 +351,17 @@ class TradedCurrencyLocationSlugView(APIView):
             #     ul_instance.save()
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
-
+        else :
+            #update lcoation
+            user_tc_instance.residence.location =user_location
+            user_tc_instance.save()
         #Q(description__icontains =slug)
         # Q(value =slug)
         # Q(expected =slug)
         # Q(offered =slug)
         #user expectation
         uc_queryset = TradedCurrency.objects.filter(
+                      Q(complete=False),
                       Q(currency_offered=user_tc_instance.currency_expected),
                       Q(currency_expected=user_tc_instance.currency_offered)
                       ).annotate(distance=Distance('residence__location',  
