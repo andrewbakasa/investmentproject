@@ -258,25 +258,38 @@ class CurrencyLocationView(APIView):
         # user allowed one incomplete record only
         user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=self.request.user, complete=False)
         if tc_created:
-            qs= UserLocation.objects.filter(user=request.user)
+            qs= UserLocation.objects.filter(user=self.request.user)
             ul_instance=None
             if qs:
                 ul_instance= qs.first()
                 ul_instance.location =user_location
                 ul_instance.save()
             else:
-                ul_instance =UserLocation.objects.create(user=request.user, location =user_location)
+                ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
                 ul_instance.save()
-            # ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
-            # if location_created:
-            #     #save location Point
-            #     ul_instance.location =user_location
-            #     ul_instance.save()
+           
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
         else:
-            user_tc_instance.residence.location =user_location
-            user_tc_instance.save()
+            if  user_tc_instance.residence:
+                #update residence
+                user_tc_instance.residence.location =user_location
+                user_tc_instance.save()
+            else :
+                # no residence
+                qs= UserLocation.objects.filter(user=self.request.user)
+                ul_instance=None
+                if qs:
+                    ul_instance= qs.first()
+                    ul_instance.location =user_location
+                    ul_instance.save()
+                else:
+                    ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
+                    ul_instance.save()
+                # save residences
+                user_tc_instance.residence =ul_instance
+                user_tc_instance.save()
+
         #user expectation
         uc_queryset = TradedCurrency.objects.filter(
                       Q(complete=False),
@@ -335,14 +348,14 @@ class TradedCurrencyLocationSlugView(APIView):
         # user allowed one incomplete record only
         user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
         if tc_created:
-            qs= UserLocation.objects.filter(user=request.user)
+            qs= UserLocation.objects.filter(user=self.request.user)
             ul_instance=None
             if qs:
                 ul_instance= qs.first()
                 ul_instance.location =user_location
                 ul_instance.save()
             else:
-                ul_instance =UserLocation.objects.create(user=request.user, location =user_location)
+                ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
                 ul_instance.save()
             # ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
             # if location_created:
@@ -352,9 +365,24 @@ class TradedCurrencyLocationSlugView(APIView):
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
         else :
-            #update lcoation
-            user_tc_instance.residence.location =user_location
-            user_tc_instance.save()
+            if  user_tc_instance.residence:
+                #update residence
+                user_tc_instance.residence.location =user_location
+                user_tc_instance.save()
+            else :
+                # no residence
+                qs= UserLocation.objects.filter(user=self.request.user)
+                ul_instance=None
+                if qs:
+                    ul_instance= qs.first()
+                    ul_instance.location =user_location
+                    ul_instance.save()
+                else:
+                    ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
+                    ul_instance.save()
+                # save residences
+                user_tc_instance.residence =ul_instance
+                user_tc_instance.save()
         #Q(description__icontains =slug)
         # Q(value =slug)
         # Q(expected =slug)
@@ -482,14 +510,14 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
 
         user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
         if tc_created:
-            qs= UserLocation.objects.filter(user=request.user)
+            qs= UserLocation.objects.filter(user=self.request.user)
             ul_instance=None
             if qs:
                 ul_instance= qs.first()
                 ul_instance.location =user_location
                 ul_instance.save()
             else:
-                ul_instance =UserLocation.objects.create(user=request.user, location =user_location)
+                ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
                 ul_instance.save()
             # ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
             # if location_created:
@@ -498,6 +526,21 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
             #     ul_instance.save()
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
+        else:
+            if  not user_tc_instance.residence:
+                # no residence
+                qs= UserLocation.objects.filter(user=self.request.user)
+                ul_instance=None
+                if qs:
+                    ul_instance= qs.first()
+                    ul_instance.location =user_location
+                    ul_instance.save()
+                else:
+                    ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
+                    ul_instance.save()
+                # save residences
+                user_tc_instance.residence =ul_instance
+                user_tc_instance.save()
         #context["form"] =TradedCurrencyForm(initial ={'created_by': self.request.user})
         context["form"] =TradedCurrencyForm(instance =user_tc_instance)
         return context
@@ -606,6 +649,21 @@ def tc_update(request):
             #     #save defaul location Point
             #     ul_instance.location =user_location
             #     ul_instance.save()
+            instance_.residence =ul_instance
+            instance_.save()
+    else:
+        if  not instance_.residence:
+            # no residence create new or attache Userlocatio
+            qs= UserLocation.objects.filter(user=request.user)
+            ul_instance=None
+            if qs:
+                ul_instance= qs.first()
+                ul_instance.location =user_location
+                ul_instance.save()
+            else:
+                ul_instance =UserLocation.objects.create(user=request.user, location =user_location)
+                ul_instance.save()
+            # save residences
             instance_.residence =ul_instance
             instance_.save()
     if request.method == 'POST':
