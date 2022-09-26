@@ -39,7 +39,7 @@ class TradedCurrency(models.Model):
     currency_expected = models.ForeignKey(Currency,related_name="expected", on_delete= models.SET_NULL, null=True)
     rate_expected = models.IntegerField(default=0)
     description = models.TextField(blank=True, null=True)
-    value = models.IntegerField(default=0)
+    value = models.IntegerField(verbose_name="Offered Value",default=0)
     complete =models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)

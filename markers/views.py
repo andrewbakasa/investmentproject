@@ -2,14 +2,15 @@
 
 from distutils import errors
 from http.client import HTTPResponse
+import math
 from urllib import request
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView
 from django.http import JsonResponse
-from django.db.models import F
-
+from django.db.models import F , Case, CharField, Value, When
+from django.db.models.functions import Abs
 import json
 
 from django.core.serializers import serialize
@@ -50,6 +51,10 @@ from rest_framework import permissions
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 
+from django.db.models import Q, F, ExpressionWrapper, IntegerField
+from django.db.models import Max, Value, Min
+from django.db.models.functions import Cast, Coalesce
+from django.db.models import FloatField 
 
 
 longitude= 32.658821726608004#27.553711
@@ -242,7 +247,53 @@ class ProductLocationView(APIView):
         serializer = ProductSerializer(product_queryset, many=True)
       
         return Response(serializer.data, status=status.HTTP_200_OK)
+""" 
+A: DATA-MATRIX
 
+Client     Expected_Amt   Offered  Difference  Diff      Rate_Offered  Rate_Expected Rate_Diff   RD      Distance
+1            300          400      |300-400|   g2*100       700           650        |700-650|  g2*50    5km
+2            300          100      |300-100|   g1*200       750           650        |750-650|  g2*100  .5km
+3            300          200      |300-200|   g2*100       600           650        |600-650|  g1*50   .1km
+
+
+B: COST PENALTY
+
+                           ^
+             * g2          |                         
+              *            |
+               *           |
+                *          |
+                 *         |
+                 +*------->|                                       ^ g1
+                 + *       |                                 ^
+                 +  *      |                            ^
+                 +   *     |                       ^
+                 +    *    |                 ^
+                 +     *   |<-----------+^
+                 +      *  |        ^   +                               g1 <g2
+                 +       * |    ^       +
+_________________+_________*^___________+__________________________________________                           
+(-) NEGATIVE    -1                      +1                            (+) POSITIVE
+
+Cost Fn = a*Rate_Diff + b*Amt_Diff + Distance
+        =a* {g1*R || g2*R} + b* {g1*A || g2*A} + D
+normalise
+        A*[0-1]   +  B*[0-1]  +   C*[0-1]  
+        A=B=C => #33.3% each 
+
+        max <---> min of population  
+
+C: Available CASH VS DEMAND
+
+
+
+
+
+
+
+
+
+"""
 class CurrencyLocationView(APIView):
     # add permission to check if user is authenticated
     #permission_classes = [permissions.IsAuthenticated]
@@ -256,65 +307,120 @@ class CurrencyLocationView(APIView):
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)
         # user allowed one incomplete record only
-        user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=self.request.user, complete=False)
-        if tc_created:
-            qs= UserLocation.objects.filter(user=self.request.user)
+        user_tc_instance=get_and_save_instance(self.request.user, user_location)
+        #user expectation
+        dict_=get_aggregate(user_tc_instance)       
+        uc_queryset= get_queryset(user_tc_instance,dict_)   
+        # panda here
+        serializer = TradedCurrencySerializer(uc_queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+def get_and_save_instance(user, user_loc):
+    user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=user, complete=False)
+    if tc_created:
+        qs= UserLocation.objects.filter(user=user)
+        ul_instance=None
+        if qs:
+            ul_instance= qs.first()
+            ul_instance.location =user_loc
+            ul_instance.save()
+        else:
+            ul_instance =UserLocation.objects.create(user=user, location =user_loc)
+            ul_instance.save()
+        
+        user_tc_instance.residence =ul_instance
+        user_tc_instance.save()
+    else:
+        if  user_tc_instance.residence:
+            #update residence
+            user_tc_instance.residence.location =user_loc
+            user_tc_instance.save()
+        else :
+            # no residence
+            qs= UserLocation.objects.filter(user=user)
             ul_instance=None
             if qs:
                 ul_instance= qs.first()
-                ul_instance.location =user_location
+                ul_instance.location =user_loc
                 ul_instance.save()
             else:
-                ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
+                ul_instance =UserLocation.objects.create(user=user, location =user_loc)
                 ul_instance.save()
-           
+            # save residences
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
-        else:
-            if  user_tc_instance.residence:
-                #update residence
-                user_tc_instance.residence.location =user_location
-                user_tc_instance.save()
-            else :
-                # no residence
-                qs= UserLocation.objects.filter(user=self.request.user)
-                ul_instance=None
-                if qs:
-                    ul_instance= qs.first()
-                    ul_instance.location =user_location
-                    ul_instance.save()
-                else:
-                    ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
-                    ul_instance.save()
-                # save residences
-                user_tc_instance.residence =ul_instance
-                user_tc_instance.save()
+    return  user_tc_instance    
+def get_aggregate(user_tc_instance):
+    total_agg = TradedCurrency.objects.filter(
+        Q(complete=False),
+        Q(currency_offered=user_tc_instance.currency_expected),
+        Q(currency_expected=user_tc_instance.currency_offered)
+        ).aggregate(
+            value_range=Max('value', output_field=FloatField()) - Min('value'),
+            value_min= Min('value'),
+            rate_expected_range=Max('rate_expected', output_field=FloatField()) - Min('rate_expected'),
+            rate_expected_min= Min('rate_expected'),
+            distance_range=Max(
+                                Distance(
+                                    'residence__location',  
+                                        user_location
+                                    )
+                                ) 
+                            - 
+                            Min(
+                                Distance(
+                                'residence__location',  
+                                    user_location
+                                )
+                            ),
+            distance_min= Min(
+                                Distance(
+                                    'residence__location',  
+                                        user_location
+                                    ),
+                        )
+                            
+    ) 
+    dict_ = {}
+    dict_['value_range']=total_agg['value_range'] if not total_agg['value_range']== 0 else 1
+    #value_min=total_agg['value_min'] 
+    dict_['rate_expected_range']=total_agg['rate_expected_range'] if not total_agg['rate_expected_range']== 0 else 1
+    dict_['rate_expected_min']=total_agg['rate_expected_min'] 
+    dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
+    dict_['distance_min']=total_agg['distance_min'].m
+    return dict_   
 
-        #user expectation
-        uc_queryset = TradedCurrency.objects.filter(
-                      Q(complete=False),
-                      Q(currency_offered=user_tc_instance.currency_expected),
-                      Q(currency_expected=user_tc_instance.currency_offered)
-                      ).annotate(distance=Distance('residence__location',  
-                                            user_location)).order_by('distance')[0:6]
-        serializer = TradedCurrencySerializer(uc_queryset, many=True)
-      
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-""" 
-    user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
-    residence = models.ForeignKey(UserLocation,verbose_name="location", on_delete= models.SET_NULL,null=True, blank=False)
-    currency_offered =models.ForeignKey(Currency, on_delete= models.SET_NULL, null=True)
-    currency_expected = models.ForeignKey(Currency, on_delete= models.SET_NULL, null=True)
-    rate_expected = models.IntegerField(default=0)
-    description = models.TextField(blank=True, null=True)
-    value = models.IntegerField()
-    complete =models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
-"""
-
+def get_queryset(user_tc_instance,dict_):
+    #A*[0-1]   +  B*[0-1]  +   C*[0-1] 
+    A = 0.3 #available cash
+    B = 0.2 # rate wanted
+    C = 0.5 # distance
+    g1= 1 # higher penalty for non -compliance
+    g2= 0.5 #over and above less gradient
+    uc_queryset = TradedCurrency.objects.filter(
+                    Q(complete=False),
+                    Q(currency_offered=user_tc_instance.currency_expected),
+                    Q(currency_expected=user_tc_instance.currency_offered)
+                    ).annotate(
+                        amt_compliant=Case(
+                                When(value__lt=user_tc_instance.value, then=(g1*Abs(F('value')- user_tc_instance.value))/dict_['value_range']),
+                                When(value__gt=user_tc_instance.value, then=(g2*Abs(F('value')- user_tc_instance.value))/dict_['value_range']),
+                                default=Value(0),
+                                output_field=FloatField(),
+                        )
+                    ).annotate(
+                        rank=ExpressionWrapper(
+                                A*F('amt_compliant') +
+                                Abs(B*(F('rate_expected')- dict_['rate_expected_min'])/dict_['rate_expected_range']) +
+                                Abs(C*(Distance('residence__location',  user_location)- dict_['distance_min'])/dict_['distance_range']),
+                                output_field=FloatField()
+                            ),
+                        distance=Distance(
+                                'residence__location',  
+                                user_location
+                            ),
+                    ).order_by('rank')[0:6]  
+    return uc_queryset
 @method_decorator(login_in_user_only_with_routing(), name='dispatch')   
 class ProductLocationSlugView(APIView):
     # add permission to check if user is authenticated
@@ -327,8 +433,50 @@ class ProductLocationSlugView(APIView):
         y =  self.kwargs.get('y')
         #print('My viewpoint:', x,y)
         user_location = Point(float(x), float(y),srid=4326)
-        product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(distance=Distance('shop__location',  
-                                            user_location)).order_by('distance')[0:6]
+
+        total_agg = Product.objects.filter(Q(description__icontains =slug)).aggregate(
+                    price_range=Max('price')- Min('price'),
+                    price_min= Min('price'),
+                    distance_range=Max(
+                                        Distance(
+                                            'shop__location',  
+                                                user_location
+                                            )
+                                        ) 
+                                    - 
+                                    Min(
+                                        Distance(
+                                        'shop__location',  
+                                            user_location
+                                        )
+                                    ),
+                    distance_min= Min(
+                                        Distance(
+                                            'shop__location',  
+                                                user_location
+                                            ),
+                                )
+                                
+                    ) 
+        dict_ = {}
+        dict_['price_range']=total_agg['price_range'] if not total_agg['price_range']== 0 else 1
+        dict_['price_min']=total_agg['price_min'] 
+        dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
+        dict_['distance_min']=total_agg['distance_min'].m
+    
+        A= 0.25 #price factor
+        B= 0.75 #distance factor
+        product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(
+                        rank=ExpressionWrapper(
+                                Abs(A*(F('price')- dict_['price_min'])/dict_['price_range']) +
+                                Abs(B*(Distance('shop__location',  user_location)- dict_['distance_min'])/dict_['distance_range']),
+                                output_field=FloatField()
+                            ),
+                        distance=Distance(
+                                'shop__location',  
+                                user_location
+                            ),
+                    ).order_by('rank')[0:6]
   
         serializer = ProductSerializer(product_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -346,54 +494,12 @@ class TradedCurrencyLocationSlugView(APIView):
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)
         # user allowed one incomplete record only
-        user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
-        if tc_created:
-            qs= UserLocation.objects.filter(user=self.request.user)
-            ul_instance=None
-            if qs:
-                ul_instance= qs.first()
-                ul_instance.location =user_location
-                ul_instance.save()
-            else:
-                ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
-                ul_instance.save()
-            # ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
-            # if location_created:
-            #     #save location Point
-            #     ul_instance.location =user_location
-            #     ul_instance.save()
-            user_tc_instance.residence =ul_instance
-            user_tc_instance.save()
-        else :
-            if  user_tc_instance.residence:
-                #update residence
-                user_tc_instance.residence.location =user_location
-                user_tc_instance.save()
-            else :
-                # no residence
-                qs= UserLocation.objects.filter(user=self.request.user)
-                ul_instance=None
-                if qs:
-                    ul_instance= qs.first()
-                    ul_instance.location =user_location
-                    ul_instance.save()
-                else:
-                    ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
-                    ul_instance.save()
-                # save residences
-                user_tc_instance.residence =ul_instance
-                user_tc_instance.save()
-        #Q(description__icontains =slug)
-        # Q(value =slug)
-        # Q(expected =slug)
-        # Q(offered =slug)
+        user_tc_instance=get_and_save_instance(self.request.user, user_location)
+       
         #user expectation
-        uc_queryset = TradedCurrency.objects.filter(
-                      Q(complete=False),
-                      Q(currency_offered=user_tc_instance.currency_expected),
-                      Q(currency_expected=user_tc_instance.currency_offered)
-                      ).annotate(distance=Distance('residence__location',  
-                                            user_location)).order_by('distance')[0:6]
+        dict_=get_aggregate(user_tc_instance)       
+        uc_queryset= get_queryset(user_tc_instance,dict_) 
+
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class AddProduct():
@@ -427,11 +533,7 @@ class ShopUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 
     def get(self, request, *args, **kwargs):
         item = get_object_or_404(Shop,pk=self.kwargs.get('pk'))
-        #print('Location >>>>>>>>>>>........', item.location, item.location.x, item.location.y)
         form = self.form_class(instance= item,  initial={'lng': item.location.x, 'lat': item.location.y})
-        #print(form)
-        # form.lng =item.location.x
-        # form.lat =item.location.y
         context={}
         context["form"] = form
         context["edit"] = True
@@ -441,7 +543,7 @@ class ShopUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
     
    
     def form_valid(self, form):
-        print('>>>>>>>', self.request.POST["lat"], self.request.POST["lng"])
+        #print('>>>>>>>', self.request.POST["lat"], self.request.POST["lng"])
         lat, lng = self.request.POST["lat"], self.request.POST["lng"]
         instance = form.save(commit=False)
         location = Point(float(lng), float(lat),srid=4326)
@@ -499,49 +601,18 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
 
         longitude= 32.658821726608004#27.553711
         latitude =-18.985227330788064#-20.756114
+        
         # Point(Lat,Long)
         user_location = Point(longitude,latitude,srid=4326)
 
         context["json_user_location_x"] =user_location.x#location_es
         context["json_user_location_y"] =user_location.y#location_es
+        
         x = user_location.x# default val
         y =  user_location.x# default val
         user_location = Point(float(x), float(y),srid=4326)#default
 
-        user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by =self.request.user, complete=False)
-        if tc_created:
-            qs= UserLocation.objects.filter(user=self.request.user)
-            ul_instance=None
-            if qs:
-                ul_instance= qs.first()
-                ul_instance.location =user_location
-                ul_instance.save()
-            else:
-                ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
-                ul_instance.save()
-            # ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
-            # if location_created:
-            #     #save location Point
-            #     ul_instance.location =user_location
-            #     ul_instance.save()
-            user_tc_instance.residence =ul_instance
-            user_tc_instance.save()
-        else:
-            if  not user_tc_instance.residence:
-                # no residence
-                qs= UserLocation.objects.filter(user=self.request.user)
-                ul_instance=None
-                if qs:
-                    ul_instance= qs.first()
-                    ul_instance.location =user_location
-                    ul_instance.save()
-                else:
-                    ul_instance =UserLocation.objects.create(user=self.request.user, location =user_location)
-                    ul_instance.save()
-                # save residences
-                user_tc_instance.residence =ul_instance
-                user_tc_instance.save()
-        #context["form"] =TradedCurrencyForm(initial ={'created_by': self.request.user})
+        user_tc_instance=get_and_save_instance(self.request.user, user_location)
         context["form"] =TradedCurrencyForm(instance =user_tc_instance)
         return context
 
@@ -591,9 +662,7 @@ def create_tc_ajax(request):
 	if request.method == 'POST':
 		form = TradedCurrencyForm(request.POST or None)
 	else:
-		#first time call from loco failure list
-        # kwargs = super().get_form_kwargs()
-        # kwargs.update({'user': self.request.user})
+		
 		form = TradedCurrencyForm(initial={'created_by': request.user })
 	return create_tc(request,form,'markers/tradedcurrency_modal.html')
 
@@ -644,11 +713,7 @@ def tc_update(request):
                 ul_instance =UserLocation.objects.create(user=request.user, location =user_location)
                 ul_instance.save()
 
-            #ul_instance, location_created = UserLocation.objects.get_or_create(user=request.user)
-            # if location_created:
-            #     #save defaul location Point
-            #     ul_instance.location =user_location
-            #     ul_instance.save()
+          
             instance_.residence =ul_instance
             instance_.save()
     else:

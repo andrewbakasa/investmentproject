@@ -41,6 +41,15 @@
                 </br>
 
                 <div class="form-group row">
+                  <label class="col-sm-2 control-label" for="{{ form.value.id_for_label }}">{{ form.value.label }}</label>
+                  <div class="col-sm-4">
+                    {{ form.value|add_class:"form-control" }}
+                    {% for error in form.value.errors %}
+                    <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  </div>  
+
+
                   <label class="col-sm-2 control-label" for="{{ form.rate_expected.id_for_label }}">{{ form.rate_expected.label }}</label>
                   <div class="col-sm-4">
                     {{ form.rate_expected|add_class:"form-control" }}
@@ -49,13 +58,7 @@
                     {% endfor %}
                   </div>
               
-                  <label class="col-sm-2 control-label" for="{{ form.value.id_for_label }}">{{ form.value.label }}</label>
-                  <div class="col-sm-4">
-                    {{ form.value|add_class:"form-control" }}
-                    {% for error in form.value.errors %}
-                    <span class="help-block">{{ error }}</span>
-                    {% endfor %}
-                  </div>  
+                  
               </div>
               </br>
                   <div class="form-group row">

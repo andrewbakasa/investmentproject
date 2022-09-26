@@ -72,6 +72,7 @@ window.addEventListener("map:init", function (event) {
          },
          onEachFeature: function onEachFeature(feature, layer) {
            var props = feature.properties;
+           console.log('********** Init:Prop:', props)
           
            var content 
            let lat_lng = [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]]
@@ -259,7 +260,7 @@ function set_map(map){
 
 function append_html(val){
         var prod_url = ''
-        
+        console.log('******** APPEND :: ITERATION', val)
         if (val.image !== null) {
             prod_url =`<img src="${val.image}" class="img-fluid product-tag" data-item-id="${val.uid}}">`
         }else {
@@ -421,7 +422,16 @@ function getPosition(position){
   }
   
 }
-
+function insert_initial(){
+  return 
+  console.log('::::::NEWNEW 1111', id_found)
+  map.eachLayer(function(ll){
+    if (!(id_found.includes(ll._id))){
+      id_found.push(ll._id)
+    }
+  })
+  console.log('::::::AFTER', id_found)
+}
 function update_popup(map,props,newContent){
   map.eachLayer(function(i_layer){               
     if (i_layer._id == props.uid){
@@ -474,13 +484,14 @@ function myScript(){
     id_found.pop();
   } // Fastest
   id_found.push('marker')
+  //insert_initial()
   // Download GeoJSON data with Ajax
     fetch(dataurl
       ).then(function(resp) {
         return resp.json();
       })
       .then(function(data) {
-      
+        console.log('*****  MyScript: data ...', data)
         console.log('*****  MyScript: data features...', data.features)
         $('.apartments').html("")
         let search_str =search_val
@@ -504,7 +515,8 @@ function myScript(){
           },
           onEachFeature: function onEachFeature(feature, layer) {
             var props = feature.properties;
-            
+            console.log("****** Are we in features?")
+            console.log('****** MyScrip:Prop:', props)
            
             var content 
             //-- append data------

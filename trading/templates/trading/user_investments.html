@@ -277,11 +277,11 @@
 <script src="{% static 'mentor/assets/js/search.js' %}"></script>
 <script>
     function truncChar(str,length){
-    var myTruncatedString = str.substring(0,length-1);              
-    if (str.length > myTruncatedString.length){
-    return myTruncatedString + "..."
-    }
-    return myTruncatedString
+        var myTruncatedString = str.substring(0,length-1);              
+        if (str.length > myTruncatedString.length){
+        return myTruncatedString + "..."
+        }
+        return myTruncatedString
     }
     function numberWithCommas(x) {
     var parts = x.toString().split(".");

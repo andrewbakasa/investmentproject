@@ -13,9 +13,8 @@ from store.models import Product
 
 class TradedCurrencySerializer(GeoFeatureModelSerializer):
 	location = GeometrySerializerMethodField(source='residence.location')
-	#shop_name = serializers.StringRelatedField(read_only=True)
-
 	distance = serializers.SerializerMethodField()
+	rank = serializers.SerializerMethodField()
 	uid = serializers.SerializerMethodField()
 	username = serializers.SerializerMethodField()
 	offer_symbol = serializers.SerializerMethodField()
@@ -53,6 +52,12 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 			return obj.distance.m
 		except:
 			return None
+	def get_rank(self, obj):
+		try:
+			#print(obj.distance)
+			return obj.rank
+		except:
+			return None
 	def get_location(self, obj):
 		try:
 			#print(obj.distance)
@@ -62,17 +67,16 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 		
 	class Meta:
 		model = TradedCurrency
-		fields = ['uid', 'value', 'image', 'username', 'description', 'offer_symbol',  'expected_symbol', 'rate_expected', 'distance'] 
+		fields = ['uid', 'value', 'image', 'rank', 'username', 'description', 'offer_symbol',  'expected_symbol', 'rate_expected', 'distance'] 
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 
 class ProductSerializer(GeoFeatureModelSerializer):
 	location = GeometrySerializerMethodField(source='shop.location')
-	#shop_name = serializers.StringRelatedField(read_only=True)
-
 	distance = serializers.SerializerMethodField()
 	pid = serializers.SerializerMethodField()
 	shopname = serializers.SerializerMethodField()
+	rank = serializers.SerializerMethodField()
 	def get_shopname(self, obj):
 		try:
 			return obj.shop.name
@@ -91,10 +95,15 @@ class ProductSerializer(GeoFeatureModelSerializer):
 			return None
 	def get_location(self, obj):
 		return obj.shop.location
-		
+	def get_rank(self, obj):
+		try:
+			#print(obj.distance)
+			return obj.rank
+		except:
+			return None	
 	class Meta:
 		model = Product
-		fields = ['pid', 'name', 'image', 'price','distance', 'shopname'] 
+		fields = ['pid', 'name', 'rank','image', 'price','distance', 'shopname'] 
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 
