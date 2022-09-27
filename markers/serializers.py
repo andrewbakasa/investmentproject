@@ -20,7 +20,23 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 	offer_symbol = serializers.SerializerMethodField()
 	expected_symbol = serializers.SerializerMethodField()
 	image = serializers.SerializerMethodField()
+	tag_source_username = serializers.SerializerMethodField() 
+	tag_target_username = serializers.SerializerMethodField() 
+	source_id = serializers.SerializerMethodField()                                                                
+	
 
+	def get_tag_target_username(self, obj):
+		try:
+			return obj.get_target
+		
+		except:
+			return 'NoData'
+	def get_tag_source_username(self, obj):
+		try:
+			return obj.get_source
+		
+		except:
+			return 'NoData'
 	def get_image(self, obj):
 		try:
 			return UserProfile.objects.filter(user= obj.created_by).first().imageURL
@@ -64,10 +80,15 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 			return obj.residence.location
 		except:
 			return None
-		
+	def get_source_id(self, obj):
+		try:
+			#print(obj.distance)
+			return obj.pk
+		except:
+			return None	
 	class Meta:
 		model = TradedCurrency
-		fields = ['uid', 'value', 'image', 'rank', 'username', 'description', 'offer_symbol',  'expected_symbol', 'rate_expected', 'distance'] 
+		fields = ['uid', 'value', 'image', 'tag_target_username','tag_source_username', 'source_id', 'rank', 'username', 'description', 'offer_symbol',  'expected_symbol', 'rate_expected', 'distance'] #
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 

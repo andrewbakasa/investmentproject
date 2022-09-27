@@ -21,7 +21,7 @@ from customers.forms import ProductForm
 from markers.forms import MarkerForm, ShopForm, TradedCurrencyForm, TradedCurrencyFormUpdate
 from store.models import Product, Shop
 
-from .models import Marker, TradedCurrency, UserLocation
+from .models import CurrencyTag, Marker, TradedCurrency, UserLocation
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, render,redirect
@@ -665,6 +665,53 @@ def create_tc_ajax(request):
 		
 		form = TradedCurrencyForm(initial={'created_by': request.user })
 	return create_tc(request,form,'markers/tradedcurrency_modal.html')
+login_required(login_url="account_login")
+
+
+# class CurrencyTag(models.Model):
+# target = models.ForeignKey(TradedCurrency,related_name="targetA", on_delete= models.SET_NULL, null=True)
+# source = models.ForeignKey(TradedCurrency,related_name="sourceA", on_delete= models.SET_NULL, null=True)
+# date_created = models.DateTimeField(auto_now_add=True, null=True)
+# last_modified=models.DateTimeField(auto_now=True)
+# created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
+# def __str__(self):
+   
+   
+def create_currency_tag_ajax(request, target_id,  *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax():
+            target= TradedCurrency.objects.filter(pk=target_id).first()
+            #target.created_by
+            source=TradedCurrency.objects.filter(Q(created_by=request.user), Q(complete=False)).first()#,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
+           
+            qs= CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user))
+            if qs:
+              
+                instance= qs.first()
+            else:
+                # delete all tags  created by me with source
+                CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
+                instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
+                instance.save() 
+            # queryset = Investor.objects.filter(Q(user=request.user)).first() 
+           
+            # #change selected accepted investor into engagement
+            # obj=Investor.objects.filter(user=request.user, investment__pk=id)
+            # obj= obj.first()
+            # if obj:
+            #     obj.application_status= 'engagement'
+            #     obj.date_status_changed= timezone.now()#datetime.datetime.now() 
+
+            #     obj.save()
+            data={}	
+            item_object = {}
+            #data["results"]=results
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
 
 
 login_required(login_url="account_login")

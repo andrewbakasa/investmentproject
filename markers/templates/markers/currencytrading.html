@@ -276,6 +276,42 @@
                 $('#modal-tc').modal('hide'); 
             })
 
+          $('body').on('click', '.ajax_tag_me', function (event) {
+               
+                event.preventDefault();
+                var href = $(this).attr('href');
+                var url = $(this).attr('data-url')
+                // ajax call
+                ajax_tag(url)
+           });
+           function ajax_tag(href){
+               
+                var data
+                data = { 
+                        csrfmiddlewaretoken: csrftoken,
+                    }
+            
+                //console.log(app_status,)
+                $.ajax({
+                        type: "POST",
+                        url: href, 
+                        data :data,
+                        // handle a successful response
+                        success: function (response) {
+                           
+                        
+                           
+                            },
+                            error: function () {
+                                alert('Error Occured');
+                            }
+                            
+                    });
+                    //add_model_class()
+                    myScript()
+                }
+ 
+
       </script>
       <script src="{% static 'currency/app.js' %}"></script>
       

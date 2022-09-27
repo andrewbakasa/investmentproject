@@ -113,7 +113,6 @@ def product_load_tags_search_string(request, tagname, search_str):
 
     tags= ProductCategory.objects.filter(name=tagname)
     models= Product.objects.filter(Q(tags__in=tags), Q(description__icontains=search_str))
-
     if not ('perpage' in request.session):
         #print('session[perpage] on set')
         if request.user.is_authenticated:

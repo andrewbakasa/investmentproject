@@ -31,7 +31,6 @@ class UserLocation(models.Model):
         ordering = ['location']
 
 
-
 class TradedCurrency(models.Model):
     #user = models.ForeignKey(User, null=True, blank=True, on_delete= models.SET_NULL)
     residence = models.ForeignKey(UserLocation,verbose_name="location", related_name='residenceA', on_delete= models.SET_NULL,null=True, blank=False)
@@ -52,7 +51,41 @@ class TradedCurrency(models.Model):
     
     class Meta:
         ordering = ['date_created']
+    @property
+    def get_target(self):
+        l =''
+        items = self.targetA.all()
+        for item in items:
+            if l=="" and item.target:
+                l = str(item.target.created_by.username)
+            elif item.target:
+                l += ',' + str(item.target.created_by.username)
 
+        return l
+    @property    
+    def get_source(self):
+        l =''
+        items = self.targetA.all()#.source
+        for item in items:
+            if l=="" and item.source:
+                l = str(item.source.created_by.username)
+            elif item.source:
+                l = l + ',' + str(item.source.created_by.username)
+        return l
+class CurrencyTag(models.Model):
+    target = models.ForeignKey(TradedCurrency,related_name="targetA", on_delete= models.SET_NULL, null=True)
+    source = models.ForeignKey(TradedCurrency,related_name="sourceA", on_delete= models.SET_NULL, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    last_modified=models.DateTimeField(auto_now=True)
+    #tagged  =models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
+    def __str__(self):
+        if self.created_by:
+            return self.created_by.username
+        return "No Data"
+    
+    class Meta:
+        ordering = ['date_created']
 
     
 from django.contrib.gis.db import models as gis_models

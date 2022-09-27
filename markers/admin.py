@@ -2,7 +2,7 @@
 
 from django.contrib.gis import admin
 
-from .models import Marker, TradedCurrency, UserLocation
+from .models import CurrencyTag, Marker, TradedCurrency, UserLocation
 
 
 @admin.register(Marker)
@@ -18,3 +18,4 @@ class UserLocationAdmin(admin.OSMGeoAdmin):
     list_display = ("user", "location")
 
 admin.site.register(TradedCurrency)
+admin.site.register(CurrencyTag)
