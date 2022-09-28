@@ -17,6 +17,7 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
     {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
+    {{ user_name|json_script:"user-name-data" }}<!--Lat-->
 {% endblock %}
 
 {% block content_header %}

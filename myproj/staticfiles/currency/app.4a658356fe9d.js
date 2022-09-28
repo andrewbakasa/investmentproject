@@ -1,28 +1,12 @@
 
  var user_loc_x = JSON.parse(document.getElementById('user-x-data').textContent);//--Long--
- var user_loc_y = JSON.parse(document.getElementById('user-y-data').textContent);//--Lat-
- var user_name = JSON.parse(document.getElementById('user-name-data').textContent);//--Lat-
-
+ var user_loc_y = JSON.parse(document.getElementById('user-y-data').textContent);//--Lat--
  var map = L.map('mapid').setView([user_loc_x, user_loc_y], 13);
  var bounds = L.latLngBounds() // Instantiate LatLngBounds object
  const color = ["#fe4848", "#fe6c58", "#fe9068", "#feb478", "#fed686"];
  const taggedIcon = L.divIcon({
   className: "marker",
-  html: svgTemplateColor(' #FF00FF'),//MAGENTA,'#2b92eb'
-  iconSize: [40, 40],
-  iconAnchor: [12, 24],
-  popupAnchor: [7, -16],
-});
-const matchIcon = L.divIcon({
-  className: "marker",
-  html: svgTemplateColor('#FFD700'),//GOLD,'#2b92eb'
-  iconSize: [40, 40],
-  iconAnchor: [12, 24],
-  popupAnchor: [7, -16],
-});
-const mytrackerIcon = L.divIcon({
-  className: "marker",
-  html: svgTemplateColor('#00FF00'),//GREEN,'#2b92eb'
+  html: svgTemplateColor(color[4]),//,'#2b92eb'
   iconSize: [40, 40],
   iconAnchor: [12, 24],
   popupAnchor: [7, -16],
@@ -76,105 +60,104 @@ var map
 window.addEventListener("map:init", function (event) {
   
   map = event.detail.map;
-  myScript()
-  // while (id_found.length > 0) {
-  //   id_found.pop();
-  // } // Fastest
-  //  id_found.push('marker')
-  //  // Download GeoJSON data with Ajax
-  //  fetch(dataurl
-  //    ).then(function(resp) {
-  //      return resp.json();
-  //    })
-  //    .then(function(data) {
-  //      //clear Product Data
-  //      $('.apartments').html("")
-  //      L.geoJson(data, {
-  //        pointToLayer: function(feature, latlng) {
-  //          const smallIcon = L.divIcon({
-  //            className: "marker",
-  //            html: svgTemplateColor('#2b92eb'),//color[5]),
-  //            iconSize: [40, 40],
-  //            iconAnchor: [12, 24],
-  //            popupAnchor: [7, -16],
-  //          });
+  while (id_found.length > 0) {
+    id_found.pop();
+  } // Fastest
+   id_found.push('marker')
+   // Download GeoJSON data with Ajax
+   fetch(dataurl
+     ).then(function(resp) {
+       return resp.json();
+     })
+     .then(function(data) {
+       //clear Product Data
+       $('.apartments').html("")
+       L.geoJson(data, {
+         pointToLayer: function(feature, latlng) {
+           const smallIcon = L.divIcon({
+             className: "marker",
+             html: svgTemplateColor('#2b92eb'),//color[5]),
+             iconSize: [40, 40],
+             iconAnchor: [12, 24],
+             popupAnchor: [7, -16],
+           });
            
-  //          return L.marker(latlng, {icon: smallIcon});
-  //        },
-  //        onEachFeature: function onEachFeature(feature, layer) {
-  //          var props = feature.properties;
+           return L.marker(latlng, {icon: smallIcon});
+         },
+         onEachFeature: function onEachFeature(feature, layer) {
+           var props = feature.properties;
           
-  //          var content 
-  //          let lat_lng = [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]]
-  //          bounds.extend(lat_lng)      // Extend LatLngBounds with coordinates 
-  //          a_html=append_html(props)
-  //          $(a_html).bind("mouseover",function(){
-  //               map.flyTo([layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]],12)
-  //          }).appendTo($('.apartments'));
-  //          //-----------------------------
+           var content 
+           let lat_lng = [layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]]
+           bounds.extend(lat_lng)      // Extend LatLngBounds with coordinates 
+           a_html=append_html(props)
+           $(a_html).bind("mouseover",function(){
+                map.flyTo([layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]],12)
+           }).appendTo($('.apartments'));
+           //-----------------------------
          
-  //          anchor_tag =`<a class="ajax_tag_me"  href="#" data-url="/m/tag_currency_ajax/${props.source_id}/" 
-  //               data-target="#modal-edit-product-div" style="color:inherit" 
-  //               data-toggle="tooltip" data-placement="bottom" 
-  //               title='Tag Me'>${props.username}
-  //           </a> `
-  //          if (props.image) {
-  //            content = `<img  style="width:100%;height:100px; object-fit: cover;" src="${props.image}"/></br><p><i style='color:blue'>Summary</i>: ${truncChar(props.description,100)}</br>
-  //                         <i style='color:blue'>Uname</i>: ${anchor_tag} &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)}&nbsp; ${props.offer_symbol}${nFormatter(props.value,2)} &nbsp;@${props.rate_expected}</p>`;
+           anchor_tag =`<a class="ajax_tag_me"  href="#" data-url="/m/tag_currency_ajax/${props.source_id}/" 
+                data-target="#modal-edit-product-div" style="color:inherit" 
+                data-toggle="tooltip" data-placement="bottom" 
+                title='Tag Me'>${props.username}
+            </a> `
+           if (props.image) {
+             content = `<img  style="width:100%;height:100px; object-fit: cover;" src="${props.image}"/></br><p><i style='color:blue'>Summary</i>: ${truncChar(props.description,100)}</br>
+                          <i style='color:blue'>Uname</i>: ${anchor_tag} &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)}&nbsp; ${props.offer_symbol}${nFormatter(props.value,2)} &nbsp;@${props.rate_expected}</p>`;
           
-  //          } else {
-  //            content = `<img                                                       src=""             /></br><p><i style='color:blue'>Summary</i>: ${truncChar(props.description,100)}</br>
-  //                         <i style='color:blue'>Uname</i>: ${anchor_tag} &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)} &nbsp;  ${props.offer_symbol}${nFormatter(props.value,2)} &nbsp;@${props.rate_expected}</p>`;
+           } else {
+             content = `<img                                                       src=""             /></br><p><i style='color:blue'>Summary</i>: ${truncChar(props.description,100)}</br>
+                          <i style='color:blue'>Uname</i>: ${anchor_tag} &nbsp;<i class="fas fa-map-marker-alt"></i>${nFormatterdist(props.distance,1)} &nbsp;  ${props.offer_symbol}${nFormatter(props.value,2)} &nbsp;@${props.rate_expected}</p>`;
           
-  //          }
+           }
           
-  //         layer.bindPopup(content)
-  //         layer.bindTooltip(
-  //           '<small>' + props.offer_symbol + nFormatter(props.value,2)  +" @" + nFormatter(props.rate_expected,2)+ "</small>",
-  //             {
-  //               direction: 'right',
-  //               permanent: true,
-  //               sticky: true,
-  //               offset: [10, 0],
-  //               opacity: 0.65,
-  //               className: 'leaflet-tooltip-own' 
-  //             });
+          layer.bindPopup(content)
+          layer.bindTooltip(
+            '<small>' + props.offer_symbol + nFormatter(props.value,2)  +" @" + nFormatter(props.rate_expected,2)+ "</small>",
+              {
+                direction: 'right',
+                permanent: true,
+                sticky: true,
+                offset: [10, 0],
+                opacity: 0.65,
+                className: 'leaflet-tooltip-own' 
+              });
 
-  //         layer._id = props.uid
+          layer._id = props.uid
         
-  //         let tag_found=false
-  //         pB.eachLayer(function(ll){
+          let tag_found=false
+          pB.eachLayer(function(ll){
                
-  //           if (ll._id == props.uid){
-  //             //console.log('test_lay::::' , ll);
-  //             tag_found=true
-  //             if (!(id_found.includes(props.uid))){
-  //               id_found.push(props.uid)
-  //             }
-  //           }
-  //         })
-  //         if (!tag_found){
-  //           pB.addLayer(layer);
-  //           map.addLayer(layer);
-  //           if (!(id_found.includes(props.uid))){
-  //             id_found.push(props.uid)
-  //           }
-  //         }
+            if (ll._id == props.uid){
+              //console.log('test_lay::::' , ll);
+              tag_found=true
+              if (!(id_found.includes(props.uid))){
+                id_found.push(props.uid)
+              }
+            }
+          })
+          if (!tag_found){
+            pB.addLayer(layer);
+            map.addLayer(layer);
+            if (!(id_found.includes(props.uid))){
+              id_found.push(props.uid)
+            }
+          }
 
          
          
-  //      }})//.addTo(map);
-  //      // origin::::::
-  //      pB.eachLayer(function(ll){
-  //       if (!(id_found.includes(ll._id))){
-  //         map.removeLayer(ll)
-  //       }else{
-  //         // console.log('not removed',ll._id) 
-  //       }
-  //     })
+       }})//.addTo(map);
+       // origin::::::
+       pB.eachLayer(function(ll){
+        if (!(id_found.includes(ll._id))){
+          map.removeLayer(ll)
+        }else{
+          // console.log('not removed',ll._id) 
+        }
+      })
     
      
-  //    });
+     });
 
  });
 
@@ -459,8 +442,7 @@ function getPosition(position){
 }
 
 function update_popup(map,props,newContent, currentLayer){
-  map.eachLayer(function(i_layer){ 
-                 
+  map.eachLayer(function(i_layer){               
     if (i_layer._id == props.uid){
         i_layer.setPopupContent(newContent)
      
@@ -471,58 +453,20 @@ function update_popup(map,props,newContent, currentLayer){
         3
         Glad it helped. With hindsight, if (layer instanceof L.Marker) */
         if(i_layer.options && i_layer.options.pane === "markerPane") {
-          // remove marker which are already ttaged by others users
-          if (props.tag_source_username.length>0 || props.tag_target_username.length>0){
-            if (!(
-                  (props.tag_source_username == user_name) || 
-                              (props.tag_target_username ==user_name)
-                  ))
-                  //console.log('Removed layer:', i_layer)
-              map.removeLayer(i_layer) 
-          }
           if (props.tag_source_username.length>0){
             //console.log('2....Setting iCon >>' + props.tag_target_username + " >" + props.tag_source_username.length)
             oldLatLng= i_layer.getLatLng()
             newLatLng= currentLayer.getLatLng()
             
-            //console.log('OLD latLang',oldLatLng)
-            //console.log('NEW latLang',newLatLng)
+            console.log('OLD latLang',oldLatLng)
+            console.log('NEW latLang',newLatLng)
             //update tthose wich are marked
             i_layer.setLatLng(newLatLng) 
-           
-           
-            //someoone has targeted me and its at match
-            if (props.tag_target_username ==user_name){
-              // match here
-              i_layer.setIcon(matchIcon);
-               //this laye shoup moved
-                console.log('MATCH', props.tag_target_username)
-            }else if (props.tag_source_username ==user_name) {
-              // suitor
-              //console.log("Suitor", props.tag_target_username)
-              i_layer.setIcon(mytrackerIcon);
-             
-           }else {
-               //this laye shoup moved
-              //console.log('TARGET VS USERNANE', props.tag_target_username,user_name)
-              //my target
-              //console.log("Tagged", props.username)
-              i_layer.setIcon(taggedIcon);
-            }
+            i_layer.setIcon(taggedIcon);
+            //this laye shoup moved
             
           }else {
-            //  //nothing here
-            //  //someoone has targeted me awating my confirmation
-            //  if (props.tag_target_username ==user_name){
-            //    // suitor
-            //    console.log("hhhhhhhhh", props.tag_target_username)
-            //    i_layer.setIcon(mytrackerIcon);
-              
-            // }else {
-              // ordinary
-              i_layer.setIcon(smallIcon);
-              //console.log("Free", props.username)
-            // }
+            i_layer.setIcon(smallIcon);
             //console.log('Nothing >>' + props.tag_target_username)
           }
       }
@@ -671,7 +615,8 @@ function myScript(){
               }
             })
 
-           
+           //update map content
+            update_popup(map,props,content,layer)
             //methos not working
             //update_toolTip(map,props,newtooltipContent)
            
@@ -683,9 +628,6 @@ function myScript(){
                   id_found.push(props.uid)
                 }
             }
-
-            //update map content
-            update_popup(map,props,content,layer)
             
       }})//.addTo(map);
       

@@ -607,6 +607,7 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
 
         context["json_user_location_x"] =user_location.x#location_es
         context["json_user_location_y"] =user_location.y#location_es
+        context["user_name"] =self.request.user.username
         
         x = user_location.x# default val
         y =  user_location.x# default val
@@ -614,6 +615,7 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
 
         user_tc_instance=get_and_save_instance(self.request.user, user_location)
         context["form"] =TradedCurrencyForm(instance =user_tc_instance)
+
         return context
 
 class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
@@ -677,6 +679,30 @@ login_required(login_url="account_login")
 # def __str__(self):
    
    
+""" 
+ Source (A)                  Target (Mark)                 Other user (B)   
+ /\                      -----                          /\
+/Ua\  ------->          |_u1__|  <-----------||--------/ub\  qs_other_users  . Check target of other user
+    \
+      \  
+        \
+          ||
+            \  
+              \  
+         \       \       ----- 
+          \         \   |_u2__|
+
+             \
+              ||
+                \
+                
+                  \
+
+                     \
+                       \ ------
+                        |_u3__|
+
+"""
 def create_currency_tag_ajax(request, target_id,  *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
@@ -686,23 +712,23 @@ def create_currency_tag_ajax(request, target_id,  *args, **kwargs):
            
             qs= CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user))
             if qs:
-              
-                instance= qs.first()
-            else:
-                # delete all tags  created by me with source
+                #Toggle/add/remove
                 CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
-                instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
-                instance.save() 
-            # queryset = Investor.objects.filter(Q(user=request.user)).first() 
-           
-            # #change selected accepted investor into engagement
-            # obj=Investor.objects.filter(user=request.user, investment__pk=id)
-            # obj= obj.first()
-            # if obj:
-            #     obj.application_status= 'engagement'
-            #     obj.date_status_changed= timezone.now()#datetime.datetime.now() 
-
-            #     obj.save()
+                #instance= qs.first()
+            else:
+                #check if any user is tracking this person
+                qs_other_users =CurrencyTag.objects.filter(target =target).exclude(created_by=request.user)
+                if not qs_other_users:
+                    #print('>>>>>>>>>>>>>>>>>>>>>>...............................THERE ARE OTHERS')
+                    # delete all tags  created by me with source
+                    CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
+                    instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
+                    instance.save() 
+                else:
+                    pass
+                    #do something engaged match
+                    # delete all tags  created by me with source
+                    CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
             data={}	
             item_object = {}
             #data["results"]=results
@@ -729,7 +755,7 @@ def create_tc(request,form,template_name):
             latest = TradedCurrency.objects.latest('id').id
             record = TradedCurrency.objects.get(pk=latest)
             item_object = model_to_dict(record)
-            print(item_object)
+            #print(item_object)
            
           
             data['model'] = item_object
