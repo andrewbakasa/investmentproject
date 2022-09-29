@@ -33,7 +33,7 @@ urlpatterns = [
     path('tc_update/', views.tc_update, name="update_tc"),
 
   
-    path('tag_currency_ajax/<str:target_id>/', views.create_currency_tag_ajax, name="create_currency_tag_ajax"),
+    path('tag_currency_ajax/<str:owner_id>/', views.create_currency_tag_ajax, name="create_currency_tag_ajax"),
     
 ]
 

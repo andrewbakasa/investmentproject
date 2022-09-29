@@ -305,9 +305,10 @@ class CurrencyLocationView(APIView):
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
         update_user_location(self.request,x,y)
-        user_location = Point(float(x), float(y),srid=4326)
+        user_location = Point(float(x), float(y),srid=4326)      
         # user allowed one incomplete record only
         user_tc_instance=get_and_save_instance(self.request.user, user_location)
+        
         #user expectation
         dict_=get_aggregate(user_tc_instance)       
         uc_queryset= get_queryset(user_tc_instance,dict_)   
@@ -315,6 +316,8 @@ class CurrencyLocationView(APIView):
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+ 
 def get_and_save_instance(user, user_loc):
     user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=user, complete=False)
     if tc_created:
@@ -420,6 +423,9 @@ def get_queryset(user_tc_instance,dict_):
                                 user_location
                             ),
                     ).order_by('rank')[0:6]  
+
+    # for i in uc_queryset:
+    #     print(i.currency_offered,",", i.currency_expected,",",i.created_by,",",i.value)
     return uc_queryset
 @method_decorator(login_in_user_only_with_routing(), name='dispatch')   
 class ProductLocationSlugView(APIView):
@@ -495,7 +501,7 @@ class TradedCurrencyLocationSlugView(APIView):
         user_location = Point(float(x), float(y),srid=4326)
         # user allowed one incomplete record only
         user_tc_instance=get_and_save_instance(self.request.user, user_location)
-       
+        
         #user expectation
         dict_=get_aggregate(user_tc_instance)       
         uc_queryset= get_queryset(user_tc_instance,dict_) 
@@ -611,13 +617,23 @@ class CurrencyTradingLocationViewLandingPage(LoginRequiredMixin, generic.Templat
         
         x = user_location.x# default val
         y =  user_location.x# default val
+        
+     
+
         user_location = Point(float(x), float(y),srid=4326)#default
 
         user_tc_instance=get_and_save_instance(self.request.user, user_location)
         context["form"] =TradedCurrencyForm(instance =user_tc_instance)
-
+        # dummy_change_location(self.request)
         return context
 
+def dummy_change_location(request):
+    x= 32.658821726608004#27.553711
+    y =-20.985227330788064#-20.756114
+    user_location = Point(float(x), float(y),srid=4326)#default
+    user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)   
+    user_tc_instance.residence.location =user_location   
+    user_tc_instance.save() 
 class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
     template_name = 'markers/product.html'
 
@@ -703,35 +719,35 @@ login_required(login_url="account_login")
                         |_u3__|
 
 """
-def create_currency_tag_ajax(request, target_id,  *args, **kwargs):
+def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
-            target= TradedCurrency.objects.filter(pk=target_id).first()
-            #target.created_by
+            # incoming A
+            target= TradedCurrency.objects.filter(pk=owner_id).first()
+            #i am stading here
+            """ Source is keeping changing........B """
             source=TradedCurrency.objects.filter(Q(created_by=request.user), Q(complete=False)).first()#,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
            
             qs= CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user))
+          
             if qs:
                 #Toggle/add/remove
-                CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
-                #instance= qs.first()
+                print('Why Toggle', qs)
+                CurrencyTag.objects.filter(source=source, created_by=request.user).delete()
+               
             else:
                 #check if any user is tracking this person
                 qs_other_users =CurrencyTag.objects.filter(target =target).exclude(created_by=request.user)
                 if not qs_other_users:
-                    #print('>>>>>>>>>>>>>>>>>>>>>>...............................THERE ARE OTHERS')
                     # delete all tags  created by me with source
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
                     instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
                     instance.save() 
                 else:
-                    pass
-                    #do something engaged match
-                    # delete all tags  created by me with source
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
             data={}	
             item_object = {}
-            #data["results"]=results
+           
             return JsonResponse({"data":data})
         else:
             return JsonResponse({'error': True, 'data': 'errors'})  

@@ -2,7 +2,7 @@ from pyexpat import model
 from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.db.models import Q
 from django.urls import reverse
 from django.contrib.gis import forms
 
@@ -41,44 +41,9 @@ class TradedCurrency(models.Model):
     value = models.IntegerField(verbose_name="Offered Value",default=0)
     complete =models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
+    created_by = models.ForeignKey(User, on_delete= models.CASCADE,null=True)
   
 
-    def __str__(self):
-        if self.description:
-            return self.description
-        return "No Data"
-    
-    class Meta:
-        ordering = ['date_created']
-    @property
-    def get_target(self):
-        l =''
-        items = self.targetA.all()
-        for item in items:
-            if l=="" and item.target:
-                l = str(item.target.created_by.username)
-            elif item.target:
-                l += ',' + str(item.target.created_by.username)
-
-        return l
-    @property    
-    def get_source(self):
-        l =''
-        items = self.targetA.all()#.source
-        for item in items:
-            if l=="" and item.source:
-                l = str(item.source.created_by.username)
-            elif item.source:
-                l = l + ',' + str(item.source.created_by.username)
-        return l
-class CurrencyTag(models.Model):
-    target = models.ForeignKey(TradedCurrency,related_name="targetA", on_delete= models.SET_NULL, null=True)
-    source = models.ForeignKey(TradedCurrency,related_name="sourceA", on_delete= models.SET_NULL, null=True)
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    last_modified=models.DateTimeField(auto_now=True)
-    #tagged  =models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete= models.SET_NULL,null=True)
     def __str__(self):
         if self.created_by:
             return self.created_by.username
@@ -86,6 +51,110 @@ class CurrencyTag(models.Model):
     
     class Meta:
         ordering = ['date_created']
+    
+    @property    
+    def get_matching_partner(self):
+      
+        items = self.targetA.all()#.s
+        if items:
+            return items.first().matching_partner()
+        return False
+    @property    
+    def get_suitor(self):
+        #get all tags created by this user
+        qs= CurrencyTag.objects.filter(Q(source__created_by =self.created_by))#.exclude(Q(source__created_by=self.created_by))
+        if qs:
+            l =""
+            for i in qs:
+                #get the username list
+                if l=="":
+                    l= i.target.created_by.username
+                else:
+                    l= l + "," + i.target.created_by.username
+
+            return l + ","
+        return ""
+    @property    
+    def get_source_target(self):
+        l =''
+        l_twin =""
+        items = self.targetA.all()#.source
+       
+        for item in items:
+            if item.source:
+                if l =="":
+                    l = str(item.source.created_by.username)
+                else:
+                    l = l + ',' + str(item.source.created_by.username)
+            if item.target:
+                if l_twin =="":
+                    l_twin = str(item.target.created_by.username)
+                else:
+                    l_twin = l_twin + ',' + str(item.target.created_by.username)
+        print('Source', items, l,l_twin)
+        return l + "," + l_twin
+    @property
+    def get_target(self):
+        l =''
+        l_twin=""
+        items = self.targetA.all()
+        # g =""
+        # for i in items:
+        #     g += i.target.created_by
+        for item in items:
+            if l=="" and item.target:
+                l = str(item.target.created_by.username)
+                l_twin = str(item.source.created_by.username)
+            else:
+               if item.target:
+                    i += ',' + str(item.target.created_by.username)
+               if item.source:
+                    l_twin += ',' + str(item.source.created_by.username)
+        print('Target', items,l, l_twin)
+        return l
+    @property    
+    def get_source(self):
+        l =''
+        l_twin =""
+        items = self.targetA.all()#.source
+        # g =""
+        # for i in items:
+        #     g+= i.source.created_by
+
+        
+        for item in items:
+            if l=="" and item.source:
+                l = str(item.source.created_by.username)
+                l_twin =str(item.target.created_by.username)
+            else :
+                if item.source:
+                    l = l + ',' + str(item.source.created_by.username)
+                if item.target:
+                    l_twin = l_twin + ',' + str(item.target.created_by.username)
+        print('Source', items, l,l_twin)
+        return l
+class CurrencyTag(models.Model):
+    target = models.ForeignKey(TradedCurrency,related_name="targetA", on_delete= models.CASCADE, null=True)
+    source = models.ForeignKey(TradedCurrency,related_name="sourceA", on_delete= models.CASCADE, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    last_modified=models.DateTimeField(auto_now=True)
+    #tagged  =models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete= models.CASCADE,null=True)
+    def __str__(self):
+        if self.created_by:
+            return self.created_by.username
+        return "No Data"
+    
+    class Meta:
+        ordering = ['date_created']
+
+    def matching_partner(self):
+        qs= CurrencyTag.objects.filter(Q(source=self.target), Q(target =self.source))
+        if qs:
+            return True
+        return False
+    
+
 
     
 from django.contrib.gis.db import models as gis_models

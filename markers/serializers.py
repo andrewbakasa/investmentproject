@@ -20,23 +20,45 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 	offer_symbol = serializers.SerializerMethodField()
 	expected_symbol = serializers.SerializerMethodField()
 	image = serializers.SerializerMethodField()
-	tag_source_username = serializers.SerializerMethodField() 
-	tag_target_username = serializers.SerializerMethodField() 
+	#tag_source_username = serializers.SerializerMethodField() 
+	#tag_target_username = serializers.SerializerMethodField() 
 	source_id = serializers.SerializerMethodField()                                                                
-	
+	owner_id = serializers.SerializerMethodField() 
 
-	def get_tag_target_username(self, obj):
+	
+	tag_source_target = serializers.SerializerMethodField()
+	matching_partner = serializers.SerializerMethodField()
+	suitor = serializers.SerializerMethodField()
+	def get_matching_partner(self, obj):
 		try:
-			return obj.get_target
+			return obj.get_matching_partner
 		
 		except:
 			return 'NoData'
-	def get_tag_source_username(self, obj):
+	def get_suitor(self, obj):
 		try:
-			return obj.get_source
+			return obj.get_suitor
 		
 		except:
 			return 'NoData'
+	def get_tag_source_target(self, obj):
+		try:
+			return obj.get_source_target
+		
+		except:
+			return 'NoData'
+	# def get_tag_target_username(self, obj):
+	# 	try:
+	# 		return obj.get_target
+		
+	# 	except:
+	# 		return 'NoData'
+	# def get_tag_source_username(self, obj):
+	# 	try:
+	# 		return obj.get_source
+		
+	# 	except:
+	# 		return 'NoData'
 	def get_image(self, obj):
 		try:
 			return UserProfile.objects.filter(user= obj.created_by).first().imageURL
@@ -86,9 +108,18 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 			return obj.pk
 		except:
 			return None	
+	def get_owner_id(self, obj):
+		try:
+			#print(obj.distance)
+			return obj.pk
+		except:
+			return None	
 	class Meta:
 		model = TradedCurrency
-		fields = ['uid', 'value', 'image', 'tag_target_username','tag_source_username', 'source_id', 'rank', 'username', 'description', 'offer_symbol',  'expected_symbol', 'rate_expected', 'distance'] #
+		fields = ['uid', 'value', 'image', 'tag_source_target', 
+		'owner_id', 'source_id','matching_partner','suitor', #'tag_target_username','tag_source_username',
+		'rank', 'username', 'description', 'offer_symbol',  'expected_symbol',
+		 'rate_expected', 'distance'] #
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 
