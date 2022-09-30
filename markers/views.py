@@ -354,6 +354,7 @@ def get_and_save_instance(user, user_loc):
             user_tc_instance.save()
     return  user_tc_instance    
 def get_aggregate(user_tc_instance):
+    
     total_agg = TradedCurrency.objects.filter(
         Q(complete=False),
         Q(currency_offered=user_tc_instance.currency_expected),
@@ -389,8 +390,15 @@ def get_aggregate(user_tc_instance):
     #value_min=total_agg['value_min'] 
     dict_['rate_expected_range']=total_agg['rate_expected_range'] if not total_agg['rate_expected_range']== 0 else 1
     dict_['rate_expected_min']=total_agg['rate_expected_min'] 
-    dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
-    dict_['distance_min']=total_agg['distance_min'].m
+    #print('distance_range', dict_['distance_range'])
+    if 'distance_range' in dict_:
+        dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
+    else:
+        dict_['distance_range']=1
+    if 'distance_min' in dict_:
+        dict_['distance_min']=total_agg['distance_min'].m
+    else:
+       dict_['distance_min']=1 
     return dict_   
 
 def get_queryset(user_tc_instance,dict_):
@@ -755,6 +763,31 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
     else:
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 
+
+def complete_currency_ajax(request, owner_id,  *args, **kwargs):
+    if request.method == 'POST':
+        if request.is_ajax():
+            # incoming A : CLOSE
+            target= TradedCurrency.objects.filter(pk=owner_id).first()
+            target.complete= True           
+            target.save() 
+            """ NOTIFY OWNER OF THIS CHANGE....  """
+            #i am stading here
+            """ Source is keeping changing........B """ #AND TIS ALSO CLOSE
+            source=TradedCurrency.objects.filter(Q(created_by=request.user), Q(complete=False)).first()#,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
+            print('Saved!!!!!!!!!!!!!!!!!!!')
+            source.complete= True           
+            source.save() 
+               
+            data={}	
+            item_object = {}
+           
+            return JsonResponse({"data":data})
+        else:
+            return JsonResponse({'error': True, 'data': 'errors'})  
+        
+    else:
+        return JsonResponse({'error': True, 'data': "Request not ajax"})
 
 login_required(login_url="account_login")
 def create_tc(request,form,template_name):

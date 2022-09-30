@@ -240,7 +240,9 @@
                    
                     console.log('Output', data)
                     if(data.product){
+
                           console.log('success', data)
+                          myScript()
                          
                           $('#modal-tc').modal('hide');
                     } else {
@@ -312,7 +314,14 @@
                     myScript()
                 }
  
-
+            $('body').on('click', '.ajax_complete_currency_trade', function (event) {
+                var_fly_bounds=false//
+                event.preventDefault();
+                var href = $(this).attr('href');
+                var url = $(this).attr('data-url')
+                // ajax call
+                ajax_tag(url)
+           });
       </script>
       <script src="{% static 'currency/app.js' %}"></script>
       
