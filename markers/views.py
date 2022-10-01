@@ -750,14 +750,31 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
                 CurrencyTag.objects.filter(source=source, created_by=request.user).delete()
                
             else:
-                #check if any user is tracking this person
+                #check if any user is tracking this person: 
+                """ OTHER SUITORS ARE TRACKING
+                SURVIVAL OF THE FITTEST
+                CHECK IF NO MATCH YES THEN MATCH
+                """
+
                 qs_other_users =CurrencyTag.objects.filter(target =target).exclude(created_by=request.user)
-                if not qs_other_users:
+
+                matching_found= False
+                for i in qs_other_users:
+                    print('Chech partner availabilty')
+                    if i.matching_partner():
+                        print('Found a parnter')
+                        matching_found=True
+                        break
+
+                if not matching_found:
                     # delete all tags  created by me with source
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
+                    print('Creating a Maching here')
                     instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
                     instance.save() 
                 else:
+                    #nothing already
+                    print('Maching found, Polygamy disallowed.......')
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
             data={}	
             item_object = {}
