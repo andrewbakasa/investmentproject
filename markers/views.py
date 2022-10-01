@@ -475,8 +475,14 @@ class ProductLocationSlugView(APIView):
         dict_ = {}
         dict_['price_range']=total_agg['price_range'] if not total_agg['price_range']== 0 else 1
         dict_['price_min']=total_agg['price_min'] 
-        dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
-        dict_['distance_min']=total_agg['distance_min'].m
+        if 'distance_range' in dict_:
+            dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
+        else:
+            dict_['distance_range']=1
+        if 'distance_min' in dict_:
+            dict_['distance_min']=total_agg['distance_min'].m
+        else:
+            dict_['distance_min']=1 
     
         A= 0.25 #price factor
         B= 0.75 #distance factor
