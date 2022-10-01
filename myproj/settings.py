@@ -58,10 +58,10 @@ INSTALLED_APPS = [
     'businessforum.apps.BusinessforumConfig',
     'fishapp.apps.FishappConfig',
     'beefapp.apps.BeefappConfig',   
-    'import_export',   
-    "common",
+    'import_export', 
     'store.apps.StoreConfig',
     'customers.apps.CustomersConfig',
+     'common.apps.CommonConfig',
     'comment',
     
      'django.contrib.gis' ,
@@ -86,6 +86,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'investments_appraisal.middlewares.LastUserActivityMiddleware',
+      'common.middlewares.OneSessionPerUserMiddleware',
     #'common.get_username.RequestMiddleware',
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

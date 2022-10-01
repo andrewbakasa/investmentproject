@@ -347,4 +347,25 @@ class VacancyOffer(models.Model):
 
     def __str__(self):     
         return "{}. {} : {}".format(self.priority, self.vacancy.name, clip_trailing_chars(self.details,50))
+
+"""  
+    You need to create some model that save session_key for each user And 
+    create middleware that checks session key in that model for each user - 
+    if it does not equal to request.session_key - t
+    han remove that session(=logout user, allowing only current to stay)
+    #models.py
+    #and you need to setup signal catching from User model - so for each User Visitor is created
   
+"""
+# class LoggedInUser(models.Model):
+#     user = models.OneToOneField(User, on_delete= models.CASCADE, null=True)
+#     session_key = models.CharField(null=True, blank=True)
+
+# Model to store the list of logged in users
+class LoggedInUser(models.Model):
+    user = models.OneToOneField(User, related_name='logged_in_user',on_delete= models.SET_NULL, null=True)
+    # Session keys are 32 characters long
+    session_key = models.CharField(max_length=32, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
