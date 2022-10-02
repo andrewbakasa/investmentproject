@@ -32,51 +32,47 @@ CELERY_TIMEZONE = 'Africa/Zimbabwe'
 
 INSTALLED_APPS = [
    
-    'whitenoise.runserver_nostatic',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.humanize',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    
-    'django.contrib.staticfiles',
-    'cloudinary_storage',
-    'cloudinary',
-    'django.contrib.sites',
-    'widget_tweaks',
-    'silverstrike',
-   
-    'allauth',
-    'allauth.account',   
-    'corsheaders',
-     
-    
-    'django_filters',
-    'investments_appraisal.apps.InvestmentsAppraisalConfig',
-    'trading.apps.TradingConfig',
-    'businessforum.apps.BusinessforumConfig',
-    'fishapp.apps.FishappConfig',
-    'beefapp.apps.BeefappConfig',   
-    'import_export', 
-    'store.apps.StoreConfig',
-    'customers.apps.CustomersConfig',
-    'common.apps.CommonConfig',
-    'comment',    
-     'django.contrib.gis' ,
-     'leaflet', 
-     'djgeojson', 
-      "markers" ,
+        'whitenoise.runserver_nostatic',
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.humanize',
+        'django.contrib.sessions',
+        'django.contrib.messages',
 
-      'rest_framework',
-      'rest_framework_gis',
+        'django.contrib.staticfiles',
+        'cloudinary_storage',
+        'cloudinary',
+        'django.contrib.sites',
+        'widget_tweaks',
+        'silverstrike',
+
+        'allauth',
+        'allauth.account',   
+        'corsheaders',
+
+
+        'django_filters',
+        'investments_appraisal.apps.InvestmentsAppraisalConfig',
+        'trading.apps.TradingConfig',
+        'businessforum.apps.BusinessforumConfig',
+        'fishapp.apps.FishappConfig',
+        'beefapp.apps.BeefappConfig',   
+        'import_export', 
+        'store.apps.StoreConfig',
+        'customers.apps.CustomersConfig',
+        'common.apps.CommonConfig',
+        'comment',
+
+        'django.contrib.gis' ,
+        'leaflet', 
+        'djgeojson', 
+        "markers",
+        'rest_framework',
+        'rest_framework_gis',
 
 ]
-# if not DEBUG:
-#     INSTALLED_APPS.append('django.contrib.gis') 
-#     INSTALLED_APPS.append('leaflet')
-#     INSTALLED_APPS.append('djgeojson') 
-#     INSTALLED_APPS.append("markers") 
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -90,14 +86,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'investments_appraisal.middlewares.LastUserActivityMiddleware',
-     'common.middlewares.OneSessionPerUserMiddleware',
+      'common.middlewares.OneSessionPerUserMiddleware',
     #'common.get_username.RequestMiddleware',
 ]
-
-SECURE_SSL_REDIRECT=False
-SESSION_COOKIE_SECURE=False
-CSRF_COOKIE_SECURE=False
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:4200',
     'http://127.0.0.1:4200',
@@ -124,28 +117,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproj.wsgi.application'
 
-import os
-if os.name == 'nt':
-    import platform
-    OSGEO4W = r"C:\OSGeo4W"
-    
-    if '64' in platform.architecture()[0]:
-        #OSGEO4W += "64"
-        pass
-    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
-    os.environ['OSGEO4W_ROOT'] = OSGEO4W
-    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
-    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
-    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
-# if DEBUG :
-# DATABASES = {
-#     'default': {
-#         #'ENGINE': 'django.db.backends.sqlite3',
-#         'ENGINE':'django.contrib.gis.db.backends.postgis',
-#         # 'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+
 
 DATABASES = {
     'default': {
@@ -156,13 +128,7 @@ DATABASES = {
          'PORT' : '5432',
     },
 }
-# else:
-#     import dj_database_url
-#     DATABASES ={}
-#     DATABASES['default'] = dj_database_url.config()
-#     DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-# Password validation
-# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -237,11 +203,8 @@ EMAIL_HOST_PASSWORD = config('EM_HOST_PSWD')
 
 
 
-GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal305.dll'
-GEOS_LIBRARY_PATH = 'c:\\Program Files\\PostgreSQL\\14\\bin\\libgeos_c.dll'
-
-#print(GEOS_LIBRARY_PATH,GDAL_LIBRARY_PATH)
-
+GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 #uncomment if you want to check all files are collected into staticfile
 STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 CLOUDINARY_STORAGE = {'CLOUD_NAME': 'dsbnt7cih', 'API_KEY': '729236266824714', 'API_SECRET': 'JZXOjGXheadh0YtH7Ip7Nbu_yv0', }
@@ -313,6 +276,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 import django_on_heroku
 django_on_heroku.settings(locals())
 
+# I pray this fixes everything
+""" 
+I'm using the Python sample application on stack cedar 14 and the regular Heroku buildpack Heroku/python with PostGIS and had the same problem that my database settings were overwritten with the wrong DB engine, which caused heroku run python manage.py migrate to fail with the above error. Just adding the engine in the settings would not change anything. After some investigation I found out that it is the call to django_heroku.settings(locals()) in the last line of my settings.py which is reverting my changes.
+
+I fixed it by overwriting the engine again like this by adding a line afterwards:
+
+ """
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+
 ''' 
 If you are deploying your application to Heroku using Git, 
 you can’t have an .env file in your project root. 
@@ -323,4 +295,15 @@ Inside Heroku’s dashboard, first select your app and click on the Settings tab
 '''
 
 # Error 500 When DEBUG=FALSE ON HEROKU SERVER
+""" 
+Collectstatic ignores images that are referenced within comment 
+but there is a typical behaviour in Django processing 
+when Debug=False is set which actually tries to parse and 
+verify images within HTML comments (This does not happen when Debug=True is set).
 
+When I removed comments, I was able to render the page and 500 error was gone. 
+
+For what it's worth, you'll face the same issue if you have an html comment in your code that calls the template tag "static" (probably the behavior is the same for every commented template tag), this was my case:
+
+removing the comment resolved the 500 error (which also, was not being logged).
+"""
