@@ -310,8 +310,8 @@ class CurrencyLocationView(APIView):
         user_tc_instance=get_and_save_instance(self.request.user, user_location)
         
         #user expectation
-        dict_=get_aggregate(user_tc_instance)       
-        uc_queryset= get_queryset(user_tc_instance,dict_)   
+        dict_=get_aggregate(user_tc_instance, user_location)       
+        uc_queryset= get_queryset(user_tc_instance,dict_, user_location)   
         # panda here
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -335,7 +335,8 @@ def get_and_save_instance(user, user_loc):
         user_tc_instance.save()
     else:
         if  user_tc_instance.residence:
-            #update residence
+            #update residence,,,, is it updating?
+            print("Updating location", user_loc)
             user_tc_instance.residence.location =user_loc
             user_tc_instance.save()
         else :
@@ -353,8 +354,8 @@ def get_and_save_instance(user, user_loc):
             user_tc_instance.residence =ul_instance
             user_tc_instance.save()
     return  user_tc_instance    
-def get_aggregate(user_tc_instance):
-    
+def get_aggregate(user_tc_instance, user_location):
+    print("UL>>>>>", user_location)
     total_agg = TradedCurrency.objects.filter(
         Q(complete=False),
         Q(currency_offered=user_tc_instance.currency_expected),
@@ -401,7 +402,8 @@ def get_aggregate(user_tc_instance):
        dict_['distance_min']=1 
     return dict_   
 
-def get_queryset(user_tc_instance,dict_):
+def get_queryset(user_tc_instance,dict_, user_location):
+    print("QSET :UL>>>>>", user_location)
     #A*[0-1]   +  B*[0-1]  +   C*[0-1] 
     A = 0.3 #available cash
     B = 0.2 # rate wanted
@@ -517,8 +519,8 @@ class TradedCurrencyLocationSlugView(APIView):
         user_tc_instance=get_and_save_instance(self.request.user, user_location)
         
         #user expectation
-        dict_=get_aggregate(user_tc_instance)       
-        uc_queryset= get_queryset(user_tc_instance,dict_) 
+        dict_=get_aggregate(user_tc_instance, user_location)       
+        uc_queryset= get_queryset(user_tc_instance,dict_, user_location) 
 
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
