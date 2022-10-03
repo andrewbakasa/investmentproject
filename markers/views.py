@@ -343,9 +343,14 @@ def get_and_save_instance(user, user_loc):
         else:
             ul_instance =UserLocation.objects.create(user=user, location =user_loc)
             ul_instance.save()
-        
-        user_tc_instance.residence =ul_instance
-        user_tc_instance.save()
+        # Error not update user location check now
+        if  user_tc_instance.residence:
+            user_tc_instance.residence.location=user_loc# =ul_instance
+            user_tc_instance.save()
+            print('Location updated>>>', user_tc_instance.residence,)
+        else:
+            user_tc_instance.residence=ul_instance
+            user_tc_instance.save()
     else:
         if  user_tc_instance.residence:
             #update residence,,,, is it updating?
@@ -368,7 +373,7 @@ def get_and_save_instance(user, user_loc):
             user_tc_instance.save()
     return  user_tc_instance    
 def get_aggregate(user_tc_instance, user_location):
-    print("UL>>>>>", user_location)
+    
     total_agg = TradedCurrency.objects.filter(
         Q(complete=False),
         Q(currency_offered=user_tc_instance.currency_expected),
@@ -416,7 +421,7 @@ def get_aggregate(user_tc_instance, user_location):
     return dict_   
 
 def get_queryset(user_tc_instance,dict_, user_location):
-    print("QSET :UL>>>>>", user_location)
+   
     #A*[0-1]   +  B*[0-1]  +   C*[0-1] 
     A = 0.3 #available cash
     B = 0.2 # rate wanted
@@ -600,6 +605,7 @@ def update_user_location(request,lng,lat):
     if qs:
         instance= qs.first()
         instance.location = location
+        print('location updated......')
         instance.save()
     else:
         instance =UserLocation.objects.create(user=request.user, location =location)
@@ -761,7 +767,7 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
           
             if qs:
                 #Toggle/add/remove
-                print('Why Toggle', qs)
+                #print('Why Toggle', qs)
                 CurrencyTag.objects.filter(source=source, created_by=request.user).delete()
                
             else:
@@ -784,12 +790,12 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
                 if not matching_found:
                     # delete all tags  created by me with source
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
-                    print('Creating a Maching here')
+                    #print('Creating a Maching here')
                     instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
                     instance.save() 
                 else:
                     #nothing already
-                    print('Maching found, Polygamy disallowed.......')
+                    #print('Maching found, Polygamy disallowed.......')
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
             data={}	
             item_object = {}
