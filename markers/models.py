@@ -1,3 +1,4 @@
+from email.policy import default
 from pyexpat import model
 from django.contrib.gis.db.models import PointField
 from django.db import models
@@ -155,7 +156,15 @@ class CurrencyTag(models.Model):
         return False
     
 
-
+class NearbyDistance(models.Model):
+    source = models.OneToOneField(TradedCurrency,related_name="nearbyA", on_delete= models.CASCADE, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    last_modified=models.DateTimeField(auto_now=True)
+    distance= models.IntegerField(default=1000)
+    def __str__(self):
+        if self.date_created:
+            return str(self.date_created)
+        return "No Data"
     
-from django.contrib.gis.db import models as gis_models
-
+    class Meta:
+        ordering = ['date_created']

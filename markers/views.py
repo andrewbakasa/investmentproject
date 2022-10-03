@@ -21,7 +21,7 @@ from customers.forms import ProductForm
 from markers.forms import MarkerForm, ShopForm, TradedCurrencyForm, TradedCurrencyFormUpdate
 from store.models import Product, Shop
 
-from .models import CurrencyTag, Marker, TradedCurrency, UserLocation
+from .models import CurrencyTag, Marker, NearbyDistance, TradedCurrency, UserLocation
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, render,redirect
@@ -57,8 +57,8 @@ from django.db.models.functions import Cast, Coalesce
 from django.db.models import FloatField 
 
 
-longitude= 32.658821726608004#27.553711
-latitude =-18.985227330788064#-20.756114
+longitude =27.553711#32.658821726608004#
+latitude  =-20.756114#=-18.985227330788064
 # Point(Lat,Long)
 user_location = Point(longitude,latitude,srid=4326)
 
@@ -314,7 +314,7 @@ class CurrencyLocationView(APIView):
         uc_queryset= get_queryset(user_tc_instance,dict_, user_location)   
         # panda here
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
-        #match_partner= get_matching_partern_exist(serializer.data)
+        match_partner= get_matching_partern_exist(serializer.data)
         
           
         # for  i  in serializer:
@@ -329,6 +329,7 @@ def get_matching_partern_exist(s_dict):
                 for key2, value2 in i.items():
                     if isinstance(value2, dict):
                         if key2=='properties':
+                            print(value2)
                             return value2['matching_partner']
     return False
 def get_and_save_instance(user, user_loc):
@@ -754,10 +755,22 @@ login_required(login_url="account_login")
                         |_u3__|
 
 """
+def distance_to_target(owner_id, request):
+    user_location=TradedCurrency.objects.filter(
+                   Q(created_by=request.user), Q(complete=False)
+            ).first().residence.location
+    target= TradedCurrency.objects.filter(
+                    pk=owner_id).annotate(
+                        distance=Distance('residence__location',user_location)
+            ).first()
+    return target.distance.m
 def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
             # incoming A
+            ##dist= distance_to_target(owner_id,request )
+            #print(dist)
+            #return ''
             target= TradedCurrency.objects.filter(pk=owner_id).first()
             #i am stading here
             """ Source is keeping changing........B """
@@ -926,3 +939,35 @@ def save_all_tc(request,form,template_name):
     data['html_form'] = render_to_string(template_name,context,request=request)
     #print(data)
     return JsonResponse(data)
+
+
+def update_nearby_user_ajax(request): 
+  
+    if request.method == 'POST':
+        uid = request.POST.get('uid', None)
+        distance = request.POST.get('distance', None)
+        tdc= TradedCurrency.objects.filter(pk=uid).first()
+        obj, created = NearbyDistance.objects.gets_or_create(source=tdc)
+        if created:
+            obj.distance =distance
+            obj.save()
+        else:
+            # update distance
+            if distance<obj.distance:
+                obj.distance =distance
+                obj.save()
+
+    data = {}
+    
+    return JsonResponse({"data":data})
+
+def remove_closed_deal_by_nearby_dist(owner_id):
+    source= TradedCurrency.objects.filter(pk=owner_id).first()
+            
+    qs= NearbyDistance.objects.filter(Q(source =source)).first()
+    if qs.distance == 10:
+        target= TradedCurrency.objects.filter(pk=owner_id).first()
+        target.complete= True           
+        target.save() 
+
+

@@ -199,7 +199,7 @@
          var base_data_url= '{% url "locate_currency_api" 12345  66778899 %}'  /* numbers contains number*/
          var slug_data_url = `{% url 'locate_currency_api_slug' 12345 6677 8899 %}` /* numbers contains number*/
          var default_img =`{% static 'images/placeholder.png' %}`
-
+         var nearby_ajax_url= "{% url 'update_nearby_user_ajax' %}"
           //------LOAD THE FORM ON MODAL DIV----------
           $('body').on('click', '.show-form-update', function(e){
                 e.stopPropagation() 
