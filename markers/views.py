@@ -314,10 +314,23 @@ class CurrencyLocationView(APIView):
         uc_queryset= get_queryset(user_tc_instance,dict_, user_location)   
         # panda here
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
+        #match_partner= get_matching_partern_exist(serializer.data)
+        
+          
+        # for  i  in serializer:
+        #     print('this22....', i)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
- 
+def get_matching_partern_exist(s_dict):
+    for key, value in s_dict.items():
+        if isinstance(value, list):
+            for i in value:
+                for key2, value2 in i.items():
+                    if isinstance(value2, dict):
+                        if key2=='properties':
+                            return value2['matching_partner']
+    return False
 def get_and_save_instance(user, user_loc):
     user_tc_instance, tc_created = TradedCurrency.objects.get_or_create(created_by=user, complete=False)
     if tc_created:
