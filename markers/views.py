@@ -115,7 +115,7 @@ class MapViewCreate(LoginRequiredMixin, generic.edit.CreateView):
 
 class AjaxableResponseMixin(object):
     def render_to_json_response(self, context, **response_kwargs):
-        print(context)
+        #print(context)
         data = json.dumps(context)
         response_kwargs['content_type'] = 'application/json'
         return HttpResponse(data, **response_kwargs)
@@ -225,7 +225,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             nearest_five_facilities = Product.objects.annotate(distance=Distance('location',user_location)).order_by('distance')[:5]
             serializer = self.get_serializer_class()
             serialized = serializer(nearest_five_facilities, many = True)
-            print(nearest_five_facilities)
+            #print(nearest_five_facilities)
             return Response(serialized.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -329,7 +329,7 @@ def get_matching_partern_exist(s_dict):
                 for key2, value2 in i.items():
                     if isinstance(value2, dict):
                         if key2=='properties':
-                            print(value2)
+                            #print(value2)
                             return value2['matching_partner']
     return False
 def get_and_save_instance(user, user_loc):
@@ -686,7 +686,7 @@ class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
 def userlocation_data(request):
    
     cookie_data = cookie_userlocation(request)
-    print('row data:', cookie_data)
+    #print('row data:', cookie_data)
     if cookie_data:
         if 'latLng' in cookie_data :
             print(cookie_data['latLng'], type(cookie_data['latLng']))
@@ -942,22 +942,30 @@ def save_all_tc(request,form,template_name):
 
 
 def update_nearby_user_ajax(request): 
-  
+    data = {}
+    
     if request.method == 'POST':
         uid = request.POST.get('uid', None)
+        #print('uid', uid)
         distance = request.POST.get('distance', None)
-        tdc= TradedCurrency.objects.filter(pk=uid).first()
-        obj, created = NearbyDistance.objects.gets_or_create(source=tdc)
-        if created:
-            obj.distance =distance
-            obj.save()
-        else:
-            # update distance
-            if distance<obj.distance:
-                obj.distance =distance
+        qs= TradedCurrency.objects.filter(pk=uid)
+        if qs:
+            tdc= TradedCurrency.objects.filter(pk=uid).first()
+            obj, created = NearbyDistance.objects.get_or_create(source=tdc)
+            data = model_to_dict(tdc)
+            if created:
+                obj.distance =int(distance)
                 obj.save()
+                data['created'] ='New'
+            else:
+                # update distance onif it closer
+                data['Updating'] ='Yes'
+                if int(distance) < obj.distance:
+                    obj.distance =int(distance)
+                    obj.save()
+                    data['Moved closer'] ='Yes'
 
-    data = {}
+   
     
     return JsonResponse({"data":data})
 
@@ -965,9 +973,21 @@ def remove_closed_deal_by_nearby_dist(owner_id):
     source= TradedCurrency.objects.filter(pk=owner_id).first()
             
     qs= NearbyDistance.objects.filter(Q(source =source)).first()
-    if qs.distance == 10:
+    if qs.distance <= 10:
         target= TradedCurrency.objects.filter(pk=owner_id).first()
         target.complete= True           
         target.save() 
 
+
+def update_all_deal_closed():
+    #filter nearby distances.......................         
+    qs= NearbyDistance.objects.filter(Q(distance__lte =10))
+    for i in qs:
+        source= i.source
+        target =i.target
+
+        source.complete= True           
+        source.save() 
+        target.complete= True           
+        target.save() 
 

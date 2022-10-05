@@ -92,7 +92,7 @@ class TradedCurrency(models.Model):
                     l_twin = str(item.target.created_by.username)
                 else:
                     l_twin = l_twin + ',' + str(item.target.created_by.username)
-        print('Source', items, l,l_twin)
+        #print('Source', items, l,l_twin)
         return l + "," + l_twin
     @property
     def get_target(self):
