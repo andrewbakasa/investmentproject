@@ -755,35 +755,34 @@ login_required(login_url="account_login")
                         |_u3__|
 
 """
-def distance_to_target(owner_id, request):
+def distance_to_target(target_id, request):
     user_location=TradedCurrency.objects.filter(
                    Q(created_by=request.user), Q(complete=False)
             ).first().residence.location
     target= TradedCurrency.objects.filter(
-                    pk=owner_id).annotate(
+                    pk=target_id).annotate(
                         distance=Distance('residence__location',user_location)
             ).first()
     return target.distance.m
-def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
+def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
     data={}	
     if request.method == 'POST':
         if request.is_ajax():
             # incoming A
-            ##dist= distance_to_target(owner_id,request )
+            ##dist= distance_to_target(target_id,request )
             #print(dist)
             #return ''
-            target= TradedCurrency.objects.filter(pk=owner_id).first()
+            target= TradedCurrency.objects.filter(pk=target_id).first()
             #i am stading here
             """ Source is keeping changing........B """
             source=TradedCurrency.objects.filter(Q(created_by=request.user), Q(complete=False)).first()#,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
            
-           #any of my tag that is related to my current search
-            qs= CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user))#
+           #does the user have a tag going to target?
+            qs= CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user))#
             if qs:
-                #Toggle/add/remove
-                #print('Why Toggle', qs)
+                #if Toggle/add/remove
                 data['Found tags created me:Reseting'] ='Yes'
-                CurrencyTag.objects.filter(target =target, source=source, created_by=request.user).delete()
+                CurrencyTag.objects.filter(Q(target =target), Q(source=source), Q(created_by=request.user)).delete()
                
             else:
                 #check if any user is tracking this person: 
@@ -792,8 +791,8 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
                 CHECK IF NO MATCH YES THEN MATCH
                 """
                 data['No tags found:'] ='Yes'
-                # other users tracking but matching
-                qs_other_users =CurrencyTag.objects.filter(target =target).exclude(created_by=request.user)
+                # other users tracking and matching
+                qs_other_users =CurrencyTag.objects.filter(target =target)#.exclude(created_by=request.user)
 
                 matching_found= False
                 for i in qs_other_users:
@@ -807,16 +806,18 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
                 if not matching_found:
                     data['No matching Found'] ='yes'
                     # delete all tags  created by me with source
-                    CurrencyTag.objects.filter(target =target, source =source, created_by=request.user).delete()
+                    CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user)).delete()
                     #print('Creating a Maching here')
                     instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
                     instance.save() 
                     data['New Tags created'] ='Yes'
                 else:
+                    pass
                     #nothing already
-                    #print('Maching found, Polygamy disallowed.......')
-                    data['Nothing found ....Deleting all'] ='Yes'
-                    CurrencyTag.objects.filter(target =target,source =source, created_by=request.user).delete()
+                    #print('Matching found, Polygamy disallowed.......')
+                    #you cant tag alreay matched parten
+                    data['Polygamy disallowed'] ='Yes'
+                    #CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user)).delete()
            
            
             return JsonResponse({"data":data})
@@ -827,11 +828,11 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
         return JsonResponse({'error': True, 'data': "Request not ajax"})
 
 
-def complete_currency_ajax(request, owner_id,  *args, **kwargs):
+def complete_currency_ajax(request, target_id,  *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
             # incoming A : CLOSE
-            target= TradedCurrency.objects.filter(pk=owner_id).first()
+            target= TradedCurrency.objects.filter(pk=target_id).first()
             target.complete= True           
             target.save() 
             """ NOTIFY OWNER OF THIS CHANGE....  """
@@ -975,12 +976,12 @@ def update_nearby_user_ajax(request):
     
     return JsonResponse({"data":data})
 
-def remove_closed_deal_by_nearby_dist(owner_id):
-    source= TradedCurrency.objects.filter(pk=owner_id).first()
+def remove_closed_deal_by_nearby_dist(target_id):
+    source= TradedCurrency.objects.filter(pk=target_id).first()
             
     qs= NearbyDistance.objects.filter(Q(source =source)).first()
     if qs.distance <= 10:
-        target= TradedCurrency.objects.filter(pk=owner_id).first()
+        target= TradedCurrency.objects.filter(pk=target_id).first()
         target.complete= True           
         target.save() 
 
