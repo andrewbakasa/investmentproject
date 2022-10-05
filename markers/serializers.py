@@ -28,6 +28,7 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 	
 	tag_source_target = serializers.SerializerMethodField()
 	matching_partner = serializers.SerializerMethodField()
+	already_matched = serializers.SerializerMethodField()
 	suitor = serializers.SerializerMethodField()
 	def get_matching_partner(self, obj):
 		try:
@@ -35,6 +36,15 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 		
 		except:
 			return 'NoData'
+
+	def get_already_matched(self, obj):
+		try:
+			return obj.get_already_matched
+		
+		except:
+			return 'NoData'
+
+			
 	def get_suitor(self, obj):
 		try:
 			return obj.get_suitor
@@ -117,9 +127,9 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 	class Meta:
 		model = TradedCurrency
 		fields = ['uid', 'value', 'image', 'tag_source_target', 
-		'owner_id', 'source_id','matching_partner','suitor', #'tag_target_username','tag_source_username',
-		'rank', 'username', 'description', 'offer_symbol',  'expected_symbol',
-		 'rate_expected', 'distance'] #
+				'owner_id', 'source_id','matching_partner','suitor', #'tag_target_username','tag_source_username',
+				'rank', 'username', 'description', 'offer_symbol',  'expected_symbol',
+				'rate_expected', 'distance', 'already_matched'] #
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 

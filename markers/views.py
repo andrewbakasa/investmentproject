@@ -765,6 +765,7 @@ def distance_to_target(owner_id, request):
             ).first()
     return target.distance.m
 def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
+    data={}	
     if request.method == 'POST':
         if request.is_ajax():
             # incoming A
@@ -781,15 +782,16 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
             if qs:
                 #Toggle/add/remove
                 #print('Why Toggle', qs)
+                data['Found tags created me:Reseting'] ='Yes'
                 CurrencyTag.objects.filter(source=source, created_by=request.user).delete()
                
             else:
                 #check if any user is tracking this person: 
-                """ OTHER SUITORS ARE TRACKING
+                """ OTHER SUITORS MAYBE TRACKING
                 SURVIVAL OF THE FITTEST
                 CHECK IF NO MATCH YES THEN MATCH
                 """
-
+                data['No tags found:'] ='Yes'
                 qs_other_users =CurrencyTag.objects.filter(target =target).exclude(created_by=request.user)
 
                 matching_found= False
@@ -797,21 +799,24 @@ def create_currency_tag_ajax(request, owner_id,  *args, **kwargs):
                     print('Chech partner availabilty')
                     if i.matching_partner():
                         print('Found a parnter')
+                        data['Found a matching partner'] ='Yes'
                         matching_found=True
                         break
 
                 if not matching_found:
+                    data['No matching Found'] ='yes'
                     # delete all tags  created by me with source
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
                     #print('Creating a Maching here')
                     instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
                     instance.save() 
+                    data['New Tags created'] ='Yes'
                 else:
                     #nothing already
                     #print('Maching found, Polygamy disallowed.......')
+                    data['Nothing found ....Deleting all'] ='Yes'
                     CurrencyTag.objects.filter(source =source, created_by=request.user).delete()
-            data={}	
-            item_object = {}
+           
            
             return JsonResponse({"data":data})
         else:

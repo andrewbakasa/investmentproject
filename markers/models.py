@@ -61,6 +61,14 @@ class TradedCurrency(models.Model):
             return items.first().matching_partner()
         return False
     @property    
+    def get_already_matched(self):
+      
+        items = self.targetA.all()#.s
+        if items:
+            return items.first().already_matched()
+        return False
+        
+    @property    
     def get_suitor(self):
         #get all tags created by this user
         qs= CurrencyTag.objects.filter(Q(source__created_by =self.created_by))#.exclude(Q(source__created_by=self.created_by))
@@ -155,6 +163,16 @@ class CurrencyTag(models.Model):
             return True
         return False
     
+    def already_matched(self):
+        #fetch all sources that terminate with me
+        # is this targeget
+        #for all other check if their target point to source
+        qs= CurrencyTag.objects.filter(Q(target =self.source))
+        if qs:
+            return True
+        return False
+
+        
 
 class NearbyDistance(models.Model):
     source = models.OneToOneField(TradedCurrency,related_name="nearbyA", on_delete= models.CASCADE, null=True)
