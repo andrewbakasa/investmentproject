@@ -47,6 +47,8 @@ class TradedCurrency(models.Model):
 
     def __str__(self):
         if self.created_by:
+            if self.currency_offered:                
+                return self.created_by.username + ", " + self.currency_offered.symbol + ', ' + str(self.pk)
             return self.created_by.username
         return "No Data"
     
@@ -71,7 +73,7 @@ class TradedCurrency(models.Model):
     @property    
     def get_suitor(self):
         #get all tags created by this user
-        qs= CurrencyTag.objects.filter(Q(source__created_by =self.created_by))#.exclude(Q(source__created_by=self.created_by))
+        qs= CurrencyTag.objects.filter(Q(source__created_by =self.created_by),Q(target__complete=False))#.exclude(Q(source__created_by=self.created_by))
         if qs:
             l =""
             for i in qs:
@@ -157,8 +159,9 @@ class CurrencyTag(models.Model):
     class Meta:
         ordering = ['date_created']
 
-    def matching_partner(self):
-        qs= CurrencyTag.objects.filter(Q(source=self.target), Q(target =self.source))
+    def matching_partner(self): 
+        #query only active Tags
+        qs= CurrencyTag.objects.filter(Q(source=self.target), Q(target =self.source),Q(target__complete=False))
         if qs:
             return True
         return False
@@ -167,7 +170,7 @@ class CurrencyTag(models.Model):
         #fetch all sources that terminate with me
         # is this targeget
         #for all other check if their target point to source
-        qs= CurrencyTag.objects.filter(Q(target =self.source))
+        qs= CurrencyTag.objects.filter(Q(target =self.source),Q(target__complete=False))
         if qs:
             return True
         return False

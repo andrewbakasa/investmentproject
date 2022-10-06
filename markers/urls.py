@@ -26,8 +26,8 @@ urlpatterns = [
     path('add/w/', add_shop,  name='add_shop'),
     path('s/<int:pk>/u/', ShopUpdateView.as_view(), name='shop-update'),
     path('c/tr/', CurrencyTradingLocationViewLandingPage.as_view(),  name='currency_trade_landing'),
-    path('api_currency/<str:x>/<str:y>', CurrencyLocationView.as_view(),  name='locate_currency_api'),
-    path('api_currency/tag/<str:slug>/<str:x>/<str:y>', TradedCurrencyLocationSlugView.as_view(),  name='locate_currency_api_slug'),
+    path('api_currency/<str:x>/<str:y>/<str:adj>/', CurrencyLocationView.as_view(),  name='locate_currency_api'),
+    path('api_currency/tag/<str:slug>/<str:x>/<str:y>/<str:adj>/', TradedCurrencyLocationSlugView.as_view(),  name='locate_currency_api_slug'),
     
     path('traded_currency_ajax/', views.create_tc_ajax, name="create_tc_ajax"),
     path('tc_update/', views.tc_update, name="update_tc"),

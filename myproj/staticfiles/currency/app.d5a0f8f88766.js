@@ -511,9 +511,9 @@ function update_map_user_specs(map,props,newContent, currentLayer,newtooltipCont
                 i_layer.setTooltipContent(newtooltipContent)
                 curr_tooltipContent = '<small> You are tracking @' + nFormatterdist(props.distance,1)+ "</small>"
                 flash_message(i_layer,newtooltipContent,curr_tooltipContent)
-                // remove layer if there is matching
-                remove_layer_if_matching_partner(map, i_layer)
-                //layer_not_avail_compansate += 1
+                // remove layer 
+                map.removeLayer(i_layer)
+                layer_not_avail_compansate += 1
               }else {
                  //matching happens on target but is not caused by current user
                  // This node is should not be availabe
@@ -521,9 +521,9 @@ function update_map_user_specs(map,props,newContent, currentLayer,newtooltipCont
                 console.log("Free", props.username)
                 let newtooltipContent = '<small>' + props.offer_symbol + nFormatter(props.value,2) +" @" + nFormatter(props.rate_expected,2)+ "</small>"
                 i_layer.setTooltipContent(newtooltipContent)  
-                 // remove layer if there is matching
-                 remove_layer_if_matching_partner(map, i_layer)
-                //layer_not_avail_compansate += 1
+                // remove layer 
+                map.removeLayer(i_layer)
+                layer_not_avail_compansate += 1
               }
             
           }else {

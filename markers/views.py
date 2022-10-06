@@ -304,6 +304,7 @@ class CurrencyLocationView(APIView):
        
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
+        adj =  self.kwargs.get('adj') 
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)      
         # user allowed one incomplete record only
@@ -311,7 +312,7 @@ class CurrencyLocationView(APIView):
         
         #user expectation
         dict_=get_aggregate(user_tc_instance, user_location)       
-        uc_queryset= get_queryset(user_tc_instance,dict_, user_location)   
+        uc_queryset= get_queryset(user_tc_instance,dict_, user_location,int(adj))   
         # panda here
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
         match_partner= get_matching_partern_exist(serializer.data)
@@ -421,8 +422,8 @@ def get_aggregate(user_tc_instance, user_location):
        dict_['distance_min']=1 
     return dict_   
 
-def get_queryset(user_tc_instance,dict_, user_location):
-   
+def get_queryset(user_tc_instance,dict_, user_location, delta_adj):
+    
     #A*[0-1]   +  B*[0-1]  +   C*[0-1] 
     A = 0.3 #available cash
     B = 0.2 # rate wanted
@@ -451,7 +452,7 @@ def get_queryset(user_tc_instance,dict_, user_location):
                                 'residence__location',  
                                 user_location
                             ),
-                    ).order_by('rank')[0:6]  
+                    ).order_by('rank')[0:6+int(delta_adj)]  
 
     # for i in uc_queryset:
     #     print(i.currency_offered,",", i.currency_expected,",",i.created_by,",",i.value)
@@ -532,6 +533,7 @@ class TradedCurrencyLocationSlugView(APIView):
         slug =  self.kwargs.get('slug')
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
+        adj =  self.kwargs.get('adj') 
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)
         # user allowed one incomplete record only
@@ -539,7 +541,7 @@ class TradedCurrencyLocationSlugView(APIView):
         
         #user expectation
         dict_=get_aggregate(user_tc_instance, user_location)       
-        uc_queryset= get_queryset(user_tc_instance,dict_, user_location) 
+        uc_queryset= get_queryset(user_tc_instance,dict_, user_location,int(adj)) 
 
         serializer = TradedCurrencySerializer(uc_queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -769,20 +771,17 @@ def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
     if request.method == 'POST':
         if request.is_ajax():
             # incoming A
-            ##dist= distance_to_target(target_id,request )
-            #print(dist)
-            #return ''
             target= TradedCurrency.objects.filter(pk=target_id).first()
             #i am stading here
             """ Source is keeping changing........B """
             source=TradedCurrency.objects.filter(Q(created_by=request.user), Q(complete=False)).first()#,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
            
-           #does the user have a tag going to target?
-            qs= CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user))#
+           #does the user have ACTIVE tag going to target?EXCLUDED SATIFIED TAGS
+            qs= CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user), Q(target__complete=False))#
             if qs:
                 #if Toggle/add/remove
                 data['Found tags created me:Reseting'] ='Yes'
-                CurrencyTag.objects.filter(Q(target =target), Q(source=source), Q(created_by=request.user)).delete()
+                CurrencyTag.objects.filter(Q(target =target), Q(source=source), Q(created_by=request.user), Q(target__complete=False)).delete()
                
             else:
                 #check if any user is tracking this person: 
@@ -791,14 +790,14 @@ def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
                 CHECK IF NO MATCH YES THEN MATCH
                 """
                 data['No tags found:'] ='Yes'
-                # other users tracking and matching
-                qs_other_users =CurrencyTag.objects.filter(target =target)#.exclude(created_by=request.user)
+                # other users tracking and matching ACTIVE
+                qs_other_users =CurrencyTag.objects.filter(Q(target =target), Q(target__complete=False))#.exclude(created_by=request.user)
 
                 matching_found= False
                 for i in qs_other_users:
-                    print('Chech partner availabilty')
+                    #print('Chech partner availabilty')
                     if i.matching_partner():
-                        print('Found a parnter')
+                        #print('Found a parnter')
                         data['Found a matching partner'] ='Yes'
                         matching_found=True
                         break
@@ -806,7 +805,7 @@ def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
                 if not matching_found:
                     data['No matching Found'] ='yes'
                     # delete all tags  created by me with source
-                    CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user)).delete()
+                    CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user),Q(target__complete=False)).delete()
                     #print('Creating a Maching here')
                     instance = CurrencyTag.objects.create(target =target, source =source, created_by=request.user)
                     instance.save() 
