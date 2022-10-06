@@ -241,6 +241,7 @@ class ProductLocationView(APIView):
        
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
+
         user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[0:6]
@@ -958,7 +959,9 @@ def update_nearby_user_ajax(request):
         if qs:
             tdc= TradedCurrency.objects.filter(pk=uid).first()
             obj, created = NearbyDistance.objects.get_or_create(source=tdc)
-            data = model_to_dict(tdc)
+            #data = model_to_dict(tdc)
+            print(data)
+            data['distance'] =int(distance)
             if created:
                 obj.distance =int(distance)
                 obj.save()
