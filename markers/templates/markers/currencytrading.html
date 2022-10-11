@@ -50,13 +50,13 @@
                         title='Update Currency Trade Request'><i class="fa fa-edit"></i>
                     </a>
               </li>
-             
-              <li class="breadcrumb-item" >
-                <label id="total_projects_searched">Nearby Currency Trading</label>
-              </li> 
               <li class="breadcrumb-item ">
                 <input id='setfull_map'  type="checkbox" style="margin:5px ;">
               </li> 
+              <li class="breadcrumb-item" >
+                <label id="total_projects_searched">Nearby Currency Trading</label>
+              </li> 
+              
             </ol>
           </div>
 
@@ -323,6 +323,14 @@
                 ajax_tag(url)
            });
       </script>
+      <script>
+        $(document).ready(function (){ 
+          // $("#index").removeClass( "active")
+          $("#_currency a").addClass( "active") 
+                   
+        })
+        </script>
+      <script src="{% static 'products/app.js' %}"></script>
       <script src="{% static 'currency/app.js' %}"></script>
       
     {% endblock %}

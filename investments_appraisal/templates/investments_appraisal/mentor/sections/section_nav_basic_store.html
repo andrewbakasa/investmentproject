@@ -10,7 +10,7 @@
     <ul id="navbar-ul">
         <li id="index"><a href="{% url 'index' %}">Home</a></li>
         {% if request.user.is_authenticated %}
-        <li id="_home"><a href="{% url 'geo_find_product_landing' %}">GeoFind</a></li> 
+        <li id="geofind"><a href="{% url 'geo_find_product_landing' %}">GeoFind</a></li> 
         <li id="_currency">
           <a href="{% url 'currency_trade_landing' %}" data-toggle="tooltip"  title="Currency Trading">
             <span class="fas-stack">

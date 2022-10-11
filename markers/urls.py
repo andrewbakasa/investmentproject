@@ -36,5 +36,8 @@ urlpatterns = [
     path('tag_currency_ajax/<str:target_id>/', views.create_user_currency_tag_ajax, name="create_currency_tag_ajax"),
     path('complete_currency_ajax/<str:owner_id>/', views.complete_currency_ajax, name="complete_currency_ajax"),
     path('update_nearby_user_ajax/', views.update_nearby_user_ajax, name="update_nearby_user_ajax"),
+    # path('display_investment_ajax/', views.display_investment_ajax, name="display_investment_ajax"),
+  
+
 ]
 

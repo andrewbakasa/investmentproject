@@ -3,7 +3,7 @@
  var user_loc_y = JSON.parse(document.getElementById('user-y-data').textContent);//--Lat--
  var map = L.map('mapid').setView([user_loc_x, user_loc_y], 13);
  var bounds = L.latLngBounds() // Instantiate LatLngBounds object
- var color = ["#fe4848", "#fe6c58", "#fe9068", "#feb478", "#fed686"];
+ const color = ["#fe4848", "#fe6c58", "#fe9068", "#feb478", "#fed686"];
  var t1 = null
  var dif_seconds =0
  var counter=0
@@ -698,14 +698,11 @@ function checkPosition_map_apartment() {
 }
 function resize_match(){
   if ( window.matchMedia('(max-width: 767px)').matches)   {// mobile
-
     $(".apartment-handle").css({'display': 'None'})
     $(".footer-top").css({'display': 'None'})
-    $(".map").css({'height':'400px'})
   }else {
     $(".apartment-handle").css({'display': 'block'})
     $(".footer-top").css({'display': 'block'})
-    $(".map").css({'height':'400px'})
   }
   if ( window.matchMedia('(max-width: 991px)').matches)   {// mobile
      
@@ -739,9 +736,7 @@ $('#setfull_map').change(function() {
 	checkPosition_map_apartment()
 });
 function wide_screen_standard(){
-  var height = $('.map').height();
-  console.log('HH:', height)
-  //$(".map").css({'height':'400px'})
+ 
   $(".apartment-handle").css({'display': 'block'})
   $(".apartment-handle").removeClass('col-md-6')
   $(".apartment-handle").removeClass('col-md-pull-6')
@@ -783,15 +778,10 @@ function wide_screen_standard(){
   */
 }
 function map_full_screen(){
-      var height = $('.map').height();
-      console.log('HH:', height)
-     
       if ( window.matchMedia('(max-width: 767px)').matches)   {// mobile
         $(".footer-top").css({'display': 'None'})
-        $(".map").css({'height':'400px'})
       }else {
         $(".footer-top").css({'display': 'block'})
-        $(".map").css({'height':'600px'})
       }
      
  

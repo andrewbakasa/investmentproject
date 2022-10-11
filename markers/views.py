@@ -12,6 +12,9 @@ from django.http import JsonResponse
 from django.db.models import F , Case, CharField, Value, When
 from django.db.models.functions import Abs
 import json
+from investments_appraisal.models import UserPreference, UserProfile
+from django.http import JsonResponse
+from django.core.paginator import Paginator
 
 from django.core.serializers import serialize
 from django.views.generic.base import TemplateView
@@ -1000,3 +1003,143 @@ def update_all_deal_closed():
         target.complete= True           
         target.save() 
 
+# def display_investment_ajax(request,  *args, **kwargs):
+   
+#     if request.method == 'POST':
+#         slug = request.POST.get('slug', None) 
+#         x = request.POST.get('x', None)
+#         y = request.POST.get('y', None)  
+#         user_location = Point(float(x), float(y),srid=4326)
+#         models= Product.objects.filter(Q(description__icontains =slug))#.order_by('-date')
+#     else:
+#         models= None
+
+
+#     if not ('perpage' in request.session):
+#         #print('session[perpage] on set')
+#         obj= UserPreference.objects.filter(user=request.user).first()
+#         if obj:
+#             #print('userpref found')
+#             request.session['perpage']=obj.perpage
+#         else:# nothing in db
+#             request.session['perpage']= 6
+#     else:
+#         #print('2. session[perpage] is...')
+#         obj= UserPreference.objects.filter(user=request.user).first()
+#         if obj:
+#             #print('2.userpref found')
+#             request.session['perpage']=obj.perpage
+#         else:# nothing in db
+#             request.session['perpage']= 6
+#         #print('2. session[perpage] =', request.session['perpage'])
+
+
+#     per_page=request.session['perpage']
+#     obj_paginator = Paginator(models, per_page)
+#     # list of objects on first page
+#     first_page = obj_paginator.page(1).object_list
+#     # range iterator of page numbers
+#     page_range = obj_paginator.page_range
+
+   
+#     #
+#     if request.method == 'POST':
+#         #getting page number
+#         page_no = request.POST.get('page_no', None) 
+#         num_of_pages= int(obj_paginator.num_pages)
+#         totalrecords= int(obj_paginator.count)
+#         current_page = obj_paginator.get_page(page_no)
+
+            
+        
+        
+#         data={}	
+#         data["per_page"]=per_page
+#         data["page_no"]=page_no
+#         data["num_of_pages"]=num_of_pages
+#         data["totalrecords"]=totalrecords
+#         #data["has_previous"]=False
+#         if current_page.has_previous():
+#             data["has_previous"]=True  
+#             data["first"]=1 
+#             data["previous_page_number"]=current_page.previous_page_number() 
+        
+#         data["current_page"]=current_page.number     
+        
+#         #data["has_next"]=False
+#         if current_page.has_next():
+#             data["has_next"]=True  
+#             data["next_page_number"]=current_page.next_page_number()
+        
+#         data["last"]=current_page.paginator.num_pages  
+       
+
+       
+
+        
+        
+#         return JsonResponse({"data":data})
+
+
+  
+#     # 3. Retrieve
+#     def get(self, request,  *args, **kwargs):
+#         slug =  self.kwargs.get('slug')
+#         x =  self.kwargs.get('x')
+#         y =  self.kwargs.get('y')
+#         #print('My viewpoint:', x,y)
+#         user_location = Point(float(x), float(y),srid=4326)
+
+#         total_agg = Product.objects.filter(Q(description__icontains =slug)).aggregate(
+#                     price_range=Max('price')- Min('price'),
+#                     price_min= Min('price'),
+#                     distance_range=Max(
+#                                         Distance(
+#                                             'shop__location',  
+#                                                 user_location
+#                                             )
+#                                         ) 
+#                                     - 
+#                                     Min(
+#                                         Distance(
+#                                         'shop__location',  
+#                                             user_location
+#                                         )
+#                                     ),
+#                     distance_min= Min(
+#                                         Distance(
+#                                             'shop__location',  
+#                                                 user_location
+#                                             ),
+#                                 )
+                                
+#                     ) 
+#         dict_ = {}
+#         dict_['price_range']=total_agg['price_range'] if not total_agg['price_range']== 0 else 1
+#         dict_['price_min']=total_agg['price_min'] 
+#         if 'distance_range' in dict_:
+#             dict_['distance_range']=total_agg['distance_range'].m if not total_agg['distance_range'].m== 0 else 1
+#         else:
+#             dict_['distance_range']=1
+#         if 'distance_min' in dict_:
+#             dict_['distance_min']=total_agg['distance_min'].m
+#         else:
+#             dict_['distance_min']=1 
+    
+#         A= 0.25 #price factor
+#         B= 0.75 #distance factor
+#         product_queryset = Product.objects.filter(Q(description__icontains =slug)).annotate(
+#                         rank=ExpressionWrapper(
+#                                 Abs(A*(F('price')- dict_['price_min'])/dict_['price_range']) +
+#                                 Abs(B*(Distance('shop__location',  user_location)- dict_['distance_min'])/dict_['distance_range']),
+#                                 output_field=FloatField()
+#                             ),
+#                         distance=Distance(
+#                                 'shop__location',  
+#                                 user_location
+#                             ),
+#                     ).order_by('rank')[0:6]
+  
+#         serializer = ProductSerializer(product_queryset, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+  

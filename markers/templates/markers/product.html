@@ -51,10 +51,14 @@
    
               <li class="breadcrumb-item" ><a href="{% url 'user_products' %}" class ="badge rounded-pill bg-success" class ="badge rounded-pill bg-success"
                   data-toggle="tooltip" data-placement="bottom" title='Manage Products'><i class="fas fa-bullhorn"></i></a></li>
-                 
+              <li class="breadcrumb-item ">
+                <input id='setfull_map'  type="checkbox" style="margin:5px ;">
+              </li>   
               <li class="breadcrumb-item" >
                 <label id="total_projects_searched">Nearby Products and Services</label>
-              </li>  
+              </li> 
+              
+              
             </ol>
           </div>
 
@@ -69,6 +73,7 @@
                 <!-- B -->
                 <div class="apartment-handle col-md-8 col-md-pull-4" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
                     <div class="apartments row">
+                      <!-- first_page -->
                         {% for product in product_qs %}
                             <div id="{{product.id}}" class="col-lg-4">                   
                                 {% if product.imageURL %}
@@ -95,7 +100,29 @@
 
             </div>
 
+            <!-- <div id= "page_section" class="pagination">
+              <ul class="pagination newpagination">
+                  {% if current_page.has_previous %}
+                      <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                      <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.previous_page_number}}">previous</a></li>
+                  {% endif %}
+          
+                  <span class="current" style="margin-left:5px">
+                      Page {{ current_page.number }} of {{ current_page.paginator.num_pages }}.
+                  </span>
+          
+                  {% if current_page.has_next %}
+                      <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.next_page_number}}">next</a></li>
+                      <li><a class='a_page_nav' style="margin-left: 5px;" href ="{{current_page.paginator.num_pages}}">last &raquo;</a></li>
+                    
+                  {% endif %}
+                </ul>
+            </div>
+     -->
+
           </div>
+
+
 
        
 
@@ -131,7 +158,82 @@
          var slug_data_url = `{% url 'locate_product_api_slug' 12345 6677 8899 %}` /* numbers contains number*/
          var default_img =`{% static 'images/placeholder.png' %}`
 
+           //first timme
+        //  var display_investment_ajax_url= "{% url 'display_investment_ajax' %}" 
+
+        //  function updatePaging2(data){
+        //     var has_previous=''
+        //     if (data.has_previous){
+        //         has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+        //             <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+            
+        //     }       
+        //     var has_next= ''          
+        //     if (data.has_next){
+        //         has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+        //                 <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
+        //             `; 
+        //     }       
+        //     a_html=`
+        //     <div id= "page_section" class="pagination">
+        //         <ul class="pagination newpagination">
+        //             ${has_previous}            
+        //             <span class="current" style="margin-left:5px">
+        //                 Page ${ data.current_page } of ${ data.last }.
+        //             </span>                   
+        //             ${has_next}
+        //         </ul>
+        //         </div>`
+        //         $("#page_section").html(a_html)
+        //   }
+ 
+        //  $('body').on('click', '.a_page_nav', function (event) {
+                 
+        //          event.preventDefault();
+        //          var page_no = $(this).attr('href');
+        //          var objthis = $(this)
+        //          // ajax call
+        //          $.ajax({
+        //              type: "POST",
+        //              // define url name
+        //              url: display_investment_ajax_url, 
+        //              data : {    
+        //                  page_no : page_no, 
+        //                  csrfmiddlewaretoken: csrftoken,
+        //              },
+        //              // handle a successful response
+        //              success: function (response) {
+        //                updatePaging2(response.data)
+        //                  //removeClass(objthis)
+        //                  $('#project_div').html('')
+        //                  if (response.data.per_page){
+        //                      per_page=response.data.per_page
+        //                  }
+        //                  var base_counter =(parseInt(page_no)-1)*per_page
+        //                  var counter=base_counter
+        //                  $.each(response.data.results, function(i, val) {
+        //                      a_html=append_html(counter,val)
+        //                      // add each model on every line
+        //                      $('#project_div').append(a_html)
+                             
+        //                  });
+                        
+        //                  },
+        //                  error: function () {
+        //                      alert('Error Occured');
+        //                  }
+        //          }); 
+        //      });
+         
+
       </script>
+      <script>
+        $(document).ready(function (){ 
+          // $("#index").removeClass( "active")
+          $("#geofind a").addClass( "active") 
+                   
+        })
+        </script>
       <script src="{% static 'products/app.js' %}"></script>
       
     {% endblock %}
@@ -140,6 +242,3 @@
 {% include 'investments_appraisal/mentor/sections/section_nav_store.html' %}
 
 {% endblock %}
-
-
-
