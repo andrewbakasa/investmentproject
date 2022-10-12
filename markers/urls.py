@@ -20,8 +20,8 @@ from .views import (
     TradedCurrencyLocationSlugView
 )
 urlpatterns = [
-    path('api_geofind/<str:x>/<str:y>', ProductLocationView.as_view(),  name='locate_product_api'),
-    path('api_geofind/tag/<str:slug>/<str:x>/<str:y>', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
+    path('api_geofind/<str:x>/<str:y>/<str:pageno>/', ProductLocationView.as_view(),  name='locate_product_api'),
+    path('api_geofind/tag/<str:slug>/<str:x>/<str:y>/<str:pageno>/', ProductLocationSlugView.as_view(),  name='locate_product_api_slug'),
     path('p/geo/s/', ProductLocationViewLandingPage.as_view(),  name='geo_find_product_landing'),
     path('add/w/', add_shop,  name='add_shop'),
     path('s/<int:pk>/u/', ShopUpdateView.as_view(), name='shop-update'),

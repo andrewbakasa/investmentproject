@@ -17,6 +17,7 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     {{ json_user_location_x|json_script:"user-x-data" }}<!--Long-->
     {{ json_user_location_y|json_script:"user-y-data" }}<!--Lat-->
+    {{request.session.pagedata|json_script:"pagedata-input" }}
 {% endblock %}
 
 {% block content_header %}
@@ -100,7 +101,7 @@
 
             </div>
 
-            <!-- <div id= "page_section" class="pagination">
+            <div id= "page_section" class="pagination">
               <ul class="pagination newpagination">
                   {% if current_page.has_previous %}
                       <li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
@@ -118,7 +119,7 @@
                   {% endif %}
                 </ul>
             </div>
-     -->
+    
 
           </div>
 
@@ -154,76 +155,138 @@
       <script>
          var product_qs= '{{json_product_qs}}'
          //var product_qs = JSON.parse("{{json_product_qs}}")
-         var base_data_url= '{% url "locate_product_api" 12345  66778899 %}'  /* numbers contains number*/
-         var slug_data_url = `{% url 'locate_product_api_slug' 12345 6677 8899 %}` /* numbers contains number*/
+         var base_data_url= '{% url "locate_product_api" 12345  66778899  444444 %}'  /* numbers contains number*/
+         var slug_data_url = `{% url 'locate_product_api_slug' 12345 6677 8899 444444 %}` /* numbers contains number*/
          var default_img =`{% static 'images/placeholder.png' %}`
 
            //first timme
         //  var display_investment_ajax_url= "{% url 'display_investment_ajax' %}" 
+          function getToken(name) {
+              let cookieValue = null;
+              if (document.cookie && document.cookie !== '') {
+                  const cookies = document.cookie.split(';');
+                  for (let i = 0; i < cookies.length; i++) {
+                      const cookie = cookies[i].trim();
+                      // Does this cookie string begin with the name we want?
+                      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                      }
+                  }
+              }
+              return cookieValue;
+          }
+        var csrftoken = getToken('csrftoken');
+         function updatePaging2(data){
+            //console.log('**************',data )
+            // const keys = Object.keys(data);
+            // console.log('keys------->',keys )
+            // Object.entries(data).forEach(([key, value]) => {
+            //   console.log(key, value);
+            // });
+            // var keys = [];
+            // $.each(data, function(key, value) {
+            //     keys.push(key);
+            // });
 
-        //  function updatePaging2(data){
-        //     var has_previous=''
-        //     if (data.has_previous){
-        //         has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
-        //             <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
+            // console.log(JSON.stringify(keys));
+            var has_previous=''
+            //console.log('has_previous',data['has_previous'] ,data.has_previous)
+            if (data['has_previous']){
+                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data['previous_page_number']}">previous</a></li>`;
             
-        //     }       
-        //     var has_next= ''          
-        //     if (data.has_next){
-        //         has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
-        //                 <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
-        //             `; 
-        //     }       
-        //     a_html=`
-        //     <div id= "page_section" class="pagination">
-        //         <ul class="pagination newpagination">
-        //             ${has_previous}            
-        //             <span class="current" style="margin-left:5px">
-        //                 Page ${ data.current_page } of ${ data.last }.
-        //             </span>                   
-        //             ${has_next}
-        //         </ul>
-        //         </div>`
-        //         $("#page_section").html(a_html)
-        //   }
- 
-        //  $('body').on('click', '.a_page_nav', function (event) {
-                 
-        //          event.preventDefault();
-        //          var page_no = $(this).attr('href');
-        //          var objthis = $(this)
-        //          // ajax call
-        //          $.ajax({
-        //              type: "POST",
-        //              // define url name
-        //              url: display_investment_ajax_url, 
-        //              data : {    
-        //                  page_no : page_no, 
-        //                  csrfmiddlewaretoken: csrftoken,
-        //              },
-        //              // handle a successful response
-        //              success: function (response) {
-        //                updatePaging2(response.data)
-        //                  //removeClass(objthis)
-        //                  $('#project_div').html('')
-        //                  if (response.data.per_page){
-        //                      per_page=response.data.per_page
-        //                  }
-        //                  var base_counter =(parseInt(page_no)-1)*per_page
-        //                  var counter=base_counter
-        //                  $.each(response.data.results, function(i, val) {
-        //                      a_html=append_html(counter,val)
-        //                      // add each model on every line
-        //                      $('#project_div').append(a_html)
+            }       
+            var has_next= '' 
+            //console.log('has_next',data['has_next'],data.has_next )         
+            if (data['has_next']){
+                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data['next_page_number']}">next</a></li>
+                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data['last']}">last &raquo;</a></li>
+                    `; 
+            }       
+            a_html=`
+            <div id= "page_section" class="pagination">
+                <ul class="pagination newpagination">
+                    ${has_previous}            
+                    <span class="current" style="margin-left:5px">
+                        Page ${ data['current_page'] } of ${ data['last'] }.
+                    </span>                   
+                    ${has_next}
+                </ul>
+                </div>`
+                $("#page_section").html(a_html)
+          }
+         
+          $('body').on('click', '.a_page_nav', function (event) {
+            event.preventDefault();
+            current_page_no = $(this).attr('href');
+            //pagedata = JSON.parse('{{request.session.pagedata|safe}}');
+            //console.log('current_page_no>>>>>>>>>>>>>>>>>>', current_page_no)
+            myScript()
+          });
+          // function call_pagedata(){
+          //   pagedata = JSON.parse('{{request.session.pagedata|safe}}');
+          //   console.log('Check new DATA <><><><><><><>:::::>>>>>', pagedata);
+          // }
+
+          $('body').on('click', '.a_page_nav_cannnotwork', function (event) {
+              
+                 event.preventDefault();
+                 var page_no = $(this).attr('href');
+                let search_val = document.getElementById('start').value//.toLowerCase();
+                search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
+                var dataurl
+                //console.log('search ' , search_val,user_loc_x,user_loc_y)
+                if (search_val.length>0){            
+                  dataurl = slug_data_url.replace(/12345/, search_val.toString())
+                                          .replace(/6677/, user_loc_x)
+                                          .replace(/8899/, user_loc_y)
+                                          .replace(/444444/, page_no) ; 
+                  //console.log('1:url', dataurl)
+                  $('#total_projects_searched').html('Running search [' + search_val + "]")
+                }else {
+                  //all products
+                  dataurl = base_data_url.replace(/12345/, user_loc_x)
+                                        .replace(/66778899/, user_loc_y)
+                                        .replace(/444444/,page_no) ;
+                  //console.log('2:url', dataurl)
+                  $('#total_projects_searched').html('Running search [all product]')
+                }
+
+
+                 var objthis = $(this)
+                 // ajax call
+                 $.ajax({
+                     type: "POST",
+                     // define url name
+                     url: dataurl, 
+                     data : {    
+                         page_no : page_no, 
+                         csrfmiddlewaretoken: csrftoken,
+                     },
+                     // handle a successful response
+                     success: function (response) {
+                       updatePaging2(response.data)
+                         //removeClass(objthis)
+                         $('#project_div').html('')
+                         if (response.data.per_page){
+                             per_page=response.data.per_page
+                         }
+                         var base_counter =(parseInt(page_no)-1)*per_page
+                         var counter=base_counter
+                         $.each(response.data.results, function(i, val) {
+                             a_html=append_html(counter,val)
+                             // add each model on every line
+                             $('#project_div').append(a_html)
                              
-        //                  });
+                         });
                         
-        //                  },
-        //                  error: function () {
-        //                      alert('Error Occured');
-        //                  }
-        //          }); 
-        //      });
+                         },
+                         error: function () {
+                             alert('Error Occured');
+                         }
+                 }); 
+             });
          
 
       </script>
@@ -233,7 +296,11 @@
           $("#geofind a").addClass( "active") 
                    
         })
+       
+        var pagedata = JSON.parse('{{request.session.pagedata|safe}}');
+      
         </script>
+       
       <script src="{% static 'products/app.js' %}"></script>
       
     {% endblock %}

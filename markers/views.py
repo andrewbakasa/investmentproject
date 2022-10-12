@@ -244,13 +244,24 @@ class ProductLocationView(APIView):
        
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
+        pageno =  self.kwargs.get('pageno')
+        #print('........HHHH:', pageno)
+        page_dict = get_page_session_data(self.request, '', pageno)
+        perpage =int(page_dict["per_page"])
+        pno =int(page_dict["page_no"])
+        lb= int((pno-1)*perpage)
+        ub = lb + perpage
 
         user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
-                                            user_location)).order_by('distance')[0:6]
-        serializer = ProductSerializer(product_queryset, many=True)
-      
+                                            user_location)).order_by('distance')[lb:ub]
+        serializer = ProductSerializer(product_queryset, many=True,
+                      context = {"page_dict": page_dict})
+       
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+        
 """ 
 A: DATA-MATRIX
 
@@ -308,7 +319,8 @@ class CurrencyLocationView(APIView):
        
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
-        adj =  self.kwargs.get('adj') 
+        adj =  self.kwargs.get('adj')
+
         update_user_location(self.request,x,y)
         user_location = Point(float(x), float(y),srid=4326)      
         # user allowed one incomplete record only
@@ -471,8 +483,17 @@ class ProductLocationSlugView(APIView):
         slug =  self.kwargs.get('slug')
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
-        #print('My viewpoint:', x,y)
+        pageno =  self.kwargs.get('pageno')
+        
         user_location = Point(float(x), float(y),srid=4326)
+        page_dict = get_page_session_data(self.request,slug,pageno)
+        perpage =int(page_dict["per_page"])
+        pno =int(page_dict["page_no"])
+        lb= int((pno-1)*perpage)
+       
+        ub = lb + perpage
+        #---------------------------------
+        #print('Pages:::', page_dict["per_page"], page_dict["page_no"],page_dict["num_of_pages"],page_dict["totalrecords"])
 
         total_agg = Product.objects.filter(Q(description__icontains =slug)).aggregate(
                     price_range=Max('price')- Min('price'),
@@ -522,9 +543,11 @@ class ProductLocationSlugView(APIView):
                                 'shop__location',  
                                 user_location
                             ),
-                    ).order_by('rank')[0:6]
+                    ).order_by('rank')[lb:ub]
   
-        serializer = ProductSerializer(product_queryset, many=True)
+        serializer = ProductSerializer(product_queryset, many=True,
+                      context = {"page_dict": page_dict})
+       
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 @method_decorator(login_in_user_only_with_routing(), name='dispatch')   
@@ -590,7 +613,7 @@ class ShopUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
     
    
     def form_valid(self, form):
-        #print('>>>>>>>', self.request.POST["lat"], self.request.POST["lng"])
+      
         lat, lng = self.request.POST["lat"], self.request.POST["lng"]
         instance = form.save(commit=False)
         location = Point(float(lng), float(lat),srid=4326)
@@ -682,7 +705,7 @@ class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
       
-
+        get_page_session_data(self.request,'',1)
         context["json_user_location_x"] =user_location.x#location_es
         context["json_user_location_y"] =user_location.y#location_es
     
@@ -1003,82 +1026,144 @@ def update_all_deal_closed():
         target.complete= True           
         target.save() 
 
-# def display_investment_ajax(request,  *args, **kwargs):
+
+def get_page_session_data(request, slug, page_no):
+    #print('get_page_session_data: page_no',page_no)
+    models= Product.objects.filter(Q(description__icontains =slug))#.order_by('-date')
+    if not ('perpage' in request.session):
+        #print('session[perpage] on set')
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            #print('userpref found')
+            request.session['perpage']=obj.perpage
+        else:# nothing in db
+            request.session['perpage']= 6
+    else:
+        #print('2. session[perpage] is...')
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            #print('2.userpref found')
+            request.session['perpage']=obj.perpage
+        else:# nothing in db
+            request.session['perpage']= 6
+        #print('2. session[perpage] =', request.session['perpage'])
+
+
+    per_page=request.session['perpage']
+    obj_paginator = Paginator(models, per_page)
+    # list of objects on first page
+    first_page = obj_paginator.page(1).object_list
+    # range iterator of page numbers
+    page_range = obj_paginator.page_range
+
+
+    num_of_pages= int(obj_paginator.num_pages)
+    totalrecords= int(obj_paginator.count)
+    current_page = obj_paginator.get_page(page_no)
+    
+    
+    data={}	
+    data["per_page"]=per_page
+    data["page_no"]=page_no
+    data["num_of_pages"]=num_of_pages
+    data["totalrecords"]=totalrecords
+    #data["has_previous"]=False
+    if current_page.has_previous():
+        data["has_previous"]=True  
+        data["first"]=1 
+        data["previous_page_number"]=current_page.previous_page_number() 
+    
+    data["current_page"]=current_page.number     
+    
+    #data["has_next"]=False
+    if current_page.has_next():
+        data["has_next"]=True  
+        data["next_page_number"]=current_page.next_page_number()
+    
+    data["last"]=current_page.paginator.num_pages  
+    datajson = json.dumps(data)
+    request.session['pagedata']=datajson
+    request.session.modified = True
+    return data
+
+def display_investment_ajax(request,  *args, **kwargs):
    
-#     if request.method == 'POST':
-#         slug = request.POST.get('slug', None) 
-#         x = request.POST.get('x', None)
-#         y = request.POST.get('y', None)  
-#         user_location = Point(float(x), float(y),srid=4326)
-#         models= Product.objects.filter(Q(description__icontains =slug))#.order_by('-date')
-#     else:
-#         models= None
+    
+   
+    if request.method == 'POST':
+        slug = request.POST.get('slug', None) 
+        x = request.POST.get('x', None)
+        y = request.POST.get('y', None)  
+        user_location = Point(float(x), float(y),srid=4326)
+        models= Product.objects.filter(Q(description__icontains =slug))#.order_by('-date')
+    else:
+        models= None
 
 
-#     if not ('perpage' in request.session):
-#         #print('session[perpage] on set')
-#         obj= UserPreference.objects.filter(user=request.user).first()
-#         if obj:
-#             #print('userpref found')
-#             request.session['perpage']=obj.perpage
-#         else:# nothing in db
-#             request.session['perpage']= 6
-#     else:
-#         #print('2. session[perpage] is...')
-#         obj= UserPreference.objects.filter(user=request.user).first()
-#         if obj:
-#             #print('2.userpref found')
-#             request.session['perpage']=obj.perpage
-#         else:# nothing in db
-#             request.session['perpage']= 6
-#         #print('2. session[perpage] =', request.session['perpage'])
+    if not ('perpage' in request.session):
+        #print('session[perpage] on set')
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            #print('userpref found')
+            request.session['perpage']=obj.perpage
+        else:# nothing in db
+            request.session['perpage']= 6
+    else:
+        #print('2. session[perpage] is...')
+        obj= UserPreference.objects.filter(user=request.user).first()
+        if obj:
+            #print('2.userpref found')
+            request.session['perpage']=obj.perpage
+        else:# nothing in db
+            request.session['perpage']= 6
+        #print('2. session[perpage] =', request.session['perpage'])
 
 
-#     per_page=request.session['perpage']
-#     obj_paginator = Paginator(models, per_page)
-#     # list of objects on first page
-#     first_page = obj_paginator.page(1).object_list
-#     # range iterator of page numbers
-#     page_range = obj_paginator.page_range
+    per_page=request.session['perpage']
+    obj_paginator = Paginator(models, per_page)
+    # list of objects on first page
+    first_page = obj_paginator.page(1).object_list
+    # range iterator of page numbers
+    page_range = obj_paginator.page_range
 
    
-#     #
-#     if request.method == 'POST':
-#         #getting page number
-#         page_no = request.POST.get('page_no', None) 
-#         num_of_pages= int(obj_paginator.num_pages)
-#         totalrecords= int(obj_paginator.count)
-#         current_page = obj_paginator.get_page(page_no)
+    #
+    if request.method == 'POST':
+        #getting page number
+        page_no = request.POST.get('page_no', None) 
+        num_of_pages= int(obj_paginator.num_pages)
+        totalrecords= int(obj_paginator.count)
+        current_page = obj_paginator.get_page(page_no)
 
             
         
         
-#         data={}	
-#         data["per_page"]=per_page
-#         data["page_no"]=page_no
-#         data["num_of_pages"]=num_of_pages
-#         data["totalrecords"]=totalrecords
-#         #data["has_previous"]=False
-#         if current_page.has_previous():
-#             data["has_previous"]=True  
-#             data["first"]=1 
-#             data["previous_page_number"]=current_page.previous_page_number() 
+        data={}	
+        data["per_page"]=per_page
+        data["page_no"]=page_no
+        data["num_of_pages"]=num_of_pages
+        data["totalrecords"]=totalrecords
+        #data["has_previous"]=False
+        if current_page.has_previous():
+            data["has_previous"]=True  
+            data["first"]=1 
+            data["previous_page_number"]=current_page.previous_page_number() 
         
-#         data["current_page"]=current_page.number     
+        data["current_page"]=current_page.number     
         
-#         #data["has_next"]=False
-#         if current_page.has_next():
-#             data["has_next"]=True  
-#             data["next_page_number"]=current_page.next_page_number()
+        #data["has_next"]=False
+        if current_page.has_next():
+            data["has_next"]=True  
+            data["next_page_number"]=current_page.next_page_number()
         
-#         data["last"]=current_page.paginator.num_pages  
-       
+        data["last"]=current_page.paginator.num_pages  
+        request.session['pagedata']=data
 
        
 
         
         
-#         return JsonResponse({"data":data})
+        return JsonResponse({"data":data})
 
 
   

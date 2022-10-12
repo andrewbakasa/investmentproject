@@ -139,6 +139,12 @@ class ProductSerializer(GeoFeatureModelSerializer):
 	pid = serializers.SerializerMethodField()
 	shopname = serializers.SerializerMethodField()
 	rank = serializers.SerializerMethodField()
+
+	page_dict = serializers.SerializerMethodField()
+	def get_page_dict(self, obj):
+		if "page_dict" in self.context:
+			return self.context["page_dict"]
+		return None
 	def get_shopname(self, obj):
 		try:
 			return obj.shop.name
@@ -165,7 +171,7 @@ class ProductSerializer(GeoFeatureModelSerializer):
 			return None	
 	class Meta:
 		model = Product
-		fields = ['pid', 'name', 'rank','image', 'price','distance', 'shopname'] 
+		fields = ['pid', 'name', 'rank','image', 'price','distance', 'shopname','page_dict'] 
 		geo_field = 'location'
 		#read_only_fields = ['distance']
 
