@@ -121,7 +121,10 @@ def create_all_user_product(request,form,template_name):
             latest = Product.objects.latest('id').id
             record = Product.objects.get(pk=latest)
             item_object = model_to_dict(record)
-            print(item_object)
+            #print(item_object)
+            shop_pk= item_object['shop']
+            shop_obj=  get_object_or_404(Shop, pk=shop_pk)
+            item_object['shop']= shop_obj.name
             #categories = []
             # for j in record.categories.all():
             #     categories.append(j.name)
@@ -1533,6 +1536,9 @@ def save_all(request,form,template_name):
             pk = form.instance.id
             product = get_object_or_404(Product,pk=pk)
             product_item_object = model_to_dict(product)
+            shop_pk= product_item_object['shop']
+            shop_obj=  get_object_or_404(Shop, pk=shop_pk)
+            product_item_object['shop']= shop_obj.name
             product_item_object['image']=str(product_item_object['image'])
             categories=""
             for x in product_item_object['categories']:
@@ -1572,7 +1578,9 @@ def unlockProduct(request, pk):
             product.locked=False
             product.save()
             product_item_object = model_to_dict(Product.objects.get(pk=pk))
-            
+            shop_pk= product_item_object['shop']
+            shop_obj=  get_object_or_404(Shop, pk=shop_pk)
+            product_item_object['shop']= shop_obj.name
             product_item_object['image']=str(product_item_object['image'])
             categories=""
             
@@ -1598,7 +1606,9 @@ def lockProduct(request, pk):
             product.locked=True
             product.save()
             product_item_object = model_to_dict(Product.objects.get(pk=pk))
-           
+            shop_pk= product_item_object['shop']
+            shop_obj=  get_object_or_404(Shop, pk=shop_pk)
+            product_item_object['shop']= shop_obj.name
             product_item_object['image']= str(product_item_object['image'])
             categories=""
             
@@ -1845,6 +1855,9 @@ class  ProductUpdate(LoginRequiredMixin, generic.edit.UpdateView):
             product= form.save()
 
             product_item_object =model_to_dict(product)
+            shop_pk= product_item_object['shop']
+            shop_obj=  get_object_or_404(Shop, pk=shop_pk)
+            product_item_object['shop']= shop_obj.name
             product_item_object['image']=str(product_item_object['image'])
             categories=""
            
