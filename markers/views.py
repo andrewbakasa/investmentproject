@@ -14,7 +14,7 @@ from django.db.models.functions import Abs
 import json
 from investments_appraisal.models import UserPreference, UserProfile
 from django.http import JsonResponse
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.core.serializers import serialize
 from django.views.generic.base import TemplateView
@@ -252,10 +252,21 @@ class ProductLocationView(APIView):
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')#[lb:ub]
 
-        obj_paginator = Paginator(product_queryset, perpage)
-        current_page = obj_paginator.get_page(pageno)
-        page_dict = get_page_session_data(perpage, obj_paginator, pageno)
-     
+        obj_paginator = Paginator(product_queryset, perpage, orphans=0,allow_empty_first_page=True)
+        #current_page = obj_paginator.get_page(int(pageno))
+        try: 
+            print('current_page..... working OK')      
+            current_page = obj_paginator.page(pageno)
+        except PageNotAnInteger:
+            print('PageNotAnInteger.....')
+            pageno =1
+            current_page = obj_paginator.page(1)
+        except EmptyPage:
+            print('Empty pages.....')
+            pageno =obj_paginator.num_pages
+            current_page = obj_paginator.page(obj_paginator.num_pages)
+       
+        page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
 
         serializer = ProductSerializer(current_page, many=True,
                       context = {"page_dict": page_dict})
@@ -551,9 +562,22 @@ class ProductLocationSlugView(APIView):
                     ).order_by('rank')#[lb:ub]
 
         perpage= get_user_page_pref(request)
-        obj_paginator = Paginator(product_queryset, perpage)
-        current_page = obj_paginator.get_page(pageno)
-        page_dict = get_page_session_data(perpage, obj_paginator, pageno)
+        obj_paginator = Paginator(product_queryset, perpage,orphans=0,allow_empty_first_page=True)
+        #current_page = obj_paginator.get_page(int(pageno))
+        #page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
+        try:   
+            print('current_page..... working OK')    
+            current_page = obj_paginator.page(pageno)
+        except PageNotAnInteger:
+            print('PageNotAnInteger.....')
+            pageno =1
+            current_page = obj_paginator.page(1)
+        except EmptyPage:
+            print('Empty pages.....')
+            pageno =obj_paginator.num_pages
+            current_page = obj_paginator.page(obj_paginator.num_pages)
+       
+        page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
         serializer = ProductSerializer(current_page, many=True,
                       context = {"page_dict": page_dict})
        
