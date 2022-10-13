@@ -268,8 +268,14 @@ class ProductLocationView(APIView):
        
         page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
 
-        serializer = ProductSerializer(current_page, many=True,
-                      context = {"page_dict": page_dict})
+        #---------Manual Fix for Single Page Queryset--------
+        if obj_paginator.num_pages==1:
+            serializer = ProductSerializer(product_queryset, many=True,
+                        context = {"page_dict": page_dict})
+        else:
+            serializer = ProductSerializer(current_page, many=True,
+                        context = {"page_dict": page_dict})
+        #----------------------------------------------------
        
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -568,6 +574,7 @@ class ProductLocationSlugView(APIView):
         try:   
             print('current_page..... working OK')    
             current_page = obj_paginator.page(pageno)
+            
         except PageNotAnInteger:
             print('PageNotAnInteger.....')
             pageno =1
@@ -578,9 +585,16 @@ class ProductLocationSlugView(APIView):
             current_page = obj_paginator.page(obj_paginator.num_pages)
        
         page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
-        serializer = ProductSerializer(current_page, many=True,
-                      context = {"page_dict": page_dict})
-       
+        
+        #---------Manual Fix for Single Page Queryset--------
+        if obj_paginator.num_pages==1:
+            serializer = ProductSerializer(product_queryset, many=True,
+                        context = {"page_dict": page_dict})
+        else:
+            serializer = ProductSerializer(current_page, many=True,
+                        context = {"page_dict": page_dict})
+        #----------------------------------------------------
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 @method_decorator(login_in_user_only_with_routing(), name='dispatch')   
