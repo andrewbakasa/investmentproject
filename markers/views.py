@@ -248,18 +248,23 @@ class ProductLocationView(APIView):
         #print('........HHHH:', pageno)
         page_dict = get_page_session_data(self.request, '', pageno)
         
-        num_of_pages =int(page_dict["num_of_pages"])
-        total =int(page_dict["totalrecords"])
+        #num_of_pages =int(page_dict["num_of_pages"])
+        #total =int(page_dict["totalrecords"])
         perpage =int(page_dict["per_page"])
         pno =int(page_dict["page_no"])
-        lb= int((pno-1)*perpage) 
-        ub = max(min((lb + perpage),total),0)
-        print((lb + perpage)<= total, (lb + perpage),'is less than' , total, "  LB:" , lb,":", (ub))     
+        #lb= int((pno-1)*perpage) 
+        #ub = max(min((lb + perpage),total),0)
+        #print((lb + perpage)<= total, (lb + perpage),'is less than' , total, "  LB:" , lb,":", (ub))     
        
         user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
-                                            user_location)).order_by('distance')[lb:ub]
-        serializer = ProductSerializer(product_queryset, many=True,
+                                            user_location)).order_by('distance')#[lb:ub]
+
+        obj_paginator = Paginator(product_queryset, perpage)
+        current_page = obj_paginator.get_page(pno)
+
+
+        serializer = ProductSerializer(current_page, many=True,
                       context = {"page_dict": page_dict})
        
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -491,13 +496,13 @@ class ProductLocationSlugView(APIView):
         
         user_location = Point(float(x), float(y),srid=4326)
         page_dict = get_page_session_data(self.request,slug,pageno)
-        num_of_pages =int(page_dict["num_of_pages"])
-        total =int(page_dict["totalrecords"])
+        #num_of_pages =int(page_dict["num_of_pages"])
+        #total =int(page_dict["totalrecords"])
         perpage =int(page_dict["per_page"])
         pno =int(page_dict["page_no"])
-        lb= int((pno-1)*perpage)
-        ub = max(min((lb + perpage),total),0)
-        print((lb + perpage)<=total, (lb + perpage),'is less than', total, "  LB:" , lb,":", (ub))       
+        #lb= int((pno-1)*perpage)
+        #ub = max(min((lb + perpage),total),0)
+        #print((lb + perpage)<=total, (lb + perpage),'is less than', total, "  LB:" , lb,":", (ub))       
       
         #---------------------------------
         #print('Pages:::', page_dict["per_page"], page_dict["page_no"],page_dict["num_of_pages"],page_dict["totalrecords"])
@@ -550,9 +555,11 @@ class ProductLocationSlugView(APIView):
                                 'shop__location',  
                                 user_location
                             ),
-                    ).order_by('rank')[lb:ub]
-  
-        serializer = ProductSerializer(product_queryset, many=True,
+                    ).order_by('rank')#[lb:ub]
+        
+        obj_paginator = Paginator(product_queryset, perpage)
+        current_page = obj_paginator.get_page(pno)
+        serializer = ProductSerializer(current_page, many=True,
                       context = {"page_dict": page_dict})
        
         return Response(serializer.data, status=status.HTTP_200_OK)
