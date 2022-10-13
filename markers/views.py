@@ -245,24 +245,17 @@ class ProductLocationView(APIView):
         x =  self.kwargs.get('x')
         y =  self.kwargs.get('y')
         pageno =  self.kwargs.get('pageno')
-        #print('........HHHH:', pageno)
-        page_dict = get_page_session_data(self.request, '', pageno)
-        
-        #num_of_pages =int(page_dict["num_of_pages"])
-        #total =int(page_dict["totalrecords"])
-        perpage =int(page_dict["per_page"])
-        pno =int(page_dict["page_no"])
-        #lb= int((pno-1)*perpage) 
-        #ub = max(min((lb + perpage),total),0)
-        #print((lb + perpage)<= total, (lb + perpage),'is less than' , total, "  LB:" , lb,":", (ub))     
-       
+            
+        perpage= get_user_page_pref(request)
         user_location = Point(float(x), float(y),srid=4326)
+
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')#[lb:ub]
 
         obj_paginator = Paginator(product_queryset, perpage)
-        current_page = obj_paginator.get_page(pno)
-
+        current_page = obj_paginator.get_page(pageno)
+        page_dict = get_page_session_data(perpage, obj_paginator, pageno)
+     
 
         serializer = ProductSerializer(current_page, many=True,
                       context = {"page_dict": page_dict})
@@ -495,11 +488,11 @@ class ProductLocationSlugView(APIView):
         pageno =  self.kwargs.get('pageno')
         
         user_location = Point(float(x), float(y),srid=4326)
-        page_dict = get_page_session_data(self.request,slug,pageno)
+       
         #num_of_pages =int(page_dict["num_of_pages"])
         #total =int(page_dict["totalrecords"])
         perpage =int(page_dict["per_page"])
-        pno =int(page_dict["page_no"])
+        #pno =int(page_dict["page_no"])
         #lb= int((pno-1)*perpage)
         #ub = max(min((lb + perpage),total),0)
         #print((lb + perpage)<=total, (lb + perpage),'is less than', total, "  LB:" , lb,":", (ub))       
@@ -556,9 +549,11 @@ class ProductLocationSlugView(APIView):
                                 user_location
                             ),
                     ).order_by('rank')#[lb:ub]
-        
+
+        perpage= get_user_page_pref(request)
         obj_paginator = Paginator(product_queryset, perpage)
-        current_page = obj_paginator.get_page(pno)
+        current_page = obj_paginator.get_page(pageno)
+        page_dict = get_page_session_data(perpage, obj_paginator, pageno)
         serializer = ProductSerializer(current_page, many=True,
                       context = {"page_dict": page_dict})
        
@@ -719,7 +714,7 @@ class ProductLocationViewLandingPage(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
       
-        get_page_session_data(self.request,'',1)
+       
         context["json_user_location_x"] =user_location.x#location_es
         context["json_user_location_y"] =user_location.y#location_es
     
@@ -1040,10 +1035,7 @@ def update_all_deal_closed():
         target.complete= True           
         target.save() 
 
-
-def get_page_session_data(request, slug, page_no):
-    #print('get_page_session_data: page_no',page_no)
-    models= Product.objects.filter(Q(description__icontains =slug))#.order_by('-date')
+def get_user_page_pref(request):
     if not ('perpage' in request.session):
         #print('session[perpage] on set')
         obj= UserPreference.objects.filter(user=request.user).first()
@@ -1061,15 +1053,9 @@ def get_page_session_data(request, slug, page_no):
         else:# nothing in db
             request.session['perpage']= 6
         #print('2. session[perpage] =', request.session['perpage'])
-
-
-    per_page=request.session['perpage']
-    obj_paginator = Paginator(models, per_page)
-    # list of objects on first page
-    first_page = obj_paginator.page(1).object_list
-    # range iterator of page numbers
-    page_range = obj_paginator.page_range
-
+    return request.session['perpage']
+def get_page_session_data(per_page, obj_paginator, page_no):
+   
 
     num_of_pages= int(obj_paginator.num_pages)
     totalrecords= int(obj_paginator.count)
@@ -1095,9 +1081,9 @@ def get_page_session_data(request, slug, page_no):
         data["next_page_number"]=current_page.next_page_number()
     
     data["last"]=current_page.paginator.num_pages  
-    datajson = json.dumps(data)
-    request.session['pagedata']=datajson
-    request.session.modified = True
+    # datajson = json.dumps(data)
+    # request.session['pagedata']=datajson
+    # request.session.modified = True
     return data
 
 def display_investment_ajax(request,  *args, **kwargs):
