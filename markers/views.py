@@ -247,13 +247,15 @@ class ProductLocationView(APIView):
         pageno =  self.kwargs.get('pageno')
         #print('........HHHH:', pageno)
         page_dict = get_page_session_data(self.request, '', pageno)
+        
+        num_of_pages =int(page_dict["num_of_pages"])
         total =int(page_dict["totalrecords"])
         perpage =int(page_dict["per_page"])
         pno =int(page_dict["page_no"])
-        lb= int((pno-1)*perpage)
+        lb= int((pno-1)*perpage) 
+        ub = max(min((lb + perpage),total),0)
+        print((lb + perpage)<= total, (lb + perpage),'is less than' , total, "  LB:" , lb,":", (ub))     
        
-        ub = min(lb + perpage,total)
-
         user_location = Point(float(x), float(y),srid=4326)
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')[lb:ub]
@@ -489,12 +491,14 @@ class ProductLocationSlugView(APIView):
         
         user_location = Point(float(x), float(y),srid=4326)
         page_dict = get_page_session_data(self.request,slug,pageno)
+        num_of_pages =int(page_dict["num_of_pages"])
         total =int(page_dict["totalrecords"])
         perpage =int(page_dict["per_page"])
         pno =int(page_dict["page_no"])
         lb= int((pno-1)*perpage)
-       
-        ub = min(lb + perpage,total)
+        ub = max(min((lb + perpage),total),0)
+        print((lb + perpage)<=total, (lb + perpage),'is less than', total, "  LB:" , lb,":", (ub))       
+      
         #---------------------------------
         #print('Pages:::', page_dict["per_page"], page_dict["page_no"],page_dict["num_of_pages"],page_dict["totalrecords"])
 
