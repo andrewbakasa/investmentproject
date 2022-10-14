@@ -269,7 +269,8 @@ class ProductLocationView(APIView):
         page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
 
         #---------Manual Fix for Single Page Queryset--------
-        if obj_paginator.num_pages==1:
+        
+        if obj_paginator.num_pages == 1:
             serializer = ProductSerializer(product_queryset, many=True,
                         context = {"page_dict": page_dict})
         else:
@@ -492,6 +493,7 @@ def get_queryset(user_tc_instance,dict_, user_location, delta_adj):
     # for i in uc_queryset:
     #     print(i.currency_offered,",", i.currency_expected,",",i.created_by,",",i.value)
     return uc_queryset
+
 @method_decorator(login_in_user_only_with_routing(), name='dispatch')   
 class ProductLocationSlugView(APIView):
     # add permission to check if user is authenticated
@@ -508,7 +510,7 @@ class ProductLocationSlugView(APIView):
        
         #num_of_pages =int(page_dict["num_of_pages"])
         #total =int(page_dict["totalrecords"])
-        perpage =int(page_dict["per_page"])
+        #perpage =int(page_dict["per_page"])
         #pno =int(page_dict["page_no"])
         #lb= int((pno-1)*perpage)
         #ub = max(min((lb + perpage),total),0)
@@ -586,6 +588,8 @@ class ProductLocationSlugView(APIView):
        
         page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
         
+
+       
         #---------Manual Fix for Single Page Queryset--------
         if obj_paginator.num_pages==1:
             serializer = ProductSerializer(product_queryset, many=True,
