@@ -91,19 +91,27 @@ class TradedCurrency(models.Model):
         l_twin =""
         items = self.targetA.all()#.source
        
+        outputstr = ''
         for item in items:
+            innerstr =''
             if item.source:
-                if l =="":
-                    l = str(item.source.created_by.username)
+                if innerstr =="":
+                    innerstr = str(item.source.created_by.username)
                 else:
-                    l = l + ',' + str(item.source.created_by.username)
+                    innerstr = innerstr + ',' + str(item.source.created_by.username)
             if item.target:
-                if l_twin =="":
-                    l_twin = str(item.target.created_by.username)
+                if innerstr =="":
+                    innerstr = str(item.target.created_by.username)
                 else:
-                    l_twin = l_twin + ',' + str(item.target.created_by.username)
+                    innerstr = innerstr + ',' + str(item.target.created_by.username)
+            
+            if outputstr == "":  
+                outputstr = innerstr
+            else:
+                outputstr = outputstr + ';' + innerstr  
+
         #print('Source', items, l,l_twin)
-        return l + "," + l_twin
+        return outputstr
     @property
     def get_target(self):
         l =''
@@ -125,6 +133,14 @@ class TradedCurrency(models.Model):
         return l
     @property    
     def get_source(self):
+        """ 
+        The list all tags that are targeting me
+        My followers
+        Can be more than one,
+        Can be suitors
+        Can be matched
+
+        """
         l =''
         l_twin =""
         items = self.targetA.all()#.source

@@ -385,14 +385,14 @@ def get_and_save_instance(user, user_loc):
         if  user_tc_instance.residence:
             user_tc_instance.residence.location=user_loc# =ul_instance
             user_tc_instance.save()
-            print('Location updated>>>', user_tc_instance.residence,)
+            #print('Location updated>>>', user_tc_instance.residence,)
         else:
             user_tc_instance.residence=ul_instance
             user_tc_instance.save()
     else:
         if  user_tc_instance.residence:
             #update residence,,,, is it updating?
-            print("Updating location", user_loc)
+            #print("Updating location", user_loc)
             user_tc_instance.residence.location =user_loc
             user_tc_instance.save()
         else :
@@ -686,7 +686,7 @@ def update_user_location(request,lng,lat):
     if qs:
         instance= qs.first()
         instance.location = location
-        print('location updated......')
+        #print('location updated......')
         instance.save()
     else:
         instance =UserLocation.objects.create(user=request.user, location =location)
