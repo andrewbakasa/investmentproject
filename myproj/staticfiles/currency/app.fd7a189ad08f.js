@@ -605,31 +605,15 @@ function nonEmptyTaglist(tag_source_targetList){
 
 function IsMarkerAlreadyMarried(props ){
   //early withdraw
-  if (props.matching_partner ==false)
-    return false
-
-  var found=false
-  var list_ = props.tag_source_target.split(";") 
-  for (let i = 0; i < list_.length; i++) {
-      var x = list_[i].split(",")
-      tag_source_username =x[0]
-      tag_target_username= x[1]
-
-      if (tag_source_username.length>0 || tag_target_username.length>0){
-        if (!( (tag_source_username == user_name) || 
-                (tag_target_username ==props.username) || 
-                    (tag_target_username ==user_name)
-              ))
-              {
-                found= true
-              }
-      }
+  if (props.already_matched ==false){
+      return false
+  // match is caused by other marker other than the logged in user 
+  } else if(props.matching_partner && (props.already_matched ==true)){
+      // married to current logged in user dont remove
+      return false
+  }else {
+      return true
   }
-  // match is caused by other marker other than the logged in user
-  if(found && (props.matching_partner ==true))
-    return true
-  return false
-
 }
 
 function loggeduserIsInSourceList(tag_source_targetList, user_name){
