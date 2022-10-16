@@ -604,18 +604,16 @@ function nonEmptyTaglist(tag_source_targetList){
 
 
 function IsMarkerAlreadyMarried(props ){
-  //early withdraw
-  if (props.already_matched ==false){
+    //early withdraw
+    if (props.already_matched ==false){
+        return false
+    // match is caused by other marker other than the logged in user
+    } else if(props.already_matched ==true && loggeduserIsInSourceList(props.tag_source_target, user_name)){
       return false
-  // match is caused by other marker other than the logged in user
-  // } else if(props.already_matched ==true && loggeduserIsInSourceList(props.tag_source_target, user_name)){
-  //   return false
-  } else if(props.already_matched ==true && props.matching_partner ==true){
-    return false
-  }else {
-    //already_matched ==true
-      return true
-  }
+   
+    }else {
+        return true
+    }
 }
 
 function loggeduserIsInSourceList(tag_source_targetList, user_name){
