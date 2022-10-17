@@ -60,14 +60,25 @@ class TradedCurrency(models.Model):
       
         items = self.targetA.all()#.s
         if items:
-            return items.first().matching_partner()
+            #Loop all the children
+            for i in items:
+                #test if matching:
+                mp= i.matching_partner()
+                if mp ==True:
+                    return mp
         return False
     @property    
     def get_already_matched(self):
       
         items = self.targetA.all()#.s
         if items:
-            return items.first().already_matched()
+            #Loop all the children
+            for i in items:
+                #test if matching:
+                am= i.already_matched()
+                if am ==True:
+                    return am
+        
         return False
         
     @property    
