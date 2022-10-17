@@ -855,11 +855,17 @@ def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
             source=TradedCurrency.objects.filter(Q(created_by=request.user), Q(complete=False)).first()#,tc_created = TradedCurrency.objects.get_or_create(created_by=request.user, complete=False)
            
            #does the user have ACTIVE tag going to target?EXCLUDED SATIFIED TAGS
-            qs= CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user), Q(target__complete=False))#
+            qs= CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user))#, Q(target__complete=False))#
+            """  
+            Current logged user might not have any connect with this target
+            As Poly gamy is disallowed
+            """
             if qs:
                 #if Toggle/add/remove
                 data['Found tags created me:Reseting'] ='Yes'
-                CurrencyTag.objects.filter(Q(target =target), Q(source=source), Q(created_by=request.user), Q(target__complete=False)).delete()
+                CurrencyTag.objects.filter(Q(target =target), Q(source=source), Q(created_by=request.user)
+                                            #, Q(target__complete=False)
+                                            ).delete()
                
             else:
                 #check if any user is tracking this person: 
@@ -867,21 +873,21 @@ def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
                 SURVIVAL OF THE FITTEST
                 CHECK IF NO MATCH YES THEN MATCH
                 """
-                data['No tags found:'] ='Yes'
-                # other users tracking and matching ACTIVE
-                qs_other_users =CurrencyTag.objects.filter(Q(target =target), Q(target__complete=False))#.exclude(created_by=request.user)
+                data['No tags found on this target:'] ='Yes'
+                # other users tracking as SOURCE and matching ACTIVE THIS TARGET
+                qs_other_users =CurrencyTag.objects.filter(Q(target =target), Q(target__complete=False)).exclude(created_by=request.user)
 
                 matching_found= False
                 for i in qs_other_users:
-                    #print('Chech partner availabilty')
                     if i.matching_partner():
+                        #this marker points to another marker that in turn points to itself also
                         #print('Found a parnter')
-                        data['Found a matching partner'] ='Yes'
+                        data['Matching partner Already Exists '] ='Yes'
                         matching_found=True
                         break
 
                 if not matching_found:
-                    data['No matching Found'] ='yes'
+                    data['No Matching Parner Found'] ='yes'
                     # delete all tags  created by me with source
                     CurrencyTag.objects.filter(Q(target =target), Q(source =source), Q(created_by=request.user),Q(target__complete=False)).delete()
                     #print('Creating a Maching here')
@@ -893,8 +899,8 @@ def create_user_currency_tag_ajax(request, target_id,  *args, **kwargs):
                     #nothing already
                     #print('Matching found, Polygamy disallowed.......')
                     #you cant tag alreay matched parten
-                    data['Polygamy disallowed'] ='Yes'
-                    #CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user)).delete()
+                    data['Polygamy disallowed: No ACTION'] ='Yes'
+                    CurrencyTag.objects.filter(Q(target =target),Q(source =source), Q(created_by=request.user)).delete()
            
            
             return JsonResponse({"data":data})
