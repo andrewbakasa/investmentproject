@@ -50,7 +50,7 @@ class TradedCurrencySerializer(GeoFeatureModelSerializer):
 			return obj.get_suitor
 		
 		except:
-			return 'NoData'
+			return []
 	def get_tag_source_target(self, obj):
 		try:
 			#get list[[source, target], .....]

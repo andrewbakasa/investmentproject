@@ -72,19 +72,13 @@ class TradedCurrency(models.Model):
         
     @property    
     def get_suitor(self):
+        suitor_list =[]
         #get all tags created by this user
         qs= CurrencyTag.objects.filter(Q(source__created_by =self.created_by),Q(target__complete=False))#.exclude(Q(source__created_by=self.created_by))
         if qs:
-            l =""
             for i in qs:
-                #get the username list
-                if l=="":
-                    l= i.target.created_by.username
-                else:
-                    l= l + "," + i.target.created_by.username
-
-            return l + ","
-        return ""
+                suitor_list.append(i.target.created_by.username)
+        return suitor_list
     @property    
     def get_source_target(self):
         l =''
