@@ -740,7 +740,7 @@ def search_filter_product(request):
 def store(request):
     context = {}
 
-    data = cart_data(request)
+    data =cart_data(request)
     if request.user.is_authenticated:
         customer, _ = Customer.objects.get_or_create(user=request.user)
         customer = get_object_or_404(Customer, user=request.user)
@@ -883,7 +883,28 @@ def update_item(request):
 
     return JsonResponse('Item was added.', safe=False)
 
+def empty_cart_ajax(request):
+    #
+    
+    if request.method == 'POST':
+       
+        data={}
+        data["deleted"]=True
+        if request.user.is_authenticated:
+            #customer = request.user.customer
+            customer = get_object_or_404(Customer, user=request.user)
+            #delete all null recors
+            order = Order.objects.filter(customer=customer, complete=False).first()
+            order.delete()
+        
+        #do this again
 
+        data["o_total_price"]= 0
+        data["o_total_qnty"]= 0
+        
+        return JsonResponse({"data":data})
+    
+    
 def update_item_ajax(request):
     #
     

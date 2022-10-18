@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('update_item/', views.update_item, name='update_item'),
     path('update_item_ajax/', views.update_item_ajax, name='update_item_ajax'),
+    path('empty_cart_ajax/', views.empty_cart_ajax, name='empty_cart_ajax'),
     
     path('process_order/', views.process_order, name='process_order'),
     path('p/d/<int:pk>/', views.ProductDetailView.as_view(), name='product_detail'),
