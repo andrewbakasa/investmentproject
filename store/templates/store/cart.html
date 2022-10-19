@@ -152,6 +152,8 @@
       });  
       $(document).ready(function (){ 
         //does it on start
+        $('#cart-total').css({ "display":"none"})
+        flip_cart_display ()
         checkPosition()
       }) 
    
@@ -163,7 +165,7 @@
                 $('#cart-total').css({ "display":"none"})
             }     
         } 
-        flip_cart_display ()
+       
         function getToken(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
