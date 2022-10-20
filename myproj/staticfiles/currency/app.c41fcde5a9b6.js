@@ -1004,8 +1004,8 @@ function myScript(){
                                            
             layer.bindTooltip(t);
             layer._id = props.uid
-            //const props_clone = structuredClone(props);
-            update_layer(map, layer, props,content,newtooltipContent, counter_ranked)
+            const props_clone = structuredClone(props);
+            update_layer(map, layer, props_clone,content,newtooltipContent, counter_ranked)
           
             
            
