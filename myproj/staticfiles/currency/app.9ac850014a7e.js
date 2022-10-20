@@ -584,7 +584,7 @@ function update_layer(map,i_layer, props,newContent,newtooltipContent,counter_ra
             AddToMap_if_not_matching_partner(map, i_layer)
             map.eachLayer(function(x_layer){               
               if (x_layer._id == props.uid){
-                flash_message(x_layer,newtooltipContent,newtooltipContent,smallIcon,newContent)
+                flash_message(x_layer,newtooltipContent,curr_tooltipContent,smallIcon,newContent)
               }
             })
            
@@ -607,7 +607,7 @@ function update_layer(map,i_layer, props,newContent,newtooltipContent,counter_ra
             AddToMap_if_not_matching_partner(map, i_layer)
             map.eachLayer(function(x_layer){               
               if (x_layer._id == props.uid){
-                flash_message(x_layer,newtooltipContent,newtooltipContent,smallIcon,newContent)
+                flash_message(x_layer,newtooltipContent,curr_tooltipContent,smallIcon,newContent)
               }
             })
         }
@@ -642,7 +642,7 @@ function update_layer(map,i_layer, props,newContent,newtooltipContent,counter_ra
           AddToMap_if_not_matching_partner(map, i_layer)
           map.eachLayer(function(x_layer){               
             if (x_layer._id == props.uid){
-              flash_message(x_layer,newtooltipContent,newtooltipContent,smallIcon,newContent)
+              flash_message(x_layer,newtooltipContent,curr_tooltipContent,smallIcon,newContent)
             }
           }) 
          
@@ -664,7 +664,7 @@ function update_layer(map,i_layer, props,newContent,newtooltipContent,counter_ra
             AddToMap_if_not_matching_partner(map, i_layer)
             map.eachLayer(function(x_layer){               
               if (x_layer._id == props.uid){
-                flash_message(x_layer,newtooltipContent,newtooltipContent,smallIcon,newContent)
+                flash_message(x_layer,newtooltipContent,curr_tooltipContent,smallIcon,newContent)
               }
             }) 
            
@@ -851,9 +851,9 @@ function set_displaynone_hidden_markers(){
 
 function get_Tag_title(props){
   if (loggeduserIsInSourceList(props.tag_source_target, user_name)==true){
-     return ['Remove Tag' ,'red', 'fas fa-tag']
+     return ['Remove Tag' ,'red', 'fas fa-tags']
   }else {
-    return ['Tag Me', 'blue', 'fas fa-tag fa-spin']
+    return ['Tag Me', 'blue', 'fas fa-tag']
   }
 }
 function myScript(){
