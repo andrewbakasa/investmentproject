@@ -61,7 +61,7 @@
           </div>
 
           <div id="project_div" class="row" data-aos="zoom-in" data-aos-delay="100">
-            <div class="row">   
+            <div class="row" style="display:none">   
                 <input type="text" name="start" class="input" id="start"/>
                 <button id="btn">Search</button>
             </div>
@@ -70,7 +70,7 @@
               
                 <!-- B -->
                 <div class="apartment-handle col-md-8 col-md-pull-4" style="box-shadow:3px 0 8px rgba(0,0,0,0.125) ;" >
-                    <div class="apartments row">
+                    <div class="apartments row" style=" margin-top: 5px;">
                         {% for product in product_qs %}
                             <div id="{{product.id}}" class="col-lg-4">                   
                                 {% if product.imageURL %}
