@@ -248,14 +248,15 @@ class ProductLocationView(APIView):
             
         perpage= get_user_page_pref(request)
         user_location = Point(float(x), float(y),srid=4326)
-
+        #user liking
+        #purchases done......
         product_queryset = Product.objects.annotate(distance=Distance('shop__location',  
                                             user_location)).order_by('distance')#[lb:ub]
 
         obj_paginator = Paginator(product_queryset, perpage, orphans=0,allow_empty_first_page=True)
         #current_page = obj_paginator.get_page(int(pageno))
         try: 
-            print('current_page..... working OK')      
+            #print('current_page..... working OK')      
             current_page = obj_paginator.page(pageno)
         except PageNotAnInteger:
             print('PageNotAnInteger.....')
@@ -507,18 +508,7 @@ class ProductLocationSlugView(APIView):
         pageno =  self.kwargs.get('pageno')
         
         user_location = Point(float(x), float(y),srid=4326)
-       
-        #num_of_pages =int(page_dict["num_of_pages"])
-        #total =int(page_dict["totalrecords"])
-        #perpage =int(page_dict["per_page"])
-        #pno =int(page_dict["page_no"])
-        #lb= int((pno-1)*perpage)
-        #ub = max(min((lb + perpage),total),0)
-        #print((lb + perpage)<=total, (lb + perpage),'is less than', total, "  LB:" , lb,":", (ub))       
       
-        #---------------------------------
-        #print('Pages:::', page_dict["per_page"], page_dict["page_no"],page_dict["num_of_pages"],page_dict["totalrecords"])
-
         total_agg = Product.objects.filter(Q(description__icontains =slug)).aggregate(
                     price_range=Max('price')- Min('price'),
                     price_min= Min('price'),
@@ -574,7 +564,7 @@ class ProductLocationSlugView(APIView):
         #current_page = obj_paginator.get_page(int(pageno))
         #page_dict = get_page_session_data(perpage, obj_paginator, int(pageno))
         try:   
-            print('current_page..... working OK')    
+            #print('current_page..... working OK')    
             current_page = obj_paginator.page(pageno)
             
         except PageNotAnInteger:
