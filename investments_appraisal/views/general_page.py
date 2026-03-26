@@ -57,9 +57,7 @@ import csv
 from itertools import chain
 
 from tempfile import NamedTemporaryFile
-from excel_response import ExcelResponse
 from openpyxl import Workbook, load_workbook
-from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter,column_index_from_string
 from openpyxl.styles import Font, Color, Alignment, Border, Side, colors, NamedStyle,PatternFill
