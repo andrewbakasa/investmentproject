@@ -122,7 +122,6 @@ def setup_excel_styles(ws, df):
 # import pandas as pd
 # from common.utils import thousand_sep
 # from openpyxl import Workbook, load_workbook
-# from openpyxl.writer.excel import save_virtual_workbook
 # from django.utils.encoding import smart_str, force_str
 # from django.http import HttpResponse, HttpResponseRedirect
 # from django.shortcuts import get_object_or_404, render

@@ -11,10 +11,8 @@ from io import StringIO, BytesIO
 
 
 from tempfile import NamedTemporaryFile
-from excel_response import ExcelResponse
 import numpy as np
 from openpyxl import Workbook, load_workbook 
-from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.utils import get_column_letter,column_index_from_string
 from openpyxl.styles import Font, Color, Alignment, Border, Side, colors, NamedStyle,PatternFill
 from openpyxl.chart import BarChart, Reference, Series, LineChart, BubbleChart

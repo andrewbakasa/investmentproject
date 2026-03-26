@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load account %}
 {% load i18n %}
-{% load tags %}
+{% load tags_extras %}
 {% load humanize %}
 
 <h1 class="logo me-auto"><a href="{% url 'index' %}">Finflex</a></h1>
@@ -11,14 +11,7 @@
         <li id="index"><a href="{% url 'index' %}">Home</a></li>
         {% if request.user.is_authenticated %}
         <li id="geofind"><a href="{% url 'geo_find_product_landing' %}">GeoFind</a></li> 
-        <li id="_currency">
-          <a href="{% url 'currency_trade_landing' %}" data-toggle="tooltip"  title="Currency Trading">
-            <span class="fas-stack">
-              <i class="fas fa-euro-sign"></i>
-              <i class="fas fa-dollar-sign"></i>
-           </span>
-          </a>
-        </li>
+       
          
         {%endif%}    
         <li ><a href="{% url 'cart' %}">Go to Cart</a></li>

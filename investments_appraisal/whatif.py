@@ -8,7 +8,14 @@ from sklearn.model_selection._search import ParameterGrid
 #from sklearn.model_selection._search import ParameterGrid
 import copy
 from tqdm import tqdm
-from scipy import rand, stats
+
+from scipy import stats
+import numpy as np
+
+# If 'rand' was being used in the code below, 
+# we define it here using the modern NumPy equivalent
+#rand = np.random.rand
+
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import math
 const_ =0.0001

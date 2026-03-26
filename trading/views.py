@@ -945,8 +945,25 @@ def get_user_investments_orphaned_ajax(request, *args, **kwargs):
 def get_user_investments(request):
     APLLICATION_STATUS_CHOICE = ["pending", "verification","accepted","engagement", "rejected","all", "orphaned"]  
     queryset = Investor.objects.filter(user=request.user).first()  
+
+    if queryset:
+        df = queryset.trading_df
+    else:
+        # Initialize an empty DATAFRAME instead of an empty LIST
+        df = pd.DataFrame() 
     
-    df=queryset.trading_df
+    # Now this won't crash even if the DataFrame is empty
+    dict_, colms = dataframe_to_list_dict(df, True)
+    
+    #df=queryset.trading_df
+    # Check if the object exists before trying to access 'trading_df'
+    # if queryset:
+    #     df = queryset.trading_df
+    # else:
+    #     df=[]
+        # Handle the case where no data is found
+        # You could return an empty list, a message, or a redirect
+        # return render(request, 'your_template.html', {'message': 'No investments found.'})
     sum_total=0
     aver_val=0
     if len(df)>0 :
