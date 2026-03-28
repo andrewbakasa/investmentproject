@@ -67,48 +67,114 @@ class FishBusinessReport(BaseModel):
          #addition
         setattr(self.excel_obj,'user_model_decription' ,user_model_decription)
       
-    def _set_parameters_simulation(self,num_reps = 10):
+    # def _set_parameters_simulationDEFUNC(self,num_reps = 10):
+    #     from numpy.random import default_rng
+    #     rg = default_rng(4470)
+    #     #from scipy.stats import norm
+        
+    #     from scipy import stats
+
+    
+    #     base_scenario_inputs = {
+    #          """     remove this""" 
+    #         #'initial_tanks_employed':np.array([10]),
+
+    #         'fish_weight_at_selling': rg.uniform(0.8*self.fish_weight_at_selling, get_alternative_sd(self.fish_weight_at_selling,.3,30), num_reps),
+    #         'fingerlings_price_per_1000_units': stats.triang.rvs(loc=.4*self.fingerlings_price_per_1000_units,scale= get_alternative_sd(self.fingerlings_price_per_1000_units,.9, 20),c=.5,size= num_reps),
+    #         'fingerlings_survival_rate': stats.triang.rvs(loc=1.-.3,scale=.1,c=1, size= num_reps),# step function with prob
+             
+    #         'fish_feed_price_per_kg': stats.triang.rvs(loc=.25*self.fish_feed_price_per_kg,scale=5*self.fish_feed_price_per_kg,c=.1, size= num_reps),# step function with prob
+            
+    #         'base_price': stats.triang.rvs(loc=.5*self.base_price,scale=get_alternative_sd(self.base_price, .5, 1000),c=.5, size= num_reps),# step function with prob
+    #         'discount_rate_equity': rg.uniform(.5*self.discount_rate_equity, get_alternative_sd(self.discount_rate_equity, 1.2, 0.2), num_reps),
+    #         'domestic_inflation_rate': rg.uniform(.5*self.domestic_inflation_rate, get_alternative_sd(self.domestic_inflation_rate, 1.2, 0.1), num_reps),
+    #         'exchange_rate': rg.uniform(1, 5, num_reps),
+    #         'annual_change_in_price_of_domestic_inputs': rg.normal(self.annual_change_in_price_of_domestic_inputs, get_alternative_sd(self.annual_change_in_price_of_domestic_inputs,3,.3), num_reps),
+        
+            
+    #         'accounts_payable': rg.normal(self.accounts_payable, .3* self.accounts_payable, num_reps),       
+    #         'accounts_receivable': rg.normal(self.accounts_receivable, .3* self.accounts_receivable, num_reps),
+    #         'change_in_price': rg.normal(self.change_in_price, get_alternative_sd(self.change_in_price,3,.3), num_reps),
+    #         'cash_balance': rg.normal(self.cash_balance, .3* self.cash_balance, num_reps),
+    #         'other_indirect_costs': rg.uniform(self.other_indirect_costs, 50* self.other_indirect_costs, num_reps),
+    #         'senior_debt': np.array([1, 0.7, 0.3 ,.1, .0]),
+        
+            
+    #         'monthly_wage_per_worker':  rg.uniform(self.monthly_wage_per_worker, 5* self.monthly_wage_per_worker, num_reps),
+    #         'monthly_wage_per_supervisor':  rg.uniform(self.monthly_wage_per_supervisor, 5* self.monthly_wage_per_supervisor, num_reps),
+    #         'annual_increase_salaries_workers':  rg.uniform(self.annual_increase_salaries_workers, get_alternative_sd(self.annual_increase_salaries_workers,.4,.2), num_reps),
+    #         'annual_increase_salaries_supervisors_technicians':  rg.uniform(self.annual_increase_salaries_supervisors_technicians, get_alternative_sd(self.annual_increase_salaries_supervisors_technicians,.4,.2), num_reps),
+            
+    #         #'num_workers_per_supervisor': np.array([5]),      
+    #     }
+    #     setattr(self, 'base_scenario_inputs', base_scenario_inputs)
+    
+    def _set_parameters_simulation(self, num_reps=10):
         from numpy.random import default_rng
         rg = default_rng(4470)
-        from scipy.stats import norm
         
-        from scipy import stats
-
-    
+        # Helper to convert SciPy triang parameters to NumPy triangular
+        # scipy: loc=L, scale=S, c=C 
+        # numpy: left=L, mode=L+(C*S), right=L+S
+        
         base_scenario_inputs = {
-             """     remove this""" 
-            #'initial_tanks_employed':np.array([10]),
+            'fish_weight_at_selling': rg.uniform(
+                0.8 * self.fish_weight_at_selling, 
+                get_alternative_sd(self.fish_weight_at_selling, .3, 30), 
+                num_reps
+            ),
+            
+            # fingerlings_price_per_1000_units
+            'fingerlings_price_per_1000_units': rg.triangular(
+                left = 0.4 * self.fingerlings_price_per_1000_units,
+                mode = (0.4 * self.fingerlings_price_per_1000_units) + (0.5 * get_alternative_sd(self.fingerlings_price_per_1000_units, .9, 20)),
+                right = (0.4 * self.fingerlings_price_per_1000_units) + get_alternative_sd(self.fingerlings_price_per_1000_units, .9, 20),
+                size = num_reps
+            ),
 
-            'fish_weight_at_selling': rg.uniform(0.8*self.fish_weight_at_selling, get_alternative_sd(self.fish_weight_at_selling,.3,30), num_reps),
-            'fingerlings_price_per_1000_units': stats.triang.rvs(loc=.4*self.fingerlings_price_per_1000_units,scale= get_alternative_sd(self.fingerlings_price_per_1000_units,.9, 20),c=.5,size= num_reps),
-            'fingerlings_survival_rate': stats.triang.rvs(loc=1.-.3,scale=.1,c=1, size= num_reps),# step function with prob
-             
-            'fish_feed_price_per_kg': stats.triang.rvs(loc=.25*self.fish_feed_price_per_kg,scale=5*self.fish_feed_price_per_kg,c=.1, size= num_reps),# step function with prob
-            
-            'base_price': stats.triang.rvs(loc=.5*self.base_price,scale=get_alternative_sd(self.base_price, .5, 1000),c=.5, size= num_reps),# step function with prob
-            'discount_rate_equity': rg.uniform(.5*self.discount_rate_equity, get_alternative_sd(self.discount_rate_equity, 1.2, 0.2), num_reps),
-            'domestic_inflation_rate': rg.uniform(.5*self.domestic_inflation_rate, get_alternative_sd(self.domestic_inflation_rate, 1.2, 0.1), num_reps),
+            # fingerlings_survival_rate: loc=0.7, scale=0.1, c=1 (Right-skewed)
+            'fingerlings_survival_rate': rg.triangular(
+                left = 0.7, 
+                mode = 0.8, # loc + (c * scale) -> 0.7 + (1 * 0.1)
+                right = 0.8, 
+                size = num_reps
+            ),
+
+            # fish_feed_price_per_kg: loc=0.25*val, scale=5*val, c=0.1
+            'fish_feed_price_per_kg': rg.triangular(
+                left = 0.25 * self.fish_feed_price_per_kg,
+                mode = (0.25 * self.fish_feed_price_per_kg) + (0.1 * 5 * self.fish_feed_price_per_kg),
+                right = (0.25 * self.fish_feed_price_per_kg) + (5 * self.fish_feed_price_per_kg),
+                size = num_reps
+            ),
+
+            # base_price
+            'base_price': rg.triangular(
+                left = 0.5 * self.base_price,
+                mode = (0.5 * self.base_price) + (0.5 * get_alternative_sd(self.base_price, .5, 1000)),
+                right = (0.5 * self.base_price) + get_alternative_sd(self.base_price, .5, 1000),
+                size = num_reps
+            ),
+
+            'discount_rate_equity': rg.uniform(.5 * self.discount_rate_equity, get_alternative_sd(self.discount_rate_equity, 1.2, 0.2), num_reps),
+            'domestic_inflation_rate': rg.uniform(.5 * self.domestic_inflation_rate, get_alternative_sd(self.domestic_inflation_rate, 1.2, 0.1), num_reps),
             'exchange_rate': rg.uniform(1, 5, num_reps),
-            'annual_change_in_price_of_domestic_inputs': rg.normal(self.annual_change_in_price_of_domestic_inputs, get_alternative_sd(self.annual_change_in_price_of_domestic_inputs,3,.3), num_reps),
-        
+            'annual_change_in_price_of_domestic_inputs': rg.normal(self.annual_change_in_price_of_domestic_inputs, get_alternative_sd(self.annual_change_in_price_of_domestic_inputs, 3, .3), num_reps),
             
-            'accounts_payable': rg.normal(self.accounts_payable, .3* self.accounts_payable, num_reps),       
-            'accounts_receivable': rg.normal(self.accounts_receivable, .3* self.accounts_receivable, num_reps),
-            'change_in_price': rg.normal(self.change_in_price, get_alternative_sd(self.change_in_price,3,.3), num_reps),
-            'cash_balance': rg.normal(self.cash_balance, .3* self.cash_balance, num_reps),
-            'other_indirect_costs': rg.uniform(self.other_indirect_costs, 50* self.other_indirect_costs, num_reps),
-            'senior_debt': np.array([1, 0.7, 0.3 ,.1, .0]),
-        
+            'accounts_payable': rg.normal(self.accounts_payable, .3 * self.accounts_payable, num_reps),       
+            'accounts_receivable': rg.normal(self.accounts_receivable, .3 * self.accounts_receivable, num_reps),
+            'change_in_price': rg.normal(self.change_in_price, get_alternative_sd(self.change_in_price, 3, .3), num_reps),
+            'cash_balance': rg.normal(self.cash_balance, .3 * self.cash_balance, num_reps),
+            'other_indirect_costs': rg.uniform(self.other_indirect_costs, 50 * self.other_indirect_costs, num_reps),
+            'senior_debt': np.array([1, 0.7, 0.3, .1, .0]),
             
-            'monthly_wage_per_worker':  rg.uniform(self.monthly_wage_per_worker, 5* self.monthly_wage_per_worker, num_reps),
-            'monthly_wage_per_supervisor':  rg.uniform(self.monthly_wage_per_supervisor, 5* self.monthly_wage_per_supervisor, num_reps),
-            'annual_increase_salaries_workers':  rg.uniform(self.annual_increase_salaries_workers, get_alternative_sd(self.annual_increase_salaries_workers,.4,.2), num_reps),
-            'annual_increase_salaries_supervisors_technicians':  rg.uniform(self.annual_increase_salaries_supervisors_technicians, get_alternative_sd(self.annual_increase_salaries_supervisors_technicians,.4,.2), num_reps),
-            
-            #'num_workers_per_supervisor': np.array([5]),      
+            'monthly_wage_per_worker': rg.uniform(self.monthly_wage_per_worker, 5 * self.monthly_wage_per_worker, num_reps),
+            'monthly_wage_per_supervisor': rg.uniform(self.monthly_wage_per_supervisor, 5 * self.monthly_wage_per_supervisor, num_reps),
+            'annual_increase_salaries_workers': rg.uniform(self.annual_increase_salaries_workers, get_alternative_sd(self.annual_increase_salaries_workers, .4, .2), num_reps),
+            'annual_increase_salaries_supervisors_technicians': rg.uniform(self.annual_increase_salaries_supervisors_technicians, get_alternative_sd(self.annual_increase_salaries_supervisors_technicians, .4, .2), num_reps),
         }
+        
         setattr(self, 'base_scenario_inputs', base_scenario_inputs)
-    
     def _model_outputs_dict(self,):
         #run with dynamic vars
         self._simulate_metrix()

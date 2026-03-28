@@ -9,7 +9,7 @@ import pandas as pd
 import copy
 from tqdm import tqdm
 
-from scipy import stats
+#from scipy import stats
 import numpy as np
 
 
@@ -22,6 +22,73 @@ def manual_parameter_grid(param_dict):
     for instance in itertools.product(*values):
         yield dict(zip(keys, instance))
 
+def get_percentile_score(data, score):
+    """
+    Replaces scipy.stats.percentileofscore(data, score) / 100.0.
+    Calculates the cumulative distribution function (CDF) value at a given point.
+    """
+    if len(data) == 0:
+        return 0.0
+    return np.mean(np.array(data) <= score)
+
+def probability_npv(df, x=None, y=None):
+    """
+    Calculates the probability of NPV falling within a range using NumPy.
+    Replaces custom logic that previously relied on scipy.stats.
+    """
+    arr = df['npv'].values
+    if x is None and y is None:
+        return 0.0
+    elif x is None:
+        # Probability P(NPV <= y)
+        return np.mean(arr <= y)
+    elif y is None:
+        # Probability P(NPV >= x)
+        return np.mean(arr >= x)
+    else:
+        # Probability P(x <= NPV <= y)
+        return np.mean((arr >= x) & (arr <= y))
+
+def probability_atleast(df, x):
+    """Calculates P(NPV >= x) using NumPy."""
+    return np.mean(df['npv'].values >= x)
+
+def cumfreq(df, bins=100):
+    """
+    Replacement for scipy-based cumulative frequency and descriptive stats.
+    Calculates bins, CDF, mean, and variance for the simulation results.
+    """
+    npv_vals = df['npv'].values
+    v_min, v_max = npv_vals.min(), npv_vals.max()
+    
+    range_val = float(v_max - v_min)
+    lower_bound = int(v_min)
+    upper_bound = int(v_max)
+    step = int(range_val / bins) if range_val > 0 else 1
+    
+    # Generate the x-axis thresholds
+    thresholds = list(range(lower_bound, upper_bound + step, step))
+    
+    # Calculate CDF and PDF (y) values
+    cdf = [round(np.mean(npv_vals <= val), 3) for val in thresholds]
+    y_probs = [round(probability_npv(df, val - step, val), 3) for val in thresholds]
+    
+    # Probability of breaking even (NPV >= 0)
+    prob_npv_zero = probability_atleast(df, 0)
+    
+    # Descriptive statistics using NumPy (replaces scipy.stats.describe)
+    mean_val = np.mean(npv_vals)
+    # ddof=1 provides the sample variance (standard in financial modeling)
+    variance_val = np.var(npv_vals, ddof=1)
+
+    return {
+        'x': thresholds, 
+        'y': y_probs, 
+        'cdf': cdf, 
+        'prob_npv_zero': prob_npv_zero, 
+        'mean': mean_val, 
+        'variance': variance_val 
+    }
 
 
 # If 'rand' was being used in the code below, 
@@ -671,42 +738,6 @@ def senstivity_table_sample(args):
 
     return dict_
 
-# def modified(args,    model, para_name, para_val_list):
-
-#     dt_param_ranges_1 = args['dt_param_ranges_1']
-#     model_clone = args['model_clone'] 
-#     para_name = args['inparameter']   
-#     outputs = ['_model_datatable_outputs_dict']
-#     para_val_list= args['list']
-   
-#     #each process has its own model object
-#     model_clone = copy.deepcopy(model_clone)
-    
-
-#     dt_param_ranges_1 = {para_name: np.array(para_val_list)}   
-#     #retun metric cal with canges
-#     outputs = ['_model_outputs_dict']
-
-#     dt_param_ranges_1 = {para_name: np.array(para_val_list)}   
-#     #retun metric cal with canges
-#     outputs = ['_model_outputs_dict']
-
-#     # Use data_table function to create 1-way data table
-#     simulation_results_1 = data_table(model, dt_param_ranges_1, outputs)  
-
-
-
-#     input_x=simulation_results_1[para_name].tolist()
-#     outpuy_y=simulation_results_1['npv'].tolist()
-#     grad_av= gradient(outpuy_y , input_x)
-#     #-----Y= ax +b
-#     # X Intercept ===Y=0
-#     #b=-ax
-#     #gradient* x
-#     #b=                   Y    -a*     x
-#     b_intercept= outpuy_y[0]- grad_av*input_x[0]
-#     return  round(grad_av,10),round(b_intercept,10)
-
 def sim_sensitivity(args):
     model_clone= args['model_clone']
     name= args['name']
@@ -1092,7 +1123,7 @@ def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10,
 
     from numpy.random import default_rng
     rg = default_rng(4470)
-    from scipy.stats import norm
+    #from scipy.stats import norm
    #0
     sim_outputs = ['_model_outputs_dict']
  
@@ -1145,8 +1176,7 @@ def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10,
     #--------------------------------------------------
 
     npv_series= model2_results_df['npv']
-    #print(model2_results_df)
-    #print('Probability NPV==0: >>>>', stats.percentileofscore(npv_series, 0) / 100.0)
+    
     min_index =npv_series.argmin()
     max_index =npv_series.argmax()
 
@@ -1182,28 +1212,28 @@ def monteCarlo_sim(request, model,npv_bin_size, num_reps = 10,
 
 
 
-def cumfreq(df,bins=100):
-    range_ = int(df['npv'].max())-int(df['npv'].min())
-    lower_= int(df['npv'].min())
-    upper_= int(df['npv'].max())            
-    step =int(range_/bins)
+# def cumfreqDefunc(df,bins=100):
+#     range_ = int(df['npv'].max())-int(df['npv'].min())
+#     lower_= int(df['npv'].min())
+#     upper_= int(df['npv'].max())            
+#     step =int(range_/bins)
    
-    cdf =[round(stats.percentileofscore(df['npv'], y) / 100.0,3) for y in range(lower_,upper_+step, step)]
-    y =[round(probability_npv(df,y-step,y),3) for y in range(lower_,upper_+step, step)]
-    #y =list(_accumulate_pos_difference(cdf))
-    x = lower_ + np.linspace(0, bins * step,  step)
-    x =[y  for y in range(lower_,upper_+step, step)]
+#     cdf =[round(stats.percentileofscore(df['npv'], y) / 100.0,3) for y in range(lower_,upper_+step, step)]
+#     y =[round(probability_npv(df,y-step,y),3) for y in range(lower_,upper_+step, step)]
+#     #y =list(_accumulate_pos_difference(cdf))
+#     x = lower_ + np.linspace(0, bins * step,  step)
+#     x =[y  for y in range(lower_,upper_+step, step)]
 
-    prob_npv_zero= probability_atleast(df, 0)
-    mean= stats.describe(df['npv']).mean
-    variance= stats.describe(df['npv']).variance
-    # print('older mu:', mean)
-    # print('older variance:', variance)
+#     prob_npv_zero= probability_atleast(df, 0)
+#     mean= stats.describe(df['npv']).mean
+#     variance= stats.describe(df['npv']).variance
+#     # print('older mu:', mean)
+#     # print('older variance:', variance)
     
-    _, mean= _get_variance(df['npv'].tolist())
+#     _, mean= _get_variance(df['npv'].tolist())
 
-    return {'x':x, 'y':y,'cdf':cdf ,'prob_npv_zero':prob_npv_zero, 
-            'mean' : mean, 'variance' : variance }#,bins,lower_, upper_
+#     return {'x':x, 'y':y,'cdf':cdf ,'prob_npv_zero':prob_npv_zero, 
+#             'mean' : mean, 'variance' : variance }#,bins,lower_, upper_
   
 def probability_upto(df, x):
     return probability_npv(df, None, x)
@@ -1212,21 +1242,22 @@ def probability_atleast(df, x):
     return probability_npv(df,x)
 
 
-def probability_npv(df, x=None, y=None):
-    # Probability profit is between x-----y
-    if x==None and y==None:
-        val = 0
-    elif x==None:
-        #--------y no lower bound
-        val=stats.percentileofscore(df['npv'], y) / 100.0
-    elif y==None:
-        #x----------no upper bound
-        val= 1- stats.percentileofscore(df['npv'], x) / 100.0
-    else:
-        #x------y inbetween
-        val=(stats.percentileofscore(df['npv'], y) - stats.percentileofscore(df['npv'], x)) / 100.0
+# def probability_npvDefucnt(df, x=None, y=None):
+#     # Probability profit is between x-----y
+#     if x==None and y==None:
+#         val = 0
+#     elif x==None:
+#         #--------y no lower bound
+#         val=stats.percentileofscore(df['npv'], y) / 100.0
+#     elif y==None:
+#         #x----------no upper bound
+#         val= 1- stats.percentileofscore(df['npv'], x) / 100.0
+#     else:
+#         #x------y inbetween
+#         val=(stats.percentileofscore(df['npv'], y) - stats.percentileofscore(df['npv'], x)) / 100.0
    
-    return val
+#     return val
+
 def _get_variance(list_):
     arr= np.array(list_)
     mu= np.mean(arr)

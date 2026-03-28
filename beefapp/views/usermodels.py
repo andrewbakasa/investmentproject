@@ -18,7 +18,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from beefapp.model_constants_beef import *
 from investments_appraisal.whatif import data_table, get_data_table_sensitivity_in_parrallel, get_sensitivity_gradient, monteCarlo_sim, parallel_data_table 
-from scipy import stats
+#from scipy import stats
 from tqdm import tqdm
 # Default invoice list, show 25 recent invoices
 from django.http import JsonResponse
