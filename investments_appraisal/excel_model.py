@@ -336,7 +336,7 @@ class ExcelReport():
         for cellObj in wkSheet[first_slice_point:second_slice_point]:
             for cell in cellObj:
                 #get column
-                new_column_letter = cell.column
+                new_column_letter = get_column_letter(cell.column)
                 # |
                 # |
                 # |
@@ -853,7 +853,7 @@ class ExcelReport():
          
   
     
-    def _populate_investment_parameters_in_excelrow(self, w_sheet, options_arraylist, row_index, item):
+    def _populate_investment_parameters_in_excelrowDefunct(self, w_sheet, options_arraylist, row_index, item):
    
         total_len = len(options_arraylist)-1
         first_slice_point = get_column_letter(9) + str(row_index)# D09
@@ -863,15 +863,42 @@ class ExcelReport():
         i=0
         for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
             for cell in cellObj:
-                w_sheet['%s%s'%(cell.column, cell.row)] = options_arraylist[i] 
-                w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
+                w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = options_arraylist[i] 
+                w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
                 if item in ['senior_debt_dynamic_parameter']:
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='0.0%'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='0.0%'
                 else:    
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
                 i += 1
 
-                       
+    
+    def _populate_investment_parameters_in_excelrow(self, w_sheet, options_arraylist, row_index, item):
+        total_len = len(options_arraylist)
+        # Start column is 9 (Column 'I')
+        start_col = 9
+        end_col = start_col + total_len - 1
+        
+        # Define the range string, e.g., 'I10:L10'
+        first_slice_point = f"{get_column_letter(start_col)}{row_index}"
+        second_slice_point = f"{get_column_letter(end_col)}{row_index}"
+        
+        i = 0
+        # openpyxl returns a generator of rows; since we are only on one row, 
+        # we iterate through the first element of the range
+        for row in w_sheet[first_slice_point:second_slice_point]:
+            for cell in row:
+                if i < len(options_arraylist):
+                    # FIX: Assign the value directly to the cell object provided by the loop
+                    cell.value = options_arraylist[i]
+                    cell.style = 'Input'
+                    
+                    # Apply conditional formatting
+                    if item == 'senior_debt_dynamic_parameter':
+                        cell.number_format = '0.0%'
+                    else:    
+                        cell.number_format = '_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                    
+                    i += 1               
            
   
     def _add_depreciation_section(self, w_sheet, row_index,total_wsheet_cols):
@@ -1123,7 +1150,7 @@ class ExcelReport():
         #w_sheet['%s%s'%(write_colValue, row_index)].number_format= val_number_format
         #w_sheet['%s%s'%(write_colValue, row_index)].font = self.description_font2
     
-    def _update_section_header_year(self, w_sheet, cat_section, flags_section_row_index,
+    def _update_section_header_yearDefunct(self, w_sheet, cat_section, flags_section_row_index,
                                    start_col_index, span_ ,source_w_sheet = None):
         #The function inserts years copied from Flas Section 
         #Do noting if no history is found
@@ -1141,14 +1168,49 @@ class ExcelReport():
                     for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                         for cell in cellObj:
                             #get column
-                            new_column_letter = cell.column # J
+                            new_column_letter = get_column_letter(cell.column) # J
                             w_sheet['%s%s'%(new_column_letter, cell.row)] =  '='+ appended_worksheet + '$'+ new_column_letter + '$'+ str(flags_section_row_index) 
                             w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Heading1'
                             w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General' 
                     
                     self._set_thick_bottom_border_range( w_sheet,  header_row_, start, end)
-        
-    def _populate_flags_section(self, w_sheet, row_index, item, cell_ref_timing):
+
+    def _update_section_header_year(self, w_sheet, cat_section, flags_section_row_index,
+                                start_col_index, span_, source_w_sheet=None):
+        from openpyxl.utils import get_column_letter
+
+        # The function inserts years copied from Flags Section 
+        if cat_section in self.track_inputs:
+           if 'header' in self.track_inputs[cat_section]:
+            start = start_col_index
+            end = start_col_index + int(span_)
+            
+            if 'row' in self.track_inputs[cat_section]['header']:
+                header_row_ = self.track_inputs[cat_section]['header']['row']
+                
+                # Format the worksheet prefix for the formula: e.g., 'Input!'
+                appended_worksheet = f'{source_w_sheet}!' if source_w_sheet is not None else ''
+                
+                # Loop through the column range
+                for col_idx in range(start, end + 1):
+                    # 1. Convert integer index to letter for the formula string
+                    col_letter = get_column_letter(col_idx)
+                    
+                    # 2. Get the specific cell object using row and column indices
+                    target_cell = w_sheet.cell(row=header_row_, column=col_idx)
+                    
+                    # 3. Construct the formula: e.g., =Input!$J$120
+                    # str() ensures flags_section_row_index (int) is concatenated correctly
+                    formula = f"={appended_worksheet}${col_letter}${str(flags_section_row_index)}"
+                    
+                    # 4. Apply value and styles directly to the cell object
+                    target_cell.value = formula
+                    target_cell.style = 'Heading1'
+                    target_cell.number_format = 'General'
+                
+                # Apply the border using your existing helper
+                self._set_thick_bottom_border_range(w_sheet, header_row_, start, end) 
+    def _populate_flags_sectionDefunct(self, w_sheet, row_index, item, cell_ref_timing):
         if item=='YEAR':
             # set row----
             self.track_inputs['flags']['years']['row']=row_index
@@ -1163,7 +1225,7 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                     prev_col=column_index_from_string(new_column_letter)-1
                     prev_letter= get_column_letter(prev_col)
                     prev_cell = prev_letter + str(cell.row)
@@ -1188,9 +1250,9 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                    #
-                    years_cell = cell.column + str(flags_years_row)
+                    years_cell = get_column_letter(cell.column) +  str(flags_years_row)
                     w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=IF(' + years_cell + '=' + cell_ref_timing['base_period'] + ',1,0)'
                     w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Output2'
                     #w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General'
@@ -1207,9 +1269,9 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                    #
-                    years_cell = cell.column + str(flags_years_row)
+                    years_cell = get_column_letter(cell.column) +  str(flags_years_row)
                     w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=IF(' + years_cell + '>' + cell_ref_timing['construction_year_end'] + ',0,1)'
                     w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Output2'
                     #w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General'
@@ -1226,9 +1288,9 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                    #
-                    years_cell = cell.column + str(flags_years_row)
+                    years_cell = get_column_letter(cell.column) +  str(flags_years_row)
                     w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=IF(OR(' + years_cell + '<' + cell_ref_timing['repayment_starts'] + \
                                                                   ',' + years_cell +'>('+ cell_ref_timing['repayment_starts'] + \
                                                                   '+' + cell_ref_timing['num_of_installments'] + '-1)),0,1)'
@@ -1247,9 +1309,9 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                    #
-                    years_cell = cell.column + str(flags_years_row)
+                    years_cell = get_column_letter(cell.column) +  str(flags_years_row)
                     w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=IF(AND(' + years_cell + '>=$' + cell_ref_timing['operation_start_year'] + \
                                                                   ',' + years_cell +'<$'+ cell_ref_timing['operation_end']  + '),1,0)'
                     w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Output2'
@@ -1266,13 +1328,77 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                    #
-                    years_cell = cell.column + str(flags_years_row)
+                    years_cell = get_column_letter(cell.column) +  str(flags_years_row)
                     w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=IF(' + years_cell + '=$' + cell_ref_timing['operation_end']  + ',1,0)'
                     w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Output2'
                   
-  
+    
+    def _populate_flags_section(self, w_sheet, row_index, item, cell_ref_timing):
+        # Helper to ensure we always have the letter and the index correctly
+        def get_col_info(cell_col):
+            if isinstance(cell_col, int):
+                return get_column_letter(cell_col), cell_col
+            else:
+                return cell_col, column_index_from_string(cell_col)
+
+        span_ = self._get_span()
+        start_col_index = 9
+        first_slice_point = get_column_letter(start_col_index) + str(row_index)
+        second_slice_point = get_column_letter(start_col_index + int(span_)) + str(row_index)
+        
+        # Pre-fetch the years row once to save resources
+        flags_years_row = self.track_inputs['flags']['years'].get('row')
+
+        if item == 'YEAR':
+            self.track_inputs['flags']['years']['row'] = row_index
+            for cellObj in w_sheet[first_slice_point:second_slice_point]:
+                for cell in cellObj:
+                    # 1. Safely identify the column letter and index
+                    new_column_letter, col_index = get_col_info(cell.column)
+                    
+                    # 2. Calculate previous cell reference
+                    prev_letter = get_column_letter(col_index - 1)
+                    prev_cell = prev_letter + str(cell.row)
+                    
+                    # 3. Write Formula
+                    w_sheet['%s%s' % (new_column_letter, cell.row)] = \
+                        '=IF(' + prev_cell + ',' + prev_cell + '+1,' + cell_ref_timing['base_period'] + ')'
+                    
+                    # Style
+                    target_cell = w_sheet['%s%s' % (new_column_letter, cell.row)]
+                    target_cell.style = 'Calculation'
+                    target_cell.number_format = 'General'
+
+            self._update_section_header_year(w_sheet, 'production_inventory', row_index, start_col_index, span_)
+            self._update_section_header_year(w_sheet, 'investment_cost', row_index, start_col_index, span_)
+
+        elif item in ['PS', 'CP', 'LPP', 'OP', 'RES']:
+            # Unified loop for the other flag types to avoid repetition
+            for cellObj in w_sheet[first_slice_point:second_slice_point]:
+                for cell in cellObj:
+                    new_column_letter, _ = get_col_info(cell.column)
+                    years_cell = new_column_letter + str(flags_years_row)
+                    
+                    formula = ""
+                    if item == 'PS':
+                        formula = '=IF(' + years_cell + '=' + cell_ref_timing['base_period'] + ',1,0)'
+                    elif item == 'CP':
+                        formula = '=IF(' + years_cell + '>' + cell_ref_timing['construction_year_end'] + ',0,1)'
+                    elif item == 'LPP':
+                        formula = '=IF(OR(' + years_cell + '<' + cell_ref_timing['repayment_starts'] + \
+                                ',' + years_cell + '>(' + cell_ref_timing['repayment_starts'] + \
+                                '+' + cell_ref_timing['num_of_installments'] + '-1)),0,1)'
+                    elif item == 'OP':
+                        formula = '=IF(AND(' + years_cell + '>=$' + cell_ref_timing['operation_start_year'] + \
+                                ',' + years_cell + '<$' + cell_ref_timing['operation_end'] + '),1,0)'
+                    elif item == 'RES':
+                        formula = '=IF(' + years_cell + '=$' + cell_ref_timing['operation_end'] + ',1,0)'
+
+                    target_cell = w_sheet['%s%s' % (new_column_letter, cell.row)]
+                    target_cell.value = formula
+                    target_cell.style = 'Output2'
 
 
     def _add_flags_section(self, w_sheet, row_index,total_wsheet_cols):
@@ -1590,34 +1716,34 @@ class ExcelReport():
         for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
             for cell in cellObj:
                 
-               # w_sheet['%s%s'%(cell.column, cell.row)] = row[i]
+               # w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = row[i]
                 if cell.column in ['L', 'M']:
                     if not cell.row == start_row + 1:
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Output4'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')
                     else:
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Arial',bold=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Arial',bold=True, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')                                 
         
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='0.00%'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='0.00%'
 
                     
                 elif cell.column in ['C']:
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = first_col_num_format
-                    w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Arial',bold=True, 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = first_col_num_format
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Arial',bold=True, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')
         
                 else:
                     if not cell.row == start_row + 1:
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Output4'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')
                     else:
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Arial',bold=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Arial',bold=True, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')                                 
                     
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
                    
         
         #---Current Model Value Setborder Outline------------------------
@@ -1647,7 +1773,7 @@ class ExcelReport():
         for cellObj in w_sheet["D" + str(row_index+3+1) +":G"+ str(row_index+3 +5)]:
             for cell in cellObj:
                 #get column
-                new_column_letter = cell.column
+                new_column_letter = get_column_letter(cell.column)
                
                 latest_row = cell.row
                 cell_ref = new_column_letter + str(cell.row)
@@ -2378,12 +2504,12 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     prev= cell.column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col =column_index_from_string(get_column_letter(cell.column))-1                  
                     prev_letter= get_column_letter(prev_col)
                     prev_cum_tax_cell = prev_letter + '$' + str(cell.row)
-                    pre_tax_income_cell = cell.column + '$' + str(pre_tax_income_r_index) if found_state_pre_tax_income else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = f'=MIN({prev_cum_tax_cell}+{pre_tax_income_cell},0)'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    pre_tax_income_cell = get_column_letter(cell.column)+ '$'+ str(pre_tax_income_r_index) if found_state_pre_tax_income else '0'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = f'=MIN({prev_cum_tax_cell}+{pre_tax_income_cell},0)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
    
         #11.taxable_income_losses_carried_forward
         pre_tax_income_r_index, _, found_state_pre_tax_income= self._retrieve_cell_row_colm('cal_income_tax_statement','pre_tax_income')
@@ -2397,13 +2523,13 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     prev= cell.column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col =column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
-                    pre_tax_income_cell = cell.column + '$' + str(pre_tax_income_r_index) if found_state_pre_tax_income else '0'
+                    pre_tax_income_cell =get_column_letter(cell.column)+ '$' + str(pre_tax_income_r_index) if found_state_pre_tax_income else '0'
                     last_year_cum_looses_cell = prev_letter + '$' + str(cumulative_losses_r_index) if found_state_cumulative_losses else '0'
                    
-                    w_sheet['%s%s'%(cell.column, cell.row)] = f'=MAX({last_year_cum_looses_cell}+{pre_tax_income_cell},0)'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = f'=MAX({last_year_cum_looses_cell}+{pre_tax_income_cell},0)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
    
         #12. taxes
         self._transfer_cell(w_sheet,'taxes','cal_income_tax_statement','corporate_income_tax','0%', 'Inputs')
@@ -2422,10 +2548,10 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    taxable_income_losses_cell = cell.column + '$' + str(taxable_income_losses_r_index) if found_state_taxable_income_losses else '0'
+                    taxable_income_losses_cell =get_column_letter(cell.column)+ '$' + str(taxable_income_losses_r_index) if found_state_taxable_income_losses else '0'
                    
-                    w_sheet['%s%s'%(cell.column, cell.row)] = f'=MAX({corporate_income_tax_cell}*{taxable_income_losses_cell},0)'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = f'=MAX({corporate_income_tax_cell}*{taxable_income_losses_cell},0)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
    
         
         #14. net_after_tax_income
@@ -2456,14 +2582,14 @@ class ExcelReport():
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    year_header_cell = cell.column + '$' + str(year_header_r_index) if found_state_year_header else '0'
-                    equity_towards_investment_cell = cell.column + '$' + str(equity_towards_investment_r_index) if found_state_equity_towards_investment else '0'
+                    year_header_cell =get_column_letter(cell.column)+ '$' + str(year_header_r_index) if found_state_year_header else '0'
+                    equity_towards_investment_cell =get_column_letter(cell.column)+ '$' + str(equity_towards_investment_r_index) if found_state_equity_towards_investment else '0'
                     
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col =column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_shareholder_equity_cell = prev_letter + '$' + str(shareholder_equity_r_index) if found_state_shareholder_equity else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = f'=IF({year_header_cell}=Inputs!{base_period_cell},{equity_towards_investment_cell},{prev_shareholder_equity_cell})'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = f'=IF({year_header_cell}=Inputs!{base_period_cell},{equity_towards_investment_cell},{prev_shareholder_equity_cell})'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
    
         #16 'dividend_payout_ratio'
         self._transfer_cell(w_sheet,'macroeconomic_parameters','cal_income_tax_statement','dividend_payout_ratio','0%', 'Inputs')
@@ -2716,15 +2842,15 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     num_of_installments_cell
-                    LPP_cell = cell.column + '$' + str(LPP_r_index) if found_state_LPP else '0'
+                    LPP_cell =get_column_letter(cell.column)+ '$' + str(LPP_r_index) if found_state_LPP else '0'
                     #------------------disbursement------------------------------------
                     a= get_column_letter(9) + str(loan_disbursement_r_index)
                     b= get_column_letter(9 + int(span_)) + str(loan_disbursement_r_index)
                     loan_disbursement_cell = f'SUM({a}:{b})' if found_state_loan_disbursement else '0'
                    
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF(' + num_of_installments_cell + '=0, 0,' + loan_disbursement_cell + \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF(' + num_of_installments_cell + '=0, 0,' + loan_disbursement_cell + \
                                                               '/'+ num_of_installments_cell  + "*" +  LPP_cell +")"
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
    
         #13. interest_paid
         self._transfer_cell_range(w_sheet,'cal_loan_schedule','cal_loan_schedule','interest_accrued_in_year',
@@ -3173,10 +3299,10 @@ class ExcelReport():
                 first_slice_point = get_column_letter(9 + int(span_)-int(last_column)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    maths_formulae ='=SUM('+ cell.column + str(row_start) + ':' + cell.column +  str(row_end) +')'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = maths_formulae
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format =number_format
+                    maths_formulae ='=SUM('+ get_column_letter(cell.column) +  str(row_start) + ':' + get_column_letter(cell.column) +   str(row_end) +')'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = maths_formulae
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format =number_format
                       
     def _calculate_formalue_fromstring(self, w_sheet,
                         formalue_string, target_header, target_para, 
@@ -3243,16 +3369,16 @@ class ExcelReport():
                         elif item['var_type']=='variable' and item['cell_type']== 'cell_range':
                             source_r_index = memory_[item['value']]['row']
                             found_state = memory_[item['value']]['found_state']
-                            variables_[item['value']]= cell.column + '$' + str(source_r_index) if found_state else '0'
+                            variables_[item['value']]=get_column_letter(cell.column)+ '$' + str(source_r_index) if found_state else '0'
                             maths_formulae +=  variables_[item['value']] 
                         elif item['value'] in variables_:
                             #already calculated
                             #print(item['value'],variables_[item['value']]) 
                             maths_formulae +=  variables_[item['value']]      
                     #print(maths_formulae) 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = maths_formulae
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format =number_format
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = maths_formulae
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format =number_format
                    
 
          
@@ -3345,7 +3471,7 @@ class ExcelReport():
                     
                     maths_formulae =''
                     for i_val in mat_attr:
-                        val =  cell.column + '$' + str(i_val['row']) if  i_val['found_state'] else '0'
+                        val = get_column_letter(cell.column)+ '$' + str(i_val['row']) if  i_val['found_state'] else '0'
                         
                         #only append neg-- on first element
                         if maths_formulae =='' and i_val['action'] in ["-"]:
@@ -3362,9 +3488,9 @@ class ExcelReport():
                     if not (div_const==""):
                         maths_formulae = maths_formulae + "/" + div_const 
 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=' + maths_formulae
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + maths_formulae
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
      
     def _productof_sumof_list_cell_range(self, w_sheet,
@@ -3410,7 +3536,7 @@ class ExcelReport():
                     
                     mathsA_formulae =''
                     for i_val in listA_attr:
-                        val =  cell.column + '$' + str(i_val['row']) if  i_val['found_state'] else '0'
+                        val = get_column_letter(cell.column)+ '$' + str(i_val['row']) if  i_val['found_state'] else '0'
                         
                         #only append neg-- on first element
                         if mathsA_formulae =='' and i_val['action'] in ["-"]:
@@ -3424,7 +3550,7 @@ class ExcelReport():
 
                     mathsB_formulae =''
                     for i_val in listB_attr:
-                        val =  cell.column + '$' + str(i_val['row']) if  i_val['found_state'] else '0'
+                        val = get_column_letter(cell.column)+ '$' + str(i_val['row']) if  i_val['found_state'] else '0'
                         
                         #only append neg-- on first element
                         if mathsB_formulae =='' and i_val['action'] in ["-"]:
@@ -3446,9 +3572,9 @@ class ExcelReport():
                     elif not (mathsB_formulae==""):
                         maths_formulae= mathsB_formulae 
 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=' + maths_formulae
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + maths_formulae
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
    
 
@@ -3471,18 +3597,18 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col =column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_source_cell = prev_letter + str(source_r_index)
                    
-                    source_cell = cell.column + '$' \
+                    source_cell =get_column_letter(cell.column)+ '$' \
                         + str(source_r_index) if found_state_source else '0'
                     if reverse_diff:
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '=' + prev_source_cell +'-'+ source_cell
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + prev_source_cell +'-'+ source_cell
                     else:
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '=' + source_cell + '-' + prev_source_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + source_cell + '-' + prev_source_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
     def _product_value_and_cell_range(self, w_sheet, 
                           val_header , val_para,
@@ -3506,10 +3632,10 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    source_cell = cell.column + '$' \
+                    source_cell =get_column_letter(cell.column)+ '$' \
                         + str(source_r_index) if found_state_source else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=' + val_cell  + '*' + source_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + val_cell  + '*' + source_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
 
 
      
@@ -3554,8 +3680,8 @@ class ExcelReport():
            
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    col_num = column_index_from_string(cell.column)
-                    cell_value =  w_sheet['%s%s'%(cell.column, cell.row)].value
+                    col_num =column_index_from_string(get_column_letter(cell.column))-1
+                    cell_value =  w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].value
                     #print("found_integer:....", cell_value)
                     if int(cell_value) ==1:
                         found_lb= True
@@ -3775,21 +3901,21 @@ class ExcelReport():
                 for cell in cellObj:
                    
                     #=NPV($F$51;K52:O52)+J52
-                    ahead =  column_index_from_string(cell.column) + 1
-                    next_col = column_index_from_string(cell.column)+ span_
-                    curr_source_cell = cell.column + str(source_r_index) if found_state_source else '0'
+                    ahead = column_index_from_string(get_column_letter(cell.column)) + 1
+                    next_col =column_index_from_string(get_column_letter(cell.column)) + span_
+                    curr_source_cell = get_column_letter(cell.column) +  str(source_r_index) if found_state_source else '0'
                     ahead_source_cell = get_column_letter(ahead) + str(source_r_index) if found_state_source else '0'
                     last_source_cell = get_column_letter(next_col) + str(source_r_index) if found_state_source else '0'
                   
                     maths_formulae ='=NPV('+ rate_cell + ','+ ahead_source_cell + ':' + last_source_cell + ')+' + curr_source_cell
                     
-                    w_sheet['%s%s'%(cell.column, cell.row)] = maths_formulae
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format =number_format
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = maths_formulae
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format =number_format
                                
        
     
-    def _transfer_cell_range(self, w_sheet, source_header, target_header, 
+    def _transfer_cell_rangeDefunct(self, w_sheet, source_header, target_header, 
                         source_para ,cell_number_format=None, source_wksheet=None, 
                         target_para = None, cell_style='Linkedcell',shift_prev=False,lower_upper_bound= None):
         
@@ -3818,19 +3944,74 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
 
-                    source_cell = cell.column + '$' + str(source_r_index) if found_state_source else '0'
+                    source_cell =get_column_letter(cell.column)+ '$' + str(source_r_index) if found_state_source else '0'
                     if shift_prev==True:
                         prev= cell.column
-                        prev_col = column_index_from_string(cell.column)-1
+                        prev_col =column_index_from_string(get_column_letter(cell.column))-1
                         prev_letter= get_column_letter(prev_col)
                         source_cell = prev_letter + '$' + str(source_r_index) if found_state_source else '0'
 
                    
-                    w_sheet['%s%s'%(cell.column, cell.row)] = f'={source_wksheet}{source_cell}'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = cell_style
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = f'={source_wksheet}{source_cell}'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = cell_style
                     if cell_number_format !=None:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = cell_number_format
-       
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = cell_number_format
+    def _transfer_cell_range(self, w_sheet, source_header, target_header, 
+                        source_para, cell_number_format=None, source_wksheet=None, 
+                        target_para=None, cell_style='Linkedcell', shift_prev=False, 
+                        lower_upper_bound=None, *args, **kwargs):
+    
+        # Get Source Row Info
+        source_r_index, _, found_state_source = self._retrieve_cell_row_colm(source_header, source_para)
+        
+        # Determine target parameter (default to source if None)
+        target_para = source_para if target_para is None else target_para
+        r_index, _, found_state = self._retrieve_cell_row_colm(target_header, target_para)
+
+        if found_state:
+            span_ = self._get_span()
+            
+            # 1. Calculate the slice points (Safe column handling)
+            lb_val = 9  # Default start (Column I)
+            ub_val = 9 + int(span_)
+            
+            # Apply custom bounds if provided
+            if lower_upper_bound is not None:
+                if 'lb' in lower_upper_bound:
+                    lb_val = int(lower_upper_bound['lb'])
+                if 'ub' in lower_upper_bound:
+                    ub_val = int(lower_upper_bound['ub'])
+
+            first_slice_point = f"{get_column_letter(lb_val)}{r_index}"
+            second_slice_point = f"{get_column_letter(ub_val)}{r_index}"
+            
+            # Format worksheet prefix safely
+            sheet_prefix = f"'{source_wksheet}'!" if source_wksheet else ''
+
+            # 2. Iterate through the range
+            # w_sheet[range] returns a tuple of rows; each row is a tuple of cells
+            for cell_row in w_sheet[f"{first_slice_point}:{second_slice_point}"]:
+                for cell in cell_row:
+                    
+                    # FIX: cell.column is an integer in modern openpyxl
+                    current_col_idx = cell.column
+                    
+                    # Handle shift_prev logic
+                    if shift_prev:
+                        # Subtract 1 from current integer index
+                        target_col_letter = get_column_letter(current_col_idx - 1)
+                    else:
+                        target_col_letter = get_column_letter(current_col_idx)
+                    
+                    # Construct the source cell coordinate (e.g., A$10)
+                    source_cell_coord = f"{target_col_letter}${source_r_index}" if found_state_source else '0'
+                    
+                    # 3. Assign values and styles directly to the cell object
+                    cell.value = f"={sheet_prefix}{source_cell_coord}"
+                    cell.style = cell_style
+                    
+                    if cell_number_format is not None:
+                        cell.number_format = cell_number_format  
     def _transfer_cell_atcolumn(self, w_sheet, source_header, target_header, 
                         source_para ,cell_number_format='General', 
                         source_wksheet=None, target_para = None,cell_style='Linkedcell',last_column=None):
@@ -3965,7 +4146,7 @@ class ExcelReport():
                 w_sheet['%s%s'%(get_column_letter(c_index), r_index)].number_format = 'General' 
 
     
-    def _transfer_value_tocellrange(self, w_sheet, source_header, 
+    def _transfer_value_tocellrangeDefunct(self, w_sheet, source_header, 
                         target_header, source_para,  source_wksheet=None,target_para=None,
                         cell_number_format=None,
                         cell_style='Linkedcell'):
@@ -3988,13 +4169,81 @@ class ExcelReport():
             #----------->
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    w_sheet['%s%s'%(cell.column, cell.row)] = f'={source_wksheet}{source_cell}'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = cell_style
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = f'={source_wksheet}{source_cell}'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = cell_style
                     if cell_number_format !=None:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = cell_number_format
-       
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = cell_number_format
+    def _transfer_value_tocellrangeNew(self, w_sheet, header, sub_header, source_wksheet, source_cell, *args, **kwargs):
+        """
+        Corrected to accept variable arguments to prevent TypeError and 
+        safely iterate through ranges to prevent AttributeError.
+        """
+        # Retrieve target row and column tracked in the model
+        r_index, c_index, found_state = self._retrieve_cell_row_colm(header, sub_header)
+        
+        if found_state:
+            # Get the span (number of columns to fill)
+            span_ = self._get_span()
+            start_col = c_index
+            end_col = c_index + span_
+            
+            # Define the range string for the specific row (e.g., 'I10:L10')
+            range_string = f"{get_column_letter(start_col)}{r_index}:{get_column_letter(end_col)}{r_index}"
+            
+            # openpyxl returns a generator of rows; each row is a tuple of cells.
+            # We must use nested loops to reach the individual 'Cell' object.
+            for row in w_sheet[range_string]:
+                for cell in row:
+                    # Assign the formula directly to the cell object's value
+                    # Wrapping sheet names in single quotes ensures Excel handles spaces correctly
+                    cell.value = f"='{source_wksheet}'!{source_cell}"
+                    
+                    # Apply the linked style if it exists in your workbook
+                    cell.style = 'Linkedcell' 
+    def _transfer_value_tocellrange(self, w_sheet, source_header, target_header, 
+                                    source_para, source_wksheet=None, target_para=None,
+                                    cell_number_format=None, cell_style='Linkedcell', 
+                                    *args, **kwargs):
+        """
+        Restores original parameters while fixing the 'tuple' AttributeError 
+        and 'TypeError' by using nested iteration and *args/**kwargs.
+        """
+        
+        # 1. Get the Source Cell (where the data comes from)
+        r_idx_s, c_idx_s, found_s = self._retrieve_cell_row_colm(source_header, source_para)
+        source_cell = f"${get_column_letter(c_idx_s)}${r_idx_s}" if found_s else '0'
 
-                            
+        # 2. Get the Target Row (where the formulas will be written)
+        target_para = source_para if target_para is None else target_para
+        r_idx_t, _, found_t = self._retrieve_cell_row_colm(target_header, target_para)
+        
+        if found_t:
+            span_ = self._get_span()
+            
+            # Define start/end columns (Using original index 9 or dynamic c_index)
+            # Based on your defunct code, it starts at column 9 (I)
+            start_col = 9 
+            end_col = start_col + int(span_)
+            
+            # Create range string (e.g., "I15:L15")
+            range_str = f"{get_column_letter(start_col)}{r_idx_t}:{get_column_letter(end_col)}{r_idx_t}"
+            
+            # Prepare the worksheet prefix
+            sheet_prefix = f"'{source_wksheet}'!" if source_wksheet else ""
+
+            # 3. CRITICAL FIX: Nested loops to handle openpyxl cell tuples
+            for row_tuple in w_sheet[range_str]:
+                for cell in row_tuple:
+                    # cell is now a single Cell object, not a tuple
+                    cell.value = f"={sheet_prefix}{source_cell}"
+                    
+                    # Apply Style
+                    if cell_style:
+                        cell.style = cell_style
+                    
+                    # Apply Number Format (Restored functionality)
+                    if cell_number_format:
+                        cell.number_format = cell_number_format    
     def _add_cal_inflation_price_indices_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
@@ -4088,7 +4337,7 @@ class ExcelReport():
        
         return row_index 
 
-    def _populate_cal_inflation_price_indices(self, w_sheet):
+    def _populate_cal_inflation_price_indicesDefunct(self, w_sheet):
          
             
         self._transfer_value_tocellrange(w_sheet, 'sens', 
@@ -4117,22 +4366,23 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
-       
+                    #header_cell =get_column_letter(cell.column)+ '$' + str(header_r_index) if found_state_header else '0'
+                    # Convert the integer column index to a letter before concatenating
+                    header_cell = f"{get_column_letter(cell.column)}${header_r_index}" if found_state_header else '0'
                     #----
-                    domestic_inflation_rate_cell = cell.column + '$' \
+                    domestic_inflation_rate_cell =get_column_letter(cell.column)+ '$' \
                         + str(domestic_inflation_rate_r_index) if found_state_domestic_inflation else '0'
 
                    
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col =column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_price_index_cell = prev_letter + str(cell.row) 
                     #=IF(I7=Inputs!$F$32;1;H11*(1+I10))
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',1,' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',1,' \
                                                                + prev_price_index_cell + '*(1+'+ domestic_inflation_rate_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format = '0%'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = '0%'
         
         #------US Inflation-------------------------------------------
         r_index, c_index, found_state= self._retrieve_cell_row_colm('sens','us_inflation_rate')
@@ -4149,9 +4399,9 @@ class ExcelReport():
             #----------->
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=Sens!' + us_inflation_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Linkedcell'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = '0%'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=Sens!' + us_inflation_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Linkedcell'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = '0%'
         
         
         #------US Price Index-------------------------------------------
@@ -4176,22 +4426,22 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    header_cell =get_column_letter(cell.column)+ '$' + str(header_r_index) if found_state_header else '0'
        
                     #----
-                    us_inflation_rate_cell = cell.column + '$' \
+                    us_inflation_rate_cell =get_column_letter(cell.column)+ '$' \
                         + str(us_inflation_rate_r_index) if found_state_us_inflation else '0'
 
                    
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col =column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_price_index_cell = prev_letter + str(cell.row) 
                     #=IF(I7=Inputs!$F$32;1;H11*(1+I10))
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',1,' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',1,' \
                                                                + prev_price_index_cell + '*(1+'+ us_inflation_rate_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
          
         
         # Relative price index------------------------------
@@ -4209,12 +4459,12 @@ class ExcelReport():
             #----------->
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    us_price_index_cell = cell.column +  str(us_price_index_r_index) if found_state_us_pi else '0'
-                    domestic_price_index_cell = cell.column +  str(domestic_price_index_r_index) if found_state_dom_pi else '0'
+                    us_price_index_cell = get_column_letter(cell.column) +   str(us_price_index_r_index) if found_state_us_pi else '0'
+                    domestic_price_index_cell = get_column_letter(cell.column) +   str(domestic_price_index_r_index) if found_state_dom_pi else '0'
        
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ domestic_price_index_cell + '/' + us_price_index_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ domestic_price_index_cell + '/' + us_price_index_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
          
 
         # Real Exchange Rate------------------------------
@@ -4230,9 +4480,9 @@ class ExcelReport():
             #----------->
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=Inputs!'+ exchange_rate_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Linkedcell'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=Inputs!'+ exchange_rate_cell 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Linkedcell'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
          
 
 
@@ -4251,13 +4501,129 @@ class ExcelReport():
             #----------->
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    relative_price_index_cell = cell.column +  str(relative_price_index_r_index) if found_state_rel_pi else '0'
-                    real_eachange_rate_cell = cell.column +  str(real_exchange_rate_index) if found_state_real_x_rate else '0'
+                    relative_price_index_cell = get_column_letter(cell.column) +   str(relative_price_index_r_index) if found_state_rel_pi else '0'
+                    real_eachange_rate_cell = get_column_letter(cell.column) +   str(real_exchange_rate_index) if found_state_real_x_rate else '0'
        
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ relative_price_index_cell + '*' + real_eachange_rate_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format = '0%'
-                              
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ relative_price_index_cell + '*' + real_eachange_rate_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = '0%'
+
+    def _populate_cal_inflation_price_indices(self, w_sheet):
+        # Initial transfer call
+        self._transfer_value_tocellrange(w_sheet, 'sens', 
+                            'calc_inflation_price_index', 'domestic_inflation_rate', "Sens", None,
+                            '0%')
+                        
+        # ------ Domestic Price Index -------------------------------------------
+        header_r_index, _, found_state_header = self._retrieve_cell_row_colm('calc_inflation_price_index','header')        
+        
+        # Base period
+        r_idx_base, c_idx_base, found_state_base = self._retrieve_cell_row_colm('timing','base_period')
+        base_period_cell = f'Inputs!${get_column_letter(c_idx_base)}${r_idx_base}' if found_state_base else '0'
+        
+        # Domestic inflation row
+        dom_inf_r_index, _, found_state_dom_inf = self._retrieve_cell_row_colm('calc_inflation_price_index','domestic_inflation_rate')
+
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_inflation_price_index','domestic_price_index')
+        if found_state:
+            span_ = self._get_span()
+            # Define range correctly using get_column_letter
+            first_col = get_column_letter(9)
+            last_col = get_column_letter(9 + int(span_))
+            
+            for row in w_sheet[f"{first_col}{r_index}:{last_col}{r_index}"]:
+                for cell in row:
+                    col_letter = get_column_letter(cell.column)
+                    header_cell = f"{col_letter}${header_r_index}" if found_state_header else '0'
+                    dom_inf_cell = f"{col_letter}${dom_inf_r_index}" if found_state_dom_inf else '0'
+                    
+                    prev_letter = get_column_letter(cell.column - 1)
+                    prev_price_index_cell = f"{prev_letter}{cell.row}" 
+                    
+                    # Assign directly to cell.value to avoid coordinate string errors
+                    cell.value = f'=IF({header_cell}={base_period_cell},1,{prev_price_index_cell}*(1+{dom_inf_cell}))'
+                    cell.style = 'Calculation'
+
+        # ------ US Inflation -------------------------------------------
+        r_idx_us, c_idx_us, found_state_us = self._retrieve_cell_row_colm('sens','us_inflation_rate')
+        us_inf_source_cell = f"{get_column_letter(c_idx_us)}${r_idx_us}" if found_state_us else '0'
+
+        us_inf_r_index, _, found_state = self._retrieve_cell_row_colm('calc_inflation_price_index','us_inflation_rate')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{us_inf_r_index}:{get_column_letter(9 + int(span_))}{us_inf_r_index}"
+            for row in w_sheet[range_str]:
+                for cell in row:
+                    cell.value = f'=Sens!{us_inf_source_cell}'
+                    cell.style = 'Linkedcell'
+                    cell.number_format = '0%'
+
+        # ------ US Price Index -------------------------------------------
+        us_inf_r_idx, _, found_state_us_inf = self._retrieve_cell_row_colm('calc_inflation_price_index','us_inflation_rate')
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_inflation_price_index','us_price_index')
+        
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for row in w_sheet[range_str]:
+                for cell in row:
+                    col_letter = get_column_letter(cell.column)
+                    header_cell = f"{col_letter}${header_r_index}" if found_state_header else '0'
+                    us_inf_cell = f"{col_letter}${us_inf_r_idx}" if found_state_us_inf else '0'
+                    
+                    prev_letter = get_column_letter(cell.column - 1)
+                    prev_price_index_cell = f"{prev_letter}{cell.row}" 
+                    
+                    cell.value = f'=IF({header_cell}={base_period_cell},1,{prev_price_index_cell}*(1+{us_inf_cell}))'
+                    cell.style = 'Calculation'
+
+        # ------ Relative Price Index ------------------------------
+        us_pi_r_idx, _, found_state_us_pi = self._retrieve_cell_row_colm('calc_inflation_price_index','us_price_index')
+        dom_pi_r_idx, _, found_state_dom_pi = self._retrieve_cell_row_colm('calc_inflation_price_index','domestic_price_index') 
+        rel_pi_r_idx, _, found_state = self._retrieve_cell_row_colm('calc_inflation_price_index','relative_price_index')
+
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{rel_pi_r_idx}:{get_column_letter(9 + int(span_))}{rel_pi_r_idx}"
+            for row in w_sheet[range_str]:
+                for cell in row:
+                    col_l = get_column_letter(cell.column)
+                    us_pi_cell = f"{col_l}{us_pi_r_idx}" if found_state_us_pi else '0'
+                    dom_pi_cell = f"{col_l}{dom_pi_r_idx}" if found_state_dom_pi else '0'
+                    cell.value = f'={dom_pi_cell}/{us_pi_cell}'
+                    cell.style = 'Calculation'
+
+        # ------ Real Exchange Rate ------------------------------
+        r_idx_ex, c_idx_ex, found_state_ex = self._retrieve_cell_row_colm('macroeconomic_parameters','exchange_rate')
+        ex_rate_input = f"${get_column_letter(c_idx_ex)}${r_idx_ex}" if found_state_ex else '0'
+        
+        r_idx_real_ex, _, found_state = self._retrieve_cell_row_colm('calc_inflation_price_index','real_exchange_rate')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_idx_real_ex}:{get_column_letter(9 + int(span_))}{r_idx_real_ex}"
+            for row in w_sheet[range_str]:
+                for cell in row:
+                    cell.value = f'=Inputs!{ex_rate_input}'
+                    cell.style = 'Linkedcell'
+                    cell.number_format = '_(* #,##0.0_);_(* (#,##0.0);_(* "-"??_);_(@_)'
+
+        # ------ Nominal Exchange Rate ------------------------------
+        rel_pi_r_idx, _, found_state_rel_pi = self._retrieve_cell_row_colm('calc_inflation_price_index','relative_price_index')
+        real_ex_r_idx, _, found_state_real_ex = self._retrieve_cell_row_colm('calc_inflation_price_index','real_exchange_rate') 
+        nom_ex_r_idx, _, found_state = self._retrieve_cell_row_colm('calc_inflation_price_index','nominal_exchange_rate')
+
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{nom_ex_r_idx}:{get_column_letter(9 + int(span_))}{nom_ex_r_idx}"
+            for row in w_sheet[range_str]:
+                for cell in row:
+                    col_l = get_column_letter(cell.column)
+                    rel_pi_c = f"{col_l}{rel_pi_r_idx}" if found_state_rel_pi else '0'
+                    real_ex_c = f"{col_l}{real_ex_r_idx}" if found_state_real_ex else '0'
+                    cell.value = f'={rel_pi_c}*{real_ex_c}'
+                    cell.style = 'Calculation'                        
+    
+    
     def _write_analytics_sheet(self, wb,):
         #---------------------------Worksheet 1---------------------------
         
@@ -4426,24 +4792,24 @@ class ExcelReport():
 
         for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
             for cell in cellObj:
-                #w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'  
+                #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Output4'  
 
                 if  cell.row == row_i : #dict_['1']:  
-                    npv_cell = cell.column + str(row_i -added_rows)  
-                    pdf_cell = cell.column + str(row_i - added_rows +1)    
-                    w_sheet['%s%s'%(cell.column, cell.row)]= '='+ npv_cell + '*' + pdf_cell
+                    npv_cell = get_column_letter(cell.column) +  str(row_i -added_rows)  
+                    pdf_cell = get_column_letter(cell.column) +  str(row_i - added_rows +1)    
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)]= '='+ npv_cell + '*' + pdf_cell
                 elif (cell.row == row_i + 1):
                     #Diff
-                    npv_cell = cell.column + str(cell.row-1)  
+                    npv_cell = get_column_letter(cell.column) +  str(cell.row-1)  
                     average_cell = last_column + str(cell.row-1 )    
-                    w_sheet['%s%s'%(cell.column, cell.row)]= '='+ npv_cell + '-' + average_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)]= '='+ npv_cell + '-' + average_cell
 
                 elif (cell.row == row_i + 2):
                     #summm sqr
-                    prev_cell = cell.column + str(cell.row-1)     
-                    w_sheet['%s%s'%(cell.column, cell.row)]= '='+ prev_cell + '^2' 
+                    prev_cell = get_column_letter(cell.column) +  str(cell.row-1)     
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)]= '='+ prev_cell + '^2' 
 
-                w_sheet['%s%s'%(cell.column, cell.row)].number_format = number_format   
+                w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = number_format   
 
         #---------List Parameters used in Simulation::::::
         scenario_var =self.sister_model.employed_scenario_inputs
@@ -4469,13 +4835,13 @@ class ExcelReport():
         second_slice_point = get_column_letter(3 + int(stride-1)) + str(row_i  + 4) # D39
         for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
             for cell in cellObj:
-                w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'  
+                w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Output4'  
 
                 if  cell.row > row_i:        
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = number_format_2
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = number_format_2
                 else:
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = number_format
-                w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = number_format
+                w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
                                                 sz=11.0, color='FF0070C0', scheme='minor')  
 
                
@@ -4566,62 +4932,62 @@ class ExcelReport():
 
                     #italic
                     if cell.row-(start_row+2)>=0:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = 'General'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = 'General'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
                                                         sz=11.0, color='FF0070C0', scheme='minor')   
                     else:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = 'General'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Arial',bold=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = 'General'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Arial',bold=True, 
                                                         sz=11.0, color='FF0070C0', scheme='minor')
                 
                 elif cell.column in ['D'] and cell.row-(start_row+2)>=0:
                     
                     #print(this_row,len(para_list))
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format = self._get_number_formats(para_list[this_row]['number_format'])
-                    w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Output4'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = self._get_number_formats(para_list[this_row]['number_format'])
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')
                 #exclude C
                 else:
                     if not cell.row == start_row + 1:
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Output4'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Output4'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')
                     else:
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Arial',bold=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Arial',bold=True, 
                                                      sz=11.0, color='FF0070C0', scheme='minor')                                 
                     
-                    w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
                    
                 if cell.row-(start_row+2)>=0 and para_list[this_row]['direction']==1 and cell.column in ['B'] :
 
                     if cell.column in ['B']:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = 'General'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = 'General'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
                                                             sz=11.0, color='FFFFCC99', scheme='minor')   
                     else:                     
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FFFFCC99', scheme='minor')
 
                     #.fill = PatternFill(fgColor='FFFFCC99', patternType='solid', fill_type='solid')
                 elif cell.row-(start_row+2)>=0 and para_list[this_row]['direction']==-1 and cell.column in ['B']:
                     if cell.column in ['B']:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = 'General'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = 'General'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
                                                             sz=11.0, color='FFF00000', scheme='minor')   
                     else:                     
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FFF00000', scheme='minor')                                                     
                  
                    #.fill = PatternFill(fgColor='70c4f4', patternType='solid', fill_type='solid')
        
                 elif cell.row-(start_row+2)>=0 and cell.column in ['B']:
                     if cell.column in ['B']:
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format = 'General'
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format = 'General'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, italic=True, 
                                                             sz=11.0, color='FF3F3F3F', scheme='minor')   
                     else:                     
-                        w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=False, 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=False, 
                                                      sz=11.0, color='FF3F3F3F', scheme='minor')       
                 
                    #.fill = PatternFill(fgColor='d0ebfb', patternType='solid', fill_type='solid')
@@ -4807,8 +5173,8 @@ class ExcelReport():
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    #----
-                   value_ =w_sheet['%s%s'%(cell.column, cell.row)].value
-                   #print(w_sheet['%s%s'%(cell.column, cell.row+1)].value)
+                   value_ =w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].value
+                   #print(w_sheet['%s%s'%(get_column_letter(cell.column), cell.row+1)].value)
                    list_.append(value_)
         return list_
         #=$F$103*I102
@@ -4847,7 +5213,8 @@ class ExcelReport():
         for cellObj in wkSheet[first_slice_point:second_slice_point]:
             for cell in cellObj:
                 #get column
-                new_column_letter = cell.column
+                new_column_letter = get_column_letter(cell.column)
+               
                 # |
                 # |
                 # |

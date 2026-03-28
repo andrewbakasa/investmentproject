@@ -11,8 +11,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),  # <--- THIS IS LIKELY MISSING
     path('common/', include('common.urls')),
+    path('forum/', include('businessforum.urls')),
     path('tr/', include('trading.urls')),
     path('beef/', include('beefapp.urls')),
     path('fish/', include('fishapp.urls')),
+    path('comment/', include('comment.urls')),
   ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -27,17 +27,21 @@
    <div class="breadcrumbs" data-aos="fade-in">
    </div>
    <!-- End Breadcrumbs -->
+ 
+
    <div class='container box-element'>
-        <!-- ======= Project Details Section ======= -->
-        {% include 'investments_appraisal/mentor/sections/section_project_details.html' %} 
-        <!-- Each project write it own DATA -->
-        {% if model.uniqueid %}   
-            <!-- ======= Project Details Tabs Section ======= -->
-          {% with template_tab_name=model.uniqueid|stringformat:"s"|add:"app/mentor/sections/section_project_details_tab.html" %}
-            {% include template_tab_name %}
-          {% endwith %}
-        {% endif %}
-   </div>
+    {% include 'investments_appraisal/mentor/sections/section_project_details.html' %} 
+
+    {% if model.uniqueid %}   
+        {% with folder=model.app_folder %}
+            {% with template_path=folder|add:"/mentor/sections/section_project_details_tab.html" %}
+                
+                {% include template_path %}
+                
+            {% endwith %}
+        {% endwith %}
+    {% endif %}
+</div>
   
 </main><!-- End #main -->
 

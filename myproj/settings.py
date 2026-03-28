@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # Your Apps
-    'investments_appraisal.apps.InvestmentsAppraisalConfig',
+    'investments_appraisal.apps.InvestmentsAppraisalConfig',    
+    'businessforum.apps.BusinessforumConfig',
     'trading.apps.TradingConfig',
     'fishapp.apps.FishappConfig',
     'beefapp.apps.BeefappConfig',
     'common.apps.CommonConfig',
+     'comment', 
 ]
 
 SITE_ID = 1

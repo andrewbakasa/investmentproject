@@ -859,32 +859,62 @@ def select_model_specs_page(request, model_id):
 	return HttpResponseRedirect(reverse(reverse_page, args=(model_id,)))
    
 @login_required(login_url="account_login")
-def select_model_specs_page_mentor(request, model_id):
+def select_model_specs_page_mentorDefunct(request, model_id):
 	#Divet to appropriate app
 	# FISH:
 	#BEEF
 	usermodel = get_object_or_404(UserModel,pk=model_id)
-	uniqueid=usermodel.model_type.uniqueid
+	uniqueid=usermodel.model_type.uniqueid # i need beef  not beef01 here that is the mistake
+	print(f'model_views_page_mentor: {model_views_page_mentor.keys()} {uniqueid}')
+	print(f'model_views_page_mentor:uniqueid: {model_views_page_mentor} {uniqueid}')
+	#print(f'reverse: {reverse_page} {uniqueid}')
 	if uniqueid in model_views_page_mentor.keys():
 		if 'ready' in model_views_page_mentor[uniqueid]:
 			if model_views_page_mentor[uniqueid]['ready']== True:
 				reverse_page= model_views_page_mentor[uniqueid]['view']
-				#print(f'reverse: {reverse_page} {uniqueid}')
+				print(f'reverse: {reverse_page} {uniqueid}')
 				return HttpResponseRedirect(reverse(reverse_page, args=(model_id,)))
 			else:
 				messages.success(request, "Project WIP")
-				return HttpResponseRedirect(reverse('models'))
+				return HttpResponseRedirect(reverse('index'))#models
 		else:
 			#ready not define for the model
 			messages.success(request, "parameter ready in in dict:Contact Admin")
-			return HttpResponseRedirect(reverse('models'))
+			return HttpResponseRedirect(reverse('index'))#models
 	else:
 		# model app not yet available
 		messages.success(request, "Project not yet availble")
-		return HttpResponseRedirect(reverse('models'))
+		return HttpResponseRedirect(reverse('index'))#models
 	    
 
-
+@login_required(login_url="account_login")
+def select_model_specs_page_mentor(request, model_id):
+    usermodel = get_object_or_404(UserModel, pk=model_id)
+    
+    # FIX: Strip trailing digits to get the base type (e.g., 'beef01' -> 'beef')
+    raw_id = usermodel.model_type.uniqueid
+    uniqueid = raw_id.rstrip('0123456789') 
+    
+    # Debugging logs
+    print(f'Looking for base key: {uniqueid} (from raw: {raw_id})')
+    
+    # Check if the model type exists in your mapping dictionary
+    model_config = model_views_page_mentor.get(uniqueid)
+    
+    if model_config:
+        # Check if the 'ready' key exists and is True
+        if model_config.get('ready') == True:
+            reverse_page = model_config.get('view')
+            return HttpResponseRedirect(reverse(reverse_page, args=(model_id,)))
+        else:
+            # Case where 'ready' is False or missing
+            msg = "Project WIP" if 'ready' in model_config else "Parameter 'ready' missing in dict: Contact Admin"
+            messages.success(request, msg)
+            return HttpResponseRedirect(reverse('index'))
+    else:
+        # Model app not found in the dictionary
+        messages.success(request, f"Project type '{uniqueid}' not yet available")
+        return HttpResponseRedirect(reverse('index'))
 	
 @login_required(login_url="account_login")
 def update_user_model(request):

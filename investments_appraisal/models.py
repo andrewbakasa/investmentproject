@@ -12,6 +12,14 @@ from datetime import date
 # from store.models import Currency
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
+from django.core.validators import RegexValidator
+
+
+# 1. Define the validator outside the class
+id_regex = RegexValidator(
+    regex=r'^[a-z0-9]+$', 
+    message="ID must be lowercase letters and numbers only (e.g., fish001). No spaces, dashes, or symbols."
+)
 
 def get_curr_year():
     current_year = datetime.datetime.now().year
@@ -211,30 +219,50 @@ class UserModelQuerySet(models.QuerySet):
 class ModelCategory(models.Model):
     name = models.CharField(max_length=60, unique=True)
     description = models.TextField()
-    #this unique id points to apps: ensure there is no break
-    #that lead to crash due to template not found
-    uniqueid = models.CharField(max_length=200, unique=True)# beef01, fish01, 
+    
+    # 2. Apply the validator and the descriptive help_text
+    uniqueid = models.CharField(
+        max_length=200, 
+        unique=True,
+        validators=[id_regex],
+        help_text="Format: [app_name][number]. Examples: **fish001**, **beef011**, **greenhouse008**. "
+                  "This MUST match the exact folder name in your templates directory."
+    )
+    
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     likes = models.IntegerField(default=0)
-    hits = models.IntegerField(default=0)# downloads
-    	
+    hits = models.IntegerField(default=0)
+        
     class Meta:
         ordering = ['-hits']
-
+    
+    @property
+    def app_folder(self):
+        # 1. Strip all numbers from the right side of the string
+        # 2. Add 'app' to the end
+        # Example: 'greenhouse008' -> 'greenhouse' + 'app' = 'greenhouseapp'
+        clean_name = self.uniqueid.rstrip('0123456789')
+        return f"{clean_name}app"
     def __str__(self):
         return str(self.name)
+
+    # 3. Add the save method to 'Auto-Fix' common admin mistakes
+    def save(self, *args, **kwargs):
+        if self.uniqueid:
+            # Force lowercase and remove all whitespace/dashes before saving
+            self.uniqueid = self.uniqueid.lower().strip().replace(" ", "").replace("-", "")
+        super(ModelCategory, self).save(*args, **kwargs)
     
     @property
     def details(self):
-        
-        item = self.modelcategorydetails
-        dict_ ={}
-        dict_['head']=item.head if item.head else ""
-        dict_['sector']=item.sector if item.sector else ""
-        dict_['premium']=item.premium
-        dict_['motto']=item.motto if item.motto else ""
-
-        
+        # Using getattr to prevent a crash if modelcategorydetails doesn't exist
+        item = getattr(self, 'modelcategorydetails', None)
+        dict_ = {}
+        if item:
+            dict_['head'] = item.head if item.head else ""
+            dict_['sector'] = item.sector if item.sector else ""
+            dict_['premium'] = item.premium
+            dict_['motto'] = item.motto if item.motto else ""
         return dict_
 
 
@@ -269,6 +297,18 @@ class UserModel(models.Model):
     design_complete =models.BooleanField(default=False)
     total_params= models.IntegerField(default=0, verbose_name="Simulation Params")
     hits = models.IntegerField(default=0)# downloads
+
+
+    @property
+    def app_folder(self):
+    # Check if model_type exists and get its uniqueid string
+        if self.model_type and hasattr(self.model_type, 'uniqueid'):
+            # We call rstrip on the STRING 'uniqueid', not the object itself
+            clean_name = self.model_type.uniqueid.rstrip('0123456789')
+            return f"{clean_name}app"
+        return "defaultapp" # Fallback if something is missing
+    def __str__(self):
+        return str(self.name)
 
     class Meta:
         ordering = ['-last_modified','-date_created']

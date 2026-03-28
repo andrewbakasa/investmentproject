@@ -74,7 +74,9 @@ class BeefBusinessReport(BaseModel):
         rg = default_rng(4470)
         from scipy.stats import norm
         
-        from scipy import rand, stats
+        from scipy import stats
+        import numpy as np
+        from scipy import stats
 
     
         base_scenario_inputs = {

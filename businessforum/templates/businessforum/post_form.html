@@ -1,0 +1,79 @@
+﻿{% extends 'investments_appraisal/mentor/index.html' %}
+{% load i18n %}
+{% load static %}
+{{% load tags_extras %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% block page_title %}
+    <title id="blog-title">Create New Post for {{investment.description |truncatechars:50}}</title>
+{% endblock %}
+
+{% block stylesheets %}
+<link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_header %}   
+{% endblock %}
+
+
+{% block content %} 
+    <main id="main">
+        <!-- ======= Breadcrumbs ======= -->
+        <div class="breadcrumbs">
+        </div>
+        <!-- End Breadcrumbs -->
+        <!---Removed padding from 70px-- 0px-->
+        <section style= 'padding: 5px 0;' id="projects" class="projects">  
+            <div class="container   box-element" data-aos="fade-up">
+            <!-- ======= Breadcrumbs ======= -->
+                <div class="row">
+                    <ol class="breadcrumb" >
+                        <li class="breadcrumb-item" ><a href="{% url 'index' %}" class ="badge rounded-pill bg-success" 
+                            data-toggle="tooltip" data-placement="bottom" title='Home'><i class="fas fa-home"></i></a></li>
+                                          
+                          
+                            {% if is_user_record_owner %}
+                                <li class="breadcrumb-item" ><a href="{% url 'edit-investment' investment_id %}" class ="badge rounded-pill bg-success" 
+                                    data-toggle="tooltip" data-placement="bottom" title='Manage Business'><i class="fas fa-wrench"></i></a></li>
+                            {% else %}
+                                <li class="breadcrumb-item" ><a href="{% url 'investment-details' investment_id %}" class ="badge rounded-pill bg-success" 
+                                    data-toggle="tooltip" data-placement="bottom" title='View Investment'><i class="fas fa-shekel-sign"></i></a></li>
+                       
+                          
+                            {% endif %}
+                        <li class="breadcrumb-item"><a href="{% url 'investment-blogs' investment_id %}" class ="badge rounded-pill bg-success">{% trans 'Blogs' %}</a></li>
+                  </ol>      
+                </div> 
+                <h5>{{investment.description |truncatechars:50}} valued at  <b>${{investment.total_value |intcomma}}</b></h5>
+                <hr>
+                <div class="content-section">
+                    <form method="POST" >
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                            <div class="col-sm-10  {% if form.title.errors %} has-error{% endif %}">
+                              {{ form.title|add_class:"form-control" }}
+                              {% for error in form.title.errors %}
+                              <span class="help-block">{{ error }}</span>
+                              {% endfor %}
+                            </div>
+                        </div>
+                       </br>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+                            <div class="col-sm-10  {% if form.content.errors %} has-error{% endif %}">
+                              {{ form.content|add_class:"form-control" }}
+                              {% for error in form.content.errors %}
+                              <span class="help-block">{{ error }}</span>
+                              {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-outline-info" type="submit">Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+</section><!-- End User Section -->
+</main><!-- End #main -->
+{%endblock%}

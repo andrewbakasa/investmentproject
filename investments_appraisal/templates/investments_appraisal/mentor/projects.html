@@ -4,6 +4,7 @@
 {% load tags_extras %}
 {% load widget_tweaks %}
 {% load humanize %}
+
 {% block page_title %}
     <title>Projects</title>
 {% endblock %}
@@ -12,61 +13,42 @@
 <link href="{% static 'mentor/assets/css/search.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block content_header %}
-   
-{% endblock %}
-
-
-
 {% block content %}
-
- 
 <main id="main">
-  <!-- ======= Breadcrumbs ======= -->
-  <div class="breadcrumbs">
-     
-  </div><!-- End Breadcrumbs -->
+  <div class="breadcrumbs"></div>
+  {% include 'investments_appraisal/mentor/sections/section_projects.html' %} 
+</main>
+{% endblock content %}
 
- <!-- ======= Projects Section ======= -->  
-   {% include 'investments_appraisal/mentor/sections/section_projects.html' %} 
-  
- 
-</main><!-- End #main -->
+{% include 'investments_appraisal/mentor/sections/section_footer.html' %}
+<div id="preloader"></div>
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+{% block scripts %}
+    <script src="{% static 'mentor/assets/js/search.js' %}"></script>
+    <script>
+        var display_projects_ajax_url = "{% url 'display_projects_ajax' %}";
 
-{%endblock content%}
+        // --- NEW UTILITY FOR UNIQUEID ---
+        function getStrippedId(id) {
+            if (!id) return "default";
+            // Strips all digits: e.g., beef01 -> beef
+            return id.toString().replace(/[0-9]/g, '');
+        }
 
-
-
- <!-- ======= Footer ======= --> 
- {% include 'investments_appraisal/mentor/sections/section_footer.html' %}
- 
-  
-  <div id="preloader"></div>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  {% block scripts %}
-      <!-- Search Button JS -->
-      <script src="{% static 'mentor/assets/js/search.js' %}"></script>
-      <script>
-         //first timme
-          var display_projects_ajax_url= "{% url 'display_projects_ajax' %}"
-          function updatePaging2(data){
-            var has_previous=''
-            console.log(data)
+        function updatePaging2(data){
+            var has_previous = '';
             if (data.has_previous){
-                has_previous= `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
-                    <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
-            
+                has_previous = `<li><a class='a_page_nav' style="margin-left: 5px;" href ="1">&laquo;first</a></li>
+                                <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.previous_page_number}">previous</a></li>`;
             }       
-            var has_next= ''          
+            var has_next = '';          
             if (data.has_next){
-                has_next= ` <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
-                        <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>
-                    `; 
+                has_next = `<li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.next_page_number}">next</a></li>
+                            <li><a class='a_page_nav' style="margin-left: 5px;" href ="${data.last}">last &raquo;</a></li>`; 
             }       
-            a_html=`
-            <div id= "page_section" class="pagination">
+            var a_html = `
+            <div id="page_section" class="pagination">
                 <ul class="pagination newpagination">
                     ${has_previous}            
                     <span class="current" style="margin-left:5px">
@@ -74,268 +56,143 @@
                     </span>                   
                     ${has_next}
                 </ul>
-                </div>`
-                $("#page_section").html(a_html)
-          }
-   
-          function removeClass(objClicked){
-            $("#page_section ul").children().each(function() {
-                var attr = $(this).find('a').removeClass("pagination-active");
-            })
-            objClicked.addClass('pagination-active');
+            </div>`;
+            $("#page_section").html(a_html);
+        }
 
-          }
-          $(document).ready(function (){ 
-              $("#investments a:first").addClass( "active") 
-              $("#projects a").addClass( "active") 
-                            
-          })
-          $("body").on("keyup", "#search", function(){
-          //$("#search").on("keyup", function() {
-            var search_val = $(this).val().toLowerCase();
-            search_val=search_val.replace(/[^a-zA-Z0-9]/g,"")
-            //console.log('stripped:', search_val)
+        $(document).ready(function (){ 
+            $("#investments a:first").addClass("active");
+            $("#projects a").addClass("active");
+        });
+
+        // SEARCH KEYUP HANDLER
+        $("body").on("keyup", "#search", function(){
+            var search_val = $(this).val().toLowerCase().replace(/[^a-zA-Z0-9]/g,"");
+            
             if (search_val.length == 0){
-                //change here
-                display_projects_ajax_url = "{% url 'display_projects_ajax' %}"
-                //clear value
-                $('#total_projects_searched').val('')
-          
-            }else{
-              //change here
-              display_projects_ajax_url = `{% url 'project_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
-          
+                display_projects_ajax_url = "{% url 'display_projects_ajax' %}";
+                $('#total_projects_searched').val('');
+            } else {
+                display_projects_ajax_url = `{% url 'project_search_ajax' 12345 %}`.replace(/12345/, search_val.toString()); 
             }
-             // click first page
-            page_no=1
 
-             // ajax call
-             $.ajax({
-                    type: "POST",
-                    // define url name
-                    url: display_projects_ajax_url, 
-                    data : {    
-                        page_no : page_no, 
-                        csrfmiddlewaretoken: csrftoken,
-                    },
-                    // handle a successful response
-                    success: function (response) {
-                        $('#project_div').html('')
-                        var num_of_pages=1
-                        if (response.data.per_page){
-                            per_page=response.data.per_page
-                        }
+            var page_no = 1;
+            $.ajax({
+                type: "POST",
+                url: display_projects_ajax_url, 
+                data : { page_no : page_no, csrfmiddlewaretoken: csrftoken },
+                success: function (response) {
+                    $('#project_div').html('');
+                    var records = response.data.totalrecords == 0 ? "No records found" : 
+                                 (response.data.totalrecords == 1 ? "1 record found" : `${response.data.totalrecords} records found`);
+                    
+                    $('#total_projects_searched').html(`<label id="total_projects_searched"><i>${records}</i></label>`);
+                    updatePaging2(response.data);
+                    
+                    renderProjectCards(response.data.results);
+                }
+            });
+        });
 
-                        if (response.data.num_of_pages){
-                          num_of_pages=response.data.num_of_pages
-                        }
-                        var records
-                        if (response.data.totalrecords == 0) {
-                          records= `No records found`
-                          html_text= `<div class="col-lg-12 text-center"><p>${records}</p></div>`
-                          $('#project_div').html(html_text)
-                        }else if(response.data.totalrecords == 1){
-                          records= `${response.data.totalrecords} record found`;
-                        }else{
-                          records= `${response.data.totalrecords} records found`;
-                        }
-                        
-                        html_a= `<label id="total_projects_searched"><i>${records}</i></label>`
-                        $('#total_projects_searched').html(html_a)
-                        
-                        updatePaging2(response.data)
-                        var base_counter =(parseInt(page_no)-1)*per_page
-                        var counter=base_counter
-                        $.each(response.data.results, function(i, val) {
-                            var simulation_checked=''
-                            if (val.simulation_run) {
-                                simulation_checked='checked'
-                            }
-                            var design_complete_checked=''
-                            if (val.design_complete) {
-                                design_complete_checked='checked'
-                            }
-                            var js_date_created = new Date(val.date_created)
-                            //append to post
-                           
-                            counter=  counter+1
-                            var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
-                            imgval= baseimageURL + val.uniqueid +'.jpg'
-                            
-                            var descript_trunc =truncChar(val.description,100)
-                            var name_trunc =truncChar(val.name,25)
-                            a_html=`
-                            <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                              <div class="project-item umodel-item">
-                                <img src="${imgval}" class="img-fluid" alt="...">
-                                <div class="project-content">    
-                                  <h3><a href="/pr-details/${val.id}/"  class ="badge rounded-pill bg-warning">${name_trunc}</a></h3>
-                                  <p>${descript_trunc}</p>
-                                  <div class="trainer d-flex justify-content-between align-items-center">
-                                    <div class="trainer-rank d-flex align-items-center">
-                                      <i class="bx bx-download"></i>&nbsp;${val.hits}
-                                    </div>
-                                    <div class="trainer-rank d-flex align-items-center">
-                                        <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" 
-                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
-                                        </a>
-                                    </div>
-                                  </div>
+        // SHARED RENDERING FUNCTION
+        function renderProjectCards(results) {
+            $.each(results, function(i, val) {
+                var baseimageURL = "{% static 'mentor/assets/img/projects/' %}";
+                
+                // CORRECTION: Strip digits for the image path
+               // var strippedId = getStrippedId(val.uniqueid);
+                //var imgval = baseimageURL + strippedId + '.jpg';
+                // Ensure uniqueid exists before stripping
+                var strippedId = val.uniqueid ? getStrippedId(val.uniqueid) : 'default';
+                var imgval = baseimageURL + strippedId + '.jpg';
+                
+                var descript_trunc = truncChar(val.description, 100);
+                var name_trunc = truncChar(val.name, 25);
+                
+                var card_html = `
+                <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
+                    <div class="project-item umodel-item">
+                        <img src="${imgval}" class="img-fluid" alt="${val.name}">
+                        <div class="project-content">    
+                            <h3><a href="/pr-details/${val.id}/" class="badge rounded-pill bg-warning">${name_trunc}</a></h3>
+                            <p>${descript_trunc}</p>
+                            <div class="trainer d-flex justify-content-between align-items-center">
+                                <div class="trainer-rank d-flex align-items-center">
+                                    <i class="bx bx-download"></i>&nbsp;${val.hits}
                                 </div>
-                              </div>
-                            </div> ` ;
-                          
-                            // add each model on every line
-                            $('#project_div').append(a_html)
-                        });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
-                }); 
-          
-          
-          });
-         
-          function truncChar(str,length){
-              var myTruncatedString = str.substring(0,length-1);              
-              if (str.length > myTruncatedString.length){
-                return myTruncatedString + "..."
-              }
-              return myTruncatedString
-          }
-          function getToken(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
+                                <div class="trainer-rank d-flex align-items-center">
+                                    <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" style="color:inherit">
+                                        <i class="bx bx-heart"></i>&nbsp;${val.likes}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                $('#project_div').append(card_html);
+            });
+        }
+
+        function truncChar(str, length){
+            if (!str) return "";
+            var myTruncatedString = str.substring(0, length - 1);              
+            return str.length > myTruncatedString.length ? myTruncatedString + "..." : myTruncatedString;
+        }
+
+        function getToken(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
                     }
                 }
-                return cookieValue;
             }
-          var csrftoken = getToken('csrftoken');
-          $(document).ready(function (){     
-          
-          $('body').on('click', '.a_page_nav', function (event) {
-                // preventing default actions
-                console.log($(this).attr('href'))
-                event.preventDefault();
-                var page_no = $(this).attr('href');
-                var objthis = $(this)
-                // ajax call
-                $.ajax({
-                    type: "POST",
-                    // define url name
-                    url: display_projects_ajax_url, 
-                    data : {    
-                        page_no : page_no, 
-                        csrfmiddlewaretoken: csrftoken,
-                    },
-                    // handle a successful response
-                    success: function (response) {
-                      updatePaging2(response.data)
-                        //removeClass(objthis)
-                        $('#project_div').html('')
-                        if (response.data.per_page){
-                            per_page=response.data.per_page
-                        }
-                        var base_counter =(parseInt(page_no)-1)*per_page
-                        var counter=base_counter
-                        $.each(response.data.results, function(i, val) {
-                            var simulation_checked=''
-                            if (val.simulation_run) {
-                                simulation_checked='checked'
-                            }
-                            var design_complete_checked=''
-                            if (val.design_complete) {
-                                design_complete_checked='checked'
-                            }
-                            var js_date_created = new Date(val.date_created)
-                            //append to post
-                           
-                            counter=  counter+1
-                            var baseimageURL = "{% static 'mentor/assets/img/projects/' %}"
-                            imgval= baseimageURL + val.uniqueid +'.jpg'
-                           
-                            var descript_trunc =truncChar(val.description,100)
-                            var name_trunc =truncChar(val.name,25)
-                            a_html=`
-                            <div id="div-${val.id}" class="col-lg-4 col-md-6 d-flex align-items-stretch umodels">
-                              <div class="project-item umodel-item">
-                                <img src="${imgval}" class="img-fluid" alt="...">
-                                <div class="project-content">    
-                                  <h3><a href="/pr-details/${val.id}/" class ="badge rounded-pill bg-warning" >${name_trunc}</a></h3>
-                                  <p>${descript_trunc}</p>
-                                  <div class="trainer d-flex justify-content-between align-items-center">
-                                    <div class="trainer-rank d-flex align-items-center">
-                                      <i class="bx bx-download"></i>&nbsp;${val.hits}
-                                    </div>
-                                    <div class="trainer-rank d-flex align-items-center">
-                                        <a class="model-likes" href="#" data-url="/update_model_likes/${val.id}/" 
-                                          style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                                          title='Like'><i class="bx bx-heart"></i>&nbsp;${val.likes}
-                                        </a>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div> ` ;
-                          
-                            // add each model on every line
-                            $('#project_div').append(a_html)
-                        });
-                        },
-                        error: function () {
-                            alert('Error Occured');
-                        }
-                }); 
+            return cookieValue;
+        }
+        var csrftoken = getToken('csrftoken');
+
+        // PAGINATION CLICK HANDLER
+        $('body').on('click', '.a_page_nav', function (event) {
+            event.preventDefault();
+            var page_no = $(this).attr('href');
+            $.ajax({
+                type: "POST",
+                url: display_projects_ajax_url, 
+                data : { page_no : page_no, csrfmiddlewaretoken: csrftoken },
+                success: function (response) {
+                    updatePaging2(response.data);
+                    $('#project_div').html('');
+                    renderProjectCards(response.data.results);
+                }
             });
-          
-          
-         
-          $('body').on("click",".model-likes",function(e){
-                event.preventDefault();
-                e.stopPropagation()
-                var url = $(this).attr('data-url');
-                // ajax call
-                $.ajax({
-                  type: "POST",
-                  url: url, 
-                  data : {  
-                    csrfmiddlewaretoken: csrftoken,
-                  },
-                  success: function(response){
-                      if(response.error == false){
-                          const ref="#div-" + response.data.id
-                          val= $(ref).children().find('.trainer').find('a')
-                        
-                          htmal_a= `<a class="model-likes" href="#" data-url="/update_model_likes/${response.data.id}/" 
-                            style="color:inherit" data-toggle="tooltip" data-placement="bottom" 
-                            title='Like'><i class="bx bx-heart"></i>&nbsp;${response.data.likes}`;
-                          $(val).html(htmal_a)
-                      }
-                  //END SUCCESS
-                  }
-              // END AJAX
-              })
-              return false;
-          })
-          
-          })
-      </script>
+        });
 
-  {% endblock %}
+        // LIKES HANDLER
+        $('body').on("click", ".model-likes", function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var url = $(this).attr('data-url');
+            $.ajax({
+                type: "POST",
+                url: url, 
+                data : { csrfmiddlewaretoken: csrftoken },
+                success: function(response){
+                    if(response.error == false){
+                        const ref = "#div-" + response.data.id;
+                        var link = $(ref).find('.model-likes');
+                        link.html(`<i class="bx bx-heart"></i>&nbsp;${response.data.likes}`);
+                    }
+                }
+            });
+            return false;
+        });
+    </script>
+{% endblock %}
 
-  {% block content_custom_menu_navbar %}
-  <!-- ======= Header ======= -->
-  {% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
-  
-  {% endblock %}
-
+{% block content_custom_menu_navbar %}
+{% include 'investments_appraisal/mentor/sections/section_nav_search.html' %}
+{% endblock %}

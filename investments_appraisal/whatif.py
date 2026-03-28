@@ -4,13 +4,25 @@ import os
 import time
 import numpy as np
 import pandas as pd
-from sklearn.model_selection._search import ParameterGrid
+#from sklearn.model_selection._search import ParameterGrid to reduce budle 615MB on vercel
 #from sklearn.model_selection._search import ParameterGrid
 import copy
 from tqdm import tqdm
 
 from scipy import stats
 import numpy as np
+
+
+import itertools
+
+def manual_parameter_grid(param_dict):
+    """Replacement for sklearn ParameterGrid"""
+    keys = param_dict.keys()
+    values = param_dict.values()
+    for instance in itertools.product(*values):
+        yield dict(zip(keys, instance))
+
+
 
 # If 'rand' was being used in the code below, 
 # we define it here using the modern NumPy equivalent
@@ -68,7 +80,11 @@ class BookstoreModel():
 def parallel_data_table(model, scenario_inputs, outputs):
     # Clone the model
     model_clone = copy.deepcopy(model)
-    dt_param_grid = list(ParameterGrid(scenario_inputs))
+   
+    # In your code, replace:
+    # dt_param_grid = list(ParameterGrid(scenario_inputs))
+    # WITH:
+    dt_param_grid = list(manual_parameter_grid(scenario_inputs))
     # Scenario loop
     args = []
     for i in tqdm(range(len(dt_param_grid))):
@@ -131,7 +147,11 @@ def data_table(model, scenario_inputs, outputs):
     model_clone = copy.deepcopy(model)
     
     # Create parameter grid
-    dt_param_grid = list(ParameterGrid(scenario_inputs))
+    #dt_param_grid = list(ParameterGrid(scenario_inputs))
+    # In your code, replace:
+    # dt_param_grid = list(ParameterGrid(scenario_inputs))
+    # WITH:
+    dt_param_grid = list(manual_parameter_grid(scenario_inputs))
     
     # Create the table as a list of dictionaries
     results = []
@@ -294,7 +314,9 @@ def simulate(model, random_inputs, outputs, scenario_inputs=None, keep_random_in
     # Check if multiple scenarios
     if scenario_inputs is not None:
         # Create parameter grid for scenario inputs
-        sim_param_grid = list(ParameterGrid(scenario_inputs))
+        #sim_param_grid = list(ParameterGrid(scenario_inputs))
+  
+        sim_param_grid = list(manual_parameter_grid(scenario_inputs))
         # Scenario loop
         #for params in sim_param_grid:
 
@@ -369,7 +391,7 @@ def simulate(model, random_inputs, outputs, scenario_inputs=None, keep_random_in
 
         return results
 
-def parallel_simulation(request, model, random_inputs, outputs, scenario_inputs=None, total_runs=10000,keep_random_inputs=False):
+def parallel_simulation2(request, model, random_inputs, outputs, scenario_inputs=None, total_runs=10000,keep_random_inputs=False):
     
     #request.session['count']=0
      # Clone the model
@@ -397,7 +419,8 @@ def parallel_simulation(request, model, random_inputs, outputs, scenario_inputs=
         #sim_param_grid=[]
         sim_param={}
         for item in scenario_inputs.keys():           
-            pos=int(len(scenario_inputs[item])* rand())
+            #pos=int(len(scenario_inputs[item])* rand())
+            pos = int(len(scenario_inputs[item]) * np.random.random())
             sim_param[item]= scenario_inputs[item][pos] 
         
         args.append({'scenario_inputs': scenario_inputs, 'model_clone': model_clone, 
@@ -480,6 +503,60 @@ def parallel_simulation(request, model, random_inputs, outputs, scenario_inputs=
    
     return res
 
+
+
+def parallel_simulation(request, model, random_inputs, outputs, scenario_inputs=None, total_runs=10000, keep_random_inputs=False):
+    # Clone the model
+    model_clone = copy.deepcopy(model)
+    if random_inputs is not None:
+        model_clone.update(random_inputs)
+    
+    # Store raw simulation input values if desired
+    scenario_base_vals = vars(model_clone) if keep_random_inputs else vars(model)
+    
+    # Initialize session tracking
+    request.session['count'] = 0
+    request.session['total_runs'] = total_runs
+    request.session.save()
+
+    args = []
+    for i in range(total_runs):
+        sim_param = {}
+        for item in scenario_inputs.keys():           
+            # FIX: Use np.random.random() instead of the deprecated rand()
+            # This selects a random index from the available scenario inputs
+            pos = int(len(scenario_inputs[item]) * np.random.random())
+            sim_param[item] = scenario_inputs[item][pos] 
+        
+        args.append({
+            'scenario_inputs': scenario_inputs, 
+            'model_clone': model_clone, 
+            'scenario_base_vals': scenario_base_vals, 
+            'outputs': outputs, 
+            'sim_param': sim_param, 
+            'scenario_num': i 
+        })
+    
+    cpu_no = multiprocessing.cpu_count()
+    
+    # Use a context manager for the Pool to ensure it closes properly
+    res = []
+    with multiprocessing.Pool(cpu_no) as pool:
+        # imap allows us to iterate as results finish
+        for i, result in enumerate(tqdm(pool.imap(simulation_sample, args), total=total_runs)):
+            res.append(result)
+            
+            # PERFORMANCE TIP: Only save the session every 100 iterations 
+            # to avoid database bottlenecks
+            if i % 100 == 0:
+                request.session['count'] = i
+                request.session.save()
+    
+    # Final session update
+    request.session['count'] = total_runs
+    request.session.save()
+      
+    return res
 def simulation_sample(args):
     scenario_inputs = args['scenario_inputs']
     model_clone = args['model_clone']

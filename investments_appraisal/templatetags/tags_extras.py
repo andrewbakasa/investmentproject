@@ -46,15 +46,56 @@ def userInvestorMethod(model, user):
     # Logic: Check if the user is an investor in this specific model
     return "" 
 
+
+# --- MISSING TAGS FOR INVESTMENT DETAILS ---
+
+@register.simple_tag
+def UserIsInvestorStatement(model, user):
+    """Returns a string describing the user's relationship to the investment."""
+    if not user or not user.is_authenticated:
+        return 'I am NOT an Investor'
+    return model.userIsInvestorStatement(user)
+
+@register.simple_tag
+def userInvestorEngagedMethod(model, user):
+    """Checks if the user has an 'engagement' status."""
+    if not user or not user.is_authenticated:
+        return False
+    # Using your model's related set
+    return model.investor_set.filter(user=user, application_status="engagement").exists()
+
+@register.simple_tag
+def userInvestorRejectedMethod(model, user):
+    """Checks if the user is rejected or if the investment is closed."""
+    if not user or not user.is_authenticated:
+        return False
+    
+    # Check if rejected status exists
+    is_rejected = model.investor_set.filter(user=user, application_status="rejected").exists()
+    
+    # Check if investment is closed (prevents editing/new actions)
+    is_closed = getattr(model, 'closed_status', False)
+    
+    return is_rejected or is_closed
 @register.simple_tag
 def userIsOwnerAttrMethod(model, user):
-    """
-    Used for the 'Entrepreneur' span.
-    Logic: Return 'hidden' or a specific style if the user isn't the owner.
-    """
-    if model.user == user:
-        return "" # or whatever attribute makes it visible
+    # Use 'creater' as defined in your model
+    if hasattr(model, 'creater') and model.creater == user:
+        return "" 
     return "hidden"
+
+@register.simple_tag
+def UserIsInvestorStake(model, user):
+    """
+    Calls the logic defined in the Investment model 
+    to get the percentage stake.
+    """
+    if not user or not user.is_authenticated:
+        return 0
+    # This calls the method you just showed me in the model
+    return model.userIsInvestorStake(user)
+
+
 
 @register.simple_tag
 def userInvestorValueMethod(model, user):
@@ -65,6 +106,7 @@ def userInvestorValueMethod(model, user):
 def userInvestorPercentMethod(model, user):
     """Used for the counter text next to the cut icon."""
     return "0%"
+
 
 @register.filter
 def shrink_num(value):
@@ -84,3 +126,15 @@ def shrink_num(value):
     if value >= 1_000:
         return f"{value / 1_000:.1f}k"
     return value
+
+
+    """
+    Checks if the user has an active stake in the current model/investment.
+    Returns True/False or a specific value based on your requirements.
+    """
+    if not user or not user.is_authenticated:
+        return False
+    
+    # You can customize this logic later to check your Investment/Trade models
+    # For now, we return False to stop the crash and keep the page loading.
+    return False

@@ -198,6 +198,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             if item in self.sister_model.feedlot_design_parameters:
                 _unit =self.sister_model.feedlot_design_parameters[item]['units']
+                print("check feedlot", _unit)
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
                 self._write_row_title_and_value3(w_sheet, colHeader, colValue, colUnits, row_index, 
@@ -942,7 +943,7 @@ class BeefExcelReport(ExcelReport):
                     #loop each cell of this row D15:G15
                     for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                         for cell in cellObj:
-                            new_column_letter = cell.column # J
+                            new_column_letter = get_column_letter(cell.column) # J
                             prev_col=column_index_from_string(new_column_letter)-1
                             prev_letter= get_column_letter(prev_col)
                             prev_targeted_cell = prev_letter + str(r_index2)
@@ -978,7 +979,7 @@ class BeefExcelReport(ExcelReport):
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
                        
-                        new_column_letter = cell.column # J
+                        new_column_letter = get_column_letter(cell.column) # J
                         prev_col=column_index_from_string(new_column_letter)-1
                         prev_letter= get_column_letter(prev_col)
                         prev_row = cell.row-1
@@ -999,7 +1000,7 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        new_column_letter = cell.column # J
+                        new_column_letter = get_column_letter(cell.column) # J
                         prev_row = cell.row-1 
                         current_constr_cell = new_column_letter + str(prev_row)
                     
@@ -1052,7 +1053,7 @@ class BeefExcelReport(ExcelReport):
                     #----------->
                     for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                         for cell in cellObj:
-                            new_column_letter = cell.column # J
+                            new_column_letter = get_column_letter(cell.column) # J
                             prev_col=column_index_from_string(new_column_letter)-1
                             prev_letter= get_column_letter(prev_col)
                             prev_targeted_cell = prev_letter + str(r_index2)
@@ -1071,7 +1072,7 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        new_column_letter = cell.column # J
+                        new_column_letter = get_column_letter(cell.column) # J
                         prev_row = cell.row-1                     
                         w_sheet['%s%s'%(new_column_letter, cell.row)] =  '=0' 
                         w_sheet['%s%s'%(new_column_letter, cell.row)].style = 'Linkedcell'
@@ -1092,10 +1093,10 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        pens_targeted_cell = cell.column + '$' + str(cum_pens_row_index) if found_state_pens else '0'
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '=' + str(pens_targeted_cell) 
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Linkedcell'
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                        pens_targeted_cell = get_column_letter(cell.column) + '$' + str(cum_pens_row_index) if found_state_pens else '0'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + str(pens_targeted_cell) 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Linkedcell'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
               
 
         if item=='num_of_workers':
@@ -1114,10 +1115,10 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        pens_targeted_cell = cell.column + '$' + str(targeted_pens_row_index) if found_state_pens else '0'
-                        w_sheet['%s%s'%(cell.column, cell.row)] ='=CEILING('+ pens_targeted_cell +'*'+ num_of_workers_per_pen_cell +',1)' 
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                        pens_targeted_cell = get_column_letter(cell.column) + '$' + str(targeted_pens_row_index) if found_state_pens else '0'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] ='=CEILING('+ pens_targeted_cell +'*'+ num_of_workers_per_pen_cell +',1)' 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
               
             
         if item=='num_of_supervisors_technicians':
@@ -1133,10 +1134,10 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        num_of_workers_per_pen_cell = cell.column + '$' + str(workers_r_index ) if found_state_workers else '0'
-                        w_sheet['%s%s'%(cell.column, cell.row)] ='=IF(' +  num_of_workers_per_pen_cell +' >0,INT(' + num_of_workers_per_pen_cell+ '/5),0)' 
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
-                        w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
+                        num_of_workers_per_pen_cell = get_column_letter(cell.column) + '$' + str(workers_r_index ) if found_state_workers else '0'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] ='=IF(' +  num_of_workers_per_pen_cell +' >0,INT(' + num_of_workers_per_pen_cell+ '/5),0)' 
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
               
 
         
@@ -1198,6 +1199,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             if item in self.sister_model.investment_cost:
                 _unit =self.sister_model.investment_cost[item]['units']
+                print("check invest", _unit)
                 _unit = _unit.upper()
                 # print(item,_unit,self._get_number_formats(_unit))
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -1225,7 +1227,7 @@ class BeefExcelReport(ExcelReport):
         #cost_of_pens_constructed
         return row_index
 
-    def _populate_investment_parameters_header_rows(self, w_sheet):
+    def _populate_investment_parameters_header_rowsDefunct(self, w_sheet):
 
          #-----------------------------------------------------------------
         r_index, _, found_state= self._retrieve_cell_row_colm('investment_cost','total_land_for_pens')
@@ -1244,13 +1246,51 @@ class BeefExcelReport(ExcelReport):
             i=0
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    w_sheet['%s%s'%(cell.column, cell.row)] = headers[i] 
-                    w_sheet['%s%s'%(cell.column, cell.row)].fill = PatternFill(fill_type="solid", fgColor="70c4f4")
-                    w_sheet['%s%s'%(cell.column, cell.row)].font = Font(name='Calibri',bold=True,  scheme='minor', sz=11.0)
-                    w_sheet['%s%s'%(cell.column, cell.row)].alignment = Alignment(wrap_text=True,horizontal='left', vertical='top',)
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = headers[i] 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].fill = PatternFill(fill_type="solid", fgColor="70c4f4")
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].font = Font(name='Calibri',bold=True,  scheme='minor', sz=11.0)
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].alignment = Alignment(wrap_text=True,horizontal='left', vertical='top',)
                     i += 1
     
     
+
+    def _populate_investment_parameters_header_rows(self, w_sheet):
+        # Retrieve the starting row index
+        r_index, _, found_state = self._retrieve_cell_row_colm('investment_cost', 'total_land_for_pens')
+
+        if found_state:
+            # 1. Build the headers list
+            headers = [
+                self.sister_model.cattle_business_options[item]['heading'] 
+                for item in self.sister_model.cattle_business_options.keys()
+            ]
+            
+            total_len = len(headers)
+            start_col = 9  # Column I
+            end_col = start_col + total_len - 1
+            
+            # 2. Define the exact range string
+            first_slice = f"{get_column_letter(start_col)}{r_index}"
+            second_slice = f"{get_column_letter(end_col)}{r_index}"
+            
+            # 3. Iterate and style cells directly
+            i = 0
+            # Access the first (and only) row of the range
+            cells_in_row = w_sheet[first_slice:second_slice][0] 
+            
+            # Setup styling objects once (outside the loop) for better performance
+            header_fill = PatternFill(fill_type="solid", fgColor="70c4f4")
+            header_font = Font(name='Calibri', bold=True, scheme='minor', sz=11.0)
+            header_align = Alignment(wrap_text=True, horizontal='left', vertical='top')
+
+            for cell in cells_in_row:
+                if i < len(headers):
+                    # FIX: Set attributes directly on the 'cell' object
+                    cell.value = headers[i]
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_align
+                    i += 1
     
     def _link_feedlot_design_parameters_to_model_selected(self, w_sheet):
        
@@ -1331,6 +1371,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             if item in self._production_inventory:
                 _unit =self._production_inventory[item]['units']
+                print("check prod", _unit)
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
                 self._write_row_title_and_value3(w_sheet, colHeader, colValue, colUnits, row_index, 
@@ -1369,10 +1410,10 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        pens_targeted_cell = cell.column + '$' + str(targeted_pens_row_index) if found_state_pens else '0'
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '=' + str(pens_targeted_cell) + '*' + cost_of_pen_construction_cell \
+                        pens_targeted_cell = get_column_letter(cell.column) + '$' + str(targeted_pens_row_index) if found_state_pens else '0'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + str(pens_targeted_cell) + '*' + cost_of_pen_construction_cell \
                                                                       + '/' + str(thousand_cell)
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
                         #w_sheet['%s%s'%(new_column_letter, cell.row)].number_format = 'General
         if item=='cost_of_land':
             r_index, c_index, found_state= self._retrieve_cell_row_colm('investment_cost','total_land_required')
@@ -1396,14 +1437,14 @@ class BeefExcelReport(ExcelReport):
                 #----------->
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        investment_roll_out_flag_cell = cell.column + '$' + str(roll_out_r_index ) if found_state_roll_out else '0'
+                        investment_roll_out_flag_cell = get_column_letter(cell.column) + '$' + str(roll_out_r_index ) if found_state_roll_out else '0'
 
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ total_land_required_cell +'>0, MAX(' \
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ total_land_required_cell +'>0, MAX(' \
                                                                         + total_land_required_cell + ',' \
                                                                         + total_land_for_pens_cell + ')*' + cost_of_land_per_sqm_cell \
                                                                         + '*'+  investment_roll_out_flag_cell   + '/' \
                                                                         + thousand_cell +',0)'
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
                         
                         #w_s 
         if item=='investment_cost_of_land':
@@ -1419,10 +1460,10 @@ class BeefExcelReport(ExcelReport):
                
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        cost_of_land_cell = cell.column + '$' + str(cost_of_land_r_index ) if found_state_cost_of_land else '0'
+                        cost_of_land_cell = get_column_letter(cell.column) + '$' + str(cost_of_land_r_index ) if found_state_cost_of_land else '0'
 
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '='+ cost_of_land_cell
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ cost_of_land_cell
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
                         
         
         if item=='cif_cost_of_machinery':
@@ -1441,11 +1482,11 @@ class BeefExcelReport(ExcelReport):
                
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        pens_targeted_for_construction_cell = cell.column + '$' + str(pens_targeted_r_index ) if found_state_pens_targeted else '0'
+                        pens_targeted_for_construction_cell = get_column_letter(cell.column) + '$' + str(pens_targeted_r_index ) if found_state_pens_targeted else '0'
            
-                        w_sheet['%s%s'%(cell.column, cell.row)] = '='+ cost_of_machinery_per_pen_cell +'*' \
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ cost_of_machinery_per_pen_cell +'*' \
                                                                         + pens_targeted_for_construction_cell + '/' + thousand_cell  
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
         
         if item=='investment_cost_of_buildings':            
             r_index, c_index, found_state= self._retrieve_cell_row_colm('investment_cost','cost_of_building_per_sqm')
@@ -1466,12 +1507,12 @@ class BeefExcelReport(ExcelReport):
                 
                 for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                     for cell in cellObj:
-                        investment_roll_out_flag_cell = cell.column + '$' + str(roll_out_r_index ) if found_state_roll_out else '0'
+                        investment_roll_out_flag_cell = get_column_letter(cell.column) + '$' + str(roll_out_r_index ) if found_state_roll_out else '0'
 
-                        w_sheet['%s%s'%(cell.column, cell.row)] ='='+ cost_of_building_per_sqm_cell + '*' \
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] ='='+ cost_of_building_per_sqm_cell + '*' \
                                                                     + total_land_for_pens_cell \
                                                                     + '*' + investment_roll_out_flag_cell  + '/' + thousand_cell  
-                        w_sheet['%s%s'%(cell.column, cell.row)].style = 'Input'
+                        w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Input'
  
     def _write_sens_sheet(self, wb):
         #---------------------------Worksheet 1---------------------------
@@ -1807,7 +1848,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("add output", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -1872,6 +1913,7 @@ class BeefExcelReport(ExcelReport):
         for item in self.sister_model.cost_real.keys():
             if item in self.sister_model.cost_real:
                 _unit =self.sister_model.cost_real[item]['units']
+                print("check cost", _unit)
                 _unit = _unit.upper() if _unit != None else 'BLANK'
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
                 self._write_row_title_and_value3(w_sheet, colHeader, colValue, colUnits, row_index, 
@@ -2307,7 +2349,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("purcha", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -2385,23 +2427,23 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    header_cell = get_column_letter(cell.column) + '$' + str(header_r_index) if found_state_header else '0'
        
                     #----
-                    change_in_price_cell = cell.column + '$' \
+                    change_in_price_cell = get_column_letter(cell.column) + '$' \
                         + str(change_in_price_r_index) if found_state_change_in_price else '0'
 
                    
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col = column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_real_cif_cell = prev_letter + str(cell.row) 
                     #=IF(I107=Inputs!$F$32; $F$111;H112*(1+I110)
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
                                                                + cost_of_imports_cell +',' \
                                                                + prev_real_cif_cell + '*(1+'+ change_in_price_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
         
         #4. copy import change in prices
@@ -2434,16 +2476,16 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    real_cif_cost_cell = cell.column + '$' \
+                    real_cif_cost_cell = get_column_letter(cell.column) + '$' \
                         + str(real_cif_cost_r_index) if found_state_real_cif_cost else '0'
 
-                    us_price_index_cell = cell.column + '$' \
+                    us_price_index_cell = get_column_letter(cell.column) + '$' \
                         + str(us_price_index_r_index) if found_state_us_price_index else '0'
 
                     #=IF(I107=Inputs!$F$32; $F$111;H112*(1+I110)
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ real_cif_cost_cell + '*' + us_price_index_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ real_cif_cost_cell + '*' + us_price_index_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
         #8-----Nominal CIF cost of imported inputs per ton (LC)--------------
         #nominal_cif_cost
@@ -2463,13 +2505,13 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    nominal_cif_cost_cell = cell.column + '$' \
+                    nominal_cif_cost_cell = get_column_letter(cell.column) + '$' \
                         + str(nominal_cif_cost_r_index) if found_state_nominal_cif_cost else '0'
 
-                    nominal_exchange_rate_cell = cell.column + '$' \
+                    nominal_exchange_rate_cell = get_column_letter(cell.column) + '$' \
                         + str(nominal_exchange_rate_r_index) if found_state_nominal_exchange_rate else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ nominal_cif_cost_cell + '*' + nominal_exchange_rate_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ nominal_cif_cost_cell + '*' + nominal_exchange_rate_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
                  
         
         #9-----Nominal CIF cost of imported inputs per ton (LC)--------------
@@ -2491,10 +2533,10 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    nominal_cif_cost_cell = cell.column + '$' \
+                    nominal_cif_cost_cell = get_column_letter(cell.column) + '$' \
                         + str(nominal_cif_cost_r_index) if found_state_nominal_cif_cost else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=' + nominal_cif_cost_cell + '*(1+'+ import_duty_cell + ')'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + nominal_cif_cost_cell + '*(1+'+ import_duty_cell + ')'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
                  
         
         #10. copy production quantity
@@ -2520,13 +2562,13 @@ class BeefExcelReport(ExcelReport):
             #----------->
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    cost_of_imported_inputs_cell = cell.column + '$' \
+                    cost_of_imported_inputs_cell = get_column_letter(cell.column) + '$' \
                                           + str(cost_of_imported_inputs_r_index) if found_state_cost_of_imported_inputs else '0'
                    
-                    prod_qnty_cell = cell.column + '$' \
+                    prod_qnty_cell = get_column_letter(cell.column) + '$' \
                                           + str(prod_qnty_r_index) if found_state_prod_qnty else '0'                      
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=' + cost_of_imported_inputs_cell + '*'+ prod_qnty_cell + '/1000'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=' + cost_of_imported_inputs_cell + '*'+ prod_qnty_cell + '/1000'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
                  
         
        
@@ -2564,23 +2606,23 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    header_cell = get_column_letter(cell.column) + '$' + str(header_r_index) if found_state_header else '0'
        
                     #----
-                    change_in_price_cell = cell.column + '$' \
+                    change_in_price_cell = get_column_letter(cell.column) + '$' \
                         + str(change_in_price_r_index) if found_state_change_in_price else '0'
 
                    
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col = column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_real_cif_cell = prev_letter + str(cell.row) 
                     #=IF(I107=Inputs!$F$32; $F$111;H112*(1+I110)
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
                                                                + cost_of_domestic_input_cell +',' \
                                                                + prev_real_cif_cell + '*(1+'+ change_in_price_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
         
         #15-----Nominal cost of domestic inputs per ton (usd)--------------
@@ -2601,14 +2643,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    real_cost_domestic_cell = cell.column + '$' \
+                    real_cost_domestic_cell = get_column_letter(cell.column) + '$' \
                         + str(real_cost_domestic_r_index) if found_state_real_cost_domestic else '0'
 
-                    domestic_price_index_cell = cell.column + '$' \
+                    domestic_price_index_cell = get_column_letter(cell.column) + '$' \
                         + str(domestic_price_index_r_index) if found_state_domestic_price_index else '0'
 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ real_cost_domestic_cell + '*' + domestic_price_index_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ real_cost_domestic_cell + '*' + domestic_price_index_cell 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
 
         #16-----total_cost_of_domestic_inputs--------------
         #real_cost_domestic
@@ -2628,14 +2670,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    nominal_cost_of_domestic_cell = cell.column + '$' \
+                    nominal_cost_of_domestic_cell = get_column_letter(cell.column) + '$' \
                         + str(nominal_cost_of_domestic_r_index) if found_state_nominal_cost_of_domestic else '0'
 
-                    prod_qnty_cell = cell.column + '$' \
+                    prod_qnty_cell = get_column_letter(cell.column) + '$' \
                         + str(prod_qnty_r_index) if found_state_prod_qnty else '0'
 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ prod_qnty_cell + '*' + nominal_cost_of_domestic_cell + '/1000'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ prod_qnty_cell + '*' + nominal_cost_of_domestic_cell + '/1000'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
 
         #17.   total_cost_of_inputs_per_ton_nominal--------------
         #cost_of_imported_inputs
@@ -2655,14 +2697,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    cost_of_imported_inputs_cell = cell.column + '$' \
+                    cost_of_imported_inputs_cell = get_column_letter(cell.column) + '$' \
                         + str(cost_of_imported_inputs_r_index) if found_state_cost_of_imported_inputs else '0'
 
-                    nominal_cost_of_domestic_cell = cell.column + '$' \
+                    nominal_cost_of_domestic_cell = get_column_letter(cell.column) + '$' \
                         + str(nominal_cost_of_domestic_r_index) if found_state_nominal_cost_of_domestic else '0'
 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ cost_of_imported_inputs_cell + '+' + nominal_cost_of_domestic_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ cost_of_imported_inputs_cell + '+' + nominal_cost_of_domestic_cell 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         #18.   total_cost_of_inputs_per_ton_nominal--------------
         #total_cost_of_imported
@@ -2682,14 +2724,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    total_cost_of_imported_cell = cell.column + '$' \
+                    total_cost_of_imported_cell = get_column_letter(cell.column) + '$' \
                         + str(total_cost_of_imported_r_index) if found_state_total_cost_of_imported else '0'
 
-                    total_cost_of_domestic_inputs_cell = cell.column + '$' \
+                    total_cost_of_domestic_inputs_cell = get_column_letter(cell.column) + '$' \
                         + str(total_cost_of_domestic_inputs_r_index) if found_state_total_cost_of_domestic_inputs else '0'
 
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ total_cost_of_imported_cell + '+' + total_cost_of_domestic_inputs_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ total_cost_of_imported_cell + '+' + total_cost_of_domestic_inputs_cell 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         list_= [
             {
@@ -2894,7 +2936,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("prod", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -2981,7 +3023,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("unit of pro", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -3098,18 +3140,18 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    new_column_letter = cell.column # J
+                    new_column_letter = get_column_letter(cell.column) # J
                     prev_col=column_index_from_string(new_column_letter)-1
                     prev_letter= get_column_letter(prev_col)
                     
-                    prod_qnty_cell = cell.column + '$' + str(prod_qnty_r_index) if found_state_prod_qnty else '0'
+                    prod_qnty_cell = get_column_letter(cell.column) + '$' + str(prod_qnty_r_index) if found_state_prod_qnty else '0'
                     closing_inv_prev_cell = prev_letter + '$' + str(closing_inv_r_index) if found_state_closing_inv else '0'
-                    closing_inv_curr_cell = cell.column + '$' + str(closing_inv_r_index) if found_state_closing_inv else '0'
+                    closing_inv_curr_cell = get_column_letter(cell.column) + '$' + str(closing_inv_r_index) if found_state_closing_inv else '0'
                    
-                    w_sheet['%s%s'%(cell.column, cell.row)] = "=" + prod_qnty_cell + '+' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = "=" + prod_qnty_cell + '+' \
                                                             + closing_inv_prev_cell +  '-' \
                                                             + closing_inv_curr_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
 
 
@@ -3156,23 +3198,23 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    header_cell = get_column_letter(cell.column) + '$' + str(header_r_index) if found_state_header else '0'
        
                     #----
-                    change_in_price_cell = cell.column + '$' \
+                    change_in_price_cell = get_column_letter(cell.column) + '$' \
                         + str(change_in_price_r_index) if found_state_change_in_price else '0'
 
                    
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col = column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_real_price_cell = prev_letter + str(cell.row) 
                     #=IF(I89=Inputs!$F$32 ;$F$98, H99*(1+I97))
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
                                                                + base_price_cell +',' \
                                                                + prev_real_price_cell + '*(1+'+ change_in_price_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
 
         #------Nominal Price-------------------------------------------
         # year row
@@ -3199,27 +3241,27 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    header_cell = get_column_letter(cell.column) + '$' + str(header_r_index) if found_state_header else '0'
        
                     #----
-                    domestic_price_index_cell = cell.column + '$' \
+                    domestic_price_index_cell = get_column_letter(cell.column) + '$' \
                         + str(domestic_price_index_r_index) if found_state_domestic_price_index else '0'
 
                    
                     #----
-                    real_price_cell = cell.column + '$' \
+                    real_price_cell = get_column_letter(cell.column) + '$' \
                         + str(real_price_r_index) if found_state_real_price else '0'
 
                     #get column
-                    prev_col = column_index_from_string(cell.column)-1
+                    prev_col = column_index_from_string(get_column_letter(cell.column))-1
                     prev_letter= get_column_letter(prev_col)
                     prev_real_price_cell = prev_letter + str(cell.row) 
                     #=IF(I89=Inputs!$F$32 ;$F$98, H99*(1+I97))
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
                                                                + real_price_cell +',' \
                                                                + real_price_cell + '*'+ domestic_price_index_cell+')'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-                    #w_sheet['%s%s'%(cell.column, cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+                    #w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
                                 
         #------NET SALES REVENUE-------------------------------------------
         #sales qnty
@@ -3237,14 +3279,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                     #----
-                    sales_qnty_cell = cell.column + '$' \
+                    sales_qnty_cell = get_column_letter(cell.column) + '$' \
                         + str(sales_qnty_r_index) if found_state_sales_qnty else '0'
                     #----
-                    nominal_price_cell = cell.column + '$' \
+                    nominal_price_cell = get_column_letter(cell.column) + '$' \
                         + str(nominal_price_r_index) if found_state_nominal_price else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ sales_qnty_cell + '*' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ sales_qnty_cell + '*' \
                                                                + nominal_price_cell + '/1000'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         #=J100*J94/1000
         
         #------LESS SALES TAX-------------------------------------------
@@ -3266,11 +3308,11 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    #----
-                    net_sales_revenue_cell = cell.column + '$' \
+                    net_sales_revenue_cell = get_column_letter(cell.column) + '$' \
                         + str(net_sales_revenue_r_index) if found_state_net_sales_revenue else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ sales_tax_cell + '*' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ sales_tax_cell + '*' \
                                                                + net_sales_revenue_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         #=$F$103*I102
         #------GROSS SALES REVENUE-------------------------------------------
         #net sales reveneu
@@ -3289,14 +3331,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    #----
-                    net_sales_revenue_cell = cell.column + '$' \
+                    net_sales_revenue_cell = get_column_letter(cell.column) + '$' \
                         + str(net_sales_revenue_r_index) if found_state_net_sales_revenue else '0'
                     
-                    sales_tax_paid_cell = cell.column + '$' \
+                    sales_tax_paid_cell = get_column_letter(cell.column) + '$' \
                         + str(sales_tax_paid_r_index) if found_state_sales_tax_paid else '0'    
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ net_sales_revenue_cell + '+' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ net_sales_revenue_cell + '+' \
                                                                + sales_tax_paid_cell 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         #=$F$103*I102
 
     def _add_cal_investment_cost_real_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
@@ -3387,7 +3429,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("check invest", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -3516,7 +3558,7 @@ class BeefExcelReport(ExcelReport):
         self._set_column_dim(cashflow_sheet,rangelist,indexlist)
 
 	
-    def _populate_cal_investment_cost_real(self, w_sheet):
+    def _populate_cal_investment_cost_realDEfunct(self, w_sheet):
          
         #*************************************************Pens*****************************************************
         #------Cost of pens constructed
@@ -3535,11 +3577,11 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    investment_cost_of_pens_cell = cell.column + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
-                    price_index_domestic_cell = cell.column + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
+                    investment_cost_of_pens_cell = get_column_letter(cell.column) + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
+                    price_index_domestic_cell = get_column_letter(cell.column) + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ investment_cost_of_pens_cell +'/' +  price_index_domestic_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ investment_cost_of_pens_cell +'/' +  price_index_domestic_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         
         #**********************************Land Real*************************************
@@ -3598,9 +3640,9 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    cif_cell = cell.column + '$' + str(cif_r_index) if found_state_cif else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ cif_cell +'*(1+'+ cost_overun_cell + ')' 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    cif_cell = get_column_letter(cell.column) + '$' + str(cif_r_index) if found_state_cif else '0'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ cif_cell +'*(1+'+ cost_overun_cell + ')' 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         #------CIF Cost of Machinery-- LC-----------------------------------------
         #cost overun
@@ -3615,9 +3657,9 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    cif_usd_cell = cell.column + '$' + str(cif_usd_r_index) if found_state_cif_usd else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ cif_usd_cell +'*'+ exchange_rate_cell  
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    cif_usd_cell = get_column_letter(cell.column) + '$' + str(cif_usd_r_index) if found_state_cif_usd else '0'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ cif_usd_cell +'*'+ exchange_rate_cell  
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         #------To cost of machiner in LC [importy duty added]-----------------------------------------
         #import duty
@@ -3632,9 +3674,9 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    cif_lc_cell = cell.column + '$' + str(cif_lc_r_index) if found_state_cif_lc else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ cif_lc_cell +'*(1+'+ import_duty_cell +')' 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    cif_lc_cell = get_column_letter(cell.column) + '$' + str(cif_lc_r_index) if found_state_cif_lc else '0'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ cif_lc_cell +'*(1+'+ import_duty_cell +')' 
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         # Buidingd Real
         self._transfer_cell_range(w_sheet,'investment_cost','calc_investment_cost_real',
@@ -3653,11 +3695,11 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    investment_cost_of_buildings_cell = cell.column + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
-                    price_index_domestic_cell = cell.column + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
+                    investment_cost_of_buildings_cell = get_column_letter(cell.column) + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
+                    price_index_domestic_cell = get_column_letter(cell.column) + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ investment_cost_of_buildings_cell +'/' +  price_index_domestic_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ investment_cost_of_buildings_cell +'/' +  price_index_domestic_cell
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         
 
@@ -3677,16 +3719,16 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    investment_cost_of_pens_cell = cell.column + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
-                    investment_cost_of_land_cell = cell.column + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
-                    investment_cost_of_machinery_cell = cell.column + '$' + str(invest_machinery_r_index) if found_state_invest_machinery else '0'
-                    investment_cost_of_buildings_cell = cell.column + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
+                    investment_cost_of_pens_cell = get_column_letter(cell.column) + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
+                    investment_cost_of_land_cell = get_column_letter(cell.column) + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
+                    investment_cost_of_machinery_cell = get_column_letter(cell.column) + '$' + str(invest_machinery_r_index) if found_state_invest_machinery else '0'
+                    investment_cost_of_buildings_cell = get_column_letter(cell.column) + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
                                                                      + investment_cost_of_land_cell + ',' \
                                                                      + investment_cost_of_machinery_cell + ',' \
                                                                      + investment_cost_of_buildings_cell +')' 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
          #------Total Local Investment cost-----------------------------------------       
         invest_pens_r_index, _, found_state_invest_pens= self._retrieve_cell_row_colm('calc_investment_cost_real','investment_cost_of_pens')
@@ -3702,14 +3744,14 @@ class BeefExcelReport(ExcelReport):
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
                    
-                    investment_cost_of_pens_cell = cell.column + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
-                    investment_cost_of_land_cell = cell.column + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
-                    investment_cost_of_buildings_cell = cell.column + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
+                    investment_cost_of_pens_cell = get_column_letter(cell.column) + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
+                    investment_cost_of_land_cell = get_column_letter(cell.column) + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
+                    investment_cost_of_buildings_cell = get_column_letter(cell.column) + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
                                                                      + investment_cost_of_land_cell + ',' \
                                                                      + investment_cost_of_buildings_cell +')' 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         #-----------------------------Equity toward Total Investment-------------------------
         #equity
@@ -3724,9 +3766,9 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    total_invest_cell = cell.column + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ total_invest_cell +'*'+ equity_cell  
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    total_invest_cell = get_column_letter(cell.column) + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ total_invest_cell +'*'+ equity_cell  
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
         
         #-----------------------------Senoir Debt Contributiom Total Investment-------------------------
         #senior_debt
@@ -3741,10 +3783,189 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    total_invest_cell = cell.column + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ total_invest_cell +'*'+ senior_debt_cell  
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    total_invest_cell = get_column_letter(cell.column) + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)] = '='+ total_invest_cell +'*'+ senior_debt_cell  
+                    w_sheet['%s%s'%(get_column_letter(cell.column), cell.row)].style = 'Calculation'
+    def _populate_cal_investment_cost_real(self, w_sheet):
+        # Standard format for currency/numbers
+        number_format = '_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)' 
+
+        # *************************************************Pens*****************************************************
+        # ------Cost of pens constructed
+        self._transfer_cell_range(w_sheet, 'investment_cost', 'calc_investment_cost_real',
+                                    'cost_of_pens_constructed', number_format, 'Inputs')        
         
+        # ------------Real cost of Pens
+        invest_pens_r_index, _, found_state_invest_pens = self._retrieve_cell_row_colm('calc_investment_cost_real', 'cost_of_pens_constructed')
+        infla_dom_pi_r_index, _, found_state_pi_domestic = self._retrieve_cell_row_colm('calc_inflation_price_index', 'domestic_price_index')
+
+        r_index, c_index, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_cost_of_pens')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    # FIX: Convert int to letter
+                    col_l = get_column_letter(cell.column)
+                    investment_cost_of_pens_cell = f"{col_l}${invest_pens_r_index}" if found_state_invest_pens else '0'
+                    price_index_domestic_cell = f"{col_l}${infla_dom_pi_r_index}" if found_state_pi_domestic else '0'
+                
+                    cell.value = f'={investment_cost_of_pens_cell}/{price_index_domestic_cell}'
+                    cell.style = 'Calculation'
+        
+        # **********************************Land Real*************************************
+        self._transfer_cell_range(w_sheet, 'investment_cost', 'calc_investment_cost_real',
+                                    'investment_cost_of_land', number_format, 'Inputs')
+        
+        self._transfer_cell_range(w_sheet=w_sheet, source_header='calc_investment_cost_real', 
+                                    target_header='calc_investment_cost_real', source_para='investment_cost_of_land',
+                                    cell_number_format=number_format, source_wksheet=None, 
+                                    target_para='investment_cost_of_land_real', cell_style='Calculation')                  
+        
+        source_cell_val = 1000 
+        if 'model_specs' in self.track_inputs:
+            if 'M_CONVERSION' in self.track_inputs['model_specs']:     
+                row_ms = self.track_inputs['model_specs']['M_CONVERSION']['row']
+                source_cell_val = f"=Inputs!{get_column_letter(6)}{row_ms}"
+        
+        self._transfer_value_tocell(w_sheet, source_cell_val, 'calc_investment_cost_real', 'million_to_thousand', number_format)
+
+        # ***********************************Transfer Cells from Input *********************************
+        self._transfer_cell_range(w_sheet, 'investment_cost', 'calc_investment_cost_real', 'cif_cost_of_machinery', number_format, 'Inputs')
+        self._transfer_cell(w_sheet, 'investment_cost', 'calc_investment_cost_real', 'investment_costs_over_run_factor', '0%', 'Inputs')             
+        self._transfer_cell(w_sheet, 'macroeconomic_parameters', 'calc_investment_cost_real', 'exchange_rate', number_format, 'Inputs')
+        self._transfer_cell(w_sheet, 'taxes', 'calc_investment_cost_real', 'import_duty', '0%', 'Inputs')                      
+        self._transfer_cell(w_sheet, 'financing', 'calc_investment_cost_real', 'equity', '0%', 'Inputs')        
+        self._transfer_cell(w_sheet, 'financing', 'calc_investment_cost_real', 'senior_debt', '0%', 'Inputs')
+
+        # ------CIF Cost of Machinery USD-------------------------------------------
+        r_idx_ov, c_idx_ov, found_ov = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_costs_over_run_factor')
+        cost_overun_cell = f'${get_column_letter(c_idx_ov)}${r_idx_ov}' if found_ov else '0'
+        
+        cif_r_index, _, found_state_cif = self._retrieve_cell_row_colm('calc_investment_cost_real', 'cif_cost_of_machinery')
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'cif_cost_of_machinery_usd')
+        
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    cif_cell = f"{get_column_letter(cell.column)}${cif_r_index}" if found_state_cif else '0'
+                    cell.value = f'={cif_cell}*(1+{cost_overun_cell})' 
+                    cell.style = 'Calculation'
+        
+        # ------CIF Cost of Machinery-- LC-----------------------------------------
+        r_idx_ex, c_idx_ex, found_ex = self._retrieve_cell_row_colm('calc_investment_cost_real', 'exchange_rate')
+        exchange_rate_cell = f'${get_column_letter(c_idx_ex)}${r_idx_ex}' if found_ex else '0'
+        
+        cif_usd_r_index, _, found_state_cif_usd = self._retrieve_cell_row_colm('calc_investment_cost_real', 'cif_cost_of_machinery_usd')
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'cif_cost_of_machinery_lc')
+        
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    cif_usd_cell = f"{get_column_letter(cell.column)}${cif_usd_r_index}" if found_state_cif_usd else '0'
+                    cell.value = f'={cif_usd_cell}*{exchange_rate_cell}'  
+                    cell.style = 'Calculation'
+        
+        # ------To cost of machinery in LC [import duty added]-----------------------------------------
+        r_idx_duty, c_idx_duty, found_duty = self._retrieve_cell_row_colm('calc_investment_cost_real', 'import_duty')
+        import_duty_cell = f'${get_column_letter(c_idx_duty)}${r_idx_duty}' if found_duty else '0'
+        
+        cif_lc_r_index, _, found_state_cif_lc = self._retrieve_cell_row_colm('calc_investment_cost_real', 'cif_cost_of_machinery_lc')
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'total_cost_machinery')
+        
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    cif_lc_cell = f"{get_column_letter(cell.column)}${cif_lc_r_index}" if found_state_cif_lc else '0'
+                    cell.value = f'={cif_lc_cell}*(1+{import_duty_cell})' 
+                    cell.style = 'Calculation'
+        
+        # Buildings Real
+        self._transfer_cell_range(w_sheet, 'investment_cost', 'calc_investment_cost_real', 'investment_cost_of_buildings', number_format, 'Inputs')
+        
+        invest_buildings_r_index, _, found_state_invest_buildings = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_cost_of_buildings')
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_cost_of_buildings_real')
+        
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    col_l = get_column_letter(cell.column)
+                    buildings_cell = f"{col_l}${invest_buildings_r_index}" if found_state_invest_buildings else '0'
+                    pi_dom_cell = f"{col_l}${infla_dom_pi_r_index}" if found_state_pi_domestic else '0'
+                    cell.value = f'={buildings_cell}/{pi_dom_cell}'
+                    cell.style = 'Calculation'
+
+        # ------Total Investment cost-----------------------------------------       
+        invest_pens_r_idx, _, found_pens = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_cost_of_pens')
+        invest_land_r_idx, _, found_land = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_cost_of_land_real')
+        invest_mach_r_idx, _, found_mach = self._retrieve_cell_row_colm('calc_investment_cost_real', 'total_cost_machinery')
+        invest_build_r_idx, _, found_build = self._retrieve_cell_row_colm('calc_investment_cost_real', 'investment_cost_of_buildings_real')
+        
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'total_investment_cost')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    col_l = get_column_letter(cell.column)
+                    c1 = f"{col_l}${invest_pens_r_idx}" if found_pens else '0'
+                    c2 = f"{col_l}${invest_land_r_idx}" if found_land else '0'
+                    c3 = f"{col_l}${invest_mach_r_idx}" if found_mach else '0'
+                    c4 = f"{col_l}${invest_build_r_idx}" if found_build else '0'
+                    cell.value = f'=SUM({c1},{c2},{c3},{c4})' 
+                    cell.style = 'Calculation'
+        
+        # ------Total Local Investment cost-----------------------------------------       
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'total_local_investment')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    col_l = get_column_letter(cell.column)
+                    c1 = f"{col_l}${invest_pens_r_idx}" if found_pens else '0'
+                    c2 = f"{col_l}${invest_land_r_idx}" if found_land else '0'
+                    c4 = f"{col_l}${invest_build_r_idx}" if found_build else '0'
+                    cell.value = f'=SUM({c1},{c2},{c4})' 
+                    cell.style = 'Calculation'
+        
+        # -----------------------------Equity toward Total Investment-------------------------
+        r_idx_eq, c_idx_eq, found_eq = self._retrieve_cell_row_colm('calc_investment_cost_real', 'equity')
+        equity_cell = f'${get_column_letter(c_idx_eq)}${r_idx_eq}' if found_eq else '0'
+        
+        total_inv_r_idx, _, found_total_inv = self._retrieve_cell_row_colm('calc_investment_cost_real', 'total_investment_cost')
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'equity_towards_investment')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    total_inv_cell = f"{get_column_letter(cell.column)}${total_inv_r_idx}" if found_total_inv else '0'
+                    cell.value = f'={total_inv_cell}*{equity_cell}'  
+                    cell.style = 'Calculation'
+        
+        # -----------------------------Senior Debt Contribution Total Investment-------------------------
+        r_idx_snr, c_idx_snr, found_snr = self._retrieve_cell_row_colm('calc_investment_cost_real', 'senior_debt')
+        senior_debt_cell = f'${get_column_letter(c_idx_snr)}${r_idx_snr}' if found_snr else '0'
+        
+        r_index, _, found_state = self._retrieve_cell_row_colm('calc_investment_cost_real', 'senior_debt_towards_investment')
+        if found_state:
+            span_ = self._get_span()
+            range_str = f"{get_column_letter(9)}{r_index}:{get_column_letter(9 + int(span_))}{r_index}"
+            for cellObj in w_sheet[range_str]:
+                for cell in cellObj:
+                    total_inv_cell = f"{get_column_letter(cell.column)}${total_inv_r_idx}" if found_total_inv else '0'
+                    cell.value = f'={total_inv_cell}*{senior_debt_cell}'  
+                    cell.style = 'Calculation'
+                   
     def _add_cf_nominal_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
         col = get_column_letter(1)
@@ -3882,7 +4103,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("check cf", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -4273,7 +4494,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("check invest", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -4409,7 +4630,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("check res",item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -4587,7 +4808,7 @@ class BeefExcelReport(ExcelReport):
        
     
     def _populate_cal_investment_cost_nominal(self, w_sheet):
-         
+          
         #*************************************************Pens*****************************************************
         #copy price index
         number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)' 
@@ -4608,12 +4829,12 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                   
-                    investment_cost_of_pens_cell = cell.column + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
-                    price_index_domestic_cell = cell.column + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
+                    col_letter = get_column_letter(cell.column)
+                    investment_cost_of_pens_cell = col_letter + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
+                    price_index_domestic_cell = col_letter + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ investment_cost_of_pens_cell +'*' +  price_index_domestic_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '='+ investment_cost_of_pens_cell +'*' +  price_index_domestic_cell
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
         
         #**********************************Land Real*************************************
@@ -4633,16 +4854,13 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                   
-                    investment_cost_of_land_cell = cell.column + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
-                    price_index_domestic_cell = cell.column + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
+                    col_letter = get_column_letter(cell.column)
+                    investment_cost_of_land_cell = col_letter + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
+                    price_index_domestic_cell = col_letter + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ investment_cost_of_land_cell +'*' +  price_index_domestic_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '='+ investment_cost_of_land_cell +'*' +  price_index_domestic_cell
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
-        
-        
-       
         number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)' 
           #***********************************Trancefer Cells from Input *********************************
         #----Machinery
@@ -4660,17 +4878,14 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                   
-                    investment_cost_of_machinery_cell = cell.column + '$' + str(invest_machinery_r_index) if found_state_invest_machinery else '0'
-                    price_index_domestic_cell = cell.column + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
+                    col_letter = get_column_letter(cell.column)
+                    investment_cost_of_machinery_cell = col_letter + '$' + str(invest_machinery_r_index) if found_state_invest_machinery else '0'
+                    price_index_domestic_cell = col_letter + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ investment_cost_of_machinery_cell +'*' +  price_index_domestic_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '='+ investment_cost_of_machinery_cell +'*' +  price_index_domestic_cell
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
 
-       
-
-                  
         #------Equity LinkedCell-------------------------------------------
         self._transfer_cell(w_sheet,'financing','calc_investment_cost_nominal','equity','0%', 'Inputs')        
         #------Senior LinkedCell-------------------------------------------
@@ -4694,12 +4909,12 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                   
-                    investment_cost_of_buildings_cell = cell.column + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
-                    price_index_domestic_cell = cell.column + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
+                    col_letter = get_column_letter(cell.column)
+                    investment_cost_of_buildings_cell = col_letter + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
+                    price_index_domestic_cell = col_letter + '$' + str(infla_dom_pi_r_index) if found_state_pi_domestic else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ investment_cost_of_buildings_cell +'*' +  price_index_domestic_cell
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '='+ investment_cost_of_buildings_cell +'*' +  price_index_domestic_cell
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
         
 
@@ -4718,17 +4933,17 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                   
-                    investment_cost_of_pens_cell = cell.column + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
-                    investment_cost_of_land_cell = cell.column + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
-                    investment_cost_of_machinery_cell = cell.column + '$' + str(invest_machinery_r_index) if found_state_invest_machinery else '0'
-                    investment_cost_of_buildings_cell = cell.column + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
+                    col_letter = get_column_letter(cell.column)
+                    investment_cost_of_pens_cell = col_letter + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
+                    investment_cost_of_land_cell = col_letter + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
+                    investment_cost_of_machinery_cell = col_letter + '$' + str(invest_machinery_r_index) if found_state_invest_machinery else '0'
+                    investment_cost_of_buildings_cell = col_letter + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
                                                                      + investment_cost_of_land_cell + ',' \
                                                                      + investment_cost_of_machinery_cell + ',' \
                                                                      + investment_cost_of_buildings_cell +')' 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
          #------Total Local Investment cost-----------------------------------------       
         invest_pens_r_index, _, found_state_invest_pens= self._retrieve_cell_row_colm('calc_investment_cost_nominal','investment_cost_of_pens')
@@ -4743,15 +4958,15 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                   
-                    investment_cost_of_pens_cell = cell.column + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
-                    investment_cost_of_land_cell = cell.column + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
-                    investment_cost_of_buildings_cell = cell.column + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
+                    col_letter = get_column_letter(cell.column)
+                    investment_cost_of_pens_cell = col_letter + '$' + str(invest_pens_r_index) if found_state_invest_pens else '0'
+                    investment_cost_of_land_cell = col_letter + '$' + str(invest_land_r_index) if found_state_invest_land else '0'
+                    investment_cost_of_buildings_cell = col_letter + '$' + str(invest_buildings_r_index) if found_state_invest_buildings else '0'
                   
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '=SUM('+ investment_cost_of_pens_cell + ',' \
                                                                      + investment_cost_of_land_cell + ',' \
                                                                      + investment_cost_of_buildings_cell +')' 
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
         #-----------------------------Equity toward Total Investment-------------------------
         #equity
@@ -4766,9 +4981,10 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    total_invest_cell = cell.column + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ total_invest_cell +'*'+ equity_cell  
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    col_letter = get_column_letter(cell.column)
+                    total_invest_cell = col_letter + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '='+ total_invest_cell +'*'+ equity_cell  
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
         #-----------------------------Senoir Debt Contributiom Total Investment-------------------------
         #senior_debt
@@ -4783,10 +4999,10 @@ class BeefExcelReport(ExcelReport):
             second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
             for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
                 for cell in cellObj:
-                    total_invest_cell = cell.column + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '='+ total_invest_cell +'*'+ senior_debt_cell  
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
-    
+                    col_letter = get_column_letter(cell.column)
+                    total_invest_cell = col_letter + '$' + str(total_invest_r_index) if found_state_total_invest else '0'
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '='+ total_invest_cell +'*'+ senior_debt_cell  
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
     
     def _add_cf_real_section(self, w_sheet, row_index,total_wsheet_cols, commodity_title='Beef'):
         #==========Lengend=========================
@@ -4903,7 +5119,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-               
+                print("check, cf", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                
@@ -5236,7 +5452,7 @@ class BeefExcelReport(ExcelReport):
         for item in itemlist:
             #print(item)
             if item in ic_parameters.keys():
-                #print(item)
+                print("\check lab", item)
                 _unit =ic_parameters[item]['units']
                 _unit = _unit.upper()
                 cell_display_val = self.modelspec_cell_ref[_unit] if  _unit in self.modelspec_cell_ref else ''
@@ -5272,7 +5488,7 @@ class BeefExcelReport(ExcelReport):
         return row_index
    
     def _populate_cal_labour_cost_nominal(self, w_sheet):
-         
+          
         number_format ='_(* #,##0.0_);_(* \(#,##0.0\);_(* "-"??_);_(@_)'
         number_format_integer ='_(* #,##0_);_(* \(#,##0\);_(* "-"??_);_(@_)'
         
@@ -5313,38 +5529,37 @@ class BeefExcelReport(ExcelReport):
         
         #annual_increase_salaries_workers
         annual_increase_salaries_workers_r_index, c_index, found_state_annual_increase_salaries_workers= self._retrieve_cell_row_colm('cal_labour_cost_nominal','annual_increase_salaries_workers')
-        #us_inflation_rate_cell--------------
 
         r_index, c_index, found_state= self._retrieve_cell_row_colm('cal_labour_cost_nominal','real_yearly_wage_rate')
         if found_state:
             span_ =self._get_span()
-            first_slice_point = get_column_letter(9) + str(r_index)# D07
-            second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
-            #loop each cell of this row D15:G15
-            #----------->
-            for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
+            first_slice_point = get_column_letter(9) + str(r_index)
+            second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) 
+            
+            for cellObj in w_sheet[first_slice_point:second_slice_point]:
                 for cell in cellObj:
-                    #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    # FIX: Convert integer column to letter
+                    col_letter = get_column_letter(cell.column)
+                    
+                    header_cell = col_letter + '$' + str(header_r_index) if found_state_header else '0'
        
-                    #----
-                    annual_increase_salaries_workers_cell = cell.column + '$' \
+                    annual_increase_salaries_workers_cell = col_letter + '$' \
                         + str(annual_increase_salaries_workers_r_index) if found_state_annual_increase_salaries_workers else '0'
 
-                   
-                    #get column
-                    prev_col = column_index_from_string(cell.column)-1
-                    prev_letter= get_column_letter(prev_col)
+                    # FIX: Use col_letter for the previous column calculation
+                    prev_col = cell.column - 1
+                    prev_letter = get_column_letter(prev_col)
                     prev_yearly_rate_cell = prev_letter + str(cell.row) 
-                    #=IF(K$153=Inputs!$F$32;$F$158*$F$159;J160*(1+K157))
+                    
                     year_salary =f'{monthly_wage_per_worker_cell} * {number_of_months_in_a_year_cell}'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
+                    
+                    # FIX: Update the coordinate string format
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
                                                                + year_salary +',' \
                                                                + prev_yearly_rate_cell + '*(1+'+ annual_increase_salaries_workers_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
                  
         #6. nominal_yearly_wage_rate
-
         list_= [{'header': 'cal_labour_cost_nominal', 'para': 'real_yearly_wage_rate',  'action': '+'  }, 
                 { 'header': 'cal_labour_cost_nominal', 'para': 'domestic_price_index', 'action': '*' }]
         self._sum_oflist_cell_range(w_sheet,list_,'cal_labour_cost_nominal','nominal_yearly_wage_rate')
@@ -5369,49 +5584,43 @@ class BeefExcelReport(ExcelReport):
         
 
         #11... Real labour cost
-        
-        # monthly_wage_per_worker
         r_index, c_index, found_state= self._retrieve_cell_row_colm('cal_labour_cost_nominal','monthly_wage_per_supervisor')
         monthly_wage_per_supervisor_cell =  get_column_letter(c_index) + '$' + str(r_index) if found_state else '0'
         
-        # monthly_wage_per_worker
         r_index, c_index, found_state= self._retrieve_cell_row_colm('cal_labour_cost_nominal','number_of_months_in_a_year')
         number_of_months_in_a_year_cell =  get_column_letter(c_index) + '$' + str(r_index) if found_state else '0'
         
-        #annual_increase_salaries_workers
         annual_increase_salaries_supervisors_technicians_r_index, c_index, found_state_annual_increase_salaries_supervisors_technicians= self._retrieve_cell_row_colm('cal_labour_cost_nominal','annual_increase_salaries_supervisors_technicians')
-        #us_inflation_rate_cell--------------
 
         r_index, c_index, found_state= self._retrieve_cell_row_colm('cal_labour_cost_nominal','real_yearly_salary_rate')
         if found_state:
             span_ =self._get_span()
-            first_slice_point = get_column_letter(9) + str(r_index)# D07
-            second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) # D39
-            #loop each cell of this row D15:G15
-            #----------->
-            for cellObj in w_sheet[first_slice_point:second_slice_point]:# along row axis
+            first_slice_point = get_column_letter(9) + str(r_index)
+            second_slice_point = get_column_letter(9 + int(span_)) + str(r_index) 
+            
+            for cellObj in w_sheet[first_slice_point:second_slice_point]:
                 for cell in cellObj:
-                    #
-                    header_cell = cell.column + '$' + str(header_r_index) if found_state_header else '0'
+                    # FIX: Convert integer column to letter
+                    col_letter = get_column_letter(cell.column)
+                    
+                    header_cell = col_letter + '$' + str(header_r_index) if found_state_header else '0'
        
-                    #----
-                    annual_increase_salaries_supervisors_technicians_cell = cell.column + '$' \
+                    annual_increase_salaries_supervisors_technicians_cell = col_letter + '$' \
                         + str(annual_increase_salaries_supervisors_technicians_r_index) if found_state_annual_increase_salaries_supervisors_technicians else '0'
 
-                   
-                    #get column
-                    prev_col = column_index_from_string(cell.column)-1
-                    prev_letter= get_column_letter(prev_col)
+                    prev_col = cell.column - 1
+                    prev_letter = get_column_letter(prev_col)
                     prev_yearly_rate_cell = prev_letter + str(cell.row) 
-                    #=IF(K$153=Inputs!$F$32;$F$158*$F$159;J160*(1+K157))
+                    
                     year_salary =f'{monthly_wage_per_supervisor_cell} * {number_of_months_in_a_year_cell}'
-                    w_sheet['%s%s'%(cell.column, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
+                    
+                    # FIX: Update coordinate format
+                    w_sheet['%s%s'%(col_letter, cell.row)] = '=IF('+ header_cell +'='+ base_period_cell + ',' \
                                                                + year_salary +',' \
                                                                + prev_yearly_rate_cell + '*(1+'+ annual_increase_salaries_supervisors_technicians_cell+'))'
-                    w_sheet['%s%s'%(cell.column, cell.row)].style = 'Calculation'
+                    w_sheet['%s%s'%(col_letter, cell.row)].style = 'Calculation'
         
          #12. nominal_yearly_salary_rate
-
         list_= [{'header': 'cal_labour_cost_nominal', 'para': 'real_yearly_salary_rate',  'action': '+'  }, 
                 { 'header': 'cal_labour_cost_nominal', 'para': 'domestic_price_index', 'action': '*' }]
         self._sum_oflist_cell_range(w_sheet,list_,'cal_labour_cost_nominal','nominal_yearly_salary_rate')
@@ -5453,8 +5662,7 @@ class BeefExcelReport(ExcelReport):
                 {'header': 'cal_labour_cost_nominal', 'para': 'domestic_price_index', 'action': '*' }]
         const_list_= [{'header': 'cal_labour_cost_nominal', 'para': 'other_indirect_costs','action': '*' },
                       {'header': 'calc_investment_cost_real', 'para': 'million_to_thousand' ,'action': '/'}] 
-        self._sum_oflist_cell_range(w_sheet,list_,'cal_labour_cost_nominal','other_indirect_costs_nominal',const_list_)
-    
+        self._sum_oflist_cell_range(w_sheet,list_,'cal_labour_cost_nominal','other_indirect_costs_nominal',const_list_)  
      
       
     
