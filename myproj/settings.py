@@ -146,3 +146,9 @@ USE_L10N = True
 USE_TZ = True
 # settings.py
 #DEBUG = config('DEBUG', default=False, cast=bool)
+
+# Production Static Storage
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Add this line below it
+    WHITENOISE_MANIFEST_STRICT = False
