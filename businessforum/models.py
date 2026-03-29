@@ -53,10 +53,3 @@ class BlogItem(models.Model):
             return ''
     #comments_qs = Comment.objects.filter_parents_by_object(obj) 
 
-    """ 
-    data = pd.DataFrame({"x1":range(5, 10),          # Create pandas DataFrame
-                     "x2":["a", "b", "c", "d", "e"],
-                     "x3":range(10, 5, - 1)})
-    print(data)   
-    
-    """    
