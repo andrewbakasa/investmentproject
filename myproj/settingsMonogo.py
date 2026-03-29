@@ -1,5 +1,4 @@
 import os
-import dj_database_url
 from pathlib import Path
 from decouple import config, Csv
 
@@ -58,27 +57,31 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'myproj.urls'
 
-# 4. DATABASE
+# 4. MONGODB DATABASE (using Djongo)
+DATABASE_URL = config('DATABASE_URL')
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'clearvision', 
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': DATABASE_URL,
+            'retryWrites': True,
+            'w': 'majority',
+        }
+    }
 }
 
-if not DEBUG:
-    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+# Note: PostgreSQL 'sslmode' removed as MongoDB uses SRV + SSL natively in the connection string.
 
 # 5. STATIC & MEDIA FILES
 STATIC_URL = '/static/'
 
-# Source: Path to your manual static files
 STATICFILES_DIRS = [
     BASE_DIR / "myproj" / "static",
 ]
 
-# Destination: Path Vercel expects
 STATIC_ROOT = BASE_DIR / "staticfiles_build" / "static"
 
 STATICFILES_FINDERS = [
@@ -86,7 +89,6 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-# Media handled by Cloudinary
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'
 
@@ -94,7 +96,7 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default='dsbnt7cih'),
     'API_KEY': config('CLOUDINARY_API_KEY', default='729236266824714'),
     'API_SECRET': config('CLOUDINARY_API_SECRET', default='JZXOjGXheadh0YtH7Ip7Nbu_yv0'),
-    'STATICFILES_STORAGE': None, # Critical: Cloudinary won't touch static
+    'STATICFILES_STORAGE': None, 
 }
 
 # 6. PRODUCTION SETTINGS
@@ -107,12 +109,11 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'
 
-    # WE REMOVED "Manifest" FROM THE NAME BELOW TO PREVENT CRASHES
+    # Non-manifest storage to prevent Vercel 500 errors
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     WHITENOISE_MANIFEST_STRICT = False
     WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 else:
-    # Development Storage
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # 7. TEMPLATES
