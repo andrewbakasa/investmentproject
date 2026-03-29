@@ -6,18 +6,17 @@ set -e
 echo "--- Building the project ---"
 
 # 1. Install dependencies
-# Using -m pip is safer in shared environments
 python3.12 -m pip install -r requirements.txt
 
 # 2. Run Migrations
-# Note: Ensure you have already committed migration files from your local machine
 echo "--- Running Database Migrations ---"
 python3.12 manage.py migrate --noinput
 
 # 3. Collect Static
-# This is the most important part for fixing your 'Missing Manifest' error
-echo "--- Collecting Static Files ---"
-python3.12 manage.py collectstatic --noinput --clear
+echo "--- Processing Static Files ---"
+# We use --no-post-process to ensure WhiteNoise doesn't crash 
+# during the build if the manifest is acting up.
+python3.12 manage.py collectstatic --noinput --no-post-process
 
 echo "--- Build Completed Successfully ---"
 # #!/bin/bash

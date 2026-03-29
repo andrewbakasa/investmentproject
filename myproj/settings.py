@@ -9,24 +9,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # 2. SECURITY
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.vercel.app,localhost,127.0.0.1', cast=Csv())
 
 # 3. APPLICATION DEFINITION
 INSTALLED_APPS = [
-    'cloudinary_storage', # Must be ABOVE staticfiles
+    'cloudinary_storage', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', 
     'cloudinary',
-    
     'django.contrib.humanize',
     'django.contrib.sites',
-
-    # Third Party
     'whitenoise.runserver_nostatic',
     'widget_tweaks',
     'allauth',
@@ -36,8 +32,6 @@ INSTALLED_APPS = [
     'django_filters',
     'import_export',
     'rest_framework',
-
-    # Your Apps
     'investments_appraisal.apps.InvestmentsAppraisalConfig',    
     'businessforum.apps.BusinessforumConfig',
     'trading.apps.TradingConfig',
@@ -78,10 +72,18 @@ if not DEBUG:
 
 # 5. STATIC & MEDIA FILES
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 
+# Source: Path to your manual static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'myproj', 'static'),
+    BASE_DIR / "myproj" / "static",
+]
+
+# Destination: Path Vercel expects
+STATIC_ROOT = BASE_DIR / "staticfiles_build" / "static"
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 # Media handled by Cloudinary
@@ -92,11 +94,11 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default='dsbnt7cih'),
     'API_KEY': config('CLOUDINARY_API_KEY', default='729236266824714'),
     'API_SECRET': config('CLOUDINARY_API_SECRET', default='JZXOjGXheadh0YtH7Ip7Nbu_yv0'),
+    'STATICFILES_STORAGE': None, # Critical: Cloudinary won't touch static
 }
 
-# 6. PRODUCTION SETTINGS (Security & Static Storage)
+# 6. PRODUCTION SETTINGS
 if not DEBUG:
-    # Security Headers
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -105,16 +107,19 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'
 
-    # WhiteNoise Optimizations
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    WHITENOISE_MANIFEST_STRICT = False  # Prevents 500 errors if an icon/file is missing
+    # WE REMOVED "Manifest" FROM THE NAME BELOW TO PREVENT CRASHES
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    WHITENOISE_MANIFEST_STRICT = False
     WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+else:
+    # Development Storage
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # 7. TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'myproj', 'templates')],
+        'DIRS': [BASE_DIR / 'myproj' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
