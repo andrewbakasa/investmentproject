@@ -28,15 +28,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 from django.shortcuts import render
-from plotly.offline import download_plotlyjs, plot
-import plotly.offline as opy
-import plotly.graph_objs as go
-import chart_studio.plotly as py
+# from plotly.offline import download_plotlyjs, plot
+# import plotly.offline as opy
+# import plotly.graph_objs as go
+# import chart_studio.plotly as py
 import os
 import numpy as np
 from datetime import datetime
-from plotly.graph_objs import Scatter
-import plotly.express as px
+# from plotly.graph_objs import Scatter
+# import plotly.express as px
 import pandas as pd
 
 
