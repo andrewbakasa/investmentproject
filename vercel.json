@@ -10,13 +10,13 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/staticfiles_build/static/$1"
+      "dest": "/static/$1"
     },
     {
       "src": "/(.*)",
       "dest": "myproj/wsgi.py"
     }
   ],
-  "installCommand": "pip install -r requirements.txt",
+  "installCommand": "pip install -r requirements.txt --no-cache-dir",
   "buildCommand": "bash build.sh"
 }

@@ -3,7 +3,7 @@ env/
 investments_env/
 .env
 .envMongo
-
+staticfiles_build/
 
 # Python
 __pycache__/
