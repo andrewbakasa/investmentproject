@@ -1,0 +1,76 @@
+/* h2 {
+    text-align:center
+}
+.container {
+    display:flex;
+} */
+
+.myform .shopaddress{
+    width:50%;
+    text-align: center;
+    background-color: beige;
+    padding-bottom: 10px;
+
+}
+input {
+    width: 70%;
+    font-size:20px;
+
+}
+
+.results {
+    font-size: 20px;
+    background-color: beige;
+    cursor: pointer;
+    margin: 5px;
+    width: 80%;
+    margin-left: 15%
+}
+.results:hover {
+    background-color: black;
+    color: white;
+   
+}
+.map{
+    width: 85%;
+    height: 300px;
+    margin-left: 15%;
+    margin-top: 20px;
+}
+
+
+ button{
+
+    width: 200px;
+    
+    font-size: 20px;
+    transition: ease 0.5s;
+    /* margin-left: 100px; */
+    
+    display: block;
+    margin-left: auto;
+    margin-right: 0;
+
+    margin-top: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    top:50%;
+    /* background-color:#0a0a23; */
+    /* color: #fff; */
+    border:none;
+    border-radius:10px;
+    box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+    margin-bottom: 10px;
+  
+}
+
+button:hover,button:hover {
+    background-color:antiquewhite;
+    transition: 0.7s;
+}
+
+button:focus ,button:focus{
+    outline-color: transparent;
+    outline-style:solid;
+    box-shadow: 0 0 0 4px #5a01a7;
+}
