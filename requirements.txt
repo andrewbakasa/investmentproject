@@ -10,9 +10,6 @@ numpy-financial==1.0.0
 pandas==2.2.2
 openpyxl==3.1.2
 django-import-export==4.1.1
-xhtml2pdf==0.2.16
-reportlab==4.2.2
-svglib==1.5.1
 django-allauth==0.54.0
 djangorestframework==3.14.0
 django-cors-headers==4.5.0
@@ -27,4 +24,3 @@ python-dateutil==2.9.0
 gunicorn==22.0.0
 django-cloudinary-storage==0.3.0
 cloudinary==1.41.0
-chart-studio==1.1.0
